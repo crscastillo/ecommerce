@@ -6,6 +6,61 @@ export async function middleware(request: NextRequest) {
     request,
   })
 
+  // Extract subdomain and tenant information
+  const hostname = request.headers.get('host') || ''
+  const subdomain = extractSubdomain(hostname)
+  const isMainDomain = !subdomain || subdomain === 'www'
+
+  // Handle main domain routing (for tenant signup, main site, etc.)
+  if (isMainDomain) {
+    return handleMainDomain(request, supabaseResponse)
+  }
+
+  // Handle tenant subdomain routing
+  return await handleTenantSubdomain(request, supabaseResponse, subdomain)
+}
+
+function extractSubdomain(hostname: string): string | null {
+  // Remove port if present
+  const host = hostname.split(':')[0]
+  
+  // Define your main domain (update this to match your domain)
+  const mainDomains = ['localhost', 'yourdomain.com', 'yourdomain.vercel.app']
+  
+  // Check if it's a main domain
+  if (mainDomains.some(domain => host === domain || host === `www.${domain}`)) {
+    return null
+  }
+  
+  // Extract subdomain
+  const parts = host.split('.')
+  if (parts.length > 2) {
+    return parts[0]
+  }
+  
+  // For localhost development like tenant.localhost:3000
+  if (host.includes('.localhost') && parts.length > 1) {
+    return parts[0]
+  }
+  
+  return null
+}
+
+function handleMainDomain(request: NextRequest, supabaseResponse: NextResponse) {
+  // Main domain routes - tenant onboarding, pricing, etc.
+  const pathname = request.nextUrl.pathname
+  
+  // Redirect to tenant onboarding if accessing root
+  if (pathname === '/') {
+    const url = request.nextUrl.clone()
+    url.pathname = '/signup'
+    return NextResponse.redirect(url)
+  }
+  
+  return supabaseResponse
+}
+
+async function handleTenantSubdomain(request: NextRequest, supabaseResponse: NextResponse, subdomain: string) {
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -27,41 +82,95 @@ export async function middleware(request: NextRequest) {
     }
   )
 
-  // IMPORTANT: Avoid writing any logic between createServerClient and
-  // supabase.auth.getUser(). A simple mistake could make it very hard to debug
-  // issues with users being randomly logged out.
+  // Validate tenant exists and is active
+  const { data: tenant, error } = await supabase
+    .from('tenants')
+    .select('id, name, subdomain, is_active, settings')
+    .eq('subdomain', subdomain)
+    .eq('is_active', true)
+    .single()
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  if (error || !tenant) {
+    // Tenant not found or inactive - redirect to error page or main site
+    const url = new URL('/tenant-not-found', request.url)
+    url.hostname = getMainDomain(request.headers.get('host') || '')
+    return NextResponse.redirect(url)
+  }
 
-  // Only protect specific routes that require authentication
-  const protectedRoutes = ['/dashboard', '/profile', '/checkout', '/orders']
+  // Add tenant info to headers for use in the application
+  supabaseResponse.headers.set('x-tenant-id', tenant.id)
+  supabaseResponse.headers.set('x-tenant-subdomain', tenant.subdomain)
+  supabaseResponse.headers.set('x-tenant-name', tenant.name)
+
+  const pathname = request.nextUrl.pathname
+
+  // Handle admin routes
+  if (pathname.startsWith('/admin')) {
+    return await handleAdminRoutes(request, supabaseResponse, supabase, tenant)
+  }
+
+  // Handle public store routes
+  return await handlePublicStoreRoutes(request, supabaseResponse, supabase, tenant)
+}
+
+async function handleAdminRoutes(request: NextRequest, supabaseResponse: NextResponse, supabase: any, tenant: any) {
+  const { data: { user } } = await supabase.auth.getUser()
+  
+  // Admin routes require authentication
+  if (!user) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/admin/login'
+    return NextResponse.redirect(url)
+  }
+
+  // Check if user has access to this tenant's admin
+  const { data: tenantUser } = await supabase
+    .from('tenant_users')
+    .select('role, permissions')
+    .eq('tenant_id', tenant.id)
+    .eq('user_id', user.id)
+    .eq('is_active', true)
+    .single()
+
+  const isOwner = tenant.owner_id === user.id
+  
+  if (!tenantUser && !isOwner) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/admin/unauthorized'
+    return NextResponse.redirect(url)
+  }
+
+  return supabaseResponse
+}
+
+async function handlePublicStoreRoutes(request: NextRequest, supabaseResponse: NextResponse, supabase: any, tenant: any) {
+  const { data: { user } } = await supabase.auth.getUser()
+  
+  // Only protect specific customer routes
+  const protectedRoutes = ['/account', '/checkout']
   const isProtectedRoute = protectedRoutes.some(route => 
     request.nextUrl.pathname.startsWith(route)
   )
 
-  if (
-    !user &&
-    isProtectedRoute &&
-    !request.nextUrl.pathname.startsWith('/login') &&
-    !request.nextUrl.pathname.startsWith('/auth')
-  ) {
-    // no user, potentially respond by redirecting the user to the login page
+  if (!user && isProtectedRoute && !request.nextUrl.pathname.startsWith('/login')) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
     return NextResponse.redirect(url)
   }
 
-  // IMPORTANT: You *must* return the supabaseResponse object as it is. If you're
-  // creating a new response object with NextResponse.next() make sure to:
-  // 1. Pass the request in it, like so:
-  //    const myNewResponse = NextResponse.next({ request })
-  // 2. Copy over the cookies, like so:
-  //    myNewResponse.cookies.setAll(supabaseResponse.cookies.getAll())
-  // 3. Change the myNewResponse object instead of the supabaseResponse object
-
   return supabaseResponse
+}
+
+function getMainDomain(hostname: string): string {
+  // Extract main domain from hostname
+  const host = hostname.split(':')[0]
+  const parts = host.split('.')
+  
+  if (parts.length > 2) {
+    return parts.slice(1).join('.')
+  }
+  
+  return host.replace(/^[^.]+\./, '')
 }
 
 export const config = {

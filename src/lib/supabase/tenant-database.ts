@@ -1,21 +1,9 @@
-import { createBrowserClient } from '@supabase/ssr'
+import { createClient } from '@/lib/supabase/client'
 import { Database } from '@/lib/types/database'
-
-let client: ReturnType<typeof createBrowserClient<Database>> | null = null
-
-export function createClient() {
-  if (!client) {
-    client = createBrowserClient<Database>(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    )
-  }
-  return client
-}
 
 // Tenant-aware database operations
 export class TenantDatabase {
-  private supabase: ReturnType<typeof createClient>
+  private supabase: any
   private tenantId: string
 
   constructor(tenantId: string) {

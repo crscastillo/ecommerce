@@ -11,6 +11,17 @@ export async function middleware(request: NextRequest) {
   const subdomain = extractSubdomain(hostname)
   const isMainDomain = !subdomain || subdomain === 'www'
 
+  // Debug logging for Vercel deployment issues
+  if (process.env.NODE_ENV === 'development' || process.env.VERCEL) {
+    console.log('Middleware Debug:', {
+      hostname,
+      subdomain,
+      isMainDomain,
+      pathname: request.nextUrl.pathname,
+      url: request.url
+    })
+  }
+
   // Handle main domain routing (for tenant signup, main site, etc.)
   if (isMainDomain) {
     return handleMainDomain(request, supabaseResponse)
@@ -24,8 +35,23 @@ function extractSubdomain(hostname: string): string | null {
   // Remove port if present
   const host = hostname.split(':')[0]
   
-  // Define your main domain (update this to match your domain)
-  const mainDomains = ['localhost', 'yourdomain.com', 'yourdomain.vercel.app']
+  // Get domains from environment or use defaults
+  const appDomain = process.env.NEXT_PUBLIC_APP_DOMAIN || 'yourdomain.com'
+  const devDomain = process.env.NEXT_PUBLIC_DEV_DOMAIN || 'localhost'
+  const mainDomains = [devDomain, appDomain]
+  
+  // Handle Vercel deployments - any .vercel.app domain without a subdomain is main
+  if (host.endsWith('.vercel.app')) {
+    const parts = host.split('.')
+    // If it's just project-name.vercel.app (3 parts), it's the main domain
+    if (parts.length === 3) {
+      return null
+    }
+    // If it's subdomain.project-name.vercel.app (4+ parts), extract subdomain
+    if (parts.length > 3) {
+      return parts[0]
+    }
+  }
   
   // Check if it's a main domain
   if (mainDomains.some(domain => host === domain || host === `www.${domain}`)) {
@@ -159,13 +185,23 @@ async function handlePublicStoreRoutes(request: NextRequest, supabaseResponse: N
 function getMainDomain(hostname: string): string {
   // Extract main domain from hostname
   const host = hostname.split(':')[0]
-  const parts = host.split('.')
   
+  // Handle Vercel deployments
+  if (host.endsWith('.vercel.app')) {
+    const parts = host.split('.')
+    if (parts.length >= 3) {
+      // Return the project-name.vercel.app part
+      return parts.slice(-3).join('.')
+    }
+  }
+  
+  // Handle regular domains
+  const parts = host.split('.')
   if (parts.length > 2) {
     return parts.slice(1).join('.')
   }
   
-  return host.replace(/^[^.]+\./, '')
+  return host
 }
 
 export const config = {

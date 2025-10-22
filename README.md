@@ -234,11 +234,30 @@ supabase/
 1. **Connect your repository** to Vercel
 2. **Add environment variables** in Vercel dashboard:
    ```
-   NEXT_PUBLIC_SUPABASE_URL=...
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=...
-   SUPABASE_SERVICE_ROLE_KEY=...
+   NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+   SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
+   
+   # Optional: Domain configuration
+   NEXT_PUBLIC_APP_DOMAIN=yourdomain.com
+   NEXT_PUBLIC_DEBUG_MIDDLEWARE=false
    ```
-3. **Deploy** - Vercel will automatically handle subdomain routing
+3. **Deploy** - Your platform will be available at `your-project.vercel.app`
+
+### Important: Vercel Subdomain Setup
+
+For multi-tenancy on Vercel, you have two options:
+
+#### Option 1: Use Vercel Subdomains (Development/Testing)
+- Your platform: `your-project.vercel.app` 
+- Tenant stores: `tenant-name.your-project.vercel.app`
+- No additional setup required
+
+#### Option 2: Custom Domain (Production)
+1. **Add your domain** in Vercel dashboard
+2. **Configure DNS**: Set up wildcard DNS (`*.yourdomain.com → your-project.vercel.app`)
+3. **Update environment**: Set `NEXT_PUBLIC_APP_DOMAIN=yourdomain.com`
+4. **SSL**: Vercel automatically handles wildcard SSL certificates
 
 ### Custom Domain Setup
 

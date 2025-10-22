@@ -142,12 +142,21 @@ export default function TenantSignup() {
     setError('')
 
     try {
-      // First, create the user account
+      // Store tenant data in localStorage for after email confirmation
+      const tenantData = {
+        storeName,
+        subdomain,
+        description,
+        contactEmail
+      }
+      localStorage.setItem('pendingTenant', JSON.stringify(tenantData))
+
+      // Create the user account
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          emailRedirectTo: `${location.origin}/auth/callback`,
+          emailRedirectTo: `${location.origin}/auth/callback?setup=tenant`,
         },
       })
 
@@ -159,65 +168,11 @@ export default function TenantSignup() {
         throw new Error('Failed to create user account')
       }
 
-      // Create the tenant
-      const { data: tenantData, error: tenantError } = await supabase
-        .from('tenants')
-        .insert({
-          name: storeName,
-          subdomain: subdomain,
-          description: description,
-          contact_email: contactEmail,
-          owner_id: authData.user.id,
-          settings: {
-            currency: 'USD',
-            timezone: 'UTC',
-            theme: 'default'
-          }
-        })
-        .select()
-        .single()
-
-      if (tenantError) {
-        throw new Error(tenantError.message)
-      }
-
-      // Create default categories
-      await supabase
-        .from('categories')
-        .insert([
-          {
-            tenant_id: tenantData.id,
-            name: 'Electronics',
-            slug: 'electronics',
-            description: 'Electronic devices and gadgets',
-            sort_order: 1
-          },
-          {
-            tenant_id: tenantData.id,
-            name: 'Clothing',
-            slug: 'clothing',
-            description: 'Fashion and apparel',
-            sort_order: 2
-          },
-          {
-            tenant_id: tenantData.id,
-            name: 'Home & Garden',
-            slug: 'home-garden',
-            description: 'Home improvement and garden supplies',
-            sort_order: 3
-          }
-        ])
-
       setSuccess(true)
-      
-      // Redirect to tenant admin after a short delay
-      setTimeout(() => {
-        window.location.href = `http://${subdomain}.${window.location.host}/admin`
-      }, 2000)
 
     } catch (err) {
-      console.error('Error creating tenant:', err)
-      setError(err instanceof Error ? err.message : 'Failed to create store')
+      console.error('Error creating account:', err)
+      setError(err instanceof Error ? err.message : 'Failed to create account')
     } finally {
       setLoading(false)
     }
@@ -238,11 +193,15 @@ export default function TenantSignup() {
           </CardHeader>
           <CardContent>
             <p className="text-sm text-gray-600 mb-4">
-              Check your email to verify your account, then you'll be redirected to your admin dashboard.
+              Please check your email <strong>{email}</strong> and click the verification link to activate your account and complete your store setup.
             </p>
-            <div className="flex items-center justify-center">
-              <Loader2 className="w-4 h-4 animate-spin mr-2" />
-              <span className="text-sm">Redirecting to admin...</span>
+            <p className="text-xs text-gray-500 mb-4">
+              After verification, you'll be automatically redirected to complete your store configuration.
+            </p>
+            <div className="text-center">
+              <Link href="/login" className="text-blue-600 hover:text-blue-500 text-sm">
+                Already verified? Sign in here
+              </Link>
             </div>
           </CardContent>
         </Card>

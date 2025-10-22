@@ -1,0 +1,21 @@
+-- Seed data for development
+-- This file is automatically run after migrations when using `supabase db reset`
+
+-- Insert sample tenant (you can use this for testing)
+-- Note: You'll need to create a user first in Supabase Auth, then replace the owner_id
+-- INSERT INTO tenants (name, subdomain, description, contact_email, owner_id) 
+-- VALUES (
+--   'Demo Store',
+--   'demo',
+--   'A demo ecommerce store',
+--   'demo@example.com',
+--   'your-user-uuid-here'
+-- );
+
+-- Insert sample categories for the demo tenant
+-- Note: Uncomment and replace tenant-id after creating tenant
+-- INSERT INTO categories (tenant_id, name, slug, description, sort_order) 
+-- VALUES 
+--   ('your-tenant-uuid-here', 'Electronics', 'electronics', 'Electronic devices and gadgets', 1),
+--   ('your-tenant-uuid-here', 'Clothing', 'clothing', 'Fashion and apparel', 2),
+--   ('your-tenant-uuid-here', 'Home & Garden', 'home-garden', 'Home and garden supplies', 3);

@@ -1,194 +1,330 @@
-# Ecommerce StoreThis is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Multi-Tenant Ecommerce Platform
 
+A powerful, scalable multi-tenant ecommerce platform built with Next.js, Supabase, and shadcn/ui. Create and manage multiple online stores with custom subdomains, all from a single codebase.
 
+## 🚀 Features
 
-A modern ecommerce application built with Next.js, Supabase, and shadcn/ui.## Getting Started
+### Platform Features
+- **Multi-Tenancy**: Each tenant gets their own subdomain (e.g., `store.yourdomain.com`)
+- **Platform Landing Page**: Marketing site for tenant acquisition
+- **Tenant Management**: Complete tenant onboarding and management system
+- **Subdomain Routing**: Automatic subdomain detection and routing
 
+### Store Features  
+- **Complete Ecommerce**: Products, categories, cart, orders, customers
+- **Admin Dashboard**: Full-featured admin panel for store management
+- **User Authentication**: Secure login/signup with Supabase Auth
+- **Row Level Security**: Data isolation between tenants
+- **Team Management**: Invite team members with role-based permissions
+- **Responsive Design**: Mobile-first, beautiful UI with shadcn/ui
 
+### Technical Features
+- **Next.js 16**: Latest App Router with Server Components
+- **TypeScript**: Full type safety throughout the application  
+- **Supabase**: PostgreSQL database with real-time subscriptions
+- **Database Migrations**: Proper schema versioning with Supabase CLI
+- **Middleware**: Smart routing between platform and tenant contexts
+- **Edge Runtime**: Optimized for performance and scalability
 
-## FeaturesFirst, run the development server:
+## 🛠 Tech Stack
 
-
-
-- ✅ Next.js 15 with App Router```bash
-
-- ✅ TypeScriptnpm run dev
-
-- ✅ Tailwind CSS# or
-
-- ✅ Supabase for authentication and databaseyarn dev
-
-- ✅ shadcn/ui components# or
-
-- ✅ Responsive designpnpm dev
-
-- ✅ User authentication (login/signup)# or
-
-bun dev
-
-## Tech Stack```
-
-
-
-- **Framework**: Next.js 15Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
+- **Framework**: Next.js 16 with App Router
 - **Language**: TypeScript
-
-- **Styling**: Tailwind CSSYou can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-- **UI Components**: shadcn/ui
-
-- **Database**: SupabaseThis project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
+- **Database**: Supabase (PostgreSQL)
 - **Authentication**: Supabase Auth
+- **Styling**: Tailwind CSS
+- **UI Components**: shadcn/ui + Radix UI
+- **Deployment**: Vercel (recommended)
 
-## Learn More
+## 📋 Prerequisites
 
-## Getting Started
+- Node.js 18+
+- npm, yarn, or pnpm
+- Supabase account
+- Domain for custom subdomains (optional for development)
 
-To learn more about Next.js, take a look at the following resources:
+## 🚀 Quick Start
 
-### Prerequisites
+### 1. Clone and Install
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+```bash
+git clone <repository-url>
+cd ecommerce
+npm install
+```
 
-- Node.js 18+ - [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 2. Environment Setup
 
-- npm or yarn
+```bash
+# Copy environment template
+cp .env.local.example .env.local
+```
 
-- Supabase accountYou can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Fill in your Supabase credentials in `.env.local`:
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://your-project-ref.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+```
 
+### 3. Database Setup
 
+#### Option A: Using Supabase CLI (Recommended)
 
-### Installation## Deploy on Vercel
+```bash
+# Link to your Supabase project
+npm run db:link
 
+# Deploy migrations
+npm run db:deploy
 
+# Generate TypeScript types
+npm run db:types
+```
 
-1. Clone the repositoryThe easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+#### Option B: Manual Setup
 
-2. Install dependencies:
+1. Go to your Supabase Dashboard
+2. Open SQL Editor
+3. Copy and paste the contents of `supabase/migrations/20251022193455_initial_schema.sql`
+4. Run the migration
 
-   ```bashCheck out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### 4. Local Development
 
-   npm install
-   ```
+```bash
+# Start development server
+npm run dev
 
-3. Set up environment variables:
-   - Copy `.env.example` to `.env.local`
-   - Fill in your Supabase project details:
-     ```
-     NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
-     NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-     SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
-     ```
+# Open in browser
+open http://localhost:3000
+```
 
-4. Run the development server:
-   ```bash
-   npm run dev
-   ```
+### 5. Test Multi-Tenancy (Optional)
 
-5. Open [http://localhost:3000](http://localhost:3000) in your browser
+Add to your `/etc/hosts` file:
+```
+127.0.0.1 teststore.localhost
+```
 
-### Supabase Setup
+Then access:
+- `http://localhost:3000` - Platform homepage
+- `http://teststore.localhost:3000` - Tenant store (after creating "teststore")
 
-1. Create a new project at [supabase.com](https://supabase.com)
-2. Go to Settings > API to find your project URL and anon key
-3. Set up your database tables (you can use the Supabase dashboard or SQL editor)
-4. Configure authentication providers in Authentication > Settings if needed
+## 🏗 Architecture Overview
+
+### Multi-Tenant Routing
+
+The application uses Next.js middleware to handle intelligent routing:
+
+```
+yourdomain.com           → Platform landing page
+store1.yourdomain.com    → Store 1's homepage  
+store2.yourdomain.com    → Store 2's homepage
+admin.yourdomain.com     → Platform admin (future)
+```
 
 ### Database Schema
 
-You'll need to create tables for your ecommerce functionality. Here's a basic schema to get started:
+The database is designed with proper multi-tenancy:
+- All tenant data includes a `tenant_id` foreign key
+- Row Level Security (RLS) policies ensure data isolation
+- Shared tables for platform-level data (billing, analytics, etc.)
 
-```sql
--- Users table (handled by Supabase Auth)
+### Key Components
 
--- Categories table
-CREATE TABLE categories (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  name VARCHAR NOT NULL,
-  description TEXT,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
-);
+- **Middleware** (`middleware.ts`): Subdomain detection and routing
+- **Tenant Provider** (`src/lib/contexts/tenant-provider.tsx`): Tenant context management  
+- **Conditional Layout** (`src/components/conditional-layout.tsx`): Platform vs Store layouts
+- **Tenant Database** (`src/lib/supabase/tenant-database.ts`): Scoped database operations
 
--- Products table
-CREATE TABLE products (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  name VARCHAR NOT NULL,
-  description TEXT,
-  price DECIMAL(10,2) NOT NULL,
-  image_url TEXT,
-  category_id UUID REFERENCES categories(id),
-  stock_quantity INTEGER DEFAULT 0,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
-);
+## 📝 Database Migrations
 
--- Cart items table
-CREATE TABLE cart_items (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
-  product_id UUID REFERENCES products(id) ON DELETE CASCADE,
-  quantity INTEGER NOT NULL DEFAULT 1,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
-  UNIQUE(user_id, product_id)
-);
+This project uses Supabase CLI for proper database schema management.
 
--- Orders table
-CREATE TABLE orders (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
-  total_amount DECIMAL(10,2) NOT NULL,
-  status VARCHAR DEFAULT 'pending',
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
-);
+### Available Commands
 
--- Order items table
-CREATE TABLE order_items (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  order_id UUID REFERENCES orders(id) ON DELETE CASCADE,
-  product_id UUID REFERENCES products(id),
-  quantity INTEGER NOT NULL,
-  price DECIMAL(10,2) NOT NULL,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
-);
+```bash
+# Database Management
+npm run db:start         # Start local Supabase (requires Docker)
+npm run db:stop          # Stop local Supabase
+npm run db:status        # Check database status
+npm run db:reset         # Reset local database (⚠️ destructive)
+
+# Migrations  
+npm run db:migrate       # Apply migrations locally
+npm run db:pull          # Pull schema from remote
+npm run db:new-migration # Create new migration
+npm run db:deploy        # Deploy migrations to remote
+
+# Development
+npm run db:seed          # Run seed data
+npm run db:types         # Generate TypeScript types
+npm run db:link          # Link to remote project
 ```
 
-## Project Structure
+### Migration Workflow
+
+1. **Create migration**: `npm run db:new-migration add_feature_name`
+2. **Edit** the generated SQL file in `supabase/migrations/`
+3. **Test locally**: `npm run db:reset` (applies all migrations)
+4. **Deploy**: `npm run db:deploy`
+5. **Update types**: `npm run db:types`
+
+## 🏪 Creating Your First Store
+
+1. **Start the application**: `npm run dev`
+2. **Visit**: `http://localhost:3000`
+3. **Click "Get Started"** on the platform homepage
+4. **Fill out the signup form**:
+   - Email & password for your account
+   - Store name and subdomain
+   - Contact information
+5. **Complete signup** - you'll be redirected to your store's admin panel
+6. **Access your store**: `http://your-subdomain.localhost:3000`
+
+## 🔧 Configuration
+
+### Domain Setup (Production)
+
+Update the domains in `middleware.ts`:
+```typescript
+const mainDomains = ['localhost', 'yourdomain.com', 'yourdomain.vercel.app']
+```
+
+### Supabase Configuration
+
+Key settings in your Supabase project:
+- **Authentication**: Enable email signup, configure redirects
+- **Database**: Ensure RLS is enabled
+- **API**: Set up CORS for your domains
+
+## 📁 Project Structure
 
 ```
 src/
-├── app/                  # Next.js app router
-│   ├── auth/            # Authentication pages
-│   ├── login/           # Login page
-│   ├── globals.css      # Global styles
-│   ├── layout.tsx       # Root layout
-│   └── page.tsx         # Homepage
-├── components/          # React components
-│   ├── ui/              # shadcn/ui components
-│   ├── header.tsx       # Navigation header
-│   └── footer.tsx       # Footer component
-├── lib/                 # Utility functions
-│   ├── supabase/        # Supabase clients
-│   └── utils.ts         # General utilities
-└── middleware.ts        # Next.js middleware
+├── app/                           # Next.js App Router
+│   ├── (platform)/                # Platform routes (main domain)
+│   │   ├── page.tsx               # Platform landing page
+│   │   └── signup/                # Tenant signup
+│   ├── (store)/                   # Store routes (subdomains)
+│   │   ├── page.tsx               # Store homepage  
+│   │   ├── products/              # Product pages
+│   │   └── admin/                 # Store admin
+│   └── api/                       # API routes
+├── components/
+│   ├── ui/                        # shadcn/ui components
+│   ├── store/                     # Store-specific components
+│   ├── admin/                     # Admin components
+│   └── conditional-layout.tsx     # Smart layout switcher
+├── lib/
+│   ├── supabase/                  # Supabase clients and utilities
+│   ├── contexts/                  # React contexts
+│   └── types/                     # TypeScript definitions
+├── middleware.ts                  # Multi-tenant routing
+supabase/
+├── migrations/                    # Database migrations
+├── seed.sql                       # Development seed data
+└── config.toml                    # Supabase configuration
 ```
 
-## Available Scripts
+## 🚢 Deployment
 
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run start` - Start production server
-- `npm run lint` - Run ESLint
+### Vercel (Recommended)
 
-## Contributing
+1. **Connect your repository** to Vercel
+2. **Add environment variables** in Vercel dashboard:
+   ```
+   NEXT_PUBLIC_SUPABASE_URL=...
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=...
+   SUPABASE_SERVICE_ROLE_KEY=...
+   ```
+3. **Deploy** - Vercel will automatically handle subdomain routing
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+### Custom Domain Setup
 
-## License
+For production with custom subdomains:
+1. **Configure DNS**: Set up wildcard DNS (`*.yourdomain.com`) 
+2. **SSL Certificates**: Ensure wildcard SSL coverage
+3. **Update middleware**: Configure your domain in `middleware.ts`
 
-This project is licensed under the MIT License.
+## 🔐 Security
+
+- **Row Level Security**: All tenant data is isolated at the database level
+- **Authentication**: Secure JWT-based auth with Supabase
+- **Environment Variables**: Sensitive data stored in environment variables
+- **CORS**: Properly configured for your domains
+- **Input Validation**: Form validation and sanitization
+
+## 🧪 Testing
+
+### Manual Testing Checklist
+
+- [ ] Platform homepage loads
+- [ ] Tenant signup flow works
+- [ ] Subdomain routing works  
+- [ ] Store admin authentication
+- [ ] Product/category CRUD operations
+- [ ] Data isolation between tenants
+
+### Automated Testing (Future)
+
+```bash
+# When tests are added
+npm run test        # Run tests
+npm run test:e2e    # End-to-end tests
+npm run test:db     # Database tests
+```
+
+## 🤝 Contributing
+
+1. **Fork** the repository
+2. **Create** your feature branch: `git checkout -b feature/amazing-feature`
+3. **Commit** your changes: `git commit -m 'Add amazing feature'`
+4. **Push** to the branch: `git push origin feature/amazing-feature`
+5. **Open** a Pull Request
+
+### Development Guidelines
+
+- Follow TypeScript best practices
+- Use conventional commit messages
+- Test multi-tenant scenarios
+- Update migrations for schema changes
+- Document new features
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+**Subdomain routing not working locally**:
+- Add entries to `/etc/hosts`: `127.0.0.1 teststore.localhost`
+- Ensure middleware domains are configured correctly
+
+**Database connection errors**:
+- Check environment variables are set
+- Verify Supabase project is active
+- Check API keys haven't expired
+
+**Migration failures**:
+- Ensure you're linked to the correct project: `npm run db:link`
+- Check for syntax errors in migration files
+- Verify database permissions
+
+**Build failures**:
+- Run `npm run db:types` to update TypeScript definitions
+- Check for missing environment variables
+- Verify all imports are correct
+
+## 📚 Learn More
+
+- [Next.js Documentation](https://nextjs.org/docs)
+- [Supabase Documentation](https://supabase.com/docs)  
+- [shadcn/ui Documentation](https://ui.shadcn.com)
+- [Multi-Tenancy Patterns](https://docs.microsoft.com/en-us/azure/architecture/patterns/multitenancy)
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+**Built with ❤️ using Next.js, Supabase, and shadcn/ui**

@@ -33,8 +33,20 @@ export default function TenantSignup() {
   const supabase = createClient()
 
   const validateSubdomain = (value: string) => {
-    const regex = /^[a-z0-9][a-z0-9-]*[a-z0-9]$/
-    return value.length >= 3 && value.length <= 30 && regex.test(value)
+    // Simple validation: 3-30 chars, alphanumeric and hyphens, no consecutive hyphens, no start/end with hyphen
+    const regex = /^[a-z0-9]([a-z0-9-]*[a-z0-9])?$/
+    const isValidLength = value.length >= 3 && value.length <= 30
+    const hasValidChars = regex.test(value)
+    const noConsecutiveHyphens = !value.includes('--')
+    
+    console.log('Validating subdomain:', value, {
+      isValidLength,
+      hasValidChars,
+      noConsecutiveHyphens,
+      overall: isValidLength && hasValidChars && noConsecutiveHyphens
+    })
+    
+    return isValidLength && hasValidChars && noConsecutiveHyphens
   }
 
   const checkSubdomainAvailability = async (subdomain: string) => {
@@ -49,11 +61,19 @@ export default function TenantSignup() {
         .from('tenants')
         .select('subdomain')
         .eq('subdomain', subdomain)
-        .single()
+        .maybeSingle()  // Use maybeSingle() instead of single()
 
-      setSubdomainAvailable(!data && !error)
-    } catch {
-      setSubdomainAvailable(true)
+      // If data exists, subdomain is taken
+      // If no data and no error, subdomain is available
+      if (error) {
+        console.error('Error checking subdomain:', error)
+        setSubdomainAvailable(false)
+      } else {
+        setSubdomainAvailable(!data)  // Available if no data found
+      }
+    } catch (err) {
+      console.error('Subdomain check failed:', err)
+      setSubdomainAvailable(false)
     } finally {
       setCheckingSubdomain(false)
     }
@@ -63,8 +83,12 @@ export default function TenantSignup() {
     const cleanValue = value.toLowerCase().replace(/[^a-z0-9-]/g, '')
     setSubdomain(cleanValue)
     
+    // Reset availability state when typing
+    setSubdomainAvailable(null)
+    
     if (cleanValue.length >= 3) {
       const timeoutId = setTimeout(() => {
+        console.log('Checking subdomain:', cleanValue, 'Valid:', validateSubdomain(cleanValue))
         checkSubdomainAvailability(cleanValue)
       }, 500)
       

@@ -47,16 +47,11 @@ function extractSubdomain(hostname: string): string | null {
 }
 
 function handleMainDomain(request: NextRequest, supabaseResponse: NextResponse) {
-  // Main domain routes - tenant onboarding, pricing, etc.
+  // Main domain routes - platform homepage, tenant onboarding, pricing, etc.
   const pathname = request.nextUrl.pathname
   
-  // Redirect to tenant onboarding if accessing root
-  if (pathname === '/') {
-    const url = request.nextUrl.clone()
-    url.pathname = '/signup'
-    return NextResponse.redirect(url)
-  }
-  
+  // Allow the platform homepage to render at root
+  // No redirect needed - let the platform homepage render
   return supabaseResponse
 }
 

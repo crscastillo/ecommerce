@@ -125,10 +125,23 @@ admin.yourdomain.com     → Platform admin (future)
 
 ### Database Schema
 
-The database is designed with proper multi-tenancy:
+The database is designed with proper multi-tenancy and includes these core tables:
+
+**Multi-Tenant Tables:**
+- `tenants` - Store configurations and settings
+- `products` & `product_variants` - Product catalog with variants
+- `categories` - Hierarchical product organization
+- `customers` - Customer management per tenant
+- `orders` & `order_line_items` - Order processing and fulfillment
+- `cart_items` - Shopping cart functionality
+- `discounts` - Promotional discount system
+- `tenant_users` - Team member access and permissions
+
+**Security & Isolation:**
 - All tenant data includes a `tenant_id` foreign key
-- Row Level Security (RLS) policies ensure data isolation
-- Shared tables for platform-level data (billing, analytics, etc.)
+- Row Level Security (RLS) policies ensure complete data isolation
+- Proper foreign key relationships maintain data integrity
+- Auto-generated TypeScript types from live database schema
 
 ### Key Components
 

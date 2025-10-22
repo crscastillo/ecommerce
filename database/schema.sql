@@ -1,12 +1,12 @@
 -- Multi-tenant ecommerce platform database schema
 -- Run this in your Supabase SQL editor
 
--- Enable UUID extension
+-- Enable UUID extension (using gen_random_uuid() which is built-in to modern PostgreSQL)
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- Tenants table (stores information about each tenant/store)
 CREATE TABLE tenants (
-  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   name VARCHAR NOT NULL,
   subdomain VARCHAR UNIQUE NOT NULL,
   domain VARCHAR, -- For custom domains
@@ -31,7 +31,7 @@ CREATE INDEX idx_tenants_active ON tenants(is_active);
 
 -- Tenant users table (for multi-user access to tenant stores)
 CREATE TABLE tenant_users (
-  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   tenant_id UUID REFERENCES tenants(id) ON DELETE CASCADE,
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
   role VARCHAR DEFAULT 'staff', -- 'owner', 'admin', 'staff', 'viewer'
@@ -46,7 +46,7 @@ CREATE TABLE tenant_users (
 
 -- Categories table (tenant-specific)
 CREATE TABLE categories (
-  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   tenant_id UUID REFERENCES tenants(id) ON DELETE CASCADE,
   name VARCHAR NOT NULL,
   slug VARCHAR NOT NULL,
@@ -64,7 +64,7 @@ CREATE TABLE categories (
 
 -- Products table (tenant-specific)
 CREATE TABLE products (
-  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   tenant_id UUID REFERENCES tenants(id) ON DELETE CASCADE,
   name VARCHAR NOT NULL,
   slug VARCHAR NOT NULL,
@@ -94,7 +94,7 @@ CREATE TABLE products (
 
 -- Product variants table (for products with different options like size, color)
 CREATE TABLE product_variants (
-  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   tenant_id UUID REFERENCES tenants(id) ON DELETE CASCADE,
   product_id UUID REFERENCES products(id) ON DELETE CASCADE,
   title VARCHAR NOT NULL, -- e.g., "Large / Red"
@@ -115,7 +115,7 @@ CREATE TABLE product_variants (
 
 -- Customers table (tenant-specific customers)
 CREATE TABLE customers (
-  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   tenant_id UUID REFERENCES tenants(id) ON DELETE CASCADE,
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE, -- Link to auth.users if they register
   email VARCHAR NOT NULL,
@@ -136,7 +136,7 @@ CREATE TABLE customers (
 
 -- Cart items table (tenant-specific)
 CREATE TABLE cart_items (
-  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   tenant_id UUID REFERENCES tenants(id) ON DELETE CASCADE,
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
   session_id VARCHAR, -- For guest users
@@ -150,7 +150,7 @@ CREATE TABLE cart_items (
 
 -- Orders table (tenant-specific)
 CREATE TABLE orders (
-  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   tenant_id UUID REFERENCES tenants(id) ON DELETE CASCADE,
   customer_id UUID REFERENCES customers(id),
   order_number VARCHAR NOT NULL, -- Human-readable order number
@@ -178,7 +178,7 @@ CREATE TABLE orders (
 
 -- Order line items table
 CREATE TABLE order_line_items (
-  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   tenant_id UUID REFERENCES tenants(id) ON DELETE CASCADE,
   order_id UUID REFERENCES orders(id) ON DELETE CASCADE,
   product_id UUID REFERENCES products(id),
@@ -195,7 +195,7 @@ CREATE TABLE order_line_items (
 
 -- Discounts/Coupons table (tenant-specific)
 CREATE TABLE discounts (
-  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   tenant_id UUID REFERENCES tenants(id) ON DELETE CASCADE,
   code VARCHAR NOT NULL,
   title VARCHAR NOT NULL,

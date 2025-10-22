@@ -330,21 +330,30 @@ npm run test:db     # Database tests
 **Subdomain routing not working locally**:
 - Add entries to `/etc/hosts`: `127.0.0.1 teststore.localhost`
 - Ensure middleware domains are configured correctly
+- Check that `NEXT_PUBLIC_APP_DOMAIN` is set correctly
 
 **Database connection errors**:
 - Check environment variables are set
 - Verify Supabase project is active
 - Check API keys haven't expired
+- Ensure database is linked: `npm run db:link`
 
 **Migration failures**:
 - Ensure you're linked to the correct project: `npm run db:link`
 - Check for syntax errors in migration files
 - Verify database permissions
+- For UUID function errors, ensure PostgreSQL version supports `gen_random_uuid()`
 
 **Build failures**:
 - Run `npm run db:types` to update TypeScript definitions
 - Check for missing environment variables
 - Verify all imports are correct
+- Ensure generated types in `database-generated.ts` are being used
+
+**Type errors after database changes**:
+- Regenerate types: `npm run db:types`
+- Restart TypeScript server in VS Code
+- Check that client files import from `database-generated.ts`
 
 ## 📚 Learn More
 

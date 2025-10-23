@@ -137,10 +137,10 @@ async function handleTenantSubdomain(request: NextRequest, supabaseResponse: Nex
 async function handleAdminRoutes(request: NextRequest, supabaseResponse: NextResponse, supabase: any, tenant: any) {
   const { data: { user } } = await supabase.auth.getUser()
   
-  // Admin routes require authentication
+  // Admin routes require authentication - redirect to main login
   if (!user) {
     const url = request.nextUrl.clone()
-    url.pathname = '/admin/login'
+    url.pathname = '/login'
     return NextResponse.redirect(url)
   }
 

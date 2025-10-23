@@ -34,7 +34,7 @@ export default function AdminHeader({ onMenuClick }: AdminHeaderProps) {
 
   const handleSignOut = async () => {
     await supabase.auth.signOut()
-    router.push('/admin/login')
+    router.push('/login')
   }
 
   const visitStore = () => {

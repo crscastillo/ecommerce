@@ -278,12 +278,11 @@ http://localhost:3000/admin/orders           # Demo orders interface
 
 **📋 Available Admin Routes:**
 ```bash
-/admin                    # Dashboard
+/admin                    # Dashboard (protected - redirects to /login if not authenticated)
 /admin/products          # Products listing  
 /admin/products/new      # Add new product
 /admin/orders            # Orders management
 /admin/settings          # Store and system settings
-/admin/login            # Admin authentication
 ```
 
 **ℹ️ Access Notes:**

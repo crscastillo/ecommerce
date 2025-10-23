@@ -86,8 +86,8 @@ export function TenantProvider({ children, initialTenant }: TenantProviderProps)
       // Check if we're in an admin route - if so, try to load user's primary tenant
       const isAdminRoute = typeof window !== 'undefined' && window.location.pathname.startsWith('/admin')
       
-      if (!subdomain || isAdminRoute) {
-        // In development or admin routes, try to get the user's first tenant
+      // For admin routes, always try to get a tenant (real or demo)
+      if (isAdminRoute) {
         if (user) {
           const { data: userTenants, error: tenantsError } = await supabase
             .from('tenants')
@@ -104,9 +104,8 @@ export function TenantProvider({ children, initialTenant }: TenantProviderProps)
           }
         }
 
-        // Fallback to demo tenant in development
+        // Fallback to demo tenant for admin routes in development
         if (process.env.NODE_ENV === 'development') {
-          // Create a more realistic demo tenant ID
           const demoTenant: Tenant = {
             id: 'demo-tenant-uuid-123e4567-e89b-12d3-a456-426614174000',
             name: 'Demo Store',
@@ -130,6 +129,14 @@ export function TenantProvider({ children, initialTenant }: TenantProviderProps)
           return
         }
         
+        setTenant(null)
+        setTenantUser(null)
+        return
+      }
+
+      // For non-admin routes, only load tenant if there's a real subdomain
+      if (!subdomain) {
+        // No subdomain = platform pages, don't create demo tenant
         setTenant(null)
         setTenantUser(null)
         return

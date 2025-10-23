@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useTenant } from '@/lib/contexts/tenant-context'
@@ -15,7 +14,6 @@ import {
   Settings,
   Tag,
   FileText,
-  Menu,
   X,
   Home,
 } from 'lucide-react'
@@ -32,8 +30,12 @@ const navigation = [
   { name: 'Settings', href: '/admin/settings', icon: Settings },
 ]
 
-export default function AdminSidebar() {
-  const [sidebarOpen, setSidebarOpen] = useState(false)
+interface AdminSidebarProps {
+  isOpen: boolean
+  onClose: () => void
+}
+
+export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
   const pathname = usePathname()
   const { tenant, isLoading } = useTenant()
 
@@ -50,10 +52,10 @@ export default function AdminSidebar() {
   return (
     <>
       {/* Mobile sidebar overlay */}
-      {sidebarOpen && (
+      {isOpen && (
         <div 
           className="fixed inset-0 z-40 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
+          onClick={onClose}
         >
           <div className="absolute inset-0 bg-gray-600 opacity-75" />
         </div>
@@ -62,7 +64,7 @@ export default function AdminSidebar() {
       {/* Sidebar */}
       <div className={cn(
         "fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0",
-        sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+        isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
       )}>
         <div className="flex h-full flex-col">
           {/* Logo */}
@@ -80,7 +82,7 @@ export default function AdminSidebar() {
               variant="ghost"
               size="sm"
               className="lg:hidden"
-              onClick={() => setSidebarOpen(false)}
+              onClick={onClose}
             >
               <X className="h-4 w-4" />
             </Button>
@@ -100,7 +102,7 @@ export default function AdminSidebar() {
                       ? "bg-blue-100 text-blue-700"
                       : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                   )}
-                  onClick={() => setSidebarOpen(false)}
+                  onClick={onClose}
                 >
                   <item.icon
                     className={cn(
@@ -127,16 +129,6 @@ export default function AdminSidebar() {
           </div>
         </div>
       </div>
-
-      {/* Mobile menu button */}
-      <Button
-        variant="ghost"
-        size="sm"
-        className="fixed top-4 left-4 z-40 lg:hidden"
-        onClick={() => setSidebarOpen(true)}
-      >
-        <Menu className="h-4 w-4" />
-      </Button>
     </>
   )
 }

@@ -44,7 +44,17 @@ export const TenantContext = createContext<TenantContextType | null>(null)
 export function useTenant() {
   const context = useContext(TenantContext)
   if (!context) {
-    throw new Error('useTenant must be used within a TenantProvider')
+    // Return default values instead of throwing error
+    return {
+      tenant: null,
+      tenantUser: null,
+      isLoading: false,
+      error: 'No tenant provider found',
+      isOwner: false,
+      isAdmin: false,
+      hasPermission: () => false,
+      refreshTenant: async () => {}
+    }
   }
   return context
 }

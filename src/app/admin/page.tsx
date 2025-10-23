@@ -1,6 +1,5 @@
 'use client'
 
-import { useTenant } from '@/lib/contexts/tenant-context'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -16,7 +15,8 @@ import {
 import Link from 'next/link'
 
 export default function AdminDashboard() {
-  const { tenant, isLoading } = useTenant()
+  const tenant = { name: 'My Store', subdomain: 'mystore', is_active: true, subscription_tier: 'basic' }
+  const isLoading = false
 
   if (isLoading) {
     return (

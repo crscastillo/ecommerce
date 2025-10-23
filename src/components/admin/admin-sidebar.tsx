@@ -129,16 +129,14 @@ export default function AdminSidebar() {
       </div>
 
       {/* Mobile menu button */}
-      <div className="lg:hidden">
-        <Button
-          variant="ghost"
-          size="sm"
-          className="fixed top-4 left-4 z-40"
-          onClick={() => setSidebarOpen(true)}
-        >
-          <Menu className="h-4 w-4" />
-        </Button>
-      </div>
+      <Button
+        variant="ghost"
+        size="sm"
+        className="fixed top-4 left-4 z-40 lg:hidden"
+        onClick={() => setSidebarOpen(true)}
+      >
+        <Menu className="h-4 w-4" />
+      </Button>
     </>
   )
 }

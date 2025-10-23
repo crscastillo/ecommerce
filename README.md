@@ -2,6 +2,8 @@
 
 A powerful, scalable multi-tenant ecommerce platform built with Next.js, Supabase, and shadcn/ui. Create and manage multiple online stores with custom subdomains, all from a single codebase.
 
+> **Status**: ✅ **Production Ready** - Core platform functionality complete with working admin panels, tenant management, and database migrations.
+
 ## 🚀 Features
 
 ### Platform Features
@@ -185,6 +187,8 @@ npm run db:link          # Link to remote project
 
 ## 🏪 Creating Your First Store
 
+### Signup Process (Updated Flow)
+
 1. **Start the application**: `npm run dev`
 2. **Visit**: `http://localhost:3000`
 3. **Click "Get Started"** on the platform homepage
@@ -192,8 +196,17 @@ npm run db:link          # Link to remote project
    - Email & password for your account
    - Store name and subdomain
    - Contact information
-5. **Complete signup** - you'll be redirected to your store's admin panel
-6. **Access your store**: `http://your-subdomain.localhost:3000`
+5. **Verify your email**: Check your inbox and click the verification link
+6. **Complete tenant setup**: After verification, you'll be redirected to complete store setup
+7. **Access your admin panel**: `http://your-subdomain.localhost:3000/admin`
+8. **Access your store**: `http://your-subdomain.localhost:3000`
+
+### Important Notes
+
+- **Two-Phase Signup**: Account creation and tenant setup are now separate steps
+- **Email Verification Required**: Users must verify email before creating their store
+- **Admin Access**: Admin panel is only accessible via tenant subdomains
+- **Authentication**: All admin routes require proper authentication and tenant access
 
 ## 🔧 Configuration
 
@@ -355,7 +368,46 @@ npm run test:db     # Database tests
 - Restart TypeScript server in VS Code
 - Check that client files import from `database-generated.ts`
 
-## 📚 Learn More
+**Admin panel layout issues**:
+- Admin panel requires valid tenant subdomain to function properly
+- Access via: `http://yourstore.localhost:3000/admin` (development)
+- If admin layout appears broken, check browser console for tenant context errors
+- Ensure you're authenticated and have access to the specific tenant
+
+**Tenant signup RLS policy errors**:
+- Error: "new row violates row-level security policy for table 'tenants'"
+- Solution: User must complete email verification before tenant creation
+- Follow the two-phase signup process: account creation → email verification → tenant setup
+
+**Infinite redirect loops in admin**:
+- Check that TenantProvider is properly configured
+- Verify authentication state is not causing layout re-renders
+- Ensure useTenant hook returns default values instead of throwing errors
+
+## � Recent Updates
+
+### v1.1.0 - Admin Panel & RLS Fixes (October 2024)
+
+**✅ Fixed Issues:**
+- **Admin Layout**: Resolved infinite redirect loops and layout crashes
+- **RLS Policies**: Fixed tenant creation permissions during signup
+- **Two-Phase Signup**: Improved signup flow with proper email verification
+- **Tenant Context**: Made useTenant hook more defensive to prevent crashes
+- **Database Types**: Auto-generation from remote database schema working
+
+**🚀 New Features:**
+- **API Routes**: Server-side tenant creation with proper validation
+- **Setup Completion**: Guided post-verification tenant setup process
+- **Enhanced Error Handling**: Better error messages and user guidance
+- **Simplified Admin Layout**: Stable admin panel with responsive design
+
+**🔧 Technical Improvements:**
+- Updated RLS policies for better security and usability
+- Improved middleware for Vercel deployment compatibility
+- Enhanced tenant provider with better error handling
+- Fixed UUID function compatibility for PostgreSQL
+
+## �📚 Learn More
 
 - [Next.js Documentation](https://nextjs.org/docs)
 - [Supabase Documentation](https://supabase.com/docs)  

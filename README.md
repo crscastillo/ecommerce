@@ -208,6 +208,49 @@ npm run db:link          # Link to remote project
 - **Admin Access**: Admin panel is only accessible via tenant subdomains
 - **Authentication**: All admin routes require proper authentication and tenant access
 
+## 🏢 Admin Panel Features
+
+### Current Admin Functionality
+
+**📊 Dashboard**
+- Store overview and metrics
+- Quick setup guide for new stores
+- Recent activity and performance indicators
+
+**🛍️ Product Management**
+- **Products List**: View all products with search and filtering
+- **Add Products**: Comprehensive product creation form
+- **Product Actions**: Edit, delete, activate/deactivate products
+- **Inventory Tracking**: Manage stock levels and SKUs
+- **SEO Settings**: Meta titles and descriptions
+- **Category Assignment**: Link products to categories
+
+**🔐 Access Control**
+- Owner and admin role management
+- Tenant-based access restrictions
+- Secure authentication with Supabase Auth
+
+### Admin Panel Access
+
+```bash
+# Access admin panel (requires tenant subdomain)
+http://yourstore.localhost:3000/admin        # Development
+https://yourstore.yourdomain.com/admin       # Production
+
+# Available admin routes
+/admin                    # Dashboard
+/admin/products          # Products listing
+/admin/products/new      # Add new product
+/admin/login            # Admin authentication
+```
+
+### Coming Soon
+- **Orders Management**: View and manage customer orders
+- **Customer Management**: Customer profiles and history
+- **Categories Management**: Organize product categories
+- **Analytics & Reports**: Sales and performance analytics
+- **Store Settings**: Theme, payment, and shipping configuration
+
 ## 🔧 Configuration
 
 ### Domain Setup (Production)
@@ -229,26 +272,33 @@ Key settings in your Supabase project:
 ```
 src/
 ├── app/                           # Next.js App Router
-│   ├── (platform)/                # Platform routes (main domain)
-│   │   ├── page.tsx               # Platform landing page
-│   │   └── signup/                # Tenant signup
-│   ├── (store)/                   # Store routes (subdomains)
-│   │   ├── page.tsx               # Store homepage  
-│   │   ├── products/              # Product pages
-│   │   └── admin/                 # Store admin
+│   ├── page.tsx                   # Platform landing page
+│   ├── signup/                    # Tenant signup flow
+│   ├── login/                     # Platform login
+│   ├── admin/                     # Admin panel routes
+│   │   ├── layout.tsx             # Admin layout wrapper
+│   │   ├── page.tsx               # Admin dashboard
+│   │   ├── login/                 # Admin authentication
+│   │   └── products/              # Product management
+│   │       ├── page.tsx           # Products listing
+│   │       └── new/               # Add new product
+│   ├── auth/                      # Authentication routes
+│   │   ├── callback/              # OAuth callback
+│   │   └── signup/                # User registration
+│   ├── setup/                     # Tenant setup completion
 │   └── api/                       # API routes
+│       └── tenants/               # Tenant management API
 ├── components/
-│   ├── ui/                        # shadcn/ui components
-│   ├── store/                     # Store-specific components
-│   ├── admin/                     # Admin components
+│   ├── ui/                        # shadcn/ui components (Table, Select, etc.)
+│   ├── admin/                     # Admin-specific components
 │   └── conditional-layout.tsx     # Smart layout switcher
 ├── lib/
 │   ├── supabase/                  # Supabase clients and utilities
-│   ├── contexts/                  # React contexts
+│   ├── contexts/                  # React contexts (Tenant, Auth)
 │   └── types/                     # TypeScript definitions
 ├── middleware.ts                  # Multi-tenant routing
 supabase/
-├── migrations/                    # Database migrations
+├── migrations/                    # Database migrations with RLS
 ├── seed.sql                       # Development seed data
 └── config.toml                    # Supabase configuration
 ```
@@ -374,6 +424,12 @@ npm run test:db     # Database tests
 - If admin layout appears broken, check browser console for tenant context errors
 - Ensure you're authenticated and have access to the specific tenant
 
+**Product management errors**:
+- **404 errors on /admin/products**: Ensure you're accessing via tenant subdomain
+- **Form validation errors**: Check all required fields (name, slug, price)
+- **Category loading issues**: Verify categories exist in database for your tenant
+- **Database connection errors**: Check Supabase connection and RLS policies
+
 **Tenant signup RLS policy errors**:
 - Error: "new row violates row-level security policy for table 'tenants'"
 - Solution: User must complete email verification before tenant creation
@@ -384,7 +440,29 @@ npm run test:db     # Database tests
 - Verify authentication state is not causing layout re-renders
 - Ensure useTenant hook returns default values instead of throwing errors
 
-## � Recent Updates
+## 🔄 Recent Updates
+
+### v1.2.0 - Admin Products Management (October 2024)
+
+**🛍️ New Admin Features:**
+- **Products Listing Page**: Complete product management interface with search & filtering
+- **Add Product Page**: Comprehensive product creation form with validation
+- **Product Actions**: View, edit, delete, and toggle product status
+- **Inventory Management**: Track quantity, SKU, and backorder settings
+- **SEO Optimization**: Meta title and description fields for search engines
+- **Category Integration**: Product categorization with database relationships
+
+**🎨 UI Components Added:**
+- **Data Tables**: Responsive table component for product listings
+- **Form Components**: Textarea, Switch, and Select components with Radix UI
+- **Status Badges**: Visual indicators for product status and features
+- **Action Menus**: Dropdown menus for product management actions
+
+**📊 Database Integration:**
+- **Product CRUD Operations**: Full create, read, update, delete functionality
+- **Real-time Updates**: Immediate UI updates after database operations
+- **Form Validation**: Client-side and server-side validation
+- **Error Handling**: Comprehensive error messages and user feedback
 
 ### v1.1.0 - Admin Panel & RLS Fixes (October 2024)
 

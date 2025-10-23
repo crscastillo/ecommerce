@@ -225,6 +225,18 @@ npm run db:link          # Link to remote project
 - **SEO Settings**: Meta titles and descriptions
 - **Category Assignment**: Link products to categories
 
+**📦 Order Management**
+- **Orders Dashboard**: View all orders with comprehensive statistics
+- **Order Filtering**: Filter by payment status, fulfillment status
+- **Search Orders**: Search by order number, customer email, or name
+- **Status Updates**: Update payment and fulfillment status inline
+- **Order Details**: View complete order information including:
+  - Customer details and contact information
+  - Billing and shipping addresses
+  - Order line items and pricing breakdown
+  - Order notes and tags
+- **Order Statistics**: Track total orders, pending payments, fulfilled orders, and total revenue
+
 **🔐 Access Control**
 - Owner and admin role management
 - Tenant-based access restrictions
@@ -241,12 +253,12 @@ https://yourstore.yourdomain.com/admin       # Production
 /admin                    # Dashboard
 /admin/products          # Products listing
 /admin/products/new      # Add new product
+/admin/orders            # Orders management
 /admin/login            # Admin authentication
 ```
 
 ### Coming Soon
-- **Orders Management**: View and manage customer orders
-- **Customer Management**: Customer profiles and history
+- **Customer Management**: Customer profiles and history  
 - **Categories Management**: Organize product categories
 - **Analytics & Reports**: Sales and performance analytics
 - **Store Settings**: Theme, payment, and shipping configuration
@@ -425,9 +437,11 @@ npm run test:db     # Database tests
 - Ensure you're authenticated and have access to the specific tenant
 
 **Product management errors**:
-- **404 errors on /admin/products**: Ensure you're accessing via tenant subdomain
+- **404 errors on /admin/products or /admin/orders**: Ensure you're accessing via tenant subdomain
 - **Form validation errors**: Check all required fields (name, slug, price)
-- **Category loading issues**: Verify categories exist in database for your tenant
+- **Category loading issues**: Verify categories exist in database for your tenant  
+- **Orders not loading**: Check database connection and ensure orders table has proper RLS policies
+- **Status update failures**: Verify user has appropriate permissions for the tenant
 - **Database connection errors**: Check Supabase connection and RLS policies
 
 **Tenant signup RLS policy errors**:
@@ -441,6 +455,22 @@ npm run test:db     # Database tests
 - Ensure useTenant hook returns default values instead of throwing errors
 
 ## 🔄 Recent Updates
+
+### v1.3.0 - Admin Orders Management (October 2024)
+
+**📦 New Order Management Features:**
+- **Orders Dashboard**: Complete order management interface with statistics dashboard
+- **Order Filtering & Search**: Filter by payment/fulfillment status, search by order number, email, or customer name
+- **Status Management**: Inline update of payment status (pending, paid, refunded, cancelled) and fulfillment status (unfulfilled, fulfilled, partial)
+- **Order Details Modal**: Comprehensive order view with customer info, addresses, pricing breakdown, and notes
+- **Order Statistics**: Real-time tracking of total orders, pending payments, fulfilled orders, and total revenue
+- **Customer Integration**: Display customer names and contact information linked to orders
+
+**🎯 Enhanced Admin Experience:**
+- **Status Badges**: Visual indicators for payment and fulfillment status with color coding
+- **Currency Formatting**: Proper display of monetary values with localization
+- **Responsive Design**: Mobile-friendly order management interface
+- **Date Formatting**: User-friendly display of order dates and timestamps
 
 ### v1.2.0 - Admin Products Management (October 2024)
 

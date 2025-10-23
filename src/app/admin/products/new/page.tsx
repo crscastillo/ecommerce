@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { createClient } from '@/lib/supabase/client'
+import { useTenant } from '@/lib/contexts/tenant-context'
+import { TenantDatabase } from '@/lib/supabase/tenant-database'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -60,22 +61,21 @@ export default function NewProductPage() {
   })
 
   const router = useRouter()
-  const supabase = createClient()
+  const { tenant } = useTenant()
 
   // Load categories
   useEffect(() => {
     const loadCategories = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('categories')
-          .select('id, name, slug')
-          .eq('is_active', true)
-          .order('name')
+      if (!tenant?.id) return
 
-        if (error) {
-          console.error('Error loading categories:', error)
+      try {
+        const tenantDb = new TenantDatabase(tenant.id)
+        const result = await tenantDb.getCategories({ is_active: true })
+
+        if (result.error) {
+          console.error('Error loading categories:', result.error)
         } else {
-          setCategories(data || [])
+          setCategories(result.data || [])
         }
       } catch (error) {
         console.error('Error loading categories:', error)
@@ -83,7 +83,7 @@ export default function NewProductPage() {
     }
 
     loadCategories()
-  }, [supabase])
+  }, [tenant?.id])
 
   // Auto-generate slug from name
   const generateSlug = (name: string) => {
@@ -141,6 +141,11 @@ export default function NewProductPage() {
     setLoading(true)
 
     try {
+      if (!tenant?.id) {
+        setError('No tenant found')
+        return
+      }
+
       // Prepare product data
       const productData = {
         name: formData.name.trim(),
@@ -166,11 +171,8 @@ export default function NewProductPage() {
 
       console.log('Creating product with data:', productData)
 
-      const { data, error } = await supabase
-        .from('products')
-        .insert(productData)
-        .select()
-        .single()
+      const tenantDb = new TenantDatabase(tenant.id)
+      const { data, error } = await tenantDb.createProduct(productData)
 
       if (error) {
         console.error('Error creating product:', error)

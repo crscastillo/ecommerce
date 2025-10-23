@@ -66,7 +66,11 @@ export default function NewProductPage() {
   // Load categories
   useEffect(() => {
     const loadCategories = async () => {
-      if (!tenant?.id) return
+      console.log('Loading categories, tenant ID:', tenant?.id)
+      if (!tenant?.id) {
+        console.log('No tenant ID available for loading categories')
+        return
+      }
 
       try {
         const tenantDb = new TenantDatabase(tenant.id)
@@ -75,6 +79,7 @@ export default function NewProductPage() {
         if (result.error) {
           console.error('Error loading categories:', result.error)
         } else {
+          console.log('Categories loaded:', result.data)
           setCategories(result.data || [])
         }
       } catch (error) {
@@ -141,8 +146,11 @@ export default function NewProductPage() {
     setLoading(true)
 
     try {
+      console.log('Tenant object:', tenant)
+      console.log('Tenant ID:', tenant?.id)
+      
       if (!tenant?.id) {
-        setError('No tenant found')
+        setError('No tenant found. Please ensure you are properly authenticated and have access to a store.')
         return
       }
 

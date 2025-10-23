@@ -83,11 +83,32 @@ export function TenantProvider({ children, initialTenant }: TenantProviderProps)
 
       const { subdomain } = getTenantFromHeaders()
       
-      if (!subdomain) {
-        // In development, create a demo tenant if none exists
+      // Check if we're in an admin route - if so, try to load user's primary tenant
+      const isAdminRoute = typeof window !== 'undefined' && window.location.pathname.startsWith('/admin')
+      
+      if (!subdomain || isAdminRoute) {
+        // In development or admin routes, try to get the user's first tenant
+        if (user) {
+          const { data: userTenants, error: tenantsError } = await supabase
+            .from('tenants')
+            .select('*')
+            .eq('owner_id', user.id)
+            .eq('is_active', true)
+            .limit(1)
+            .single()
+
+          if (!tenantsError && userTenants) {
+            setTenant(userTenants)
+            setTenantUser(null)
+            return
+          }
+        }
+
+        // Fallback to demo tenant in development
         if (process.env.NODE_ENV === 'development') {
+          // Create a more realistic demo tenant ID
           const demoTenant: Tenant = {
-            id: 'demo-tenant-id',
+            id: 'demo-tenant-uuid-123e4567-e89b-12d3-a456-426614174000',
             name: 'Demo Store',
             subdomain: 'demo',
             domain: undefined,

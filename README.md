@@ -2,7 +2,7 @@
 
 A powerful, scalable multi-tenant ecommerce platform built with Next.js, Supabase, and shadcn/ui. Create and manage multiple online stores with custom subdomains, all from a single codebase.
 
-> **Status**: ✅ **Production Ready** - Core platform functionality complete with working admin panels, tenant management, and database migrations.
+> **Status**: ✅ **Production Ready** - Core platform functionality complete with admin panels (products & orders), tenant management, demo mode for development, and comprehensive database migrations.
 
 ## 🚀 Features
 
@@ -99,6 +99,16 @@ npm run dev
 
 # Open in browser
 open http://localhost:3000
+```
+
+**🧪 Testing Admin Features:**
+```bash
+# Demo mode (no database required)
+http://localhost:3000/admin          # Demo dashboard
+http://localhost:3000/admin/orders   # Demo orders interface
+
+# With tenant setup (full functionality)
+http://yourstore.localhost:3000/admin  # Real tenant admin
 ```
 
 ### 5. Test Multi-Tenancy (Optional)
@@ -244,18 +254,33 @@ npm run db:link          # Link to remote project
 
 ### Admin Panel Access
 
+**🏪 Proper Tenant Access (Recommended):**
 ```bash
-# Access admin panel (requires tenant subdomain)
-http://yourstore.localhost:3000/admin        # Development
+# Access admin panel via tenant subdomain
+http://yourstore.localhost:3000/admin        # Development  
 https://yourstore.yourdomain.com/admin       # Production
+```
 
-# Available admin routes
+**🧪 Demo Mode Access (Development Only):**
+```bash  
+# Direct access shows demo mode with sample interface
+http://localhost:3000/admin                  # Demo mode - no real data
+http://localhost:3000/admin/orders           # Demo orders interface
+```
+
+**📋 Available Admin Routes:**
+```bash
 /admin                    # Dashboard
-/admin/products          # Products listing
+/admin/products          # Products listing  
 /admin/products/new      # Add new product
 /admin/orders            # Orders management
 /admin/login            # Admin authentication
 ```
+
+**ℹ️ Access Notes:**
+- **Production**: Always use tenant subdomains for real store data
+- **Development**: Demo mode available for UI testing without database setup
+- **Authentication**: Admin access requires owner or admin role permissions
 
 ### Coming Soon
 - **Customer Management**: Customer profiles and history  
@@ -437,12 +462,18 @@ npm run test:db     # Database tests
 - Ensure you're authenticated and have access to the specific tenant
 
 **Product management errors**:
-- **404 errors on /admin/products or /admin/orders**: Ensure you're accessing via tenant subdomain
+- **404 errors on /admin/products**: Ensure you're accessing via tenant subdomain
 - **Form validation errors**: Check all required fields (name, slug, price)
-- **Category loading issues**: Verify categories exist in database for your tenant  
-- **Orders not loading**: Check database connection and ensure orders table has proper RLS policies
-- **Status update failures**: Verify user has appropriate permissions for the tenant
+- **Category loading issues**: Verify categories exist in database for your tenant
 - **Database connection errors**: Check Supabase connection and RLS policies
+
+**Orders page issues**:
+- **Orders page not displaying**: Admin orders require tenant context - access via `yourstore.localhost:3000/admin/orders`
+- **"No tenant found" error**: Use proper subdomain access or check demo mode in development
+- **Orders not loading**: Verify orders table exists with proper RLS policies for your tenant
+- **Status update failures**: Ensure user has admin permissions for the specific tenant
+- **Demo mode displaying**: Normal for direct localhost access - use tenant subdomain for real data
+- **Statistics not updating**: Check that order status updates are being saved to database
 
 **Tenant signup RLS policy errors**:
 - Error: "new row violates row-level security policy for table 'tenants'"
@@ -471,6 +502,12 @@ npm run test:db     # Database tests
 - **Currency Formatting**: Proper display of monetary values with localization
 - **Responsive Design**: Mobile-friendly order management interface
 - **Date Formatting**: User-friendly display of order dates and timestamps
+
+**🛠️ Developer Experience Improvements:**
+- **Demo Mode**: Automatic demo tenant creation for development testing without database setup
+- **Enhanced Error Handling**: Clear tenant access error messages with helpful instructions
+- **Loading States**: Proper loading indicators for tenant resolution and data fetching
+- **Multi-tenant Guidance**: Informative messages about proper subdomain access patterns
 
 ### v1.2.0 - Admin Products Management (October 2024)
 

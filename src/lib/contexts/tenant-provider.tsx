@@ -84,6 +84,31 @@ export function TenantProvider({ children, initialTenant }: TenantProviderProps)
       const { subdomain } = getTenantFromHeaders()
       
       if (!subdomain) {
+        // In development, create a demo tenant if none exists
+        if (process.env.NODE_ENV === 'development') {
+          const demoTenant: Tenant = {
+            id: 'demo-tenant-id',
+            name: 'Demo Store',
+            subdomain: 'demo',
+            domain: undefined,
+            description: 'Demo store for testing',
+            logo_url: undefined,
+            theme_config: {},
+            contact_email: 'demo@example.com',
+            contact_phone: undefined,
+            address: undefined,
+            settings: {},
+            subscription_tier: 'basic',
+            is_active: true,
+            owner_id: user?.id || 'demo-user',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          }
+          setTenant(demoTenant)
+          setTenantUser(null)
+          return
+        }
+        
         setTenant(null)
         setTenantUser(null)
         return

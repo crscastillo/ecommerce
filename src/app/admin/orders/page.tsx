@@ -42,7 +42,7 @@ type OrderStats = {
 }
 
 export default function OrdersPage() {
-  const { tenant } = useTenant()
+  const { tenant, isLoading: tenantLoading, error } = useTenant()
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
@@ -67,9 +67,19 @@ export default function OrdersPage() {
     }
   }, [tenant?.id])
 
+
+
   const loadOrders = async () => {
     try {
       setLoading(true)
+      
+      // If this is a demo tenant, don't make database calls
+      if (tenant?.id === 'demo-tenant-id') {
+        setOrders([])
+        setLoading(false)
+        return
+      }
+      
       const { data: orders, error } = await supabase
         .from('orders')
         .select(`
@@ -97,6 +107,19 @@ export default function OrdersPage() {
 
   const loadStats = async () => {
     try {
+      // If this is a demo tenant, show demo stats
+      if (tenant?.id === 'demo-tenant-id') {
+        const demoStats: OrderStats = {
+          total: 0,
+          pending: 0,
+          paid: 0,
+          fulfilled: 0,
+          totalRevenue: 0
+        }
+        setStats(demoStats)
+        return
+      }
+      
       const { data: orders, error } = await supabase
         .from('orders')
         .select('financial_status, fulfillment_status, total_price')
@@ -199,6 +222,65 @@ export default function OrdersPage() {
       hour: '2-digit',
       minute: '2-digit'
     })
+  }
+
+  // Show tenant loading state
+  if (tenantLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h1 className="text-3xl font-bold">Orders</h1>
+        </div>
+        <div className="text-center py-8">
+          <p>Loading tenant information...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Show tenant error state
+  if (error || !tenant) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h1 className="text-3xl font-bold">Orders</h1>
+        </div>
+        <Card>
+          <CardContent className="p-8 text-center">
+            <AlertCircle className="mx-auto h-12 w-12 text-orange-500 mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">Tenant Access Required</h3>
+            <p className="text-gray-600 mb-4">
+              {error || 'No tenant found. This admin panel requires access via your store subdomain.'}
+            </p>
+            <div className="bg-gray-50 rounded-lg p-4 mb-4">
+              <p className="text-sm text-gray-700 mb-2"><strong>How to access:</strong></p>
+              <ol className="text-sm text-gray-600 space-y-1 text-left max-w-md mx-auto">
+                <li>1. Set up a tenant/store first at the main domain</li>
+                <li>2. Access via subdomain: <code className="bg-gray-200 px-1 rounded">yourstore.localhost:3000</code></li>
+                <li>3. Then navigate to <code className="bg-gray-200 px-1 rounded">/admin/orders</code></li>
+              </ol>
+            </div>
+            <p className="text-xs text-gray-500">
+              Current URL: {typeof window !== 'undefined' ? window.location.href : 'Unknown'}
+            </p>
+            <div className="mt-4">
+              <Button 
+                onClick={() => window.location.href = '/'}
+                className="mr-2"
+              >
+                Go to Main Site
+              </Button>
+              <Button 
+                variant="outline"
+                onClick={() => window.location.reload()}
+              >
+                Retry
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    )
   }
 
   if (loading) {
@@ -351,9 +433,19 @@ export default function OrdersPage() {
               <p className="mt-1 text-sm text-gray-500">
                 {searchTerm || statusFilter !== 'all' || fulfillmentFilter !== 'all' 
                   ? 'Try adjusting your filters or search term.'
-                  : 'Orders will appear here once customers start placing them.'
+                  : tenant?.id === 'demo-tenant-id'
+                    ? 'This is a demo environment. Orders will appear here once customers start placing them in a real store.'
+                    : 'Orders will appear here once customers start placing them.'
                 }
               </p>
+              {tenant?.id === 'demo-tenant-id' && (
+                <div className="mt-4 p-4 bg-blue-50 rounded-lg max-w-md mx-auto">
+                  <p className="text-sm text-blue-700">
+                    <strong>Demo Mode:</strong> You're viewing the orders page in demo mode. 
+                    In a real store with orders, you'd see comprehensive order management features here.
+                  </p>
+                </div>
+              )}
             </div>
           ) : (
             <div className="overflow-x-auto">

@@ -2,7 +2,7 @@
 
 A powerful, scalable multi-tenant ecommerce platform built with Next.js, Supabase, and shadcn/ui. Create and manage multiple online stores with custom subdomains, all from a single codebase.
 
-> **Status**: ✅ **Production Ready** - Core platform functionality complete with admin panels (products & orders), tenant management, demo mode for development, and comprehensive database migrations.
+> **Status**: ✅ **Production Ready** - Core platform functionality complete with comprehensive admin panels (products, orders & settings), tenant management, theme customization, team management, demo mode for development, and robust database migrations.
 
 ## 🚀 Features
 
@@ -247,6 +247,14 @@ npm run db:link          # Link to remote project
   - Order notes and tags
 - **Order Statistics**: Track total orders, pending payments, fulfilled orders, and total revenue
 
+**⚙️ Settings Management**
+- **Store Settings**: Configure store information, contact details, and business address
+- **Store Configuration**: Set currency, timezone, tax rates, and operational preferences
+- **Theme Customization**: Customize colors, fonts, logo, and branding elements
+- **Team Management**: Invite users, manage roles (owner, admin, staff, viewer), and permissions
+- **Security Settings**: View account information, manage subscription, and store deletion
+- **Feature Toggles**: Enable/disable inventory tracking, backorders, auto-fulfillment, and notifications
+
 **🔐 Access Control**
 - Owner and admin role management
 - Tenant-based access restrictions
@@ -274,6 +282,7 @@ http://localhost:3000/admin/orders           # Demo orders interface
 /admin/products          # Products listing  
 /admin/products/new      # Add new product
 /admin/orders            # Orders management
+/admin/settings          # Store and system settings
 /admin/login            # Admin authentication
 ```
 
@@ -286,7 +295,8 @@ http://localhost:3000/admin/orders           # Demo orders interface
 - **Customer Management**: Customer profiles and history  
 - **Categories Management**: Organize product categories
 - **Analytics & Reports**: Sales and performance analytics
-- **Store Settings**: Theme, payment, and shipping configuration
+- **Payment Integration**: Stripe, PayPal, and other payment processors
+- **Shipping Management**: Shipping zones, rates, and carrier integration
 
 ## 🔧 Configuration
 
@@ -475,6 +485,13 @@ npm run test:db     # Database tests
 - **Demo mode displaying**: Normal for direct localhost access - use tenant subdomain for real data
 - **Statistics not updating**: Check that order status updates are being saved to database
 
+**Settings page issues**:
+- **Settings not saving**: Verify user has owner/admin permissions for the tenant
+- **Theme changes not applying**: Check that theme_config is being properly saved to database
+- **User invitation failures**: Ensure proper SMTP configuration for email invitations
+- **Color picker not working**: Verify browser supports HTML5 color input type
+- **Settings page not loading**: Same tenant access requirements as other admin pages
+
 **Tenant signup RLS policy errors**:
 - Error: "new row violates row-level security policy for table 'tenants'"
 - Solution: User must complete email verification before tenant creation
@@ -486,6 +503,28 @@ npm run test:db     # Database tests
 - Ensure useTenant hook returns default values instead of throwing errors
 
 ## 🔄 Recent Updates
+
+### v1.4.0 - Admin Settings Management (October 2024)
+
+**⚙️ Comprehensive Settings System:**
+- **Store Configuration**: Complete store information management with business details and contact info
+- **Theme Customization**: Full branding control with color schemes, typography, and custom CSS
+- **Team Management**: User invitation system with role-based access control (owner, admin, staff, viewer)
+- **Feature Toggles**: Configurable store features including inventory tracking, backorders, and notifications
+- **Security Dashboard**: Account overview, subscription management, and store deletion controls
+
+**🎨 New UI Components:**
+- **Tabbed Interface**: Organized settings categories with responsive navigation
+- **Color Pickers**: Visual color selection for theme customization
+- **Alert Dialogs**: Confirmation dialogs for destructive actions
+- **Advanced Forms**: Complex form handling with real-time validation
+- **Role Management**: Dropdown selectors for user permissions and role assignment
+
+**🔧 Technical Improvements:**
+- **Settings Persistence**: Automatic saving of configuration changes to database
+- **Real-time Updates**: Immediate reflection of settings changes across the interface
+- **Validation & Error Handling**: Comprehensive input validation with user-friendly error messages
+- **Demo Mode Support**: Settings interface works seamlessly in development demo mode
 
 ### v1.3.0 - Admin Orders Management (October 2024)
 

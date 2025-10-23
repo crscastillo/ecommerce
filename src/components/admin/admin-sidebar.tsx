@@ -61,19 +61,19 @@ export default function AdminSidebar() {
 
       {/* Sidebar */}
       <div className={cn(
-        "fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0",
-        sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        "fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0",
+        sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
       )}>
         <div className="flex h-full flex-col">
           {/* Logo */}
-          <div className="flex h-16 items-center justify-between px-4 border-b border-gray-200">
+          <div className="flex h-16 items-center justify-between px-4 border-b border-gray-200 bg-gray-50">
             <div className="flex items-center">
-              <Store className="h-8 w-8 text-blue-600" />
+              <Store className="h-6 w-6 text-blue-600" />
               <div className="ml-2">
                 <p className="text-sm font-semibold text-gray-900">
-                  {tenant?.name || 'Loading...'}
+                  {tenant?.name || 'Demo Store'}
                 </p>
-                <p className="text-xs text-gray-500">Admin Panel</p>
+                <p className="text-xs text-gray-500">Admin</p>
               </div>
             </div>
             <Button

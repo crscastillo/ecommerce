@@ -355,4 +355,261 @@ export class TenantDatabase {
       .eq('tenant_id', this.tenantId)
       .eq('user_id', userId)
   }
+
+  // Product Variants
+  async getProductVariants(productId: string) {
+    return this.supabase
+      .from('product_variants')
+      .select('*')
+      .eq('product_id', productId)
+      .eq('tenant_id', this.tenantId)
+      .eq('is_active', true)
+      .order('title', { ascending: true })
+  }
+
+  async getProductVariant(id: string) {
+    return this.supabase
+      .from('product_variants')
+      .select('*')
+      .eq('id', id)
+      .eq('tenant_id', this.tenantId)
+      .single()
+  }
+
+  async createProductVariant(variantData: any) {
+    return this.supabase
+      .from('product_variants')
+      .insert({
+        ...variantData,
+        tenant_id: this.tenantId
+      })
+      .select()
+      .single()
+  }
+
+  async updateProductVariant(id: string, variantData: any) {
+    return this.supabase
+      .from('product_variants')
+      .update(variantData)
+      .eq('id', id)
+      .eq('tenant_id', this.tenantId)
+      .select()
+      .single()
+  }
+
+  async deleteProductVariant(id: string) {
+    return this.supabase
+      .from('product_variants')
+      .delete()
+      .eq('id', id)
+      .eq('tenant_id', this.tenantId)
+  }
+
+  // Order Line Items
+  async getOrderLineItems(orderId: string) {
+    return this.supabase
+      .from('order_line_items')
+      .select(`
+        *,
+        product:products(id, name, slug),
+        variant:product_variants(id, title, sku)
+      `)
+      .eq('order_id', orderId)
+      .eq('tenant_id', this.tenantId)
+      .order('created_at', { ascending: true })
+  }
+
+  async createOrderLineItem(lineItemData: any) {
+    return this.supabase
+      .from('order_line_items')
+      .insert({
+        ...lineItemData,
+        tenant_id: this.tenantId
+      })
+      .select()
+      .single()
+  }
+
+  async updateOrderLineItem(id: string, lineItemData: any) {
+    return this.supabase
+      .from('order_line_items')
+      .update(lineItemData)
+      .eq('id', id)
+      .eq('tenant_id', this.tenantId)
+      .select()
+      .single()
+  }
+
+  async deleteOrderLineItem(id: string) {
+    return this.supabase
+      .from('order_line_items')
+      .delete()
+      .eq('id', id)
+      .eq('tenant_id', this.tenantId)
+  }
+
+  // Discounts
+  async getDiscounts(filters: {
+    is_active?: boolean
+    type?: string
+    search?: string
+    limit?: number
+    offset?: number
+  } = {}) {
+    let query = this.supabase
+      .from('discounts')
+      .select('*')
+      .eq('tenant_id', this.tenantId)
+      .order('created_at', { ascending: false })
+
+    if (filters.is_active !== undefined) {
+      query = query.eq('is_active', filters.is_active)
+    }
+    if (filters.type) {
+      query = query.eq('type', filters.type)
+    }
+    if (filters.search) {
+      query = query.or(`code.ilike.%${filters.search}%,title.ilike.%${filters.search}%`)
+    }
+    if (filters.limit) {
+      query = query.limit(filters.limit)
+    }
+    if (filters.offset) {
+      query = query.range(filters.offset, filters.offset + (filters.limit || 10) - 1)
+    }
+
+    return query
+  }
+
+  async getDiscount(id: string) {
+    return this.supabase
+      .from('discounts')
+      .select('*')
+      .eq('id', id)
+      .eq('tenant_id', this.tenantId)
+      .single()
+  }
+
+  async getDiscountByCode(code: string) {
+    return this.supabase
+      .from('discounts')
+      .select('*')
+      .eq('code', code)
+      .eq('tenant_id', this.tenantId)
+      .eq('is_active', true)
+      .single()
+  }
+
+  async createDiscount(discountData: any) {
+    return this.supabase
+      .from('discounts')
+      .insert({
+        ...discountData,
+        tenant_id: this.tenantId
+      })
+      .select()
+      .single()
+  }
+
+  async updateDiscount(id: string, discountData: any) {
+    return this.supabase
+      .from('discounts')
+      .update(discountData)
+      .eq('id', id)
+      .eq('tenant_id', this.tenantId)
+      .select()
+      .single()
+  }
+
+  async deleteDiscount(id: string) {
+    return this.supabase
+      .from('discounts')
+      .delete()
+      .eq('id', id)
+      .eq('tenant_id', this.tenantId)
+  }
+
+  // Tenant Users (for team management)
+  async getTenantUsers(filters: {
+    is_active?: boolean
+    role?: string
+    limit?: number
+    offset?: number
+  } = {}) {
+    let query = this.supabase
+      .from('tenant_users')
+      .select(`
+        *,
+        user:auth.users(id, email),
+        invited_by_user:auth.users!invited_by(id, email)
+      `)
+      .eq('tenant_id', this.tenantId)
+      .order('created_at', { ascending: false })
+
+    if (filters.is_active !== undefined) {
+      query = query.eq('is_active', filters.is_active)
+    }
+    if (filters.role) {
+      query = query.eq('role', filters.role)
+    }
+    if (filters.limit) {
+      query = query.limit(filters.limit)
+    }
+    if (filters.offset) {
+      query = query.range(filters.offset, filters.offset + (filters.limit || 10) - 1)
+    }
+
+    return query
+  }
+
+  async getTenantUser(id: string) {
+    return this.supabase
+      .from('tenant_users')
+      .select(`
+        *,
+        user:auth.users(id, email),
+        invited_by_user:auth.users!invited_by(id, email)
+      `)
+      .eq('id', id)
+      .eq('tenant_id', this.tenantId)
+      .single()
+  }
+
+  async getTenantUserByUserId(userId: string) {
+    return this.supabase
+      .from('tenant_users')
+      .select('*')
+      .eq('user_id', userId)
+      .eq('tenant_id', this.tenantId)
+      .single()
+  }
+
+  async inviteTenantUser(userData: any) {
+    return this.supabase
+      .from('tenant_users')
+      .insert({
+        ...userData,
+        tenant_id: this.tenantId
+      })
+      .select()
+      .single()
+  }
+
+  async updateTenantUser(id: string, userData: any) {
+    return this.supabase
+      .from('tenant_users')
+      .update(userData)
+      .eq('id', id)
+      .eq('tenant_id', this.tenantId)
+      .select()
+      .single()
+  }
+
+  async removeTenantUser(id: string) {
+    return this.supabase
+      .from('tenant_users')
+      .delete()
+      .eq('id', id)
+      .eq('tenant_id', this.tenantId)
+  }
 }

@@ -65,6 +65,103 @@ export interface Database {
           updated_at?: string
         }
       }
+      tenant_users: {
+        Row: {
+          id: string
+          tenant_id: string
+          user_id: string
+          role: string
+          permissions: Json
+          invited_by: string | null
+          invited_at: string
+          accepted_at: string | null
+          is_active: boolean
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          tenant_id: string
+          user_id: string
+          role?: string
+          permissions?: Json
+          invited_by?: string | null
+          invited_at?: string
+          accepted_at?: string | null
+          is_active?: boolean
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          tenant_id?: string
+          user_id?: string
+          role?: string
+          permissions?: Json
+          invited_by?: string | null
+          invited_at?: string
+          accepted_at?: string | null
+          is_active?: boolean
+          created_at?: string
+        }
+      }
+      product_variants: {
+        Row: {
+          id: string
+          tenant_id: string
+          product_id: string
+          title: string
+          option1: string | null
+          option2: string | null
+          option3: string | null
+          sku: string | null
+          price: number | null
+          compare_price: number | null
+          cost_price: number | null
+          inventory_quantity: number
+          weight: number | null
+          image_url: string | null
+          is_active: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          tenant_id: string
+          product_id: string
+          title: string
+          option1?: string | null
+          option2?: string | null
+          option3?: string | null
+          sku?: string | null
+          price?: number | null
+          compare_price?: number | null
+          cost_price?: number | null
+          inventory_quantity?: number
+          weight?: number | null
+          image_url?: string | null
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          tenant_id?: string
+          product_id?: string
+          title?: string
+          option1?: string | null
+          option2?: string | null
+          option3?: string | null
+          sku?: string | null
+          price?: number | null
+          compare_price?: number | null
+          cost_price?: number | null
+          inventory_quantity?: number
+          weight?: number | null
+          image_url?: string | null
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+      }
       categories: {
         Row: {
           id: string
@@ -362,6 +459,109 @@ export interface Database {
           product_variant_id?: string | null
           quantity?: number
           properties?: Json
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      order_line_items: {
+        Row: {
+          id: string
+          tenant_id: string
+          order_id: string
+          product_id: string | null
+          product_variant_id: string | null
+          title: string
+          variant_title: string | null
+          sku: string | null
+          quantity: number
+          price: number
+          total_discount: number
+          properties: Json
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          tenant_id: string
+          order_id: string
+          product_id?: string | null
+          product_variant_id?: string | null
+          title: string
+          variant_title?: string | null
+          sku?: string | null
+          quantity: number
+          price: number
+          total_discount?: number
+          properties?: Json
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          tenant_id?: string
+          order_id?: string
+          product_id?: string | null
+          product_variant_id?: string | null
+          title?: string
+          variant_title?: string | null
+          sku?: string | null
+          quantity?: number
+          price?: number
+          total_discount?: number
+          properties?: Json
+          created_at?: string
+        }
+      }
+      discounts: {
+        Row: {
+          id: string
+          tenant_id: string
+          code: string
+          title: string
+          description: string | null
+          type: string
+          value: number
+          minimum_amount: number | null
+          usage_limit: number | null
+          usage_count: number
+          customer_usage_limit: number
+          starts_at: string | null
+          ends_at: string | null
+          is_active: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          tenant_id: string
+          code: string
+          title: string
+          description?: string | null
+          type: string
+          value: number
+          minimum_amount?: number | null
+          usage_limit?: number | null
+          usage_count?: number
+          customer_usage_limit?: number
+          starts_at?: string | null
+          ends_at?: string | null
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          tenant_id?: string
+          code?: string
+          title?: string
+          description?: string | null
+          type?: string
+          value?: number
+          minimum_amount?: number | null
+          usage_limit?: number | null
+          usage_count?: number
+          customer_usage_limit?: number
+          starts_at?: string | null
+          ends_at?: string | null
+          is_active?: boolean
           created_at?: string
           updated_at?: string
         }

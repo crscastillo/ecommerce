@@ -323,7 +323,7 @@ export default function ProductsPage() {
                               </Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem asChild>
-                              <Link href={`/admin/products/${product.id}/edit`}>
+                              <Link href={`/admin/products/${product.id}?mode=edit`}>
                                 <Edit className="mr-2 h-4 w-4" />
                                 Edit
                               </Link>

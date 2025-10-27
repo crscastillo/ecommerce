@@ -18,9 +18,9 @@ This guide explains how to use the CSV import feature in the admin products pane
 
 ### Basic CSV Structure
 ```csv
-name,price,description,sku,inventory_quantity,category_slug,is_active
-"Sample Product",29.99,"A great product description","SKU001",100,"electronics",true
-"Another Product",49.99,"Another description","SKU002",50,"clothing",true
+name,price,description,sku,inventory_quantity,category_slug,image_url,is_active
+"Sample Product",29.99,"A great product description","SKU001",100,"electronics","https://example.com/product-image.jpg",true
+"Another Product",49.99,"Another description","SKU002",50,"clothing","https://example.com/another-image.jpg",true
 ```
 
 ## 📊 Supported Product Properties
@@ -41,6 +41,7 @@ name,price,description,sku,inventory_quantity,category_slug,is_active
 | `is_active` | Boolean | | Active status | true, false, 1, 0, yes, no |
 | `is_featured` | Boolean | | Featured status | true, false, 1, 0, yes, no |
 | `category_slug` | Text | | Category identifier | "electronics" |
+| `image_url` | URL | | Product image URL | "https://example.com/image.jpg" |
 
 ### Data Type Details
 
@@ -48,6 +49,14 @@ name,price,description,sku,inventory_quantity,category_slug,is_active
 The following values are accepted for boolean fields (`is_active`, `is_featured`):
 - **True**: `true`, `1`, `yes`, `active`
 - **False**: `false`, `0`, `no`, `inactive`
+
+#### Image URLs
+When providing `image_url` values:
+- Must be a valid, publicly accessible URL
+- Supported formats: JPEG, PNG, WebP, GIF
+- Images will be automatically downloaded and uploaded to secure storage
+- Maximum file size: 50MB per image
+- If download fails, the product will still be created without an image
 
 #### Tags Format
 Multiple tags should be separated by commas:
@@ -132,7 +141,7 @@ name,price,description,short_description,sku,inventory_quantity,category_slug,is
 ### After Import
 1. **Review Products**: Check that products imported correctly
 2. **Verify Categories**: Ensure products are assigned to correct categories
-3. **Check Images**: Note that CSV import doesn't include product images (add separately)
+3. **Check Images**: Review that product images were downloaded and uploaded successfully from provided URLs
 4. **Update Inventory**: Verify inventory quantities are correct
 
 ## 🔧 Troubleshooting

@@ -524,10 +524,18 @@ npm run test:db     # Database tests
 - **Bulk Product Import**: Professional CSV import with column mapping and validation
 - **4-Step Import Wizard**: Upload → Map Columns → Validate Data → Import with progress tracking
 - **Smart Column Detection**: Automatic CSV header recognition with example data preview
-- **Comprehensive Validation**: Type checking, required field validation, and category verification
-- **Template Download**: One-click CSV template generation with proper format
+- **Image URL Processing**: Automatic download and upload of product images from URLs to secure storage
+- **Comprehensive Validation**: Type checking, required field validation, URL validation, and category verification
+- **Template Download**: One-click CSV template generation with proper format including image URLs
 - **Error Reporting**: Detailed validation errors with row and column specificity
 - **Progress Tracking**: Real-time import progress with success/failure reporting
+
+**🖼️ Product Image Management:**
+- **Supabase Storage Integration**: Secure image storage with tenant isolation
+- **Drag & Drop Upload**: Intuitive image upload interface with preview
+- **Multiple Image Support**: Upload up to 10 images per product with automatic ordering
+- **Image Processing**: Automatic file validation and optimization
+- **Storage Policies**: Row-level security ensuring tenant data isolation
 
 **🛍️ Public Store Pages:**
 - **Products Catalog**: Complete public product browsing with search and filtering

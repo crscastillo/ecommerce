@@ -39,6 +39,7 @@ import {
 } from 'lucide-react'
 import { TenantDatabase } from '@/lib/supabase/tenant-database'
 import { useTenant } from '@/lib/contexts/tenant-context'
+import { productImageStorage } from '@/lib/storage/product-images'
 
 interface CSVImportModalProps {
   open: boolean
@@ -78,6 +79,7 @@ const PRODUCT_PROPERTIES = [
   { value: 'is_active', label: 'Active Status', required: false, type: 'boolean' },
   { value: 'is_featured', label: 'Featured Status', required: false, type: 'boolean' },
   { value: 'category_slug', label: 'Category Slug', required: false, type: 'text' },
+  { value: 'image_url', label: 'Image URL', required: false, type: 'url' },
 ]
 
 export function CSVImportModal({ open, onOpenChange, onImportComplete }: CSVImportModalProps) {
@@ -219,6 +221,18 @@ export function CSVImportModal({ open, onOpenChange, onImportComplete }: CSVImpo
                 })
               }
               break
+            case 'url':
+              try {
+                new URL(value.trim())
+              } catch {
+                errors.push({
+                  row: index + 1,
+                  column: mapping.csvColumn,
+                  message: `${property.label} must be a valid URL`,
+                  value
+                })
+              }
+              break
           }
         }
       })
@@ -320,6 +334,31 @@ export function CSVImportModal({ open, onOpenChange, onImportComplete }: CSVImpo
           productData.is_featured = false
         }
 
+        // Handle image URL - download and upload to Supabase Storage
+        const imageMapping = columnMappings.find(m => m.productProperty === 'image_url')
+        if (imageMapping && imageMapping.productProperty !== 'skip' && row[imageMapping.csvColumn]) {
+          const imageUrl = row[imageMapping.csvColumn].trim()
+          if (imageUrl) {
+            try {
+              const uploadResult = await productImageStorage.downloadAndUploadFromUrl(
+                imageUrl,
+                {
+                  tenantId: tenant.id,
+                  productId: productData.slug || 'imported-product'
+                }
+              )
+              
+              if (uploadResult.success && uploadResult.url) {
+                productData.images = [uploadResult.url]
+              } else {
+                console.warn(`Failed to upload image for row ${i + 1}: ${uploadResult.error}`)
+              }
+            } catch (error) {
+              console.warn(`Error processing image for row ${i + 1}:`, error)
+            }
+          }
+        }
+
         const result = await tenantDb.createProduct(productData)
         
         if (result.error) {
@@ -354,8 +393,8 @@ export function CSVImportModal({ open, onOpenChange, onImportComplete }: CSVImpo
   }
 
   const downloadTemplate = () => {
-    const headers = ['name', 'price', 'description', 'short_description', 'sku', 'inventory_quantity', 'category_slug', 'is_active']
-    const example = ['Sample Product', '29.99', 'A great product description', 'Short description', 'SKU001', '100', 'electronics', 'true']
+    const headers = ['name', 'price', 'description', 'short_description', 'sku', 'inventory_quantity', 'category_slug', 'image_url', 'is_active']
+    const example = ['Sample Product', '29.99', 'A great product description', 'Short description', 'SKU001', '100', 'electronics', 'https://example.com/product-image.jpg', 'true']
     
     const csvContent = [headers.join(','), example.join(',')].join('\n')
     const blob = new Blob([csvContent], { type: 'text/csv' })

@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
+import { ImageUpload } from '@/components/admin/image-upload'
 import { 
   ArrowLeft, 
   Save, 
@@ -59,6 +60,8 @@ export default function NewProductPage() {
     seo_title: '',
     seo_description: '',
   })
+  
+  const [productImages, setProductImages] = useState<string[]>([])
 
   const router = useRouter()
   const { tenant } = useTenant()
@@ -173,7 +176,7 @@ export default function NewProductPage() {
         is_featured: formData.is_featured,
         seo_title: formData.seo_title.trim() || null,
         seo_description: formData.seo_description.trim() || null,
-        images: [],
+        images: productImages,
         variants: {},
       }
 
@@ -424,6 +427,28 @@ export default function NewProductPage() {
                     />
                   </div>
                 </div>
+              </CardContent>
+            </Card>
+
+            {/* Images */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Product Images</CardTitle>
+                <CardDescription>
+                  Upload images for your product. The first image will be the main product image.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {tenant?.id && (
+                  <ImageUpload
+                    tenantId={tenant.id}
+                    productId={formData.slug || 'new-product'}
+                    initialImages={productImages}
+                    maxImages={10}
+                    onImagesChange={setProductImages}
+                    disabled={loading}
+                  />
+                )}
               </CardContent>
             </Card>
 

@@ -42,6 +42,7 @@ interface Product {
   is_active: boolean
   is_featured: boolean
   inventory_quantity: number
+  track_inventory: boolean
   tags: string[] | null
 }
 
@@ -60,6 +61,7 @@ export default function ProductsPage() {
   const { tenant } = useTenant()
   const [products, setProducts] = useState<Product[]>([])
   const [categories, setCategories] = useState<Category[]>([])
+  const [tenantSettings, setTenantSettings] = useState<any>({})
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState<string>('')
@@ -80,6 +82,10 @@ export default function ProductsPage() {
         if (categoriesResult.data) {
           setCategories(categoriesResult.data)
         }
+
+        // Load tenant settings
+        const settings = await tenantDb.getTenantSettings()
+        setTenantSettings(settings)
 
         // Load products
         const filters: any = {
@@ -303,6 +309,7 @@ export default function ProductsPage() {
               key={product.id}
               product={product}
               viewMode={viewMode}
+              tenantSettings={tenantSettings}
             />
           ))}
         </div>

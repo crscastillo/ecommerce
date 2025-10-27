@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { useTenant } from '@/lib/contexts/tenant-context'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -23,18 +24,21 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { 
+  Package, 
   Plus, 
   Search, 
-  MoreHorizontal, 
-  Edit, 
-  Trash2, 
-  Eye,
-  Package,
   Filter,
-  Upload
+  MoreHorizontal,
+  Edit,
+  Trash2,
+  Eye,
+  Upload,
+  FileSpreadsheet,
+  AlertTriangle
 } from 'lucide-react'
 import Link from 'next/link'
 import { CSVImportModal } from '@/components/admin/csv-import-modal'
+import { isProductLowStock } from '@/lib/utils/low-stock'
 
 interface Product {
   id: string
@@ -42,6 +46,7 @@ interface Product {
   slug: string
   price: number
   inventory_quantity: number
+  track_inventory: boolean
   is_active: boolean
   is_featured: boolean
   category_id: string
@@ -50,21 +55,26 @@ interface Product {
 }
 
 export default function ProductsPage() {
+  const { tenant } = useTenant()
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'inactive'>('all')
   const [showImportModal, setShowImportModal] = useState(false)
+  const [tenantSettings, setTenantSettings] = useState<any>({})
   
   const supabase = createClient()
 
   const loadProducts = async () => {
+    if (!tenant?.id) return
+    
     try {
       setLoading(true)
       
       let query = supabase
         .from('products')
         .select('*')
+        .eq('tenant_id', tenant.id)
         .order('created_at', { ascending: false })
 
       // Apply status filter
@@ -83,6 +93,17 @@ export default function ProductsPage() {
         console.error('Error loading products:', error)
       } else {
         setProducts(data || [])
+      }
+
+      // Load tenant settings
+      const { data: tenantData } = await supabase
+        .from('tenants')
+        .select('settings')
+        .eq('id', tenant.id)
+        .single()
+      
+      if (tenantData?.settings) {
+        setTenantSettings(tenantData.settings)
       }
     } catch (error) {
       console.error('Error loading products:', error)
@@ -135,7 +156,7 @@ export default function ProductsPage() {
 
   useEffect(() => {
     loadProducts()
-  }, [searchQuery, filterStatus])
+  }, [tenant?.id, searchQuery, filterStatus])
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -285,15 +306,20 @@ export default function ProductsPage() {
                       </TableCell>
                       <TableCell>{formatPrice(product.price)}</TableCell>
                       <TableCell>
-                        <span className={`text-sm ${
-                          product.inventory_quantity > 10 
-                            ? 'text-green-600' 
-                            : product.inventory_quantity > 0 
-                              ? 'text-yellow-600' 
-                              : 'text-red-600'
-                        }`}>
-                          {product.inventory_quantity}
-                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className={`text-sm ${
+                            product.inventory_quantity > (tenantSettings.low_stock_threshold || 5)
+                              ? 'text-green-600' 
+                              : product.inventory_quantity > 0 
+                                ? 'text-yellow-600' 
+                                : 'text-red-600'
+                          }`}>
+                            {product.inventory_quantity}
+                          </span>
+                          {product.track_inventory && isProductLowStock(product, { low_stock_threshold: tenantSettings.low_stock_threshold || 5 }) && (
+                            <AlertTriangle className="h-4 w-4 text-orange-500" />
+                          )}
+                        </div>
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">

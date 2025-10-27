@@ -79,6 +79,7 @@ interface StoreSettings {
     auto_fulfill_orders?: boolean
     email_notifications?: boolean
     sms_notifications?: boolean
+    low_stock_threshold?: number
   }
 }
 
@@ -117,7 +118,8 @@ export default function SettingsPage() {
       allow_backorders: false,
       auto_fulfill_orders: false,
       email_notifications: true,
-      sms_notifications: false
+      sms_notifications: false,
+      low_stock_threshold: 5
     }
   })
 
@@ -168,6 +170,7 @@ export default function SettingsPage() {
           auto_fulfill_orders: false,
           email_notifications: true,
           sms_notifications: false,
+          low_stock_threshold: 5,
           ...(tenant.settings as any) || {}
         }
       })
@@ -665,6 +668,24 @@ export default function SettingsPage() {
                   }))}
                   placeholder="8.25"
                 />
+              </div>
+
+              <div>
+                <Label htmlFor="low-stock-threshold">Low Stock Threshold</Label>
+                <Input
+                  id="low-stock-threshold"
+                  type="number"
+                  min="0"
+                  value={storeSettings.settings.low_stock_threshold || 5}
+                  onChange={(e) => setStoreSettings(prev => ({ 
+                    ...prev, 
+                    settings: { ...prev.settings, low_stock_threshold: parseInt(e.target.value) || 0 }
+                  }))}
+                  placeholder="5"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Show low stock warnings when product quantity is below this number
+                </p>
               </div>
 
               <Separator />

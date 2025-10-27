@@ -12,6 +12,7 @@ import {
   Package
 } from 'lucide-react'
 import { useState } from 'react'
+import { isProductLowStock, getLowStockBadge } from '@/lib/utils/low-stock'
 
 interface Product {
   id: string
@@ -31,15 +32,19 @@ interface Product {
   is_active: boolean
   is_featured: boolean
   inventory_quantity: number
+  track_inventory: boolean
   tags: string[] | null
 }
 
 interface ProductCardProps {
   product: Product
   viewMode?: 'grid' | 'list'
+  tenantSettings?: {
+    low_stock_threshold?: number
+  }
 }
 
-export function ProductCard({ product, viewMode = 'grid' }: ProductCardProps) {
+export function ProductCard({ product, viewMode = 'grid', tenantSettings = {} }: ProductCardProps) {
   const [imageError, setImageError] = useState(false)
   const [isWishlisted, setIsWishlisted] = useState(false)
 
@@ -68,8 +73,10 @@ export function ProductCard({ product, viewMode = 'grid' }: ProductCardProps) {
     ? Math.round(((product.compare_price - product.price) / product.compare_price) * 100)
     : 0
 
-  const isOutOfStock = product.inventory_quantity <= 0
-  const isLowStock = product.inventory_quantity <= 5 && product.inventory_quantity > 0
+  const isOutOfStock = product.track_inventory && product.inventory_quantity <= 0
+  const lowStockSettings = { low_stock_threshold: tenantSettings.low_stock_threshold || 5 }
+  const lowStockBadge = getLowStockBadge(product, lowStockSettings)
+  const isLowStockProduct = isProductLowStock(product, lowStockSettings)
 
   if (viewMode === 'list') {
     return (
@@ -108,9 +115,12 @@ export function ProductCard({ product, viewMode = 'grid' }: ProductCardProps) {
                   Out of Stock
                 </Badge>
               )}
-              {isLowStock && (
-                <Badge variant="outline" className="text-xs border-orange-500 text-orange-600">
-                  Low Stock
+              {lowStockBadge.show && (
+                <Badge 
+                  variant={lowStockBadge.variant === 'destructive' ? 'destructive' : 'outline'} 
+                  className={`text-xs ${lowStockBadge.variant === 'warning' ? 'border-orange-500 text-orange-600' : ''}`}
+                >
+                  {lowStockBadge.text}
                 </Badge>
               )}
             </div>
@@ -189,8 +199,8 @@ export function ProductCard({ product, viewMode = 'grid' }: ProductCardProps) {
               <div className="text-sm text-gray-600">
                 {isOutOfStock ? (
                   <span className="text-red-600">Out of stock</span>
-                ) : isLowStock ? (
-                  <span className="text-orange-600">Only {product.inventory_quantity} left</span>
+                ) : lowStockBadge.show ? (
+                  <span className="text-orange-600">{lowStockBadge.text}</span>
                 ) : (
                   <span className="text-green-600">In stock</span>
                 )}
@@ -247,9 +257,12 @@ export function ProductCard({ product, viewMode = 'grid' }: ProductCardProps) {
               Out of Stock
             </Badge>
           )}
-          {isLowStock && (
-            <Badge variant="outline" className="text-xs border-orange-500 text-orange-600">
-              Low Stock
+          {lowStockBadge.show && (
+            <Badge 
+              variant={lowStockBadge.variant === 'destructive' ? 'destructive' : 'outline'} 
+              className={`text-xs ${lowStockBadge.variant === 'warning' ? 'border-orange-500 text-orange-600' : ''}`}
+            >
+              {lowStockBadge.text}
             </Badge>
           )}
         </div>
@@ -321,8 +334,8 @@ export function ProductCard({ product, viewMode = 'grid' }: ProductCardProps) {
         <div className="mt-2 text-sm">
           {isOutOfStock ? (
             <span className="text-red-600">Out of stock</span>
-          ) : isLowStock ? (
-            <span className="text-orange-600">Only {product.inventory_quantity} left</span>
+          ) : lowStockBadge.show ? (
+            <span className="text-orange-600">{lowStockBadge.text}</span>
           ) : (
             <span className="text-green-600">In stock</span>
           )}

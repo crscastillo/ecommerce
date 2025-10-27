@@ -612,4 +612,61 @@ export class TenantDatabase {
       .eq('id', id)
       .eq('tenant_id', this.tenantId)
   }
+
+  // Tenant Settings
+  async getTenant() {
+    return this.supabase
+      .from('tenants')
+      .select('*')
+      .eq('id', this.tenantId)
+      .single()
+  }
+
+  async getTenantSettings() {
+    const { data: tenant } = await this.supabase
+      .from('tenants')
+      .select('settings')
+      .eq('id', this.tenantId)
+      .single()
+    
+    return tenant?.settings || {}
+  }
+
+  async updateTenantSettings(settings: any) {
+    return this.supabase
+      .from('tenants')
+      .update({ settings })
+      .eq('id', this.tenantId)
+      .select()
+      .single()
+  }
+
+  // Low Stock Helpers
+  async getLowStockThreshold(): Promise<number> {
+    const settings = await this.getTenantSettings()
+    return settings.low_stock_threshold || 5
+  }
+
+  async isProductLowStock(product: { inventory_quantity: number, track_inventory: boolean }): Promise<boolean> {
+    if (!product.track_inventory) {
+      return false
+    }
+    
+    const threshold = await this.getLowStockThreshold()
+    return product.inventory_quantity < threshold
+  }
+
+  async getLowStockProducts(limit: number = 50) {
+    const threshold = await this.getLowStockThreshold()
+    
+    return this.supabase
+      .from('products')
+      .select('*')
+      .eq('tenant_id', this.tenantId)
+      .eq('track_inventory', true)
+      .eq('is_active', true)
+      .lt('inventory_quantity', threshold)
+      .order('inventory_quantity', { ascending: true })
+      .limit(limit)
+  }
 }

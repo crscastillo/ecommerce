@@ -94,7 +94,7 @@ export default function ProductViewPage() {
     inventory_quantity: '',
     allow_backorder: false,
     weight: '',
-    category_id: '',
+    category_id: 'none',
     is_active: true,
     is_featured: false,
     seo_title: '',
@@ -140,7 +140,7 @@ export default function ProductViewPage() {
           inventory_quantity: productData.inventory_quantity.toString(),
           allow_backorder: productData.allow_backorder,
           weight: productData.weight?.toString() || '',
-          category_id: productData.category_id || '',
+          category_id: productData.category_id || 'none',
           is_active: productData.is_active,
           is_featured: productData.is_featured,
           seo_title: productData.seo_title || '',
@@ -218,7 +218,7 @@ export default function ProductViewPage() {
         inventory_quantity: formData.track_inventory ? parseInt(formData.inventory_quantity) : 0,
         allow_backorder: formData.allow_backorder,
         weight: formData.weight ? parseFloat(formData.weight) : null,
-        category_id: formData.category_id || null,
+        category_id: formData.category_id === 'none' ? null : formData.category_id,
         is_active: formData.is_active,
         is_featured: formData.is_featured,
         seo_title: formData.seo_title.trim() || null,
@@ -807,7 +807,7 @@ export default function ProductViewPage() {
                     <SelectValue placeholder="Select category" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">No category</SelectItem>
+                    <SelectItem value="none">No category</SelectItem>
                     {categories.map((category) => (
                       <SelectItem key={category.id} value={category.id}>
                         {category.name}

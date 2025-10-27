@@ -10,6 +10,7 @@ import { useTenant } from "@/lib/contexts/tenant-context";
 import { createClient } from "@/lib/supabase/client";
 import { redirectToUserTenantAdmin } from "@/lib/utils/tenant-redirects";
 import StoreHomepage from "@/components/store/store-homepage";
+import { platformConfig } from "@/lib/config/platform";
 
 export default function HomePage() {
   const { tenant, isLoading } = useTenant();
@@ -75,7 +76,7 @@ function PlatformHomepage() {
             <div className="flex items-center">
               <Store className="h-8 w-8 text-indigo-600 dark:text-indigo-400" />
               <span className="ml-2 text-xl font-bold text-gray-900 dark:text-white">
-                StoreBuilder
+                {platformConfig.name}
               </span>
             </div>
             <div className="flex items-center space-x-4">
@@ -332,7 +333,7 @@ function PlatformHomepage() {
             <div>
               <div className="flex items-center space-x-2 mb-4">
                 <Store className="w-6 h-6 text-blue-400" />
-                <span className="text-lg font-bold">StoreBuilder</span>
+                <span className="text-lg font-bold">{platformConfig.name}</span>
               </div>
               <p className="text-gray-400 text-sm">
                 The easiest way to create and manage your online store.
@@ -364,7 +365,7 @@ function PlatformHomepage() {
             </div>
           </div>
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-sm text-gray-400">
-            © 2025 StoreBuilder. All rights reserved.
+            © 2025 {platformConfig.name}. All rights reserved.
           </div>
         </div>
       </footer>

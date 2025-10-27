@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation'
 import { useTenant } from '@/lib/contexts/tenant-context'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { platformConfig } from '@/lib/config/platform'
 import {
   Store,
   Package,
@@ -124,7 +125,7 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
               </Badge>
             </div>
             <p className="mt-1 text-xs text-gray-500">
-              {tenant?.subdomain}.yourdomain.com
+              {tenant?.subdomain}.{platformConfig.getDomain()}
             </p>
           </div>
         </div>

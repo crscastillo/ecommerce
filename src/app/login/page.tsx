@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { platformConfig } from '@/lib/config/platform'
+import { Store } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { redirectToUserTenantAdmin } from '@/lib/utils/tenant-redirects'
@@ -105,6 +107,10 @@ export default function Login() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <Card className="w-full max-w-md">
         <CardHeader>
+          <div className="flex items-center justify-center mb-4">
+            <Store className="h-8 w-8 text-blue-600 mr-2" />
+            <span className="text-xl font-bold">{platformConfig.name}</span>
+          </div>
           <CardTitle className="text-2xl font-bold text-center">Sign in to your account</CardTitle>
           <CardDescription className="text-center">
             Enter your email and password to access your account

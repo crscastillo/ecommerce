@@ -3,6 +3,7 @@
 import { useTenant } from '@/lib/contexts/tenant-context'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { platformConfig } from '@/lib/config/platform'
 import { 
   Bell, 
   Search, 
@@ -39,7 +40,7 @@ export default function AdminHeader({ onMenuClick }: AdminHeaderProps) {
 
   const visitStore = () => {
     if (tenant?.subdomain) {
-      const url = `${window.location.protocol}//${tenant.subdomain}.${window.location.host}`
+      const url = `${window.location.protocol}//${tenant.subdomain}.${platformConfig.getDomain()}`
       window.open(url, '_blank')
     }
   }

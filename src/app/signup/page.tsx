@@ -7,7 +7,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Check, Loader2, AlertCircle } from 'lucide-react'
+import { platformConfig } from '@/lib/config/platform'
+import { Check, Loader2, AlertCircle, Store } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
@@ -188,7 +189,7 @@ export default function TenantSignup() {
             </div>
             <CardTitle className="text-2xl font-bold">Store Created Successfully!</CardTitle>
             <CardDescription>
-              Your store "{storeName}" has been created at {subdomain}.yourdomain.com
+              Your store "{storeName}" has been created at {subdomain}.{platformConfig.getDomain()}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -231,6 +232,10 @@ export default function TenantSignup() {
 
         <Card>
           <CardHeader>
+            <div className="flex items-center justify-center mb-4">
+              <Store className="h-8 w-8 text-blue-600 mr-2" />
+              <span className="text-xl font-bold">{platformConfig.name}</span>
+            </div>
             <CardTitle className="text-2xl font-bold text-center">
               {step === 1 ? 'Create Your Account' : 'Set Up Your Store'}
             </CardTitle>
@@ -316,7 +321,7 @@ export default function TenantSignup() {
                       className="rounded-r-none"
                     />
                     <div className="bg-gray-100 border border-l-0 px-3 py-2 text-sm text-gray-600 rounded-r-md">
-                      .yourdomain.com
+                      .{platformConfig.getDomain()}
                     </div>
                   </div>
                   <div className="mt-2 flex items-center gap-2">

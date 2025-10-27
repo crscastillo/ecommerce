@@ -3,6 +3,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { platformConfig } from '@/lib/config/platform'
 import { 
   DollarSign, 
   Package, 
@@ -66,7 +67,7 @@ export default function AdminDashboard() {
             <div>
               <p className="text-sm text-muted-foreground">Store URL</p>
               <p className="font-medium">
-                {tenant?.subdomain}.yourdomain.com
+                {tenant?.subdomain}.{platformConfig.getDomain()}
               </p>
             </div>
             <div>

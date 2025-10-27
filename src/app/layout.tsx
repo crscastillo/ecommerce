@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ConditionalLayout } from "@/components/conditional-layout";
 import { TenantProvider } from "@/lib/contexts/tenant-provider";
+import { platformConfig } from "@/lib/config/platform";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,8 +16,14 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Multi-Tenant Ecommerce Platform",
-  description: "Create and manage your own online store with our powerful multi-tenant ecommerce platform.",
+  title: platformConfig.seo.defaultTitle,
+  description: platformConfig.seo.description,
+  keywords: platformConfig.seo.keywords,
+  openGraph: {
+    title: platformConfig.seo.defaultTitle,
+    description: platformConfig.seo.description,
+    siteName: platformConfig.name,
+  },
 };
 
 export default function RootLayout({

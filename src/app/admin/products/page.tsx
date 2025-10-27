@@ -30,9 +30,11 @@ import {
   Trash2, 
   Eye,
   Package,
-  Filter
+  Filter,
+  Upload
 } from 'lucide-react'
 import Link from 'next/link'
+import { CSVImportModal } from '@/components/admin/csv-import-modal'
 
 interface Product {
   id: string
@@ -52,6 +54,7 @@ export default function ProductsPage() {
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'inactive'>('all')
+  const [showImportModal, setShowImportModal] = useState(false)
   
   const supabase = createClient()
 
@@ -155,12 +158,18 @@ export default function ProductsPage() {
             Manage your store's product catalog
           </p>
         </div>
-        <Button asChild>
-          <Link href="/admin/products/new">
-            <Plus className="mr-2 h-4 w-4" />
-            Add Product
-          </Link>
-        </Button>
+        <div className="flex items-center gap-3">
+          <Button variant="outline" onClick={() => setShowImportModal(true)}>
+            <Upload className="mr-2 h-4 w-4" />
+            Import CSV
+          </Button>
+          <Button asChild>
+            <Link href="/admin/products/new">
+              <Plus className="mr-2 h-4 w-4" />
+              Add Product
+            </Link>
+          </Button>
+        </div>
       </div>
 
       {/* Filters */}
@@ -344,6 +353,15 @@ export default function ProductsPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* CSV Import Modal */}
+      <CSVImportModal
+        open={showImportModal}
+        onOpenChange={setShowImportModal}
+        onImportComplete={() => {
+          loadProducts() // Reload products after import
+        }}
+      />
     </div>
   )
 }

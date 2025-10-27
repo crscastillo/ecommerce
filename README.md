@@ -14,6 +14,8 @@ A powerful, scalable multi-tenant ecommerce platform built with Next.js, Supabas
 
 ### Store Features  
 - **Complete Ecommerce**: Products, categories, cart, orders, customers
+- **Product Management**: Full CRUD operations with bulk CSV import ([Import Guide](docs/admin-products-import.md))
+- **Public Store**: Product catalog with search, filtering, and category browsing
 - **Admin Dashboard**: Full-featured admin panel for store management
 - **User Authentication**: Secure login/signup with Supabase Auth
 - **Row Level Security**: Data isolation between tenants
@@ -38,7 +40,14 @@ A powerful, scalable multi-tenant ecommerce platform built with Next.js, Supabas
 - **UI Components**: shadcn/ui + Radix UI
 - **Deployment**: Vercel (recommended)
 
-## 📋 Prerequisites
+## � Documentation
+
+- **[CSV Import Guide](docs/admin-products-import.md)** - Complete guide for bulk product imports with validation
+- **Admin Panel** - Store management features and workflows (sections below)
+- **API Reference** - Database operations and type definitions (generated from schema)
+- **Deployment** - Production setup instructions (see Deployment section)
+
+## �📋 Prerequisites
 
 - Node.js 18+
 - npm, yarn, or pnpm
@@ -508,6 +517,39 @@ npm run test:db     # Database tests
 - Ensure useTenant hook returns default values instead of throwing errors
 
 ## 🔄 Recent Updates
+
+### v1.6.0 - Products CSV Import & Public Store (October 2024)
+
+**📦 CSV Import System:**
+- **Bulk Product Import**: Professional CSV import with column mapping and validation
+- **4-Step Import Wizard**: Upload → Map Columns → Validate Data → Import with progress tracking
+- **Smart Column Detection**: Automatic CSV header recognition with example data preview
+- **Comprehensive Validation**: Type checking, required field validation, and category verification
+- **Template Download**: One-click CSV template generation with proper format
+- **Error Reporting**: Detailed validation errors with row and column specificity
+- **Progress Tracking**: Real-time import progress with success/failure reporting
+
+**🛍️ Public Store Pages:**
+- **Products Catalog**: Complete public product browsing with search and filtering
+- **Category Pages**: Dedicated category-specific product listings (`/products/category/[slug]`)
+- **Product Details**: Individual product pages with image gallery and cart functionality
+- **Product Grid/List Views**: Toggle between grid and list display modes
+- **Advanced Filtering**: Search, category filtering, and sorting options
+- **SEO-Friendly URLs**: Clean URL structure for better search engine optimization
+
+**🎨 Enhanced UI Components:**
+- **ProductCard Component**: Reusable product display with hover effects and status badges
+- **CSV Import Modal**: Multi-step wizard with drag-and-drop file upload
+- **Progress Indicators**: Visual feedback for import operations and loading states
+- **Responsive Design**: Mobile-optimized product browsing and admin interfaces
+
+**📊 Technical Improvements:**
+- **CSV Processing**: Robust CSV parsing with error handling and data validation
+- **Batch Operations**: Efficient bulk product creation with progress tracking
+- **Route Organization**: Proper Next.js routing structure avoiding conflicts
+- **Type Safety**: Full TypeScript support for all new components and operations
+
+> **Documentation**: See [docs/admin-products-import.md](docs/admin-products-import.md) for detailed CSV import guide.
 
 ### v1.5.0 - Signup Flow & RLS Policy Fixes (October 2024)
 

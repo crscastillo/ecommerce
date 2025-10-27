@@ -492,9 +492,15 @@ npm run test:db     # Database tests
 - **Settings page not loading**: Same tenant access requirements as other admin pages
 
 **Tenant signup RLS policy errors**:
-- Error: "new row violates row-level security policy for table 'tenants'"
-- Solution: User must complete email verification before tenant creation
-- Follow the two-phase signup process: account creation → email verification → tenant setup
+- **Error**: "infinite recursion detected in policy for relation 'tenants'"
+- **Solution**: Fixed with simplified RLS policies that avoid circular dependencies
+- **Migration Applied**: `20251026000002_fix_tenants_rls_simple.sql`
+
+**Signup flow creating users without tenants**:
+- **Issue**: Users created in auth.users but no tenant records
+- **Root Cause**: Multiple signup routes causing confusion (/signup vs /auth/signup)
+- **Solution**: Consolidated all signup flows to use proper tenant creation process
+- **Fix Applied**: Login page now correctly links to /signup, /auth/signup redirects to /signup
 
 **Infinite redirect loops in admin**:
 - Check that TenantProvider is properly configured
@@ -502,6 +508,26 @@ npm run test:db     # Database tests
 - Ensure useTenant hook returns default values instead of throwing errors
 
 ## 🔄 Recent Updates
+
+### v1.5.0 - Signup Flow & RLS Policy Fixes (October 2024)
+
+**🔧 Critical Bug Fixes:**
+- **Fixed Infinite Recursion**: Resolved "infinite recursion detected in policy for relation 'tenants'" error
+- **Consolidated Signup Flow**: Fixed users being created without tenants by unifying signup routes
+- **RLS Policy Optimization**: Simplified tenant table policies to prevent circular dependencies
+- **Authentication Flow**: Improved login-to-signup routing to ensure proper tenant creation
+
+**🛠️ Technical Improvements:**
+- **Simplified RLS Policies**: Migration `20251026000002_fix_tenants_rls_simple.sql` eliminates circular policy references
+- **Unified Signup Routes**: All signup flows now properly go through `/signup` with tenant creation
+- **Enhanced Error Handling**: Better user experience for authentication and tenant access issues
+- **Production-Ready Tenant Management**: Automatic redirection to signup for users without tenants
+
+**📋 Authentication Flow Updates:**
+- Login page correctly links to main signup flow (`/signup`)
+- Legacy signup route (`/auth/signup`) now redirects to proper flow
+- Two-phase signup maintained: account creation → email verification → tenant setup
+- Admin access properly validates tenant ownership and redirects when needed
 
 ### v1.4.0 - Admin Settings Management (October 2024)
 

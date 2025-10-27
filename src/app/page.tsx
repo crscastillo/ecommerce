@@ -1,11 +1,13 @@
 'use client'
 
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle, Store, Zap, Shield, Globe, Users, TrendingUp } from "lucide-react";
 import Link from "next/link";
 import { useTenant } from "@/lib/contexts/tenant-context";
+import { createClient } from "@/lib/supabase/client";
 import StoreHomepage from "@/components/store/store-homepage";
 
 export default function HomePage() {
@@ -30,23 +32,52 @@ export default function HomePage() {
 }
 
 function PlatformHomepage() {
+  const [user, setUser] = useState<any>(null);
+  const supabase = createClient();
+
+  useEffect(() => {
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+    });
+
+    // Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
       {/* Navigation */}
-      <nav className="bg-white border-b border-gray-200 sticky top-0 z-50">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+      <nav className="bg-white/80 backdrop-blur-md border-b border-gray-200 dark:bg-gray-900/80 dark:border-gray-700 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-2">
-              <Store className="w-8 h-8 text-blue-600" />
-              <span className="text-xl font-bold text-gray-900">StoreBuilder</span>
+            <div className="flex items-center">
+              <Store className="h-8 w-8 text-indigo-600 dark:text-indigo-400" />
+              <span className="ml-2 text-xl font-bold text-gray-900 dark:text-white">
+                StoreBuilder
+              </span>
             </div>
             <div className="flex items-center space-x-4">
-              <Link href="/login" className="text-gray-700 hover:text-blue-600">
-                Sign In
-              </Link>
-              <Button asChild>
-                <Link href="/signup">Get Started</Link>
-              </Button>
+              {user ? (
+                <Link href="/admin">
+                  <Button variant="default">Go to admin</Button>
+                </Link>
+              ) : (
+                <>
+                  <Link href="/login">
+                    <Button variant="ghost">Sign In</Button>
+                  </Link>
+                  <Link href="/signup">
+                    <Button variant="default">Get Started</Button>
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </div>

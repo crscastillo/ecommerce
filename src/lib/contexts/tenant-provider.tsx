@@ -129,6 +129,13 @@ export function TenantProvider({ children, initialTenant }: TenantProviderProps)
           return
         }
         
+        // In production, if user has no tenant and is trying to access admin,
+        // redirect them to signup to create a tenant
+        if (user && typeof window !== 'undefined') {
+          window.location.href = '/signup'
+          return
+        }
+        
         setTenant(null)
         setTenantUser(null)
         return

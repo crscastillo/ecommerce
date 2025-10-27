@@ -1,6 +1,50 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 
+export async function GET(request: NextRequest) {
+  try {
+    const supabase = await createClient()
+    
+    // Get the current user session
+    const { data: { user }, error: userError } = await supabase.auth.getUser()
+    
+    if (userError || !user) {
+      return NextResponse.json(
+        { error: 'Unauthorized - user must be authenticated' },
+        { status: 401 }
+      )
+    }
+
+    // Get tenants owned by the user
+    const { data: tenants, error: tenantsError } = await supabase
+      .from('tenants')
+      .select('*')
+      .eq('owner_id', user.id)
+      .eq('is_active', true)
+      .order('created_at', { ascending: false })
+
+    if (tenantsError) {
+      console.error('Tenants fetch error:', tenantsError)
+      return NextResponse.json(
+        { error: `Failed to fetch tenants: ${tenantsError.message}` },
+        { status: 500 }
+      )
+    }
+
+    return NextResponse.json({
+      success: true,
+      tenants: tenants || []
+    })
+
+  } catch (error) {
+    console.error('API error:', error)
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    )
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient()

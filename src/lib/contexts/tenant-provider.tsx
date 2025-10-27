@@ -86,9 +86,52 @@ export function TenantProvider({ children, initialTenant }: TenantProviderProps)
       // Check if we're in an admin route - if so, try to load user's primary tenant
       const isAdminRoute = typeof window !== 'undefined' && window.location.pathname.startsWith('/admin')
       
-      // For admin routes, always try to get a tenant (real or demo)
+      // For admin routes, prioritize subdomain tenant if present, otherwise fallback to user's tenant
       if (isAdminRoute) {
         if (user) {
+          // If we have a subdomain, try to load that specific tenant first
+          if (subdomain) {
+            const { data: subdomainTenant, error: subdomainError } = await supabase
+              .from('tenants')
+              .select('*')
+              .eq('subdomain', subdomain)
+              .eq('is_active', true)
+              .single()
+
+            if (!subdomainError && subdomainTenant) {
+              // Check if user has access to this tenant
+              const isOwner = subdomainTenant.owner_id === user.id
+              
+              if (isOwner) {
+                setTenant(subdomainTenant)
+                setTenantUser(null)
+                return
+              }
+
+              // Check if user is a member of this tenant
+              const { data: memberCheck } = await supabase
+                .from('tenant_users')
+                .select('*')
+                .eq('tenant_id', subdomainTenant.id)
+                .eq('user_id', user.id)
+                .eq('is_active', true)
+                .single()
+
+              if (memberCheck) {
+                setTenant(subdomainTenant)
+                setTenantUser(memberCheck)
+                return
+              }
+
+              // User doesn't have access to this tenant, redirect to unauthorized
+              if (typeof window !== 'undefined') {
+                window.location.href = '/admin/unauthorized'
+                return
+              }
+            }
+          }
+
+          // Fallback: load user's first owned tenant if no subdomain or subdomain access failed
           const { data: userTenants, error: tenantsError } = await supabase
             .from('tenants')
             .select('*')
@@ -98,9 +141,96 @@ export function TenantProvider({ children, initialTenant }: TenantProviderProps)
             .single()
 
           if (!tenantsError && userTenants) {
+            // If we're on the main domain (no subdomain) and user has a tenant,
+            // redirect them to their tenant's subdomain admin
+            if (!subdomain && typeof window !== 'undefined') {
+              const currentHostname = window.location.hostname
+              const currentPort = window.location.port
+              const protocol = window.location.protocol
+              
+              // Build the tenant subdomain URL
+              let tenantHostname: string
+              
+              if (currentHostname === 'localhost') {
+                // Development: redirect to tenant.localhost:3000
+                tenantHostname = `${userTenants.subdomain}.localhost`
+              } else if (currentHostname.endsWith('.vercel.app')) {
+                // Vercel: redirect to tenant.project.vercel.app
+                tenantHostname = `${userTenants.subdomain}.${currentHostname}`
+              } else {
+                // Production: redirect to tenant.yourdomain.com
+                tenantHostname = `${userTenants.subdomain}.${currentHostname}`
+              }
+              
+              const portSuffix = currentPort ? `:${currentPort}` : ''
+              const redirectUrl = `${protocol}//${tenantHostname}${portSuffix}/admin`
+              
+              console.log('Redirecting to tenant subdomain:', redirectUrl)
+              window.location.href = redirectUrl
+              return
+            }
+            
             setTenant(userTenants)
             setTenantUser(null)
             return
+          }
+
+          // If user doesn't own any tenants, check if they're a member of any tenant
+          if (!subdomain) {
+            const { data: memberTenants, error: memberError } = await supabase
+              .from('tenant_users')
+              .select(`
+                *,
+                tenants:tenant_id (
+                  id,
+                  name,
+                  subdomain,
+                  description,
+                  logo_url,
+                  theme_config,
+                  contact_email,
+                  contact_phone,
+                  address,
+                  settings,
+                  subscription_tier,
+                  is_active,
+                  owner_id,
+                  created_at,
+                  updated_at
+                )
+              `)
+              .eq('user_id', user.id)
+              .eq('is_active', true)
+              .limit(1)
+              .single()
+
+            if (!memberError && memberTenants && memberTenants.tenants) {
+              const memberTenant = memberTenants.tenants
+              
+              // Redirect to the tenant subdomain they're a member of
+              if (typeof window !== 'undefined') {
+                const currentHostname = window.location.hostname
+                const currentPort = window.location.port
+                const protocol = window.location.protocol
+                
+                let tenantHostname: string
+                
+                if (currentHostname === 'localhost') {
+                  tenantHostname = `${memberTenant.subdomain}.localhost`
+                } else if (currentHostname.endsWith('.vercel.app')) {
+                  tenantHostname = `${memberTenant.subdomain}.${currentHostname}`
+                } else {
+                  tenantHostname = `${memberTenant.subdomain}.${currentHostname}`
+                }
+                
+                const portSuffix = currentPort ? `:${currentPort}` : ''
+                const redirectUrl = `${protocol}//${tenantHostname}${portSuffix}/admin`
+                
+                console.log('Redirecting to member tenant subdomain:', redirectUrl)
+                window.location.href = redirectUrl
+                return
+              }
+            }
           }
         }
 

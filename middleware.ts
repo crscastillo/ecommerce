@@ -11,6 +11,13 @@ export async function middleware(request: NextRequest) {
   const subdomain = extractSubdomain(hostname)
   const isMainDomain = !subdomain || subdomain === 'www'
 
+  // Check for redirect loops by examining referrer
+  const referer = request.headers.get('referer')
+  if (referer && new URL(referer).hostname === hostname && request.nextUrl.pathname === new URL(referer).pathname) {
+    console.warn('Potential redirect loop detected:', { hostname, pathname: request.nextUrl.pathname })
+    return supabaseResponse
+  }
+
   // Debug logging for Vercel deployment issues
   if (process.env.NODE_ENV === 'development' || process.env.VERCEL) {
     console.log('Middleware Debug:', {

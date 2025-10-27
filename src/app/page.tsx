@@ -8,6 +8,7 @@ import { CheckCircle, Store, Zap, Shield, Globe, Users, TrendingUp } from "lucid
 import Link from "next/link";
 import { useTenant } from "@/lib/contexts/tenant-context";
 import { createClient } from "@/lib/supabase/client";
+import { redirectToUserTenantAdmin } from "@/lib/utils/tenant-redirects";
 import StoreHomepage from "@/components/store/store-homepage";
 
 export default function HomePage() {
@@ -34,6 +35,20 @@ export default function HomePage() {
 function PlatformHomepage() {
   const [user, setUser] = useState<any>(null);
   const supabase = createClient();
+
+  // Function to redirect to user's tenant admin
+  const handleGoToAdmin = async () => {
+    if (!user) return;
+    
+    await redirectToUserTenantAdmin(user, {
+      fallbackPath: '/signup',
+      onError: (error) => {
+        console.error('Admin redirect failed:', error)
+        // Fallback to signup if user has no tenants
+        window.location.href = '/signup'
+      }
+    })
+  }
 
   useEffect(() => {
     // Get initial session
@@ -65,9 +80,9 @@ function PlatformHomepage() {
             </div>
             <div className="flex items-center space-x-4">
               {user ? (
-                <Link href="/admin">
-                  <Button variant="default">Go to admin</Button>
-                </Link>
+                <Button variant="default" onClick={handleGoToAdmin}>
+                  Go to admin
+                </Button>
               ) : (
                 <>
                   <Link href="/login">

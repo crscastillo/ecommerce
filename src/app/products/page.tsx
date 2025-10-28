@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useTenant } from '@/lib/contexts/tenant-context'
+import { formatPrice } from '@/lib/utils/currency'
 import { ProductCard } from '@/components/product-card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -96,13 +97,6 @@ export default function ProductsPage() {
 
     loadData()
   }, [tenant?.id, selectedCategory, searchQuery, sortBy])
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    }).format(price)
-  }
 
   const handleCategoryChange = (categoryId: string) => {
     setSelectedCategory(categoryId === 'all' ? '' : categoryId)

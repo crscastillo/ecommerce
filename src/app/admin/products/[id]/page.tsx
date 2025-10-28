@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import { useTenant } from '@/lib/contexts/tenant-context'
 import { TenantDatabase } from '@/lib/supabase/tenant-database'
+import { formatPrice } from '@/lib/utils/currency'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -295,13 +296,6 @@ export default function ProductViewPage() {
     }
   }
 
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    }).format(price)
-  }
-
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -518,7 +512,7 @@ export default function ProductViewPage() {
                 <div>
                   <Label htmlFor="price">Price *</Label>
                   {mode === 'view' ? (
-                    <p className="mt-1 text-sm font-semibold">{formatPrice(product.price)}</p>
+                    <p className="mt-1 text-sm font-semibold">{formatPrice(product.price, tenant)}</p>
                   ) : (
                     <Input
                       id="price"
@@ -534,7 +528,7 @@ export default function ProductViewPage() {
                 <div>
                   <Label htmlFor="compare_price">Compare Price</Label>
                   {mode === 'view' ? (
-                    <p className="mt-1 text-sm">{product.compare_price ? formatPrice(product.compare_price) : 'Not set'}</p>
+                    <p className="mt-1 text-sm">{product.compare_price ? formatPrice(product.compare_price, tenant) : 'Not set'}</p>
                   ) : (
                     <Input
                       id="compare_price"
@@ -550,7 +544,7 @@ export default function ProductViewPage() {
                 <div>
                   <Label htmlFor="cost_price">Cost per Item</Label>
                   {mode === 'view' ? (
-                    <p className="mt-1 text-sm">{product.cost_price ? formatPrice(product.cost_price) : 'Not set'}</p>
+                    <p className="mt-1 text-sm">{product.cost_price ? formatPrice(product.cost_price, tenant) : 'Not set'}</p>
                   ) : (
                     <Input
                       id="cost_price"

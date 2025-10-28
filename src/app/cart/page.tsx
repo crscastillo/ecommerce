@@ -1,6 +1,8 @@
 'use client'
 
 import { useCart } from '@/lib/contexts/cart-context'
+import { useTenant } from '@/lib/contexts/tenant-context'
+import { formatPrice } from '@/lib/utils/currency'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -16,13 +18,8 @@ export default function CartPage() {
     getTotalPrice, 
     getItemCount 
   } = useCart()
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    }).format(price)
-  }
+  
+  const { tenant } = useTenant()
 
   if (items.length === 0) {
     return (
@@ -87,7 +84,7 @@ export default function CartPage() {
                         {item.name}
                       </Link>
                       <p className="text-gray-600 mt-1">
-                        {formatPrice(item.price)} each
+                        {formatPrice(item.price, tenant)} each
                       </p>
                     </div>
 
@@ -115,7 +112,7 @@ export default function CartPage() {
                     {/* Item Total */}
                     <div className="text-right">
                       <p className="text-lg font-medium text-gray-900">
-                        {formatPrice(item.price * item.quantity)}
+                        {formatPrice(item.price * item.quantity, tenant)}
                       </p>
                     </div>
 
@@ -143,7 +140,7 @@ export default function CartPage() {
               <CardContent className="space-y-4">
                 <div className="flex justify-between">
                   <span>Subtotal ({getItemCount()} items)</span>
-                  <span>{formatPrice(getTotalPrice())}</span>
+                  <span>{formatPrice(getTotalPrice(), tenant)}</span>
                 </div>
                 
                 <div className="flex justify-between">
@@ -154,7 +151,7 @@ export default function CartPage() {
                 <div className="border-t pt-4">
                   <div className="flex justify-between text-lg font-medium">
                     <span>Total</span>
-                    <span>{formatPrice(getTotalPrice())}</span>
+                    <span>{formatPrice(getTotalPrice(), tenant)}</span>
                   </div>
                 </div>
 

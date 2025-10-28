@@ -5,6 +5,7 @@ import { useCart } from '@/lib/contexts/cart-context'
 import { useToast } from '@/lib/contexts/toast-context'
 import { useTenant } from '@/lib/contexts/tenant-context'
 import { PaymentMethodsService, type PaymentMethodConfig } from '@/lib/services/payment-methods'
+import { formatPrice } from '@/lib/utils/currency'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -105,13 +106,6 @@ export default function CheckoutPage() {
       router.push('/cart')
     }
   }, [items.length, router])
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    }).format(price)
-  }
 
   const formatCardNumber = (value: string) => {
     // Remove all non-digits
@@ -582,7 +576,7 @@ export default function CheckoutPage() {
                         return (
                           <TiloPayPayment
                             amount={total}
-                            currency="USD"
+                            currency={tenant?.settings?.currency || "USD"}
                             onSuccess={handleTiloPaySuccess}
                             onError={handleTiloPayError}
                             apiKey={tiloPayConfig.keys.publishableKey}
@@ -763,7 +757,7 @@ export default function CheckoutPage() {
                               <p className="text-sm text-gray-600">Qty: {item.quantity}</p>
                             </div>
                           </div>
-                          <p className="font-medium">{formatPrice(item.price * item.quantity)}</p>
+                          <p className="font-medium">{formatPrice(item.price * item.quantity, tenant)}</p>
                         </div>
                       ))}
                     </div>
@@ -783,7 +777,7 @@ export default function CheckoutPage() {
                       disabled={isProcessing}
                       className="flex-1"
                     >
-                      {isProcessing ? 'Processing...' : `Place Order - ${formatPrice(total)}`}
+                      {isProcessing ? 'Processing...' : `Place Order - ${formatPrice(total, tenant)}`}
                     </Button>
                   </div>
                 </CardContent>
@@ -802,7 +796,7 @@ export default function CheckoutPage() {
                   {items.map((item) => (
                     <div key={item.id} className="flex justify-between text-sm">
                       <span>{item.name} × {item.quantity}</span>
-                      <span>{formatPrice(item.price * item.quantity)}</span>
+                      <span>{formatPrice(item.price * item.quantity, tenant)}</span>
                     </div>
                   ))}
                 </div>
@@ -810,7 +804,7 @@ export default function CheckoutPage() {
                 <div className="border-t pt-4 space-y-2">
                   <div className="flex justify-between">
                     <span>Subtotal</span>
-                    <span>{formatPrice(subtotal)}</span>
+                    <span>{formatPrice(subtotal, tenant)}</span>
                   </div>
                   
                   <div className="flex justify-between">
@@ -820,13 +814,13 @@ export default function CheckoutPage() {
                   
                   <div className="flex justify-between">
                     <span>Tax</span>
-                    <span>{formatPrice(tax)}</span>
+                    <span>{formatPrice(tax, tenant)}</span>
                   </div>
                   
                   <div className="border-t pt-2">
                     <div className="flex justify-between text-lg font-medium">
                       <span>Total</span>
-                      <span>{formatPrice(total)}</span>
+                      <span>{formatPrice(total, tenant)}</span>
                     </div>
                   </div>
                 </div>

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useTenant } from '@/lib/contexts/tenant-context'
+import { formatPrice } from '@/lib/utils/currency'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -158,13 +159,6 @@ export default function ProductsPage() {
     loadProducts()
   }, [tenant?.id, searchQuery, filterStatus])
 
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    }).format(price)
-  }
-
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString()
   }
@@ -304,7 +298,7 @@ export default function ProductsPage() {
                           {product.sku || 'N/A'}
                         </code>
                       </TableCell>
-                      <TableCell>{formatPrice(product.price)}</TableCell>
+                      <TableCell>{formatPrice(product.price, tenant)}</TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
                           <span className={`text-sm ${

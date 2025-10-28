@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation'
 import { useTenant } from '@/lib/contexts/tenant-context'
 import { useCart } from '@/lib/contexts/cart-context'
 import { useToast } from '@/lib/contexts/toast-context'
+import { formatPrice } from '@/lib/utils/currency'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
@@ -65,13 +66,6 @@ export default function ProductPage() {
 
     fetchProduct()
   }, [tenant?.id, productSlug])
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    }).format(price)
-  }
 
   const handleAddToCart = async () => {
     if (!product) return
@@ -290,11 +284,11 @@ export default function ProductPage() {
             {/* Price */}
             <div className="flex items-center space-x-4">
               <span className="text-3xl font-bold text-gray-900">
-                {formatPrice(product.price)}
+                {formatPrice(product.price, tenant)}
               </span>
               {product.compare_price && product.compare_price > product.price && (
                 <span className="text-xl text-gray-500 line-through">
-                  {formatPrice(product.compare_price)}
+                  {formatPrice(product.compare_price, tenant)}
                 </span>
               )}
             </div>
@@ -389,7 +383,7 @@ export default function ProductPage() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="flex items-center space-x-2 text-sm text-gray-600">
                 <Truck className="w-5 h-5" />
-                <span>Free shipping on orders over $50</span>
+                <span>Free shipping on orders over {formatPrice(50, tenant)}</span>
               </div>
               <div className="flex items-center space-x-2 text-sm text-gray-600">
                 <Shield className="w-5 h-5" />

@@ -12,6 +12,8 @@ import {
   Package
 } from 'lucide-react'
 import { useState } from 'react'
+import { useTenant } from '@/lib/contexts/tenant-context'
+import { formatPrice } from '@/lib/utils/currency'
 import { isProductLowStock, getLowStockBadge } from '@/lib/utils/low-stock'
 
 interface Product {
@@ -47,13 +49,7 @@ interface ProductCardProps {
 export function ProductCard({ product, viewMode = 'grid', tenantSettings = {} }: ProductCardProps) {
   const [imageError, setImageError] = useState(false)
   const [isWishlisted, setIsWishlisted] = useState(false)
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    }).format(price)
-  }
+  const { tenant } = useTenant()
 
   const getImageUrl = (): string => {
     try {
@@ -162,11 +158,11 @@ export function ProductCard({ product, viewMode = 'grid', tenantSettings = {} }:
               <div className="text-right">
                 <div className="flex items-center gap-2 mb-1">
                   <span className="text-xl font-bold text-gray-900">
-                    {formatPrice(product.price)}
+                    {formatPrice(product.price, tenant)}
                   </span>
                   {product.compare_price && product.compare_price > product.price && (
                     <span className="text-sm text-gray-500 line-through">
-                      {formatPrice(product.compare_price)}
+                      {formatPrice(product.compare_price, tenant)}
                     </span>
                   )}
                 </div>
@@ -320,11 +316,11 @@ export function ProductCard({ product, viewMode = 'grid', tenantSettings = {} }:
         <div className="flex items-center justify-between mt-3">
           <div className="flex items-center gap-2">
             <span className="text-lg font-bold text-gray-900">
-              {formatPrice(product.price)}
+              {formatPrice(product.price, tenant)}
             </span>
             {product.compare_price && product.compare_price > product.price && (
               <span className="text-sm text-gray-500 line-through">
-                {formatPrice(product.compare_price)}
+                {formatPrice(product.compare_price, tenant)}
               </span>
             )}
           </div>

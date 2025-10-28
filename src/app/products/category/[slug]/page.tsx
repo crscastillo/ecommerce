@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import { useTenant } from '@/lib/contexts/tenant-context'
+import { formatPrice } from '@/lib/utils/currency'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -44,13 +45,6 @@ export default function CategoryProductsPage() {
 
     fetchProducts()
   }, [tenant?.id, categorySlug])
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    }).format(price)
-  }
 
   if (loading) {
     return (
@@ -180,11 +174,11 @@ export default function CategoryProductsPage() {
                   )}
                   <div className="flex items-center gap-2">
                     <span className="text-lg font-bold text-gray-900">
-                      {formatPrice(product.price)}
+                      {formatPrice(product.price, tenant)}
                     </span>
                     {product.compare_price && product.compare_price > product.price && (
                       <span className="text-sm text-gray-500 line-through">
-                        {formatPrice(product.compare_price)}
+                        {formatPrice(product.compare_price, tenant)}
                       </span>
                     )}
                   </div>

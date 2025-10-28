@@ -114,7 +114,7 @@ interface PaymentSettings {
 }
 
 export default function SettingsPage() {
-  const { tenant, isLoading: tenantLoading, error } = useTenant()
+  const { tenant, isLoading: tenantLoading, error, refreshTenant } = useTenant()
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
@@ -308,6 +308,9 @@ export default function SettingsPage() {
       if (error) {
         throw error
       }
+
+      // Refresh tenant context to get updated currency
+      await refreshTenant()
 
       setMessage({ type: 'success', text: 'Store settings saved successfully!' })
     } catch (error) {

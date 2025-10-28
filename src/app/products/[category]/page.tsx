@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import { useTenant } from '@/lib/contexts/tenant-context'
 import { TenantDatabase } from '@/lib/supabase/tenant-database'
+import { formatPrice } from '@/lib/utils/currency'
 import { ProductCard } from '@/components/product-card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -134,13 +135,6 @@ export default function CategoryProductsPage() {
 
     loadData()
   }, [tenant?.id, categorySlug, searchQuery, sortBy])
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    }).format(price)
-  }
 
   if (!tenant) {
     return (

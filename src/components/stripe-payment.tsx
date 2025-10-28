@@ -7,9 +7,12 @@ import { STRIPE_CONFIG } from '@/lib/stripe'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { useToast } from '@/lib/contexts/toast-context'
+import { formatPrice } from '@/lib/utils/currency'
+import { Tenant } from '@/lib/contexts/tenant-context'
 
 interface StripePaymentFormProps {
   amount: number
+  tenant: Tenant | null
   onSuccess: (paymentMethod: any) => void
   onError: (error: string) => void
   isProcessing: boolean
@@ -18,6 +21,7 @@ interface StripePaymentFormProps {
 
 function StripePaymentForm({ 
   amount, 
+  tenant,
   onSuccess, 
   onError, 
   isProcessing, 
@@ -107,7 +111,7 @@ function StripePaymentForm({
         disabled={!stripe || isProcessing}
         className="w-full"
       >
-        {isProcessing ? 'Processing...' : `Pay $${(amount / 100).toFixed(2)}`}
+        {isProcessing ? 'Processing...' : `Pay ${formatPrice(amount / 100, tenant)}`}
       </Button>
     </form>
   )
@@ -115,6 +119,7 @@ function StripePaymentForm({
 
 interface StripePaymentWrapperProps {
   amount: number
+  tenant: Tenant | null
   onSuccess: (paymentMethod: any) => void
   onError: (error: string) => void
   isProcessing: boolean
@@ -123,7 +128,7 @@ interface StripePaymentWrapperProps {
 }
 
 export function StripePaymentWrapper(props: StripePaymentWrapperProps) {
-  const { publishableKey, ...otherProps } = props
+  const { publishableKey, tenant, ...otherProps } = props
   
   // Use provided key or fall back to environment variable
   const stripeKey = publishableKey || process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || 'pk_test_51234567890abcdef'
@@ -132,14 +137,16 @@ export function StripePaymentWrapper(props: StripePaymentWrapperProps) {
     return loadStripe(stripeKey)
   }, [stripeKey])
 
+  const currency = tenant?.settings?.currency?.toLowerCase() || 'usd'
+
   return (
     <Elements stripe={dynamicStripePromise} options={{
       mode: 'payment',
       amount: props.amount,
-      currency: STRIPE_CONFIG.currency,
+      currency: currency,
       appearance: STRIPE_CONFIG.appearance,
     }}>
-      <StripePaymentForm {...otherProps} />
+      <StripePaymentForm {...otherProps} tenant={tenant} />
     </Elements>
   )
 }

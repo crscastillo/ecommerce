@@ -6,10 +6,13 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { CreditCard, Lock } from 'lucide-react'
+import { formatPrice } from '@/lib/utils/currency'
+import { Tenant } from '@/lib/contexts/tenant-context'
 
 interface TiloPayPaymentProps {
   amount: number
   currency: string
+  tenant: Tenant | null
   onSuccess: (paymentId: string) => void
   onError: (error: string) => void
   apiKey: string
@@ -27,6 +30,7 @@ interface PaymentData {
 export function TiloPayPayment({ 
   amount, 
   currency, 
+  tenant,
   onSuccess, 
   onError, 
   apiKey,
@@ -272,7 +276,7 @@ export function TiloPayPayment({
           disabled={disabled || isProcessing}
           className="w-full"
         >
-          {isProcessing ? 'Processing...' : `Pay ${currency} ${amount.toFixed(2)}`}
+          {isProcessing ? 'Processing...' : `Pay ${formatPrice(amount, tenant)}`}
         </Button>
       </CardContent>
     </Card>

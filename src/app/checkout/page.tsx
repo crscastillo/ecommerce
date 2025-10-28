@@ -535,6 +535,7 @@ export default function CheckoutPage() {
                         return (
                           <StripePaymentWrapper
                             amount={Math.round(total * 100)} // Convert to cents
+                            tenant={tenant}
                             onSuccess={handleStripeSuccess}
                             onError={handleStripeError}
                             isProcessing={isProcessing}
@@ -577,6 +578,7 @@ export default function CheckoutPage() {
                           <TiloPayPayment
                             amount={total}
                             currency={tenant?.settings?.currency || "USD"}
+                            tenant={tenant}
                             onSuccess={handleTiloPaySuccess}
                             onError={handleTiloPayError}
                             apiKey={tiloPayConfig.keys.publishableKey}

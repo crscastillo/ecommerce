@@ -33,35 +33,39 @@ export default function StoreHomepage({ tenant }: StoreHomepageProps) {
 
   useEffect(() => {
     async function fetchCategories() {
-      console.log('fetchCategories called with tenant:', tenant);
+      console.log('StoreHomepage: fetchCategories called with tenant:', tenant);
       
       if (!tenant?.id) {
-        console.log('No tenant ID available:', tenant);
+        console.log('StoreHomepage: No tenant ID available:', tenant);
         setLoading(false);
         return;
       }
 
       try {
-        console.log('Fetching categories via API route...');
+        console.log('StoreHomepage: Fetching categories via API route for tenant:', tenant.id);
         
         const response = await fetch(`/api/categories?tenant_id=${tenant.id}`);
+        console.log('StoreHomepage: API response status:', response.status);
         
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+          const errorText = await response.text();
+          console.error('StoreHomepage: API request failed:', response.status, errorText);
+          throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
         }
         
         const result = await response.json();
-        console.log('API response:', result);
+        console.log('StoreHomepage: API response data:', result);
         
         if (result.error) {
-          console.error('API error:', result.error);
+          console.error('StoreHomepage: API returned error:', result.error);
+          throw new Error(result.error);
         } else {
-          console.log('Categories fetched successfully:', result.data);
+          console.log('StoreHomepage: Categories fetched successfully, count:', result.data?.length);
           // Show maximum 6 categories for the homepage
           setCategories(result.data?.slice(0, 6) || []);
         }
       } catch (error) {
-        console.error('Error fetching categories:', error);
+        console.error('StoreHomepage: Error fetching categories:', error);
       } finally {
         setLoading(false);
       }

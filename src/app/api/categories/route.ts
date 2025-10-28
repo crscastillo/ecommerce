@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(request: NextRequest) {
@@ -10,7 +10,19 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const supabase = await createClient()
+    // Use service role key to bypass RLS
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false,
+        },
+      }
+    )
+    
+    console.log('API: Fetching categories for tenant:', tenantId)
     
     const { data, error } = await supabase
       .from('categories')
@@ -19,11 +31,14 @@ export async function GET(request: NextRequest) {
       .eq('is_active', true)
       .order('sort_order', { ascending: true })
 
+    console.log('API: Database response:', { data, error })
+
     if (error) {
       console.error('Database error:', error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
+    console.log('API: Returning categories:', data)
     return NextResponse.json({ data })
   } catch (error) {
     console.error('Server error:', error)

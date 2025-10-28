@@ -158,9 +158,13 @@ export default function CartPage() {
                   </div>
                 </div>
 
-                <Button className="w-full mt-6" size="lg">
-                  Proceed to Checkout
-                </Button>
+                {items.length > 0 && (
+                  <Link href="/checkout">
+                    <Button className="w-full mt-6" size="lg">
+                      Proceed to Checkout
+                    </Button>
+                  </Link>
+                )}
                 
                 <Link href="/products">
                   <Button variant="outline" className="w-full">

@@ -101,11 +101,14 @@ interface PaymentMethodConfig {
   enabled: boolean
   stripe_publishable_key?: string
   stripe_secret_key?: string
+  tilopay_api_key?: string
+  tilopay_secret_key?: string
 }
 
 interface PaymentSettings {
   cash_on_delivery: PaymentMethodConfig
   stripe: PaymentMethodConfig
+  tilopay: PaymentMethodConfig
 }
 
 export default function SettingsPage() {
@@ -117,9 +120,11 @@ export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState('store')
   const [paymentMethods, setPaymentMethods] = useState<PaymentSettings>({
     cash_on_delivery: { enabled: true },
-    stripe: { enabled: false }
+    stripe: { enabled: false },
+    tilopay: { enabled: false }
   })
   const [showStripeKeys, setShowStripeKeys] = useState(false)
+  const [showTiloPayKeys, setShowTiloPayKeys] = useState(false)
   
   const [storeSettings, setStoreSettings] = useState<StoreSettings>({
     name: '',
@@ -254,6 +259,7 @@ export default function SettingsPage() {
       // Convert to our local state format
       const stripeMethod = methods.find(m => m.id === 'stripe')
       const traditionalMethod = methods.find(m => m.id === 'traditional')
+      const tilopayMethod = methods.find(m => m.id === 'tilopay')
       
       setPaymentMethods({
         cash_on_delivery: {
@@ -263,6 +269,11 @@ export default function SettingsPage() {
           enabled: stripeMethod?.enabled || false,
           stripe_publishable_key: stripeMethod?.keys?.publishableKey || '',
           stripe_secret_key: stripeMethod?.keys?.secretKey || ''
+        },
+        tilopay: {
+          enabled: tilopayMethod?.enabled || false,
+          tilopay_api_key: tilopayMethod?.keys?.publishableKey || '',
+          tilopay_secret_key: tilopayMethod?.keys?.secretKey || ''
         }
       })
     } catch (error) {
@@ -358,6 +369,19 @@ export default function SettingsPage() {
         }
       }
 
+      // Validate TiloPay keys if TiloPay is enabled
+      if (paymentMethods.tilopay.enabled) {
+        const validation = PaymentMethodsService.validateTiloPayKeys({
+          publishableKey: paymentMethods.tilopay.tilopay_api_key,
+          secretKey: paymentMethods.tilopay.tilopay_secret_key
+        })
+        
+        if (!validation.valid) {
+          setMessage({ type: 'error', text: `TiloPay validation error: ${validation.message}` })
+          return
+        }
+      }
+
       // Convert to service format
       const defaultMethods = PaymentMethodsService.getDefaultPaymentMethods()
       const updatedMethods = defaultMethods.map(method => {
@@ -376,6 +400,17 @@ export default function SettingsPage() {
           return {
             ...method,
             enabled: paymentMethods.cash_on_delivery.enabled
+          }
+        }
+        if (method.id === 'tilopay') {
+          return {
+            ...method,
+            enabled: paymentMethods.tilopay.enabled,
+            keys: {
+              ...method.keys,
+              publishableKey: paymentMethods.tilopay.tilopay_api_key || '',
+              secretKey: paymentMethods.tilopay.tilopay_secret_key || ''
+            }
           }
         }
         return method
@@ -1128,6 +1163,113 @@ export default function SettingsPage() {
                               Stripe Dashboard
                             </a>
                             . Use test keys for testing and live keys for production.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* TiloPay */}
+              <div className="border rounded-lg">
+                <div className="flex items-center justify-between p-4">
+                  <div className="flex items-center space-x-4">
+                    <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                      🏦
+                    </div>
+                    <div>
+                      <h3 className="font-medium">TiloPay</h3>
+                      <p className="text-sm text-gray-500">
+                        Costa Rican payment gateway for local and international cards
+                      </p>
+                    </div>
+                  </div>
+                  <Switch
+                    checked={paymentMethods.tilopay.enabled}
+                    onCheckedChange={(checked) => setPaymentMethods(prev => ({
+                      ...prev,
+                      tilopay: { ...prev.tilopay, enabled: checked }
+                    }))}
+                  />
+                </div>
+
+                {paymentMethods.tilopay.enabled && (
+                  <div className="px-4 pb-4 space-y-4 border-t bg-gray-50">
+                    <div className="flex items-center justify-between pt-4">
+                      <Label className="text-sm font-medium">API Keys</Label>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setShowTiloPayKeys(!showTiloPayKeys)}
+                      >
+                        {showTiloPayKeys ? (
+                          <>
+                            <EyeOff className="h-4 w-4 mr-2" />
+                            Hide Keys
+                          </>
+                        ) : (
+                          <>
+                            <Eye className="h-4 w-4 mr-2" />
+                            Show Keys
+                          </>
+                        )}
+                      </Button>
+                    </div>
+
+                    <div className="space-y-3">
+                      <div>
+                        <Label htmlFor="tilopay-api-key" className="text-sm">
+                          API Key
+                        </Label>
+                        <Input
+                          id="tilopay-api-key"
+                          type={showTiloPayKeys ? "text" : "password"}
+                          value={paymentMethods.tilopay.tilopay_api_key || ''}
+                          onChange={(e) => setPaymentMethods(prev => ({
+                            ...prev,
+                            tilopay: { ...prev.tilopay, tilopay_api_key: e.target.value }
+                          }))}
+                          placeholder="Your TiloPay API key"
+                          className="font-mono text-sm"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="tilopay-secret-key" className="text-sm">
+                          Secret Key
+                        </Label>
+                        <Input
+                          id="tilopay-secret-key"
+                          type={showTiloPayKeys ? "text" : "password"}
+                          value={paymentMethods.tilopay.tilopay_secret_key || ''}
+                          onChange={(e) => setPaymentMethods(prev => ({
+                            ...prev,
+                            tilopay: { ...prev.tilopay, tilopay_secret_key: e.target.value }
+                          }))}
+                          placeholder="Your TiloPay secret key"
+                          className="font-mono text-sm"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="bg-green-50 p-3 rounded-lg">
+                      <div className="flex items-start space-x-2">
+                        <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <span className="text-white text-xs font-bold">i</span>
+                        </div>
+                        <div className="text-sm">
+                          <p className="font-medium text-green-900">TiloPay API Keys</p>
+                          <p className="text-green-700">
+                            Get your API keys from the{' '}
+                            <a 
+                              href="https://portal.tilopay.com" 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="underline"
+                            >
+                              TiloPay Portal
+                            </a>
+                            . TiloPay supports CRC and USD payments for Costa Rica.
                           </p>
                         </div>
                       </div>

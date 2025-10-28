@@ -89,6 +89,23 @@ export class PaymentMethodsService {
         requiresKeys: false
       },
       {
+        id: 'tilopay',
+        name: 'TiloPay',
+        enabled: false,
+        requiresKeys: true,
+        keys: {
+          publishableKey: '',
+          secretKey: '',
+          webhookSecret: ''
+        },
+        testMode: true,
+        metadata: {
+          description: 'TiloPay payment gateway for Costa Rica',
+          supportedCountries: ['CR'],
+          supportedCurrencies: ['CRC', 'USD']
+        }
+      },
+      {
         id: 'paypal',
         name: 'PayPal',
         enabled: false,
@@ -136,11 +153,35 @@ export class PaymentMethodsService {
     }
   }
 
+  static validateTiloPayKeys(keys: any): { valid: boolean; message: string } {
+    if (!keys.publishableKey || !keys.secretKey) {
+      return { valid: false, message: 'Both API key and secret key are required' }
+    }
+    
+    // TiloPay uses different key formats - validate basic structure
+    if (keys.publishableKey.length < 10) {
+      return { valid: false, message: 'Invalid API key format' }
+    }
+    
+    if (keys.secretKey.length < 20) {
+      return { valid: false, message: 'Invalid secret key format' }
+    }
+    
+    return { 
+      valid: true, 
+      message: 'TiloPay keys validated successfully' 
+    }
+  }
+
   static getEnabledPaymentMethods(paymentMethods: PaymentMethodConfig[]): PaymentMethodConfig[] {
     return paymentMethods.filter(method => method.enabled)
   }
 
   static getStripeConfig(paymentMethods: PaymentMethodConfig[]): PaymentMethodConfig | null {
     return paymentMethods.find(method => method.id === 'stripe' && method.enabled) || null
+  }
+
+  static getTiloPayConfig(paymentMethods: PaymentMethodConfig[]): PaymentMethodConfig | null {
+    return paymentMethods.find(method => method.id === 'tilopay' && method.enabled) || null
   }
 }

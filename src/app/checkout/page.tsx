@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { StripePaymentWrapper } from '@/components/stripe-payment'
+import { TiloPayPayment } from '@/components/tilopay-payment'
 import Link from 'next/link'
 import Image from 'next/image'
 import { ArrowLeft, CreditCard, Truck, Shield, ShoppingBag } from 'lucide-react'
@@ -33,7 +34,7 @@ interface PaymentInfo {
   expiryDate: string
   cvv: string
   cardholderName: string
-  paymentMethod: 'card' | 'stripe'
+  paymentMethod: 'card' | 'stripe' | 'tilopay'
 }
 
 export default function CheckoutPage() {
@@ -45,6 +46,7 @@ export default function CheckoutPage() {
   const [isProcessing, setIsProcessing] = useState(false)
   const [currentStep, setCurrentStep] = useState<'shipping' | 'payment' | 'review'>('shipping')
   const [stripePaymentMethod, setStripePaymentMethod] = useState<any>(null)
+  const [tiloPayPaymentMethod, setTiloPayPaymentMethod] = useState<any>(null)
   const [availablePaymentMethods, setAvailablePaymentMethods] = useState<PaymentMethodConfig[]>([])
   const [loadingPaymentMethods, setLoadingPaymentMethods] = useState(true)
   
@@ -83,7 +85,7 @@ export default function CheckoutPage() {
         if (enabledMethods.length > 0) {
           setPaymentInfo(prev => ({
             ...prev,
-            paymentMethod: enabledMethods[0].id as 'card' | 'stripe'
+            paymentMethod: enabledMethods[0].id as 'card' | 'stripe' | 'tilopay'
           }))
         }
       } catch (err) {
@@ -181,6 +183,17 @@ export default function CheckoutPage() {
       setCurrentStep('review')
       return
     }
+
+    if (paymentInfo.paymentMethod === 'tilopay') {
+      // TiloPay payment will be handled by the TiloPay component
+      if (!tiloPayPaymentMethod) {
+        error('Payment Required', 'Please complete your payment information')
+        return
+      }
+      success('Payment Information Saved', 'Please review your order')
+      setCurrentStep('review')
+      return
+    }
     
     // Handle traditional card form validation
     const requiredFields = ['cardNumber', 'expiryDate', 'cvv', 'cardholderName']
@@ -256,6 +269,16 @@ export default function CheckoutPage() {
   }
 
   const handleStripeError = (errorMessage: string) => {
+    error('Payment Failed', errorMessage)
+  }
+
+  const handleTiloPaySuccess = (paymentId: string) => {
+    setTiloPayPaymentMethod({ paymentId, last4: '****' })
+    success('Payment Method Added', 'TiloPay payment method saved successfully')
+    setCurrentStep('review')
+  }
+
+  const handleTiloPayError = (errorMessage: string) => {
     error('Payment Failed', errorMessage)
   }
 
@@ -462,15 +485,17 @@ export default function CheckoutPage() {
                                 ? 'border-blue-500 bg-blue-50' 
                                 : 'border-gray-200 hover:border-gray-300'
                             }`}
-                            onClick={() => setPaymentInfo(prev => ({ ...prev, paymentMethod: method.id as 'card' | 'stripe' }))}
+                            onClick={() => setPaymentInfo(prev => ({ ...prev, paymentMethod: method.id as 'card' | 'stripe' | 'tilopay' }))}
                           >
                             <CardContent className="p-4 text-center">
                               <div className="mb-2">
                                 <div className={`inline-flex items-center justify-center w-12 h-12 rounded-lg mb-2 ${
-                                  method.id === 'stripe' ? 'bg-indigo-100' : 'bg-green-100'
+                                  method.id === 'stripe' ? 'bg-indigo-100' : 
+                                  method.id === 'tilopay' ? 'bg-green-100' : 'bg-gray-100'
                                 }`}>
                                   <CreditCard className={`w-6 h-6 ${
-                                    method.id === 'stripe' ? 'text-indigo-600' : 'text-green-600'
+                                    method.id === 'stripe' ? 'text-indigo-600' : 
+                                    method.id === 'tilopay' ? 'text-green-600' : 'text-gray-600'
                                   }`} />
                                 </div>
                               </div>
@@ -478,6 +503,7 @@ export default function CheckoutPage() {
                               <p className="text-sm text-gray-600">
                                 {method.id === 'stripe' ? 'Secure payment with Stripe' :
                                  method.id === 'traditional' ? 'Enter card details manually' :
+                                 method.id === 'tilopay' ? 'Costa Rican payment gateway' :
                                  method.id === 'paypal' ? 'Pay with PayPal' :
                                  'Secure payment processing'}
                               </p>
@@ -505,8 +531,8 @@ export default function CheckoutPage() {
                         if (!stripeConfig || !stripeConfig.keys?.publishableKey) {
                           return (
                             <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                              <p className="text-yellow-800 text-sm">
-                                Stripe is not properly configured. Please contact the store owner.
+                              <p className="text-yellow-800">
+                                Stripe is not properly configured. Please contact support.
                               </p>
                             </div>
                           )
@@ -537,7 +563,46 @@ export default function CheckoutPage() {
                     </div>
                   )}
 
-                  {/* Traditional Card Form */}
+                  {/* TiloPay Payment Form */}
+                  {paymentInfo.paymentMethod === 'tilopay' && (
+                    <div className="space-y-4">
+                      <h3 className="font-medium">TiloPay Payment</h3>
+                      {(() => {
+                        const tiloPayConfig = PaymentMethodsService.getTiloPayConfig(availablePaymentMethods)
+                        if (!tiloPayConfig || !tiloPayConfig.keys?.publishableKey) {
+                          return (
+                            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                              <p className="text-yellow-800">
+                                TiloPay is not properly configured. Please contact support.
+                              </p>
+                            </div>
+                          )
+                        }
+                        
+                        return (
+                          <TiloPayPayment
+                            amount={total}
+                            currency="USD"
+                            onSuccess={handleTiloPaySuccess}
+                            onError={handleTiloPayError}
+                            apiKey={tiloPayConfig.keys.publishableKey}
+                            disabled={isProcessing}
+                          />
+                        )
+                      })()}
+                      
+                      <div className="flex space-x-4 mt-6">
+                        <Button 
+                          type="button" 
+                          variant="outline" 
+                          onClick={() => setCurrentStep('shipping')}
+                          className="flex-1"
+                        >
+                          Back to Shipping
+                        </Button>
+                      </div>
+                    </div>
+                  )}                  {/* Traditional Card Form */}
                   {paymentInfo.paymentMethod === 'card' && (
                     <form onSubmit={handlePaymentSubmit} className="space-y-4">
                       <div>
@@ -647,6 +712,19 @@ export default function CheckoutPage() {
                           </p>
                           <p className="text-sm text-gray-600">
                             {stripePaymentMethod.card?.brand?.toUpperCase()} ending in {stripePaymentMethod.card?.last4}
+                          </p>
+                        </div>
+                      ) : paymentInfo.paymentMethod === 'tilopay' && tiloPayPaymentMethod ? (
+                        <div>
+                          <p className="flex items-center">
+                            <CreditCard className="w-4 h-4 mr-2" />
+                            TiloPay Payment
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            Payment ID: {tiloPayPaymentMethod.paymentId}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            Secure payment processed via TiloPay
                           </p>
                         </div>
                       ) : paymentInfo.paymentMethod === 'card' ? (

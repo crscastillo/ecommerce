@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import { TenantDatabase } from "@/lib/supabase/tenant-database";
 
 interface Category {
   id: string;
@@ -43,19 +42,27 @@ export default function StoreHomepage({ tenant }: StoreHomepageProps) {
       }
 
       try {
-        console.log('StoreHomepage: Fetching categories via TenantDatabase for tenant:', tenant.id);
+        console.log('StoreHomepage: Fetching categories via API route for tenant:', tenant.id);
         
-        const tenantDb = new TenantDatabase(tenant.id);
-        const result = await tenantDb.getCategoriesAPI({ is_active: true, limit: 6 });
+        const response = await fetch(`/api/categories?tenant_id=${tenant.id}`);
+        console.log('StoreHomepage: API response status:', response.status);
         
-        console.log('StoreHomepage: TenantDatabase response:', result);
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('StoreHomepage: API request failed:', response.status, errorText);
+          throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+        }
+        
+        const result = await response.json();
+        console.log('StoreHomepage: API response data:', result);
         
         if (result.error) {
-          console.error('StoreHomepage: TenantDatabase returned error:', result.error);
+          console.error('StoreHomepage: API returned error:', result.error);
           throw new Error(result.error);
         } else {
           console.log('StoreHomepage: Categories fetched successfully, count:', result.data?.length);
-          setCategories(result.data || []);
+          // Show maximum 6 categories for the homepage
+          setCategories(result.data?.slice(0, 6) || []);
         }
       } catch (error) {
         console.error('StoreHomepage: Error fetching categories:', error);

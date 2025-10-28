@@ -16,7 +16,6 @@ import {
 import { ShoppingCart, User, Search, Menu } from "lucide-react"
 import { useTenant } from "@/lib/contexts/tenant-context"
 import { useState, useEffect } from "react"
-import { TenantDatabase } from "@/lib/supabase/tenant-database"
 
 interface Category {
   id: string
@@ -38,13 +37,16 @@ export function Header() {
     const loadCategories = async () => {
       try {
         setLoadingCategories(true)
-        const tenantDb = new TenantDatabase(tenant.id)
-        const result = await tenantDb.getNavigationCategories(3)
-        
-        if (result.error) {
-          console.error('Error loading categories:', result.error)
-        } else if (result.data) {
-          setCategories(result.data)
+        const response = await fetch(`/api/categories?tenant_id=${tenant.id}`)
+        if (response.ok) {
+          const result = await response.json()
+          if (result.data) {
+            // Only show active categories and limit to first 3 for the menu
+            const activeCategories = result.data
+              .filter((cat: Category) => cat.is_active)
+              .slice(0, 3)
+            setCategories(activeCategories)
+          }
         }
       } catch (error) {
         console.error('Error loading categories:', error)

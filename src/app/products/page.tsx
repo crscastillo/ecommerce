@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import { useTenant } from '@/lib/contexts/tenant-context'
-import { TenantDatabase } from '@/lib/supabase/tenant-database'
 import { ProductCard } from '@/components/product-card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -75,34 +74,40 @@ export default function ProductsPage() {
     const loadData = async () => {
       try {
         setLoading(true)
-        const tenantDb = new TenantDatabase(tenant.id)
 
-        // Load categories via centralized method
-        const categoriesResult = await tenantDb.getCategoriesAPI({ is_active: true })
-        if (categoriesResult.data) {
-          setCategories(categoriesResult.data)
+        // Load categories via API
+        const categoriesResponse = await fetch(`/api/categories?tenant_id=${tenant.id}`)
+        if (categoriesResponse.ok) {
+          const categoriesResult = await categoriesResponse.json()
+          if (categoriesResult.data) {
+            setCategories(categoriesResult.data.filter((cat: Category) => cat.is_active))
+          }
         }
 
-        // Load products via centralized method
-        const filters: any = {
-          is_active: true,
-        }
+        // Build products API URL with filters
+        const params = new URLSearchParams({
+          tenant_id: tenant.id,
+        })
 
         if (selectedCategory) {
-          filters.category_id = selectedCategory
+          params.append('category_id', selectedCategory)
         }
 
         if (searchQuery) {
-          filters.search = searchQuery
+          params.append('search', searchQuery)
         }
 
         if (sortBy) {
-          filters.sort_by = sortBy
+          params.append('sort_by', sortBy)
         }
 
-        const productsResult = await tenantDb.getProductsAPI(filters)
-        if (productsResult.data) {
-          setProducts(productsResult.data)
+        // Load products via API
+        const productsResponse = await fetch(`/api/products?${params.toString()}`)
+        if (productsResponse.ok) {
+          const productsResult = await productsResponse.json()
+          if (productsResult.data) {
+            setProducts(productsResult.data)
+          }
         }
 
         // For now, use empty tenant settings since we removed the direct DB call

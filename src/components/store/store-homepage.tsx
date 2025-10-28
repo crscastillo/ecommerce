@@ -111,9 +111,9 @@ export default function StoreHomepage({ tenant }: StoreHomepageProps) {
         </h2>
         
         {loading ? (
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-center">
             {[1, 2, 3].map((i) => (
-              <Card key={i} className="hover:shadow-lg transition-shadow">
+              <Card key={i} className="hover:shadow-lg transition-shadow w-full max-w-sm">
                 <CardHeader>
                   <div className="h-6 bg-gray-200 rounded animate-pulse mb-2"></div>
                   <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
@@ -129,11 +129,17 @@ export default function StoreHomepage({ tenant }: StoreHomepageProps) {
             ))}
           </div>
         ) : categories.length > 0 ? (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className={`grid gap-6 justify-items-center ${
+            categories.length === 1 
+              ? 'grid-cols-1 max-w-md mx-auto' 
+              : categories.length === 2 
+                ? 'grid-cols-1 md:grid-cols-2 max-w-2xl mx-auto'
+                : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
+          }`}>
             {categories.map((category, index) => {
               const colorScheme = colorSchemes[index % colorSchemes.length];
               return (
-                <Card key={category.id} className="hover:shadow-lg transition-shadow">
+                <Card key={category.id} className="hover:shadow-lg transition-shadow w-full max-w-sm">
                   <CardHeader>
                     <CardTitle>{category.name}</CardTitle>
                     <CardDescription>

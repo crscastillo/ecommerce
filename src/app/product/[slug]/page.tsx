@@ -3,10 +3,11 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import { useTenant } from '@/lib/contexts/tenant-context'
+import { useCart } from '@/lib/contexts/cart-context'
+import { useToast } from '@/lib/contexts/toast-context'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
-import { Separator } from '@/components/ui/separator'
 import Link from 'next/link'
 import Image from 'next/image'
 import { 
@@ -25,12 +26,15 @@ import { getProductBySlug, type Product } from '@/lib/services/api'
 export default function ProductPage() {
   const params = useParams()
   const { tenant } = useTenant()
+  const { addToCart, isInCart, getCartItem } = useCart()
+  const { success, error: showError } = useToast()
   const [product, setProduct] = useState<Product | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [selectedImageIndex, setSelectedImageIndex] = useState(0)
   const [quantity, setQuantity] = useState(1)
   const [isWishlisted, setIsWishlisted] = useState(false)
+  const [addingToCart, setAddingToCart] = useState(false)
 
   const productSlug = params?.slug as string
 
@@ -69,9 +73,43 @@ export default function ProductPage() {
     }).format(price)
   }
 
-  const handleAddToCart = () => {
-    // TODO: Implement add to cart functionality
-    console.log('Add to cart:', { productId: product?.id, quantity })
+  const handleAddToCart = async () => {
+    if (!product) return
+    
+    setAddingToCart(true)
+    
+    try {
+      // Get the main product image
+      const productImage = product.images && product.images.length > 0 
+        ? product.images[0] 
+        : undefined
+
+      addToCart({
+        id: product.id,
+        name: product.name,
+        slug: product.slug,
+        price: product.price,
+        image: productImage,
+        maxQuantity: product.track_inventory ? product.inventory_quantity : undefined
+      }, quantity)
+
+      // Show success toast
+      success(
+        'Added to cart!',
+        `${quantity} ${quantity === 1 ? 'item' : 'items'} added to your cart`
+      )
+      
+      // Reset quantity to 1 after adding
+      setQuantity(1)
+    } catch (err) {
+      console.error('Error adding to cart:', err)
+      showError(
+        'Failed to add to cart',
+        'Please try again later'
+      )
+    } finally {
+      setAddingToCart(false)
+    }
   }
 
   const handleQuantityChange = (newQuantity: number) => {
@@ -279,6 +317,13 @@ export default function ProductPage() {
                   In Stock
                 </Badge>
               )}
+              
+              {/* Cart Status */}
+              {isInCart(product.id) && (
+                <Badge variant="outline" className="border-blue-500 text-blue-600">
+                  {getCartItem(product.id)?.quantity} in cart
+                </Badge>
+              )}
             </div>
 
             {/* Quantity and Add to Cart */}
@@ -313,10 +358,17 @@ export default function ProductPage() {
                       className="flex-1" 
                       size="lg"
                       onClick={handleAddToCart}
-                      disabled={isOutOfStock}
+                      disabled={isOutOfStock || addingToCart}
                     >
                       <ShoppingCart className="w-5 h-5 mr-2" />
-                      {isOutOfStock ? 'Out of Stock' : 'Add to Cart'}
+                      {addingToCart 
+                        ? 'Adding...' 
+                        : isOutOfStock 
+                        ? 'Out of Stock' 
+                        : isInCart(product.id)
+                        ? 'Add More to Cart'
+                        : 'Add to Cart'
+                      }
                     </Button>
                     <Button
                       variant="outline"

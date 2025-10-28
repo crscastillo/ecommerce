@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ConditionalLayout } from "@/components/conditional-layout";
 import { TenantProvider } from "@/lib/contexts/tenant-provider";
+import { CartProvider } from "@/lib/contexts/cart-context";
+import { ToastProvider } from "@/lib/contexts/toast-context";
 import { platformConfig } from "@/lib/config/platform";
 
 const geistSans = Geist({
@@ -37,9 +39,13 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <TenantProvider>
-          <ConditionalLayout>
-            {children}
-          </ConditionalLayout>
+          <ToastProvider>
+            <CartProvider>
+              <ConditionalLayout>
+                {children}
+              </ConditionalLayout>
+            </CartProvider>
+          </ToastProvider>
         </TenantProvider>
       </body>
     </html>

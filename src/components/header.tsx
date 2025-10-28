@@ -15,14 +15,17 @@ import {
 } from "@/components/ui/navigation-menu"
 import { ShoppingCart, User, Search, Menu } from "lucide-react"
 import { useTenant } from "@/lib/contexts/tenant-context"
+import { useCart } from "@/lib/contexts/cart-context"
 import { useState, useEffect } from "react"
 import { getNavigationCategories, type Category } from "@/lib/services/api"
 
 export function Header() {
   const { tenant } = useTenant()
+  const { getItemCount } = useCart()
   const [categories, setCategories] = useState<Category[]>([])
   const [loadingCategories, setLoadingCategories] = useState(false)
   const storeName = tenant?.name || "Store"
+  const cartItemCount = getItemCount()
 
   useEffect(() => {
     if (!tenant?.id) return
@@ -162,12 +165,16 @@ export function Header() {
           
           {/* Cart and User Actions */}
           <div className="flex items-center space-x-2">
-            <Button variant="ghost" size="sm" className="relative">
-              <ShoppingCart className="h-5 w-5" />
-              <Badge className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 text-xs flex items-center justify-center">
-                0
-              </Badge>
-            </Button>
+            <Link href="/cart">
+              <Button variant="ghost" size="sm" className="relative">
+                <ShoppingCart className="h-5 w-5" />
+                {cartItemCount > 0 && (
+                  <Badge className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 text-xs flex items-center justify-center">
+                    {cartItemCount}
+                  </Badge>
+                )}
+              </Button>
+            </Link>
             <Button variant="ghost" size="sm">
               <User className="h-5 w-5" />
             </Button>

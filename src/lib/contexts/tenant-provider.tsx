@@ -96,7 +96,7 @@ export function TenantProvider({ children, initialTenant }: TenantProviderProps)
               .select('*')
               .eq('subdomain', subdomain)
               .eq('is_active', true)
-              .single()
+              .maybeSingle()
 
             if (!subdomainError && subdomainTenant) {
               // Check if user has access to this tenant
@@ -115,7 +115,7 @@ export function TenantProvider({ children, initialTenant }: TenantProviderProps)
                 .eq('tenant_id', subdomainTenant.id)
                 .eq('user_id', user.id)
                 .eq('is_active', true)
-                .single()
+                .maybeSingle()
 
               if (memberCheck) {
                 setTenant(subdomainTenant)
@@ -138,7 +138,7 @@ export function TenantProvider({ children, initialTenant }: TenantProviderProps)
             .eq('owner_id', user.id)
             .eq('is_active', true)
             .limit(1)
-            .single()
+            .maybeSingle()
 
           if (!tenantsError && userTenants) {
             // If we're on the main domain (no subdomain) and user has a tenant,
@@ -202,7 +202,7 @@ export function TenantProvider({ children, initialTenant }: TenantProviderProps)
               .eq('user_id', user.id)
               .eq('is_active', true)
               .limit(1)
-              .single()
+              .maybeSingle()
 
             if (!memberError && memberTenants && memberTenants.tenants) {
               const memberTenant = memberTenants.tenants
@@ -285,10 +285,14 @@ export function TenantProvider({ children, initialTenant }: TenantProviderProps)
         .select('*')
         .eq('subdomain', subdomain)
         .eq('is_active', true)
-        .single()
+        .maybeSingle()
 
       if (tenantError) {
-        throw new Error(`Tenant not found: ${tenantError.message}`)
+        throw new Error(`Tenant query error: ${tenantError.message}`)
+      }
+
+      if (!tenantData) {
+        throw new Error(`Tenant not found for subdomain: ${subdomain}`)
       }
 
       setTenant(tenantData)
@@ -301,7 +305,7 @@ export function TenantProvider({ children, initialTenant }: TenantProviderProps)
           .eq('tenant_id', tenantData.id)
           .eq('user_id', user.id)
           .eq('is_active', true)
-          .single()
+          .maybeSingle()
 
         setTenantUser(tenantUserData || null)
       } else {

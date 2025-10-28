@@ -157,18 +157,30 @@ async function handleAdminRoutes(request: NextRequest, supabaseResponse: NextRes
     return NextResponse.redirect(url)
   }
 
-  // Check if user has access to this tenant's admin
-  const { data: tenantUser } = await supabase
+  const isOwner = tenant.owner_id === user.id
+  
+  // If user is the owner, allow access immediately
+  if (isOwner) {
+    return supabaseResponse
+  }
+
+  // Check if user has access to this tenant's admin (only for non-owners)
+  const { data: tenantUser, error } = await supabase
     .from('tenant_users')
     .select('role, permissions')
     .eq('tenant_id', tenant.id)
     .eq('user_id', user.id)
     .eq('is_active', true)
-    .single()
+    .maybeSingle()
 
-  const isOwner = tenant.owner_id === user.id
+  if (error) {
+    console.error('Error checking tenant user access:', error)
+    const url = request.nextUrl.clone()
+    url.pathname = '/admin/unauthorized'
+    return NextResponse.redirect(url)
+  }
   
-  if (!tenantUser && !isOwner) {
+  if (!tenantUser) {
     const url = request.nextUrl.clone()
     url.pathname = '/admin/unauthorized'
     return NextResponse.redirect(url)

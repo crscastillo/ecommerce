@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import { useTenant } from '@/lib/contexts/tenant-context'
+import { TenantDatabase } from '@/lib/supabase/tenant-database'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -50,14 +51,13 @@ export default function CategoryProductsPage() {
       setError(null)
 
       try {
-        const response = await fetch(`/api/products/category/${categorySlug}?tenant_id=${tenant.id}`)
+        const tenantDb = new TenantDatabase(tenant.id)
+        const result = await tenantDb.getProductsByCategoryAPI(categorySlug as string)
         
-        if (!response.ok) {
-          const errorData = await response.json()
-          throw new Error(errorData.error || 'Failed to fetch products')
+        if (result.error) {
+          throw new Error(result.error)
         }
 
-        const result = await response.json()
         setData(result)
       } catch (err) {
         console.error('Error fetching products:', err)

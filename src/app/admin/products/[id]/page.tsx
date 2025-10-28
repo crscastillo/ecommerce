@@ -31,6 +31,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { parseProductImages, prepareImagesForStorage, createImagePlaceholder, isSupabaseStorageUrl } from '@/lib/utils/image-utils'
 
 interface Category {
   id: string
@@ -124,7 +125,17 @@ export default function ProductViewPage() {
         }
 
         setProduct(productData)
-        setProductImages(Array.isArray(productData.images) ? productData.images : [])
+        
+        // Parse images using the utility function
+        const parsedResult = parseProductImages(productData.images)
+        console.log('Raw product images data:', productData.images)
+        console.log('Parsed images result:', parsedResult)
+        
+        if (parsedResult.errors.length > 0) {
+          console.warn('Image parsing errors:', parsedResult.errors)
+        }
+        
+        setProductImages(parsedResult.images)
         
         // Initialize form data
         setFormData({
@@ -223,8 +234,11 @@ export default function ProductViewPage() {
         is_featured: formData.is_featured,
         seo_title: formData.seo_title.trim() || null,
         seo_description: formData.seo_description.trim() || null,
-        images: productImages,
+        images: prepareImagesForStorage(productImages),
       }
+
+      console.log('Saving product with images:', productImages)
+      console.log('Prepared images for storage:', prepareImagesForStorage(productImages))
 
       const { error: updateError } = await tenantDb.updateProduct(product.id, updateData)
 
@@ -669,13 +683,26 @@ export default function ProductViewPage() {
                 productImages.length > 0 ? (
                   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                     {productImages.map((imageUrl, index) => (
-                      <div key={imageUrl} className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden">
-                        <Image
-                          src={imageUrl}
-                          alt={`${product.name} image ${index + 1}`}
-                          fill
-                          className="object-cover"
-                        />
+                      <div key={imageUrl || index} className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden">
+                        {imageUrl ? (
+                          <Image
+                            src={imageUrl}
+                            alt={`${product.name} image ${index + 1}`}
+                            fill
+                            className="object-cover"
+                            unoptimized={isSupabaseStorageUrl(imageUrl)} // Disable optimization for Supabase images
+                            onError={(e) => {
+                              console.error('Failed to load image:', imageUrl)
+                              // Replace with placeholder
+                              const target = e.currentTarget as HTMLImageElement
+                              target.src = createImagePlaceholder(`Image ${index + 1}`)
+                            }}
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-gray-400">
+                            <Package className="w-8 h-8" />
+                          </div>
+                        )}
                         {index === 0 && (
                           <Badge className="absolute top-2 left-2 text-xs">
                             Main

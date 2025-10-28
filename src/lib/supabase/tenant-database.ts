@@ -28,6 +28,7 @@ export class TenantDatabase {
         variants:product_variants(*)
       `)
       .eq('tenant_id', this.tenantId)
+      .order('created_at', { ascending: false })
 
     if (filters.category_id) {
       query = query.eq('category_id', filters.category_id)
@@ -48,7 +49,7 @@ export class TenantDatabase {
       query = query.range(filters.offset, filters.offset + (filters.limit || 10) - 1)
     }
 
-    return query
+    return await query
   }
 
   async getProduct(id: string) {
@@ -118,7 +119,7 @@ export class TenantDatabase {
       query = query.eq('is_active', filters.is_active)
     }
 
-    return query
+    return await query
   }
 
   async getCategory(id: string) {
@@ -202,7 +203,7 @@ export class TenantDatabase {
       query = query.range(filters.offset, filters.offset + (filters.limit || 10) - 1)
     }
 
-    return query
+    return await query
   }
 
   async getOrder(id: string) {
@@ -261,7 +262,7 @@ export class TenantDatabase {
       query = query.range(filters.offset, filters.offset + (filters.limit || 10) - 1)
     }
 
-    return query
+    return await query
   }
 
   async getCustomer(id: string) {
@@ -478,7 +479,7 @@ export class TenantDatabase {
       query = query.range(filters.offset, filters.offset + (filters.limit || 10) - 1)
     }
 
-    return query
+    return await query
   }
 
   async getDiscount(id: string) {
@@ -559,7 +560,7 @@ export class TenantDatabase {
       query = query.range(filters.offset, filters.offset + (filters.limit || 10) - 1)
     }
 
-    return query
+    return await query
   }
 
   async getTenantUser(id: string) {
@@ -659,7 +660,7 @@ export class TenantDatabase {
   async getLowStockProducts(limit: number = 50) {
     const threshold = await this.getLowStockThreshold()
     
-    return this.supabase
+    return await this.supabase
       .from('products')
       .select('*')
       .eq('tenant_id', this.tenantId)

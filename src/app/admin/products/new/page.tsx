@@ -27,6 +27,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { prepareImagesForStorage } from '@/lib/utils/image-utils'
 
 interface Category {
   id: string
@@ -176,7 +177,7 @@ export default function NewProductPage() {
         is_featured: formData.is_featured,
         seo_title: formData.seo_title.trim() || null,
         seo_description: formData.seo_description.trim() || null,
-        images: productImages,
+        images: prepareImagesForStorage(productImages),
         variants: {},
       }
 

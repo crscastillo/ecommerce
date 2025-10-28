@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import { useTenant } from '@/lib/contexts/tenant-context'
-import { TenantDatabase } from '@/lib/supabase/tenant-database'
 import { ProductCard } from '@/components/product-card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -75,54 +74,45 @@ export default function ProductsPage() {
     const loadData = async () => {
       try {
         setLoading(true)
-        const tenantDb = new TenantDatabase(tenant.id)
 
-        // Load categories
-        const categoriesResult = await tenantDb.getCategories({ is_active: true })
-        if (categoriesResult.data) {
-          setCategories(categoriesResult.data)
+        // Load categories via API
+        const categoriesResponse = await fetch(`/api/categories?tenant_id=${tenant.id}`)
+        if (categoriesResponse.ok) {
+          const categoriesResult = await categoriesResponse.json()
+          if (categoriesResult.data) {
+            setCategories(categoriesResult.data.filter((cat: Category) => cat.is_active))
+          }
         }
 
-        // Load tenant settings
-        const settings = await tenantDb.getTenantSettings()
-        setTenantSettings(settings)
-
-        // Load products
-        const filters: any = {
-          is_active: true,
-        }
+        // Build products API URL with filters
+        const params = new URLSearchParams({
+          tenant_id: tenant.id,
+        })
 
         if (selectedCategory) {
-          filters.category_id = selectedCategory
+          params.append('category_id', selectedCategory)
         }
 
         if (searchQuery) {
-          filters.search = searchQuery
+          params.append('search', searchQuery)
         }
 
-        const productsResult = await tenantDb.getProducts(filters)
-        if (productsResult.data) {
-          let sortedProducts = [...productsResult.data]
-          
-          // Apply sorting
-          switch (sortBy) {
-            case 'price-low':
-              sortedProducts.sort((a, b) => a.price - b.price)
-              break
-            case 'price-high':
-              sortedProducts.sort((a, b) => b.price - a.price)
-              break
-            case 'name':
-              sortedProducts.sort((a, b) => a.name.localeCompare(b.name))
-              break
-            case 'newest':
-            default:
-              // Already sorted by created_at desc in database
-              break
-          }
-          
-          setProducts(sortedProducts)
+        if (sortBy) {
+          params.append('sort_by', sortBy)
         }
+
+        // Load products via API
+        const productsResponse = await fetch(`/api/products?${params.toString()}`)
+        if (productsResponse.ok) {
+          const productsResult = await productsResponse.json()
+          if (productsResult.data) {
+            setProducts(productsResult.data)
+          }
+        }
+
+        // For now, use empty tenant settings since we removed the direct DB call
+        // TODO: Create an API route for tenant settings if needed
+        setTenantSettings({})
       } catch (error) {
         console.error('Error loading products:', error)
       } finally {

@@ -14,6 +14,7 @@ import {
 } from 'lucide-react'
 import Image from 'next/image'
 import { productImageStorage, ImageUploadResult } from '@/lib/storage/product-images'
+import { createImagePlaceholder } from '@/lib/utils/image-utils'
 
 export interface ImageUploadProps {
   tenantId: string
@@ -273,6 +274,12 @@ export function ImageUpload({
                     alt={`Product image ${index + 1}`}
                     fill
                     className="object-cover"
+                    unoptimized={imageUrl.includes('supabase')}
+                    onError={(e) => {
+                      console.error('Failed to load image in ImageUpload:', imageUrl)
+                      const target = e.currentTarget as HTMLImageElement
+                      target.src = createImagePlaceholder(`Image ${index + 1}`)
+                    }}
                   />
                   {index === 0 && (
                     <Badge className="absolute top-2 left-2 text-xs">

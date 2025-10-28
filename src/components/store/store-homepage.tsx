@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/client";
 
 interface Category {
   id: string;
@@ -43,25 +42,23 @@ export default function StoreHomepage({ tenant }: StoreHomepageProps) {
       }
 
       try {
-        console.log('Creating Supabase client and querying categories...');
-        const supabase = createClient();
+        console.log('Fetching categories via API route...');
         
-        // Direct query instead of using TenantDatabase
-        const { data, error } = await supabase
-          .from('categories')
-          .select('*')
-          .eq('tenant_id', tenant.id)
-          .eq('is_active', true)
-          .order('sort_order', { ascending: true });
+        const response = await fetch(`/api/categories?tenant_id=${tenant.id}`);
         
-        console.log('Categories response:', { data, error });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
         
-        if (error) {
-          console.error('Error fetching categories:', error);
+        const result = await response.json();
+        console.log('API response:', result);
+        
+        if (result.error) {
+          console.error('API error:', result.error);
         } else {
-          console.log('Categories fetched successfully:', data);
+          console.log('Categories fetched successfully:', result.data);
           // Show maximum 6 categories for the homepage
-          setCategories(data?.slice(0, 6) || []);
+          setCategories(result.data?.slice(0, 6) || []);
         }
       } catch (error) {
         console.error('Error fetching categories:', error);

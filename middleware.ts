@@ -43,9 +43,21 @@ function extractSubdomain(hostname: string): string | null {
   const host = hostname.split(':')[0]
   
   // Get domains from environment or use defaults
-  const appDomain = process.env.NEXT_PUBLIC_APP_DOMAIN || 'yourdomain.com'
-  const devDomain = process.env.NEXT_PUBLIC_DEV_DOMAIN || 'localhost'
-  const mainDomains = [devDomain, appDomain]
+  const appDomain = process.env.NEXT_PUBLIC_APP_DOMAIN || 'localhost:3000'
+  const productionDomain = process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN || 'aluro.shop'
+  const devDomain = 'localhost'
+  
+  // Handle production domain (aluro.shop)
+  if (host === productionDomain || host === `www.${productionDomain}`) {
+    return null // Main domain
+  }
+  
+  if (host.endsWith(`.${productionDomain}`)) {
+    const parts = host.split('.')
+    if (parts.length >= 3) {
+      return parts[0] // Extract subdomain from subdomain.aluro.shop
+    }
+  }
   
   // Handle Vercel deployments - any .vercel.app domain without a subdomain is main
   if (host.endsWith('.vercel.app')) {
@@ -60,20 +72,14 @@ function extractSubdomain(hostname: string): string | null {
     }
   }
   
-  // Check if it's a main domain
-  if (mainDomains.some(domain => host === domain || host === `www.${domain}`)) {
-    return null
-  }
-  
-  // Extract subdomain
-  const parts = host.split('.')
-  if (parts.length > 2) {
-    return parts[0]
+  // Handle development
+  if (host === devDomain || host.startsWith(`${devDomain}:`)) {
+    return null // Main domain for localhost
   }
   
   // For localhost development like tenant.localhost:3000
-  if (host.includes('.localhost') && parts.length > 1) {
-    return parts[0]
+  if (host.includes('.localhost') && host.split('.').length > 1) {
+    return host.split('.')[0]
   }
   
   return null
@@ -192,6 +198,12 @@ async function handlePublicStoreRoutes(request: NextRequest, supabaseResponse: N
 function getMainDomain(hostname: string): string {
   // Extract main domain from hostname
   const host = hostname.split(':')[0]
+  const productionDomain = process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN || 'aluro.shop'
+  
+  // If we're on production domain, return it
+  if (host.endsWith(`.${productionDomain}`) || host === productionDomain) {
+    return productionDomain
+  }
   
   // Handle Vercel deployments
   if (host.endsWith('.vercel.app')) {
@@ -200,6 +212,11 @@ function getMainDomain(hostname: string): string {
       // Return the project-name.vercel.app part
       return parts.slice(-3).join('.')
     }
+  }
+  
+  // Handle localhost development
+  if (host.includes('localhost')) {
+    return 'localhost:3000'
   }
   
   // Handle regular domains

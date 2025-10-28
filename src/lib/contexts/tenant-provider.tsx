@@ -234,32 +234,7 @@ export function TenantProvider({ children, initialTenant }: TenantProviderProps)
           }
         }
 
-        // Fallback to demo tenant for admin routes in development
-        if (process.env.NODE_ENV === 'development') {
-          const demoTenant: Tenant = {
-            id: 'demo-tenant-uuid-123e4567-e89b-12d3-a456-426614174000',
-            name: 'Demo Store',
-            subdomain: 'demo',
-            domain: undefined,
-            description: 'Demo store for testing',
-            logo_url: undefined,
-            theme_config: {},
-            contact_email: 'demo@example.com',
-            contact_phone: undefined,
-            address: undefined,
-            settings: {},
-            subscription_tier: 'basic',
-            is_active: true,
-            owner_id: user?.id || 'demo-user',
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          }
-          setTenant(demoTenant)
-          setTenantUser(null)
-          return
-        }
-        
-        // In production, if user has no tenant and is trying to access admin,
+        // If user has no tenant and is trying to access admin,
         // redirect them to signup to create a tenant
         if (user && typeof window !== 'undefined') {
           window.location.href = '/signup'

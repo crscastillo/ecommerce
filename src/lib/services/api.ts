@@ -253,12 +253,64 @@ export class ApiService {
 export const apiService = new ApiService()
 
 // Export convenience functions for easier usage
-export const {
-  getCategories,
-  getNavigationCategories,
-  getProducts,
-  getProductsByCategory,
-  getProductBySlug,
-  getFeaturedProducts,
-  searchProducts
-} = apiService
+export const getCategories = (
+  tenantId: string, 
+  filters: {
+    is_active?: boolean
+    limit?: number
+  } = {}
+): Promise<ApiResponse<Category[]>> => apiService.getCategories(tenantId, filters)
+
+export const getNavigationCategories = (
+  tenantId: string, 
+  limit: number = 3
+): Promise<ApiResponse<Category[]>> => apiService.getNavigationCategories(tenantId, limit)
+
+export const getProducts = (
+  tenantId: string, 
+  filters: {
+    category_id?: string
+    is_active?: boolean
+    is_featured?: boolean
+    search?: string
+    sort_by?: 'newest' | 'price-low' | 'price-high' | 'name'
+    limit?: number
+    offset?: number
+  } = {}
+): Promise<ApiResponse<Product[]>> => apiService.getProducts(tenantId, filters)
+
+export const getProductsByCategory = (
+  tenantId: string, 
+  categorySlug: string, 
+  filters: {
+    is_active?: boolean
+    is_featured?: boolean
+    search?: string
+    sort_by?: 'newest' | 'price-low' | 'price-high' | 'name'
+    limit?: number
+    offset?: number
+  } = {}
+): Promise<ApiResponse<ProductsByCategoryResponse>> => apiService.getProductsByCategory(tenantId, categorySlug, filters)
+
+export const getProductBySlug = (
+  tenantId: string, 
+  slug: string
+): Promise<ApiResponse<ProductBySlugResponse>> => apiService.getProductBySlug(tenantId, slug)
+
+export const getFeaturedProducts = (
+  tenantId: string, 
+  limit: number = 8
+): Promise<ApiResponse<Product[]>> => apiService.getFeaturedProducts(tenantId, limit)
+
+export const searchProducts = (
+  tenantId: string, 
+  query: string, 
+  filters: {
+    category_id?: string
+    is_active?: boolean
+    is_featured?: boolean
+    sort_by?: 'newest' | 'price-low' | 'price-high' | 'name'
+    limit?: number
+    offset?: number
+  } = {}
+): Promise<ApiResponse<Product[]>> => apiService.searchProducts(tenantId, query, filters)

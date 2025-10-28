@@ -1,10 +1,24 @@
+'use client'
+
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
+import { TenantDatabase } from "@/lib/supabase/tenant-database";
+
+interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  is_active: boolean;
+  sort_order: number;
+}
 
 interface StoreHomepageProps {
   tenant?: {
+    id: string;
     name: string;
     description?: string;
     theme_config?: Record<string, any>;
@@ -12,8 +26,48 @@ interface StoreHomepageProps {
 }
 
 export default function StoreHomepage({ tenant }: StoreHomepageProps) {
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
+  
   const storeName = tenant?.name || "Our Store";
   const storeDescription = tenant?.description || "Discover amazing products at unbeatable prices. Quality guaranteed with fast shipping.";
+
+  useEffect(() => {
+    async function fetchCategories() {
+      if (!tenant?.id) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const db = new TenantDatabase(tenant.id);
+        const { data, error } = await db.getCategories({ is_active: true });
+        
+        if (error) {
+          console.error('Error fetching categories:', error);
+        } else {
+          // Show maximum 6 categories for the homepage
+          setCategories(data?.slice(0, 6) || []);
+        }
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchCategories();
+  }, [tenant?.id]);
+
+  // Predefined color schemes for categories
+  const colorSchemes = [
+    { bg: 'from-blue-100 to-blue-200', badge: 'New Arrivals' },
+    { bg: 'from-pink-100 to-pink-200', badge: 'Trending' },
+    { bg: 'from-green-100 to-green-200', badge: 'Best Sellers' },
+    { bg: 'from-purple-100 to-purple-200', badge: 'Featured' },
+    { bg: 'from-orange-100 to-orange-200', badge: 'Popular' },
+    { bg: 'from-indigo-100 to-indigo-200', badge: 'Hot Deals' },
+  ];
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -26,8 +80,8 @@ export default function StoreHomepage({ tenant }: StoreHomepageProps) {
           {storeDescription}
         </p>
         <div className="space-x-4">
-          <Button size="lg" variant="secondary">
-            Shop Now
+          <Button size="lg" variant="secondary" asChild>
+            <Link href="/products">Shop Now</Link>
           </Button>
           <Button size="lg" variant="outline" className="text-white border-white hover:bg-white hover:text-blue-600">
             Learn More
@@ -37,56 +91,65 @@ export default function StoreHomepage({ tenant }: StoreHomepageProps) {
 
       {/* Featured Categories */}
       <section className="mb-12">
-        <h2 className="text-3xl font-bold text-center mb-8">Featured Categories</h2>
-        <div className="grid md:grid-cols-3 gap-6">
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <CardTitle>Electronics</CardTitle>
-              <CardDescription>Latest gadgets and tech accessories</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="bg-gradient-to-br from-blue-100 to-blue-200 h-32 rounded-md mb-4"></div>
-              <Badge variant="secondary">New Arrivals</Badge>
-            </CardContent>
-            <CardFooter>
-              <Button asChild className="w-full">
-                <Link href="/products/electronics">Browse Electronics</Link>
-              </Button>
-            </CardFooter>
-          </Card>
-
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <CardTitle>Clothing</CardTitle>
-              <CardDescription>Fashion and apparel for everyone</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="bg-gradient-to-br from-pink-100 to-pink-200 h-32 rounded-md mb-4"></div>
-              <Badge variant="secondary">Trending</Badge>
-            </CardContent>
-            <CardFooter>
-              <Button asChild className="w-full">
-                <Link href="/products/clothing">Shop Clothing</Link>
-              </Button>
-            </CardFooter>
-          </Card>
-
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <CardTitle>Home & Garden</CardTitle>
-              <CardDescription>Everything for your home and outdoor spaces</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="bg-gradient-to-br from-green-100 to-green-200 h-32 rounded-md mb-4"></div>
-              <Badge variant="secondary">Best Sellers</Badge>
-            </CardContent>
-            <CardFooter>
-              <Button asChild className="w-full">
-                <Link href="/products/home">Explore Home</Link>
-              </Button>
-            </CardFooter>
-          </Card>
-        </div>
+        <h2 className="text-3xl font-bold text-center mb-8">
+          {categories.length > 0 ? 'Featured Categories' : 'Our Store'}
+        </h2>
+        
+        {loading ? (
+          <div className="grid md:grid-cols-3 gap-6">
+            {[1, 2, 3].map((i) => (
+              <Card key={i} className="hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <div className="h-6 bg-gray-200 rounded animate-pulse mb-2"></div>
+                  <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+                </CardHeader>
+                <CardContent>
+                  <div className="bg-gray-200 h-32 rounded-md mb-4 animate-pulse"></div>
+                  <div className="h-6 bg-gray-200 rounded animate-pulse w-20"></div>
+                </CardContent>
+                <CardFooter>
+                  <div className="h-10 bg-gray-200 rounded animate-pulse w-full"></div>
+                </CardFooter>
+              </Card>
+            ))}
+          </div>
+        ) : categories.length > 0 ? (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {categories.map((category, index) => {
+              const colorScheme = colorSchemes[index % colorSchemes.length];
+              return (
+                <Card key={category.id} className="hover:shadow-lg transition-shadow">
+                  <CardHeader>
+                    <CardTitle>{category.name}</CardTitle>
+                    <CardDescription>
+                      {category.description || `Explore our ${category.name.toLowerCase()} collection`}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className={`bg-gradient-to-br ${colorScheme.bg} h-32 rounded-md mb-4`}></div>
+                    <Badge variant="secondary">{colorScheme.badge}</Badge>
+                  </CardContent>
+                  <CardFooter>
+                    <Button asChild className="w-full">
+                      <Link href={`/products/category/${category.slug}`}>
+                        Browse {category.name}
+                      </Link>
+                    </Button>
+                  </CardFooter>
+                </Card>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <p className="text-gray-600 mb-8">
+              This store is being set up. Categories will appear here once they're added.
+            </p>
+            <Button asChild variant="outline">
+              <Link href="/products">View All Products</Link>
+            </Button>
+          </div>
+        )}
       </section>
 
       {/* Call to Action */}
@@ -96,11 +159,11 @@ export default function StoreHomepage({ tenant }: StoreHomepageProps) {
           Join thousands of satisfied customers. Create an account today and get exclusive access to deals and offers.
         </p>
         <div className="space-x-4">
-          <Button size="lg">
-            Sign Up Now
+          <Button size="lg" asChild>
+            <Link href="/signup">Sign Up Now</Link>
           </Button>
-          <Button size="lg" variant="outline">
-            Continue as Guest
+          <Button size="lg" variant="outline" asChild>
+            <Link href="/products">Continue as Guest</Link>
           </Button>
         </div>
       </section>

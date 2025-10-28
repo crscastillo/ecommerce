@@ -1,3 +1,5 @@
+"use client"
+
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -13,10 +15,48 @@ import {
 } from "@/components/ui/navigation-menu"
 import { ShoppingCart, User, Search, Menu } from "lucide-react"
 import { useTenant } from "@/lib/contexts/tenant-context"
+import { useState, useEffect } from "react"
+
+interface Category {
+  id: string
+  name: string
+  slug: string
+  description: string | null
+  is_active: boolean
+}
 
 export function Header() {
   const { tenant } = useTenant()
+  const [categories, setCategories] = useState<Category[]>([])
+  const [loadingCategories, setLoadingCategories] = useState(false)
   const storeName = tenant?.name || "Store"
+
+  useEffect(() => {
+    if (!tenant?.id) return
+
+    const loadCategories = async () => {
+      try {
+        setLoadingCategories(true)
+        const response = await fetch(`/api/categories?tenant_id=${tenant.id}`)
+        if (response.ok) {
+          const result = await response.json()
+          if (result.data) {
+            // Only show active categories and limit to first 3 for the menu
+            const activeCategories = result.data
+              .filter((cat: Category) => cat.is_active)
+              .slice(0, 3)
+            setCategories(activeCategories)
+          }
+        }
+      } catch (error) {
+        console.error('Error loading categories:', error)
+      } finally {
+        setLoadingCategories(false)
+      }
+    }
+
+    loadCategories()
+  }, [tenant?.id])
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -52,45 +92,54 @@ export function Header() {
                           </Link>
                         </NavigationMenuLink>
                       </li>
-                      <li>
-                        <NavigationMenuLink asChild>
-                          <Link
-                            href="/products/category/electronics"
-                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                          >
-                            <div className="text-sm font-medium leading-none">Electronics</div>
-                            <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                              Latest gadgets and tech accessories
-                            </p>
-                          </Link>
-                        </NavigationMenuLink>
-                      </li>
-                      <li>
-                        <NavigationMenuLink asChild>
-                          <Link
-                            href="/products/category/clothing"
-                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                          >
-                            <div className="text-sm font-medium leading-none">Clothing</div>
-                            <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                              Fashion and apparel for everyone
-                            </p>
-                          </Link>
-                        </NavigationMenuLink>
-                      </li>
-                      <li>
-                        <NavigationMenuLink asChild>
-                          <Link
-                            href="/products/category/home"
-                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                          >
-                            <div className="text-sm font-medium leading-none">Home & Garden</div>
-                            <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                              Everything for your home and outdoor spaces
-                            </p>
-                          </Link>
-                        </NavigationMenuLink>
-                      </li>
+                      {loadingCategories ? (
+                        <li>
+                          <div className="block select-none space-y-1 rounded-md p-3 leading-none">
+                            <div className="text-sm font-medium leading-none text-muted-foreground">
+                              Loading categories...
+                            </div>
+                          </div>
+                        </li>
+                      ) : categories.length > 0 ? (
+                        <>
+                          {categories.map((category) => (
+                            <li key={category.id}>
+                              <NavigationMenuLink asChild>
+                                <Link
+                                  href={`/products/category/${category.slug}`}
+                                  className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                                >
+                                  <div className="text-sm font-medium leading-none">{category.name}</div>
+                                  <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                                    {category.description || `Browse our ${category.name.toLowerCase()} collection`}
+                                  </p>
+                                </Link>
+                              </NavigationMenuLink>
+                            </li>
+                          ))}
+                          <li>
+                            <NavigationMenuLink asChild>
+                              <Link
+                                href="/products"
+                                className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground border-t border-border mt-2 pt-3"
+                              >
+                                <div className="text-sm font-medium leading-none">View All Products</div>
+                                <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                                  Browse our complete product catalog
+                                </p>
+                              </Link>
+                            </NavigationMenuLink>
+                          </li>
+                        </>
+                      ) : (
+                        <li>
+                          <div className="block select-none space-y-1 rounded-md p-3 leading-none">
+                            <div className="text-sm font-medium leading-none text-muted-foreground">
+                              No categories available
+                            </div>
+                          </div>
+                        </li>
+                      )}
                     </ul>
                   </NavigationMenuContent>
                 </NavigationMenuItem>

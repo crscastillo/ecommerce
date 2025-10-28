@@ -30,9 +30,10 @@ export default function Login() {
         if (!error && user) {
           // Check if we're already on a tenant subdomain - if so, just redirect to /admin
           const currentHostname = window.location.hostname
+          const productionDomain = process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN || 'aluro.shop'
           const isOnTenantSubdomain = 
             (currentHostname !== 'localhost' && currentHostname.includes('.localhost')) || // localhost subdomain
-            (currentHostname.includes('.aluro.shop') && currentHostname !== 'aluro.shop') || // production subdomain
+            (currentHostname.includes(`.${productionDomain}`) && currentHostname !== productionDomain) || // production subdomain
             (currentHostname.includes('.vercel.app') && currentHostname.split('.').length > 3) // vercel subdomain
           
           if (isOnTenantSubdomain) {
@@ -78,9 +79,10 @@ export default function Login() {
         setMessage('Login successful!')
         // Check if we're on a tenant subdomain and redirect accordingly
         const currentHostname = window.location.hostname
+        const productionDomain = process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN || 'aluro.shop'
         const isOnTenantSubdomain = 
           (currentHostname !== 'localhost' && currentHostname.includes('.localhost')) || // localhost subdomain
-          (currentHostname.includes('.aluro.shop') && currentHostname !== 'aluro.shop') || // production subdomain
+          (currentHostname.includes(`.${productionDomain}`) && currentHostname !== productionDomain) || // production subdomain
           (currentHostname.includes('.vercel.app') && currentHostname.split('.').length > 3) // vercel subdomain
         
         if (isOnTenantSubdomain) {

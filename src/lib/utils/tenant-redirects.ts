@@ -89,11 +89,14 @@ export const redirectToTenantSubdomain = (subdomain: string, path: string = '/ad
     tenantHostname = `${subdomain}.localhost`
   } else if (currentHostname.endsWith('.vercel.app')) {
     tenantHostname = `${subdomain}.${currentHostname}`
-  } else if (currentHostname === 'aluro.shop' || currentHostname === 'www.aluro.shop') {
-    // Production domain
-    tenantHostname = `${subdomain}.aluro.shop`
   } else {
-    tenantHostname = `${subdomain}.${currentHostname}`
+    // Handle production domain
+    const productionDomain = process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN || 'aluro.shop'
+    if (currentHostname === productionDomain || currentHostname === `www.${productionDomain}`) {
+      tenantHostname = `${subdomain}.${productionDomain}`
+    } else {
+      tenantHostname = `${subdomain}.${currentHostname}`
+    }
   }
   
   const portSuffix = currentPort ? `:${currentPort}` : ''
@@ -118,15 +121,16 @@ export const extractSubdomain = (hostname: string): string | null => {
   // If it's just localhost, no subdomain
   if (host === 'localhost') return null
   
-  // Handle production domain (aluro.shop)
-  if (host === 'aluro.shop' || host === 'www.aluro.shop') {
+  // Handle production domain
+  const productionDomain = process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN || 'aluro.shop'
+  if (host === productionDomain || host === `www.${productionDomain}`) {
     return null // Main domain
   }
   
-  if (host.endsWith('.aluro.shop')) {
+  if (host.endsWith(`.${productionDomain}`)) {
     const parts = host.split('.')
     if (parts.length >= 3) {
-      return parts[0] // Extract subdomain from subdomain.aluro.shop
+      return parts[0] // Extract subdomain from subdomain.domain.com
     }
   }
   

@@ -47,7 +47,7 @@ function extractSubdomain(hostname: string): string | null {
   const productionDomain = process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN || 'aluro.shop'
   const devDomain = 'localhost'
   
-  // Handle production domain (aluro.shop)
+  // Handle production domain
   if (host === productionDomain || host === `www.${productionDomain}`) {
     return null // Main domain
   }
@@ -55,7 +55,7 @@ function extractSubdomain(hostname: string): string | null {
   if (host.endsWith(`.${productionDomain}`)) {
     const parts = host.split('.')
     if (parts.length >= 3) {
-      return parts[0] // Extract subdomain from subdomain.aluro.shop
+      return parts[0] // Extract subdomain from subdomain.domain.com
     }
   }
   

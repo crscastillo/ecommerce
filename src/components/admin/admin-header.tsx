@@ -28,6 +28,7 @@ interface AdminHeaderProps {
   onMenuClick?: () => void
 }
 
+
 export default function AdminHeader({ onMenuClick }: AdminHeaderProps) {
   const { tenant, isOwner, isAdmin } = useTenant()
   const router = useRouter()

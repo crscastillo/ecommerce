@@ -22,36 +22,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-
-interface Product {
-  id: string
-  name: string
-  slug: string
-  description: string | null
-  short_description: string | null
-  price: number
-  compare_price: number | null
-  category_id: string | null
-  category?: {
-    id: string
-    name: string
-    slug: string
-  }
-  images: any
-  is_active: boolean
-  is_featured: boolean
-  inventory_quantity: number
-  track_inventory: boolean
-  tags: string[] | null
-}
-
-interface Category {
-  id: string
-  name: string
-  slug: string
-  description: string | null
-  is_active: boolean
-}
+import { 
+  getCategories, 
+  getProducts, 
+  searchProducts,
+  type Category, 
+  type Product 
+} from '@/lib/services/api'
 
 type ViewMode = 'grid' | 'list'
 type SortOption = 'newest' | 'price-low' | 'price-high' | 'name'
@@ -75,39 +52,36 @@ export default function ProductsPage() {
       try {
         setLoading(true)
 
-        // Load categories via API
-        const categoriesResponse = await fetch(`/api/categories?tenant_id=${tenant.id}`)
-        if (categoriesResponse.ok) {
-          const categoriesResult = await categoriesResponse.json()
-          if (categoriesResult.data) {
-            setCategories(categoriesResult.data.filter((cat: Category) => cat.is_active))
-          }
+        // Load categories
+        const categoriesResult = await getCategories(tenant.id, { is_active: true })
+        if (categoriesResult.data) {
+          setCategories(categoriesResult.data)
+        } else {
+          console.error('Error loading categories:', categoriesResult.error)
         }
 
-        // Build products API URL with filters
-        const params = new URLSearchParams({
-          tenant_id: tenant.id,
-        })
+        // Build product filters
+        const filters: any = {
+          is_active: true,
+          sort_by: sortBy
+        }
 
         if (selectedCategory) {
-          params.append('category_id', selectedCategory)
+          filters.category_id = selectedCategory
         }
 
+        // Load products with filters
+        let productsResult
         if (searchQuery) {
-          params.append('search', searchQuery)
+          productsResult = await searchProducts(tenant.id, searchQuery, filters)
+        } else {
+          productsResult = await getProducts(tenant.id, filters)
         }
 
-        if (sortBy) {
-          params.append('sort_by', sortBy)
-        }
-
-        // Load products via API
-        const productsResponse = await fetch(`/api/products?${params.toString()}`)
-        if (productsResponse.ok) {
-          const productsResult = await productsResponse.json()
-          if (productsResult.data) {
-            setProducts(productsResult.data)
-          }
+        if (productsResult.data) {
+          setProducts(productsResult.data)
+        } else {
+          console.error('Error loading products:', productsResult.error)
         }
 
         // For now, use empty tenant settings since we removed the direct DB call

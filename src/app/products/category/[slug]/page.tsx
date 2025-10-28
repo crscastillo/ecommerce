@@ -8,35 +8,12 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import Link from 'next/link'
 import Image from 'next/image'
-
-interface Product {
-  id: string
-  name: string
-  slug: string
-  description: string
-  short_description: string
-  price: number
-  compare_price?: number
-  images: string[]
-  is_featured: boolean
-  created_at: string
-}
-
-interface Category {
-  id: string
-  name: string
-  description: string
-}
-
-interface ProductsResponse {
-  category: Category
-  products: Product[]
-}
+import { getProductsByCategory, type ProductsByCategoryResponse } from '@/lib/services/api'
 
 export default function CategoryProductsPage() {
   const params = useParams()
   const { tenant } = useTenant()
-  const [data, setData] = useState<ProductsResponse | null>(null)
+  const [data, setData] = useState<ProductsByCategoryResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -50,15 +27,13 @@ export default function CategoryProductsPage() {
       setError(null)
 
       try {
-        const response = await fetch(`/api/products/category/${categorySlug}?tenant_id=${tenant.id}`)
+        const result = await getProductsByCategory(tenant.id, categorySlug, { is_active: true })
         
-        if (!response.ok) {
-          const errorData = await response.json()
-          throw new Error(errorData.error || 'Failed to fetch products')
+        if (result.error) {
+          throw new Error(result.error)
         }
 
-        const result = await response.json()
-        setData(result)
+        setData(result.data)
       } catch (err) {
         console.error('Error fetching products:', err)
         setError(err instanceof Error ? err.message : 'Failed to fetch products')

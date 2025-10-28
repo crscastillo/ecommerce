@@ -5,15 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-
-interface Category {
-  id: string;
-  name: string;
-  slug: string;
-  description?: string;
-  is_active: boolean;
-  sort_order: number;
-}
+import { getCategories, type Category } from "@/lib/services/api";
 
 interface StoreHomepageProps {
   tenant?: {
@@ -42,27 +34,17 @@ export default function StoreHomepage({ tenant }: StoreHomepageProps) {
       }
 
       try {
-        console.log('StoreHomepage: Fetching categories via API route for tenant:', tenant.id);
+        console.log('StoreHomepage: Fetching categories via API service for tenant:', tenant.id);
         
-        const response = await fetch(`/api/categories?tenant_id=${tenant.id}`);
-        console.log('StoreHomepage: API response status:', response.status);
-        
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.error('StoreHomepage: API request failed:', response.status, errorText);
-          throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
-        }
-        
-        const result = await response.json();
-        console.log('StoreHomepage: API response data:', result);
+        const result = await getCategories(tenant.id, { is_active: true, limit: 6 });
+        console.log('StoreHomepage: API service response:', result);
         
         if (result.error) {
-          console.error('StoreHomepage: API returned error:', result.error);
+          console.error('StoreHomepage: API service returned error:', result.error);
           throw new Error(result.error);
         } else {
           console.log('StoreHomepage: Categories fetched successfully, count:', result.data?.length);
-          // Show maximum 6 categories for the homepage
-          setCategories(result.data?.slice(0, 6) || []);
+          setCategories(result.data || []);
         }
       } catch (error) {
         console.error('StoreHomepage: Error fetching categories:', error);

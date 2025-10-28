@@ -20,28 +20,7 @@ import {
   Star,
   ChevronLeft
 } from 'lucide-react'
-
-interface Product {
-  id: string
-  name: string
-  slug: string
-  description: string
-  short_description: string
-  price: number
-  compare_price?: number
-  images: string[]
-  is_featured: boolean
-  is_active: boolean
-  inventory_quantity: number
-  track_inventory: boolean
-  tags: string[]
-  category?: {
-    id: string
-    name: string
-    slug: string
-  }
-  created_at: string
-}
+import { getProductBySlug, type Product } from '@/lib/services/api'
 
 export default function ProductPage() {
   const params = useParams()
@@ -63,15 +42,15 @@ export default function ProductPage() {
       setError(null)
 
       try {
-        const response = await fetch(`/api/products/${productSlug}?tenant_id=${tenant.id}`)
+        const result = await getProductBySlug(tenant.id, productSlug)
         
-        if (!response.ok) {
-          const errorData = await response.json()
-          throw new Error(errorData.error || 'Failed to fetch product')
+        if (result.error) {
+          throw new Error(result.error)
         }
 
-        const result = await response.json()
-        setProduct(result.product)
+        if (result.data) {
+          setProduct(result.data.product)
+        }
       } catch (err) {
         console.error('Error fetching product:', err)
         setError(err instanceof Error ? err.message : 'Failed to fetch product')
@@ -234,7 +213,7 @@ export default function ProductPage() {
             {/* Thumbnail Images */}
             {product.images && product.images.length > 1 && (
               <div className="grid grid-cols-4 gap-2">
-                {product.images.slice(0, 4).map((image, index) => (
+                {product.images.slice(0, 4).map((image: string, index: number) => (
                   <button
                     key={index}
                     onClick={() => setSelectedImageIndex(index)}

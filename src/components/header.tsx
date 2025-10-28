@@ -16,14 +16,7 @@ import {
 import { ShoppingCart, User, Search, Menu } from "lucide-react"
 import { useTenant } from "@/lib/contexts/tenant-context"
 import { useState, useEffect } from "react"
-
-interface Category {
-  id: string
-  name: string
-  slug: string
-  description: string | null
-  is_active: boolean
-}
+import { getNavigationCategories, type Category } from "@/lib/services/api"
 
 export function Header() {
   const { tenant } = useTenant()
@@ -37,16 +30,12 @@ export function Header() {
     const loadCategories = async () => {
       try {
         setLoadingCategories(true)
-        const response = await fetch(`/api/categories?tenant_id=${tenant.id}`)
-        if (response.ok) {
-          const result = await response.json()
-          if (result.data) {
-            // Only show active categories and limit to first 3 for the menu
-            const activeCategories = result.data
-              .filter((cat: Category) => cat.is_active)
-              .slice(0, 3)
-            setCategories(activeCategories)
-          }
+        const result = await getNavigationCategories(tenant.id, 3)
+        
+        if (result.data) {
+          setCategories(result.data)
+        } else {
+          console.error('Error loading categories:', result.error)
         }
       } catch (error) {
         console.error('Error loading categories:', error)

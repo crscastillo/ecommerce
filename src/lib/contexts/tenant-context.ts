@@ -15,6 +15,7 @@ export interface Tenant {
   subscription_tier: string
   is_active: boolean
   owner_id: string
+  country?: string
   created_at: string
   updated_at: string
 }

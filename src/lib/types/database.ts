@@ -25,6 +25,7 @@ export interface Database {
           subscription_tier: string
           is_active: boolean
           owner_id: string
+          country: string | null
           created_at: string
           updated_at: string
         }
@@ -43,6 +44,7 @@ export interface Database {
           subscription_tier?: string
           is_active?: boolean
           owner_id: string
+          country?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -61,6 +63,7 @@ export interface Database {
           subscription_tier?: string
           is_active?: boolean
           owner_id?: string
+          country?: string | null
           created_at?: string
           updated_at?: string
         }

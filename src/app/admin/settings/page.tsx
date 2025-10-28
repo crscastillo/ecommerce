@@ -41,7 +41,8 @@ import {
   Plus,
   Eye,
   EyeOff,
-  CreditCard
+  CreditCard,
+  Cog
 } from 'lucide-react'
 
 type Tenant = Database['public']['Tables']['tenants']['Row']
@@ -64,6 +65,7 @@ interface StoreSettings {
   description: string
   contact_email: string
   contact_phone: string
+  country: string
   address: {
     street?: string
     city?: string
@@ -131,6 +133,7 @@ export default function SettingsPage() {
     description: '',
     contact_email: '',
     contact_phone: '',
+    country: '',
     address: {},
     settings: {
       currency: 'USD',
@@ -183,6 +186,7 @@ export default function SettingsPage() {
         description: tenant.description || '',
         contact_email: tenant.contact_email || '',
         contact_phone: tenant.contact_phone || '',
+        country: tenant.country || 'US',
         address: (tenant.address as any) || {},
         settings: {
           currency: 'USD',
@@ -294,6 +298,7 @@ export default function SettingsPage() {
           description: storeSettings.description,
           contact_email: storeSettings.contact_email,
           contact_phone: storeSettings.contact_phone,
+          country: storeSettings.country,
           address: storeSettings.address,
           settings: storeSettings.settings,
           updated_at: new Date().toISOString()
@@ -578,10 +583,14 @@ export default function SettingsPage() {
 
       {/* Settings Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="store" className="flex items-center space-x-2">
             <Store className="h-4 w-4" />
             <span>Store</span>
+          </TabsTrigger>
+          <TabsTrigger value="config" className="flex items-center space-x-2">
+            <Cog className="h-4 w-4" />
+            <span>Config</span>
           </TabsTrigger>
           <TabsTrigger value="theme" className="flex items-center space-x-2">
             <Palette className="h-4 w-4" />
@@ -608,7 +617,7 @@ export default function SettingsPage() {
               <CardTitle>Store Information</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <Label htmlFor="store-name">Store Name</Label>
                   <Input
@@ -627,6 +636,34 @@ export default function SettingsPage() {
                     placeholder="mystore"
                   />
                   <p className="text-xs text-gray-500 mt-1">Subdomain cannot be changed after creation</p>
+                </div>
+                <div>
+                  <Label htmlFor="country">Country</Label>
+                  <Select 
+                    value={storeSettings.country} 
+                    onValueChange={(value) => setStoreSettings(prev => ({ ...prev, country: value }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select country" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="US">🇺🇸 United States</SelectItem>
+                      <SelectItem value="CA">🇨🇦 Canada</SelectItem>
+                      <SelectItem value="GB">🇬🇧 United Kingdom</SelectItem>
+                      <SelectItem value="AU">🇦🇺 Australia</SelectItem>
+                      <SelectItem value="CR">🇨🇷 Costa Rica</SelectItem>
+                      <SelectItem value="MX">🇲🇽 Mexico</SelectItem>
+                      <SelectItem value="ES">🇪🇸 Spain</SelectItem>
+                      <SelectItem value="FR">🇫🇷 France</SelectItem>
+                      <SelectItem value="DE">🇩🇪 Germany</SelectItem>
+                      <SelectItem value="IT">🇮🇹 Italy</SelectItem>
+                      <SelectItem value="BR">🇧🇷 Brazil</SelectItem>
+                      <SelectItem value="AR">🇦🇷 Argentina</SelectItem>
+                      <SelectItem value="CL">🇨🇱 Chile</SelectItem>
+                      <SelectItem value="CO">🇨🇴 Colombia</SelectItem>
+                      <SelectItem value="PE">🇵🇪 Peru</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
               
@@ -733,12 +770,14 @@ export default function SettingsPage() {
 
               <Button onClick={saveStoreSettings} disabled={saving} className="w-full md:w-auto">
                 <Save className="h-4 w-4 mr-2" />
-                {saving ? 'Saving...' : 'Save Store Settings'}
+                {saving ? 'Saving...' : 'Save Store Information'}
               </Button>
             </CardContent>
           </Card>
+        </TabsContent>
 
-          {/* Store Configuration */}
+        {/* Configuration Settings */}
+        <TabsContent value="config" className="space-y-6">
           <Card>
             <CardHeader>
               <CardTitle>Store Configuration</CardTitle>
@@ -758,10 +797,23 @@ export default function SettingsPage() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="USD">USD - US Dollar</SelectItem>
-                      <SelectItem value="EUR">EUR - Euro</SelectItem>
-                      <SelectItem value="GBP">GBP - British Pound</SelectItem>
-                      <SelectItem value="CAD">CAD - Canadian Dollar</SelectItem>
+                      <SelectItem value="USD">💵 USD - US Dollar</SelectItem>
+                      <SelectItem value="EUR">💶 EUR - Euro</SelectItem>
+                      <SelectItem value="GBP">💷 GBP - British Pound</SelectItem>
+                      <SelectItem value="CAD">🇨🇦 CAD - Canadian Dollar</SelectItem>
+                      <SelectItem value="CRC">🇨🇷 CRC - Costa Rican Colón</SelectItem>
+                      <SelectItem value="MXN">🇲🇽 MXN - Mexican Peso</SelectItem>
+                      <SelectItem value="AUD">🇦🇺 AUD - Australian Dollar</SelectItem>
+                      <SelectItem value="JPY">🇯🇵 JPY - Japanese Yen</SelectItem>
+                      <SelectItem value="CHF">🇨🇭 CHF - Swiss Franc</SelectItem>
+                      <SelectItem value="SEK">🇸🇪 SEK - Swedish Krona</SelectItem>
+                      <SelectItem value="NOK">🇳🇴 NOK - Norwegian Krone</SelectItem>
+                      <SelectItem value="DKK">🇩🇰 DKK - Danish Krone</SelectItem>
+                      <SelectItem value="BRL">🇧🇷 BRL - Brazilian Real</SelectItem>
+                      <SelectItem value="ARS">🇦🇷 ARS - Argentine Peso</SelectItem>
+                      <SelectItem value="CLP">🇨🇱 CLP - Chilean Peso</SelectItem>
+                      <SelectItem value="COP">🇨🇴 COP - Colombian Peso</SelectItem>
+                      <SelectItem value="PEN">🇵🇪 PEN - Peruvian Sol</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

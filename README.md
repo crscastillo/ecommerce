@@ -73,9 +73,15 @@ cp .env.local.example .env.local
 
 Fill in your Supabase credentials in `.env.local`:
 ```env
+# Supabase Configuration
 NEXT_PUBLIC_SUPABASE_URL=https://your-project-ref.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+
+# Platform Configuration
+NEXT_PUBLIC_PLATFORM_NAME=Aluro
+NEXT_PUBLIC_APP_DOMAIN=localhost:3000
+NEXT_PUBLIC_PRODUCTION_DOMAIN=yourdomain.com
 ```
 
 ### 3. Database Setup
@@ -310,10 +316,15 @@ http://localhost:3000/admin/orders           # Demo orders interface
 
 ### Domain Setup (Production)
 
-Update the domains in `middleware.ts`:
-```typescript
-const mainDomains = ['localhost', 'yourdomain.com', 'yourdomain.vercel.app']
+Configure your production domain in the environment variables:
+```env
+NEXT_PUBLIC_PRODUCTION_DOMAIN=yourdomain.com
 ```
+
+All domain-related logic uses this environment variable, so you can easily deploy to different domains by changing this single configuration. The application will automatically:
+- Handle subdomain detection for `tenant.yourdomain.com`
+- Redirect authentication flows properly
+- Configure tenant routing correctly
 
 ### Supabase Configuration
 
@@ -369,7 +380,9 @@ supabase/
    NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
    SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
    
-   # Optional: Domain configuration
+   # Platform Configuration
+   NEXT_PUBLIC_PLATFORM_NAME=Aluro
+   NEXT_PUBLIC_PRODUCTION_DOMAIN=yourdomain.com
    NEXT_PUBLIC_APP_DOMAIN=yourdomain.com
    NEXT_PUBLIC_DEBUG_MIDDLEWARE=false
    ```
@@ -387,7 +400,7 @@ For multi-tenancy on Vercel, you have two options:
 #### Option 2: Custom Domain (Production)
 1. **Add your domain** in Vercel dashboard
 2. **Configure DNS**: Set up wildcard DNS (`*.yourdomain.com → your-project.vercel.app`)
-3. **Update environment**: Set `NEXT_PUBLIC_APP_DOMAIN=yourdomain.com`
+3. **Update environment**: Set `NEXT_PUBLIC_PRODUCTION_DOMAIN=yourdomain.com`
 4. **SSL**: Vercel automatically handles wildcard SSL certificates
 
 ### Custom Domain Setup
@@ -511,12 +524,57 @@ npm run test:db     # Database tests
 - **Solution**: Consolidated all signup flows to use proper tenant creation process
 - **Fix Applied**: Login page now correctly links to /signup, /auth/signup redirects to /signup
 
+**PGRST116 authentication errors**:
+- **Error**: "PGRST116" errors during login on tenant subdomains
+- **Root Cause**: `.single()` calls expecting records that don't exist for tenant owners
+- **Solution**: Replaced all `.single()` calls with `.maybeSingle()` in authentication flows
+- **Fix Applied**: Tenant owners can now authenticate without requiring `tenant_users` records
+
+**Login loops on tenant subdomains**:
+- **Issue**: Successful login but redirected back to login page
+- **Root Cause**: Login page trying to redirect to tenant subdomain when already on one
+- **Solution**: Enhanced login logic to detect current subdomain and redirect directly to `/admin`
+- **Fix Applied**: Smart redirect logic based on current hostname detection
+
+**Production domain configuration issues**:
+- **Issue**: Hardcoded domain references causing issues with custom domains
+- **Solution**: All domain logic now uses `NEXT_PUBLIC_PRODUCTION_DOMAIN` environment variable
+- **Configuration**: Set `NEXT_PUBLIC_PRODUCTION_DOMAIN=yourdomain.com` in environment variables
+- **Benefits**: Single configuration change supports any production domain
+
 **Infinite redirect loops in admin**:
 - Check that TenantProvider is properly configured
 - Verify authentication state is not causing layout re-renders
 - Ensure useTenant hook returns default values instead of throwing errors
 
 ## 🔄 Recent Updates
+
+### v1.7.0 - Authentication Flow Fixes & Domain Configuration (October 2024)
+
+**🔐 Authentication System Overhaul:**
+- **Fixed PGRST116 Errors**: Replaced `.single()` calls with `.maybeSingle()` throughout the codebase to prevent database errors when records don't exist
+- **Tenant Subdomain Login**: Fixed authentication flow when logging in directly on tenant subdomains (e.g., `tenant.yourdomain.com/login`)
+- **Smart Redirect Logic**: Login page now detects when you're already on the correct tenant subdomain and redirects directly to `/admin`
+- **Owner vs Member Authentication**: Properly handles tenant owners (who don't need `tenant_users` records) vs team members
+- **Production Domain Support**: Full support for custom production domains via environment configuration
+
+**🌐 Domain Management Improvements:**
+- **Environment-Driven Configuration**: All domain logic now uses `NEXT_PUBLIC_PRODUCTION_DOMAIN` environment variable
+- **Flexible Domain Support**: Easy deployment to different domains by changing a single environment variable
+- **Subdomain Detection**: Enhanced subdomain extraction for localhost, Vercel, and custom production domains
+- **Cross-Environment Compatibility**: Seamless operation across development, staging, and production environments
+
+**🛠️ Technical Improvements:**
+- **Middleware Optimization**: Enhanced tenant lookup with proper error handling for non-existent tenants
+- **Client-Side Routing**: Improved tenant context provider with defensive programming for missing data
+- **Database Query Optimization**: All tenant-related queries now handle null results gracefully
+- **Error Handling**: Better user experience with meaningful error messages and fallback behaviors
+
+**🚀 Production Readiness:**
+- **Vercel Deployment**: Fully compatible with Vercel's wildcard subdomain system
+- **Custom Domain Setup**: Streamlined configuration for production domains
+- **SSL Certificate Support**: Automatic wildcard SSL handling through Vercel
+- **Multi-Environment Config**: Single codebase supports multiple deployment environments
 
 ### v1.6.0 - Products CSV Import & Public Store (October 2024)
 

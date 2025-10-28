@@ -27,7 +27,16 @@ const ToastContext = createContext<ToastContextType | null>(null)
 export function useToast() {
   const context = useContext(ToastContext)
   if (!context) {
-    throw new Error('useToast must be used within a ToastProvider')
+    // Return safe fallback instead of throwing
+    return {
+      toasts: [],
+      addToast: () => {},
+      removeToast: () => {},
+      success: () => {},
+      error: () => {},
+      info: () => {},
+      warning: () => {}
+    } as ToastContextType
   }
   return context
 }

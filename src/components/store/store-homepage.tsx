@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import { TenantDatabase } from "@/lib/supabase/tenant-database";
+import { createClient } from "@/lib/supabase/client";
 
 interface Category {
   id: string;
@@ -34,18 +34,32 @@ export default function StoreHomepage({ tenant }: StoreHomepageProps) {
 
   useEffect(() => {
     async function fetchCategories() {
+      console.log('fetchCategories called with tenant:', tenant);
+      
       if (!tenant?.id) {
+        console.log('No tenant ID available:', tenant);
         setLoading(false);
         return;
       }
 
       try {
-        const db = new TenantDatabase(tenant.id);
-        const { data, error } = await db.getCategories({ is_active: true });
+        console.log('Creating Supabase client and querying categories...');
+        const supabase = createClient();
+        
+        // Direct query instead of using TenantDatabase
+        const { data, error } = await supabase
+          .from('categories')
+          .select('*')
+          .eq('tenant_id', tenant.id)
+          .eq('is_active', true)
+          .order('sort_order', { ascending: true });
+        
+        console.log('Categories response:', { data, error });
         
         if (error) {
           console.error('Error fetching categories:', error);
         } else {
+          console.log('Categories fetched successfully:', data);
           // Show maximum 6 categories for the homepage
           setCategories(data?.slice(0, 6) || []);
         }

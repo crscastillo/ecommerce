@@ -24,7 +24,7 @@ export const redirectToUserTenantAdmin = async (
       .eq('owner_id', user.id)
       .eq('is_active', true)
       .limit(1)
-      .single()
+      .maybeSingle()
 
     if (!tenantsError && userTenants) {
       redirectToTenantSubdomain(userTenants.subdomain)
@@ -43,7 +43,7 @@ export const redirectToUserTenantAdmin = async (
       .eq('user_id', user.id)
       .eq('is_active', true)
       .limit(1)
-      .single()
+      .maybeSingle()
 
     if (!memberError && memberTenants && memberTenants.tenants) {
       redirectToTenantSubdomain(memberTenants.tenants.subdomain)
@@ -78,7 +78,8 @@ export const redirectToTenantSubdomain = (subdomain: string, path: string = '/ad
   // Check if we're already on the target subdomain to prevent infinite loops
   const currentSubdomain = extractSubdomain(currentHostname)
   if (currentSubdomain === subdomain) {
-    console.log('Already on target subdomain, no redirect needed')
+    console.log('Already on target subdomain, redirecting to admin path')
+    window.location.href = path
     return
   }
   
@@ -88,6 +89,9 @@ export const redirectToTenantSubdomain = (subdomain: string, path: string = '/ad
     tenantHostname = `${subdomain}.localhost`
   } else if (currentHostname.endsWith('.vercel.app')) {
     tenantHostname = `${subdomain}.${currentHostname}`
+  } else if (currentHostname === 'aluro.shop' || currentHostname === 'www.aluro.shop') {
+    // Production domain
+    tenantHostname = `${subdomain}.aluro.shop`
   } else {
     tenantHostname = `${subdomain}.${currentHostname}`
   }
@@ -113,6 +117,18 @@ export const extractSubdomain = (hostname: string): string | null => {
   
   // If it's just localhost, no subdomain
   if (host === 'localhost') return null
+  
+  // Handle production domain (aluro.shop)
+  if (host === 'aluro.shop' || host === 'www.aluro.shop') {
+    return null // Main domain
+  }
+  
+  if (host.endsWith('.aluro.shop')) {
+    const parts = host.split('.')
+    if (parts.length >= 3) {
+      return parts[0] // Extract subdomain from subdomain.aluro.shop
+    }
+  }
   
   // Handle Vercel deployments
   if (host.endsWith('.vercel.app')) {

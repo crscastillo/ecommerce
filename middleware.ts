@@ -119,10 +119,10 @@ async function handleTenantSubdomain(request: NextRequest, supabaseResponse: Nex
   // Validate tenant exists and is active
   const { data: tenant, error } = await supabase
     .from('tenants')
-    .select('id, name, subdomain, is_active, settings')
+    .select('id, name, subdomain, is_active, settings, owner_id')
     .eq('subdomain', subdomain)
     .eq('is_active', true)
-    .single()
+    .maybeSingle()
 
   if (error || !tenant) {
     // Tenant not found or inactive - redirect to error page or main site

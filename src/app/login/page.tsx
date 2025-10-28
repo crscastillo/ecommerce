@@ -30,7 +30,12 @@ export default function Login() {
         if (!error && user) {
           // Check if we're already on a tenant subdomain - if so, just redirect to /admin
           const currentHostname = window.location.hostname
-          if (currentHostname !== 'localhost' && currentHostname.includes('.localhost')) {
+          const isOnTenantSubdomain = 
+            (currentHostname !== 'localhost' && currentHostname.includes('.localhost')) || // localhost subdomain
+            (currentHostname.includes('.aluro.shop') && currentHostname !== 'aluro.shop') || // production subdomain
+            (currentHostname.includes('.vercel.app') && currentHostname.split('.').length > 3) // vercel subdomain
+          
+          if (isOnTenantSubdomain) {
             // We're on a subdomain, just go to admin
             window.location.href = '/admin'
             return
@@ -71,6 +76,19 @@ export default function Login() {
         setMessage(error.message)
       } else {
         setMessage('Login successful!')
+        // Check if we're on a tenant subdomain and redirect accordingly
+        const currentHostname = window.location.hostname
+        const isOnTenantSubdomain = 
+          (currentHostname !== 'localhost' && currentHostname.includes('.localhost')) || // localhost subdomain
+          (currentHostname.includes('.aluro.shop') && currentHostname !== 'aluro.shop') || // production subdomain
+          (currentHostname.includes('.vercel.app') && currentHostname.split('.').length > 3) // vercel subdomain
+        
+        if (isOnTenantSubdomain) {
+          // We're on a tenant subdomain, just go to admin
+          window.location.href = '/admin'
+          return
+        }
+        
         // Redirect to tenant admin after successful login
         if (data.user) {
           await redirectToUserTenantAdmin(data.user, {

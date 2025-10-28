@@ -4,11 +4,13 @@ import { useState, useEffect } from 'react'
 import { useCart } from '@/lib/contexts/cart-context'
 import { useToast } from '@/lib/contexts/toast-context'
 import { useTenant } from '@/lib/contexts/tenant-context'
+import { PaymentMethodsService, type PaymentMethodConfig } from '@/lib/services/payment-methods'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
+import { StripePaymentWrapper } from '@/components/stripe-payment'
 import Link from 'next/link'
 import Image from 'next/image'
 import { ArrowLeft, CreditCard, Truck, Shield, ShoppingBag } from 'lucide-react'
@@ -31,6 +33,7 @@ interface PaymentInfo {
   expiryDate: string
   cvv: string
   cardholderName: string
+  paymentMethod: 'card' | 'stripe'
 }
 
 export default function CheckoutPage() {
@@ -41,6 +44,9 @@ export default function CheckoutPage() {
   
   const [isProcessing, setIsProcessing] = useState(false)
   const [currentStep, setCurrentStep] = useState<'shipping' | 'payment' | 'review'>('shipping')
+  const [stripePaymentMethod, setStripePaymentMethod] = useState<any>(null)
+  const [availablePaymentMethods, setAvailablePaymentMethods] = useState<PaymentMethodConfig[]>([])
+  const [loadingPaymentMethods, setLoadingPaymentMethods] = useState(true)
   
   const [shippingInfo, setShippingInfo] = useState<ShippingInfo>({
     firstName: '',
@@ -58,8 +64,38 @@ export default function CheckoutPage() {
     cardNumber: '',
     expiryDate: '',
     cvv: '',
-    cardholderName: ''
+    cardholderName: '',
+    paymentMethod: 'stripe'
   })
+
+  // Load available payment methods for this tenant
+  useEffect(() => {
+    const loadPaymentMethods = async () => {
+      if (!tenant?.id) return
+      
+      try {
+        setLoadingPaymentMethods(true)
+        const methods = await PaymentMethodsService.getPaymentMethodsConfig(tenant.id)
+        const enabledMethods = PaymentMethodsService.getEnabledPaymentMethods(methods)
+        setAvailablePaymentMethods(enabledMethods)
+        
+        // Set default payment method to the first enabled one
+        if (enabledMethods.length > 0) {
+          setPaymentInfo(prev => ({
+            ...prev,
+            paymentMethod: enabledMethods[0].id as 'card' | 'stripe'
+          }))
+        }
+      } catch (err) {
+        console.error('Error loading payment methods:', err)
+        error('Payment Methods Error', 'Failed to load available payment methods')
+      } finally {
+        setLoadingPaymentMethods(false)
+      }
+    }
+
+    loadPaymentMethods()
+  }, [tenant?.id])
 
   // Redirect if cart is empty
   useEffect(() => {
@@ -135,7 +171,18 @@ export default function CheckoutPage() {
   const handlePaymentSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     
-    // Basic validation
+    if (paymentInfo.paymentMethod === 'stripe') {
+      // Stripe payment will be handled by the Stripe component
+      if (!stripePaymentMethod) {
+        error('Payment Required', 'Please complete your payment information')
+        return
+      }
+      success('Payment Information Saved', 'Please review your order')
+      setCurrentStep('review')
+      return
+    }
+    
+    // Handle traditional card form validation
     const requiredFields = ['cardNumber', 'expiryDate', 'cvv', 'cardholderName']
     const missingFields = requiredFields.filter(field => 
       !paymentInfo[field as keyof PaymentInfo].trim()
@@ -179,7 +226,7 @@ export default function CheckoutPage() {
       
       // In a real app, you would:
       // 1. Create order in database
-      // 2. Process payment
+      // 2. Process payment (Stripe or traditional)
       // 3. Send confirmation email
       // 4. Update inventory
       
@@ -200,6 +247,16 @@ export default function CheckoutPage() {
     } finally {
       setIsProcessing(false)
     }
+  }
+
+  const handleStripeSuccess = (paymentMethod: any) => {
+    setStripePaymentMethod(paymentMethod)
+    success('Payment Method Added', 'Stripe payment method saved successfully')
+    setCurrentStep('review')
+  }
+
+  const handleStripeError = (errorMessage: string) => {
+    error('Payment Failed', errorMessage)
   }
 
   if (items.length === 0) {
@@ -369,74 +426,187 @@ export default function CheckoutPage() {
                     Payment Information
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <form onSubmit={handlePaymentSubmit} className="space-y-4">
-                    <div>
-                      <Label htmlFor="cardholderName">Cardholder Name *</Label>
-                      <Input
-                        id="cardholderName"
-                        value={paymentInfo.cardholderName}
-                        onChange={(e) => setPaymentInfo(prev => ({ ...prev, cardholderName: e.target.value }))}
-                        required
-                      />
+                <CardContent className="space-y-6">
+                  {/* Payment Method Selection */}
+                  <div>
+                    <Label className="text-base font-medium mb-3 block">Choose Payment Method</Label>
+                    {loadingPaymentMethods ? (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {[1, 2].map((i) => (
+                          <Card key={i} className="border-2 border-gray-200">
+                            <CardContent className="p-4 text-center">
+                              <div className="animate-pulse">
+                                <div className="w-12 h-12 bg-gray-200 rounded-lg mx-auto mb-2"></div>
+                                <div className="h-4 bg-gray-200 rounded w-24 mx-auto mb-1"></div>
+                                <div className="h-3 bg-gray-200 rounded w-32 mx-auto"></div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        ))}
+                      </div>
+                    ) : availablePaymentMethods.length === 0 ? (
+                      <div className="text-center py-8 bg-gray-50 rounded-lg">
+                        <CreditCard className="w-12 h-12 text-gray-400 mx-auto mb-2" />
+                        <h3 className="font-medium text-gray-900 mb-1">No Payment Methods Available</h3>
+                        <p className="text-sm text-gray-600">
+                          Please contact the store owner to configure payment methods.
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {availablePaymentMethods.map((method) => (
+                          <Card 
+                            key={method.id}
+                            className={`cursor-pointer border-2 transition-colors ${
+                              paymentInfo.paymentMethod === method.id 
+                                ? 'border-blue-500 bg-blue-50' 
+                                : 'border-gray-200 hover:border-gray-300'
+                            }`}
+                            onClick={() => setPaymentInfo(prev => ({ ...prev, paymentMethod: method.id as 'card' | 'stripe' }))}
+                          >
+                            <CardContent className="p-4 text-center">
+                              <div className="mb-2">
+                                <div className={`inline-flex items-center justify-center w-12 h-12 rounded-lg mb-2 ${
+                                  method.id === 'stripe' ? 'bg-indigo-100' : 'bg-green-100'
+                                }`}>
+                                  <CreditCard className={`w-6 h-6 ${
+                                    method.id === 'stripe' ? 'text-indigo-600' : 'text-green-600'
+                                  }`} />
+                                </div>
+                              </div>
+                              <h3 className="font-medium">{method.name}</h3>
+                              <p className="text-sm text-gray-600">
+                                {method.id === 'stripe' ? 'Secure payment with Stripe' :
+                                 method.id === 'traditional' ? 'Enter card details manually' :
+                                 method.id === 'paypal' ? 'Pay with PayPal' :
+                                 'Secure payment processing'}
+                              </p>
+                              <div className="mt-2 flex justify-center space-x-2">
+                                <span className="text-xs bg-gray-200 px-2 py-1 rounded">Visa</span>
+                                <span className="text-xs bg-gray-200 px-2 py-1 rounded">MC</span>
+                                {method.id === 'stripe' && <span className="text-xs bg-gray-200 px-2 py-1 rounded">Amex</span>}
+                              </div>
+                              {method.testMode && (
+                                <Badge variant="outline" className="mt-2">Test Mode</Badge>
+                              )}
+                            </CardContent>
+                          </Card>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Stripe Payment Form */}
+                  {paymentInfo.paymentMethod === 'stripe' && (
+                    <div className="space-y-4">
+                      <h3 className="font-medium">Stripe Payment</h3>
+                      {(() => {
+                        const stripeConfig = PaymentMethodsService.getStripeConfig(availablePaymentMethods)
+                        if (!stripeConfig || !stripeConfig.keys?.publishableKey) {
+                          return (
+                            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                              <p className="text-yellow-800 text-sm">
+                                Stripe is not properly configured. Please contact the store owner.
+                              </p>
+                            </div>
+                          )
+                        }
+                        
+                        return (
+                          <StripePaymentWrapper
+                            amount={Math.round(total * 100)} // Convert to cents
+                            onSuccess={handleStripeSuccess}
+                            onError={handleStripeError}
+                            isProcessing={isProcessing}
+                            setIsProcessing={setIsProcessing}
+                            publishableKey={stripeConfig.keys.publishableKey}
+                          />
+                        )
+                      })()}
+                      
+                      <div className="flex space-x-4 mt-6">
+                        <Button 
+                          type="button" 
+                          variant="outline" 
+                          onClick={() => setCurrentStep('shipping')}
+                          className="flex-1"
+                        >
+                          Back to Shipping
+                        </Button>
+                      </div>
                     </div>
-                    
-                    <div>
-                      <Label htmlFor="cardNumber">Card Number *</Label>
-                      <Input
-                        id="cardNumber"
-                        placeholder="1234 5678 9012 3456"
-                        value={paymentInfo.cardNumber}
-                        onChange={(e) => {
-                          const formatted = formatCardNumber(e.target.value)
-                          setPaymentInfo(prev => ({ ...prev, cardNumber: formatted }))
-                        }}
-                        maxLength={19}
-                        required
-                      />
-                    </div>
-                    
-                    <div className="grid grid-cols-2 gap-4">
+                  )}
+
+                  {/* Traditional Card Form */}
+                  {paymentInfo.paymentMethod === 'card' && (
+                    <form onSubmit={handlePaymentSubmit} className="space-y-4">
                       <div>
-                        <Label htmlFor="expiryDate">Expiry Date *</Label>
+                        <Label htmlFor="cardholderName">Cardholder Name *</Label>
                         <Input
-                          id="expiryDate"
-                          placeholder="MM/YY"
-                          value={paymentInfo.expiryDate}
+                          id="cardholderName"
+                          value={paymentInfo.cardholderName}
+                          onChange={(e) => setPaymentInfo(prev => ({ ...prev, cardholderName: e.target.value }))}
+                          required
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="cardNumber">Card Number *</Label>
+                        <Input
+                          id="cardNumber"
+                          placeholder="1234 5678 9012 3456"
+                          value={paymentInfo.cardNumber}
                           onChange={(e) => {
-                            const formatted = formatExpiryDate(e.target.value)
-                            setPaymentInfo(prev => ({ ...prev, expiryDate: formatted }))
+                            const formatted = formatCardNumber(e.target.value)
+                            setPaymentInfo(prev => ({ ...prev, cardNumber: formatted }))
                           }}
-                          maxLength={5}
+                          maxLength={19}
                           required
                         />
                       </div>
-                      <div>
-                        <Label htmlFor="cvv">CVV *</Label>
-                        <Input
-                          id="cvv"
-                          placeholder="123"
-                          value={paymentInfo.cvv}
-                          onChange={(e) => setPaymentInfo(prev => ({ ...prev, cvv: e.target.value }))}
-                          required
-                        />
+                      
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="expiryDate">Expiry Date *</Label>
+                          <Input
+                            id="expiryDate"
+                            placeholder="MM/YY"
+                            value={paymentInfo.expiryDate}
+                            onChange={(e) => {
+                              const formatted = formatExpiryDate(e.target.value)
+                              setPaymentInfo(prev => ({ ...prev, expiryDate: formatted }))
+                            }}
+                            maxLength={5}
+                            required
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="cvv">CVV *</Label>
+                          <Input
+                            id="cvv"
+                            placeholder="123"
+                            value={paymentInfo.cvv}
+                            onChange={(e) => setPaymentInfo(prev => ({ ...prev, cvv: e.target.value }))}
+                            required
+                          />
+                        </div>
                       </div>
-                    </div>
-                    
-                    <div className="flex space-x-4 mt-6">
-                      <Button 
-                        type="button" 
-                        variant="outline" 
-                        onClick={() => setCurrentStep('shipping')}
-                        className="flex-1"
-                      >
-                        Back to Shipping
-                      </Button>
-                      <Button type="submit" className="flex-1">
-                        Review Order
-                      </Button>
-                    </div>
-                  </form>
+                      
+                      <div className="flex space-x-4 mt-6">
+                        <Button 
+                          type="button" 
+                          variant="outline" 
+                          onClick={() => setCurrentStep('shipping')}
+                          className="flex-1"
+                        >
+                          Back to Shipping
+                        </Button>
+                        <Button type="submit" className="flex-1">
+                          Review Order
+                        </Button>
+                      </div>
+                    </form>
+                  )}
                 </CardContent>
               </Card>
             )}
@@ -466,8 +636,31 @@ export default function CheckoutPage() {
                   <div>
                     <h3 className="font-medium mb-2">Payment Method</h3>
                     <div className="bg-gray-50 p-4 rounded-lg">
-                      <p>**** **** **** {paymentInfo.cardNumber.slice(-4)}</p>
-                      <p>{paymentInfo.cardholderName}</p>
+                      {paymentInfo.paymentMethod === 'stripe' && stripePaymentMethod ? (
+                        <div>
+                          <p className="flex items-center">
+                            <CreditCard className="w-4 h-4 mr-2" />
+                            Stripe Payment
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            **** **** **** {stripePaymentMethod.card?.last4 || '****'}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            {stripePaymentMethod.card?.brand?.toUpperCase()} ending in {stripePaymentMethod.card?.last4}
+                          </p>
+                        </div>
+                      ) : paymentInfo.paymentMethod === 'card' ? (
+                        <div>
+                          <p className="flex items-center">
+                            <CreditCard className="w-4 h-4 mr-2" />
+                            Credit Card
+                          </p>
+                          <p>**** **** **** {paymentInfo.cardNumber.slice(-4)}</p>
+                          <p>{paymentInfo.cardholderName}</p>
+                        </div>
+                      ) : (
+                        <p className="text-gray-600">No payment method selected</p>
+                      )}
                     </div>
                   </div>
 

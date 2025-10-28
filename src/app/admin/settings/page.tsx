@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useTenant } from '@/lib/contexts/tenant-context'
 import { createClient } from '@/lib/supabase/client'
 import { Database } from '@/lib/types/database'
+import { PaymentMethodsService } from '@/lib/services/payment-methods'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -39,7 +40,8 @@ import {
   Trash2,
   Plus,
   Eye,
-  EyeOff
+  EyeOff,
+  CreditCard
 } from 'lucide-react'
 
 type Tenant = Database['public']['Tables']['tenants']['Row']
@@ -95,6 +97,17 @@ interface ThemeSettings {
   custom_css: string
 }
 
+interface PaymentMethodConfig {
+  enabled: boolean
+  stripe_publishable_key?: string
+  stripe_secret_key?: string
+}
+
+interface PaymentSettings {
+  cash_on_delivery: PaymentMethodConfig
+  stripe: PaymentMethodConfig
+}
+
 export default function SettingsPage() {
   const { tenant, isLoading: tenantLoading, error } = useTenant()
   const [loading, setLoading] = useState(false)
@@ -102,6 +115,11 @@ export default function SettingsPage() {
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
   const [tenantUsers, setTenantUsers] = useState<TenantUser[]>([])
   const [activeTab, setActiveTab] = useState('store')
+  const [paymentMethods, setPaymentMethods] = useState<PaymentSettings>({
+    cash_on_delivery: { enabled: true },
+    stripe: { enabled: false }
+  })
+  const [showStripeKeys, setShowStripeKeys] = useState(false)
   
   const [storeSettings, setStoreSettings] = useState<StoreSettings>({
     name: '',
@@ -144,6 +162,7 @@ export default function SettingsPage() {
     if (tenant?.id) {
       loadSettings()
       loadTenantUsers()
+      loadPaymentMethods()
     }
   }, [tenant?.id])
 
@@ -226,6 +245,31 @@ export default function SettingsPage() {
     }
   }
 
+  const loadPaymentMethods = async () => {
+    if (!tenant?.id) return
+
+    try {
+      const methods = await PaymentMethodsService.getPaymentMethodsConfig(tenant.id)
+      
+      // Convert to our local state format
+      const stripeMethod = methods.find(m => m.id === 'stripe')
+      const traditionalMethod = methods.find(m => m.id === 'traditional')
+      
+      setPaymentMethods({
+        cash_on_delivery: {
+          enabled: traditionalMethod?.enabled || true
+        },
+        stripe: {
+          enabled: stripeMethod?.enabled || false,
+          stripe_publishable_key: stripeMethod?.keys?.publishableKey || '',
+          stripe_secret_key: stripeMethod?.keys?.secretKey || ''
+        }
+      })
+    } catch (error) {
+      console.error('Error loading payment methods:', error)
+    }
+  }
+
   const saveStoreSettings = async () => {
     if (!tenant?.id) return
 
@@ -290,6 +334,58 @@ export default function SettingsPage() {
     } catch (error) {
       console.error('Error saving theme settings:', error)
       setMessage({ type: 'error', text: 'Failed to save theme settings' })
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const savePaymentSettings = async () => {
+    if (!tenant?.id) return
+
+    try {
+      setSaving(true)
+      
+      // Validate Stripe keys if Stripe is enabled
+      if (paymentMethods.stripe.enabled) {
+        const validation = PaymentMethodsService.validateStripeKeys({
+          publishableKey: paymentMethods.stripe.stripe_publishable_key,
+          secretKey: paymentMethods.stripe.stripe_secret_key
+        })
+        
+        if (!validation.valid) {
+          setMessage({ type: 'error', text: `Stripe validation error: ${validation.message}` })
+          return
+        }
+      }
+
+      // Convert to service format
+      const defaultMethods = PaymentMethodsService.getDefaultPaymentMethods()
+      const updatedMethods = defaultMethods.map(method => {
+        if (method.id === 'stripe') {
+          return {
+            ...method,
+            enabled: paymentMethods.stripe.enabled,
+            keys: {
+              ...method.keys,
+              publishableKey: paymentMethods.stripe.stripe_publishable_key || '',
+              secretKey: paymentMethods.stripe.stripe_secret_key || ''
+            }
+          }
+        }
+        if (method.id === 'traditional') {
+          return {
+            ...method,
+            enabled: paymentMethods.cash_on_delivery.enabled
+          }
+        }
+        return method
+      })
+
+      await PaymentMethodsService.savePaymentMethodsConfig(tenant.id, updatedMethods)
+      setMessage({ type: 'success', text: 'Payment settings saved successfully!' })
+    } catch (error) {
+      console.error('Error saving payment settings:', error)
+      setMessage({ type: 'error', text: 'Failed to save payment settings' })
     } finally {
       setSaving(false)
     }
@@ -447,7 +543,7 @@ export default function SettingsPage() {
 
       {/* Settings Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="store" className="flex items-center space-x-2">
             <Store className="h-4 w-4" />
             <span>Store</span>
@@ -455,6 +551,10 @@ export default function SettingsPage() {
           <TabsTrigger value="theme" className="flex items-center space-x-2">
             <Palette className="h-4 w-4" />
             <span>Theme</span>
+          </TabsTrigger>
+          <TabsTrigger value="payments" className="flex items-center space-x-2">
+            <CreditCard className="h-4 w-4" />
+            <span>Payments</span>
           </TabsTrigger>
           <TabsTrigger value="users" className="flex items-center space-x-2">
             <Users className="h-4 w-4" />
@@ -893,6 +993,155 @@ export default function SettingsPage() {
                 <Save className="h-4 w-4 mr-2" />
                 {saving ? 'Saving...' : 'Save Theme Settings'}
               </Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Payment Methods Settings */}
+        <TabsContent value="payments" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Payment Methods</CardTitle>
+              <p className="text-sm text-muted-foreground">
+                Configure which payment methods are available to your customers.
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Cash on Delivery */}
+              <div className="flex items-center justify-between p-4 border rounded-lg">
+                <div className="flex items-center space-x-4">
+                  <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
+                    💵
+                  </div>
+                  <div>
+                    <h3 className="font-medium">Cash on Delivery</h3>
+                    <p className="text-sm text-gray-500">
+                      Allow customers to pay when they receive their order
+                    </p>
+                  </div>
+                </div>
+                <Switch
+                  checked={paymentMethods.cash_on_delivery.enabled}
+                  onCheckedChange={(checked) => setPaymentMethods(prev => ({
+                    ...prev,
+                    cash_on_delivery: { ...prev.cash_on_delivery, enabled: checked }
+                  }))}
+                />
+              </div>
+
+              {/* Stripe */}
+              <div className="border rounded-lg">
+                <div className="flex items-center justify-between p-4">
+                  <div className="flex items-center space-x-4">
+                    <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                      <CreditCard className="h-6 w-6 text-blue-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-medium">Stripe</h3>
+                      <p className="text-sm text-gray-500">
+                        Accept credit cards and other payment methods with Stripe
+                      </p>
+                    </div>
+                  </div>
+                  <Switch
+                    checked={paymentMethods.stripe.enabled}
+                    onCheckedChange={(checked) => setPaymentMethods(prev => ({
+                      ...prev,
+                      stripe: { ...prev.stripe, enabled: checked }
+                    }))}
+                  />
+                </div>
+
+                {paymentMethods.stripe.enabled && (
+                  <div className="px-4 pb-4 space-y-4 border-t bg-gray-50">
+                    <div className="flex items-center justify-between pt-4">
+                      <Label className="text-sm font-medium">API Keys</Label>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setShowStripeKeys(!showStripeKeys)}
+                      >
+                        {showStripeKeys ? (
+                          <>
+                            <EyeOff className="h-4 w-4 mr-2" />
+                            Hide Keys
+                          </>
+                        ) : (
+                          <>
+                            <Eye className="h-4 w-4 mr-2" />
+                            Show Keys
+                          </>
+                        )}
+                      </Button>
+                    </div>
+
+                    <div className="space-y-3">
+                      <div>
+                        <Label htmlFor="stripe-publishable-key" className="text-sm">
+                          Publishable Key
+                        </Label>
+                        <Input
+                          id="stripe-publishable-key"
+                          type={showStripeKeys ? "text" : "password"}
+                          value={paymentMethods.stripe.stripe_publishable_key || ''}
+                          onChange={(e) => setPaymentMethods(prev => ({
+                            ...prev,
+                            stripe: { ...prev.stripe, stripe_publishable_key: e.target.value }
+                          }))}
+                          placeholder="pk_test_..."
+                          className="font-mono text-sm"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="stripe-secret-key" className="text-sm">
+                          Secret Key
+                        </Label>
+                        <Input
+                          id="stripe-secret-key"
+                          type={showStripeKeys ? "text" : "password"}
+                          value={paymentMethods.stripe.stripe_secret_key || ''}
+                          onChange={(e) => setPaymentMethods(prev => ({
+                            ...prev,
+                            stripe: { ...prev.stripe, stripe_secret_key: e.target.value }
+                          }))}
+                          placeholder="sk_test_..."
+                          className="font-mono text-sm"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="bg-blue-50 p-3 rounded-lg">
+                      <div className="flex items-start space-x-2">
+                        <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <span className="text-white text-xs font-bold">i</span>
+                        </div>
+                        <div className="text-sm">
+                          <p className="font-medium text-blue-900">Stripe API Keys</p>
+                          <p className="text-blue-700">
+                            Get your API keys from the{' '}
+                            <a 
+                              href="https://dashboard.stripe.com/apikeys" 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="underline"
+                            >
+                              Stripe Dashboard
+                            </a>
+                            . Use test keys for testing and live keys for production.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex justify-end">
+                <Button onClick={savePaymentSettings} disabled={saving}>
+                  <Save className="h-4 w-4 mr-2" />
+                  {saving ? 'Saving...' : 'Save Payment Settings'}
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>

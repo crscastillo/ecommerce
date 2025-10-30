@@ -637,53 +637,6 @@ export type Database = {
           },
         ]
       }
-      subscriptions: {
-        Row: {
-          cancel_at_period_end: boolean | null
-          created_at: string
-          current_period_end: string
-          current_period_start: string
-          id: string
-          plan_id: string
-          status: string
-          stripe_subscription_id: string
-          tenant_id: string
-          updated_at: string
-        }
-        Insert: {
-          cancel_at_period_end?: boolean | null
-          created_at?: string
-          current_period_end: string
-          current_period_start: string
-          id: string
-          plan_id: string
-          status: string
-          stripe_subscription_id: string
-          tenant_id: string
-          updated_at?: string
-        }
-        Update: {
-          cancel_at_period_end?: boolean | null
-          created_at?: string
-          current_period_end?: string
-          current_period_start?: string
-          id?: string
-          plan_id?: string
-          status?: string
-          stripe_subscription_id?: string
-          tenant_id?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "subscriptions_tenant_id_fkey"
-            columns: ["tenant_id"]
-            isOneToOne: false
-            referencedRelation: "tenants"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       tenant_payment_settings: {
         Row: {
           created_at: string | null
@@ -777,9 +730,7 @@ export type Database = {
           logo_url: string | null
           name: string
           owner_id: string | null
-          plan: string | null
           settings: Json | null
-          stripe_customer_id: string | null
           subdomain: string
           subscription_tier: string | null
           theme_config: Json | null
@@ -798,9 +749,7 @@ export type Database = {
           logo_url?: string | null
           name: string
           owner_id?: string | null
-          plan?: string | null
           settings?: Json | null
-          stripe_customer_id?: string | null
           subdomain: string
           subscription_tier?: string | null
           theme_config?: Json | null
@@ -819,9 +768,7 @@ export type Database = {
           logo_url?: string | null
           name?: string
           owner_id?: string | null
-          plan?: string | null
           settings?: Json | null
-          stripe_customer_id?: string | null
           subdomain?: string
           subscription_tier?: string | null
           theme_config?: Json | null
@@ -970,12 +917,3 @@ export const Constants = {
     Enums: {},
   },
 } as const
-
-// Helper types for common table references
-export type Tenant = Tables<"tenants">
-export type TenantInsert = TablesInsert<"tenants">
-export type TenantUpdate = TablesUpdate<"tenants">
-
-export type Subscription = Tables<"subscriptions">
-export type SubscriptionInsert = TablesInsert<"subscriptions">
-export type SubscriptionUpdate = TablesUpdate<"subscriptions">

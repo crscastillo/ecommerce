@@ -42,7 +42,8 @@ import {
   Eye,
   EyeOff,
   CreditCard,
-  Cog
+  Cog,
+  Puzzle
 } from 'lucide-react'
 
 type Tenant = Database['public']['Tables']['tenants']['Row']
@@ -586,7 +587,7 @@ export default function SettingsPage() {
 
       {/* Settings Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-6">
+        <TabsList className="grid w-full grid-cols-7">
           <TabsTrigger value="store" className="flex items-center space-x-2">
             <Store className="h-4 w-4" />
             <span>Store</span>
@@ -602,6 +603,10 @@ export default function SettingsPage() {
           <TabsTrigger value="payments" className="flex items-center space-x-2">
             <CreditCard className="h-4 w-4" />
             <span>Payments</span>
+          </TabsTrigger>
+          <TabsTrigger value="plugins" className="flex items-center space-x-2">
+            <Puzzle className="h-4 w-4" />
+            <span>Plugins</span>
           </TabsTrigger>
           <TabsTrigger value="users" className="flex items-center space-x-2">
             <Users className="h-4 w-4" />
@@ -1337,6 +1342,294 @@ export default function SettingsPage() {
                 <Button onClick={savePaymentSettings} disabled={saving}>
                   <Save className="h-4 w-4 mr-2" />
                   {saving ? 'Saving...' : 'Save Payment Settings'}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Plugins Management */}
+        <TabsContent value="plugins" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Puzzle className="h-5 w-5 mr-2" />
+                Available Plugins
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                
+                {/* Analytics Plugin */}
+                <Card className="border-2">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <div className="p-2 bg-blue-100 rounded-lg mr-3">
+                          <Globe className="h-5 w-5 text-blue-600" />
+                        </div>
+                        <div>
+                          <h3 className="font-medium">Google Analytics</h3>
+                          <p className="text-sm text-gray-600">Track store performance and visitor behavior</p>
+                        </div>
+                      </div>
+                      <Switch 
+                        checked={false}
+                        onCheckedChange={(checked) => {
+                          // TODO: Handle plugin toggle
+                        }}
+                      />
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      <div>
+                        <Label htmlFor="ga-tracking-id">Tracking ID</Label>
+                        <Input
+                          id="ga-tracking-id"
+                          placeholder="G-XXXXXXXXXX"
+                          disabled
+                        />
+                      </div>
+                      <Badge variant="outline">Pro Feature</Badge>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Facebook Pixel Plugin */}
+                <Card className="border-2">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <div className="p-2 bg-blue-100 rounded-lg mr-3">
+                          <Globe className="h-5 w-5 text-blue-600" />
+                        </div>
+                        <div>
+                          <h3 className="font-medium">Facebook Pixel</h3>
+                          <p className="text-sm text-gray-600">Track conversions and optimize ads</p>
+                        </div>
+                      </div>
+                      <Switch 
+                        checked={false}
+                        onCheckedChange={(checked) => {
+                          // TODO: Handle plugin toggle
+                        }}
+                      />
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      <div>
+                        <Label htmlFor="fb-pixel-id">Pixel ID</Label>
+                        <Input
+                          id="fb-pixel-id"
+                          placeholder="1234567890123456"
+                          disabled
+                        />
+                      </div>
+                      <Badge variant="outline">Pro Feature</Badge>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Email Marketing Plugin */}
+                <Card className="border-2">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <div className="p-2 bg-green-100 rounded-lg mr-3">
+                          <Mail className="h-5 w-5 text-green-600" />
+                        </div>
+                        <div>
+                          <h3 className="font-medium">Mailchimp Integration</h3>
+                          <p className="text-sm text-gray-600">Sync customers and send newsletters</p>
+                        </div>
+                      </div>
+                      <Switch 
+                        checked={false}
+                        onCheckedChange={(checked) => {
+                          // TODO: Handle plugin toggle
+                        }}
+                      />
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      <div>
+                        <Label htmlFor="mailchimp-api-key">API Key</Label>
+                        <Input
+                          id="mailchimp-api-key"
+                          placeholder="API Key"
+                          type="password"
+                          disabled
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="mailchimp-list-id">List ID</Label>
+                        <Input
+                          id="mailchimp-list-id"
+                          placeholder="List ID"
+                          disabled
+                        />
+                      </div>
+                      <Badge variant="outline">Pro Feature</Badge>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* WhatsApp Plugin */}
+                <Card className="border-2">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <div className="p-2 bg-green-100 rounded-lg mr-3">
+                          <Mail className="h-5 w-5 text-green-600" />
+                        </div>
+                        <div>
+                          <h3 className="font-medium">WhatsApp Business</h3>
+                          <p className="text-sm text-gray-600">Customer support via WhatsApp</p>
+                        </div>
+                      </div>
+                      <Switch 
+                        checked={true}
+                        onCheckedChange={(checked) => {
+                          // TODO: Handle plugin toggle
+                        }}
+                      />
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      <div>
+                        <Label htmlFor="whatsapp-number">WhatsApp Number</Label>
+                        <Input
+                          id="whatsapp-number"
+                          placeholder="+506 1234 5678"
+                          defaultValue="+506 8888 8888"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="whatsapp-message">Default Message</Label>
+                        <Textarea
+                          id="whatsapp-message"
+                          placeholder="Hi! I'm interested in..."
+                          defaultValue="Hola! Me interesa obtener información sobre sus productos."
+                        />
+                      </div>
+                      <Badge variant="default" className="bg-green-100 text-green-800">Active</Badge>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Live Chat Plugin */}
+                <Card className="border-2">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <div className="p-2 bg-purple-100 rounded-lg mr-3">
+                          <Mail className="h-5 w-5 text-purple-600" />
+                        </div>
+                        <div>
+                          <h3 className="font-medium">Live Chat Widget</h3>
+                          <p className="text-sm text-gray-600">Real-time customer support</p>
+                        </div>
+                      </div>
+                      <Switch 
+                        checked={false}
+                        onCheckedChange={(checked) => {
+                          // TODO: Handle plugin toggle
+                        }}
+                      />
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      <div>
+                        <Label htmlFor="chat-position">Widget Position</Label>
+                        <Select defaultValue="bottom-right">
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="bottom-right">Bottom Right</SelectItem>
+                            <SelectItem value="bottom-left">Bottom Left</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <Badge variant="outline">Pro Feature</Badge>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Inventory Management Plugin */}
+                <Card className="border-2">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <div className="p-2 bg-orange-100 rounded-lg mr-3">
+                          <AlertCircle className="h-5 w-5 text-orange-600" />
+                        </div>
+                        <div>
+                          <h3 className="font-medium">Low Stock Alerts</h3>
+                          <p className="text-sm text-gray-600">Get notified when inventory is low</p>
+                        </div>
+                      </div>
+                      <Switch 
+                        checked={true}
+                        onCheckedChange={(checked) => {
+                          // TODO: Handle plugin toggle
+                        }}
+                      />
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      <div>
+                        <Label htmlFor="low-stock-threshold">Alert Threshold</Label>
+                        <Input
+                          id="low-stock-threshold"
+                          type="number"
+                          placeholder="5"
+                          defaultValue="5"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="alert-email">Alert Email</Label>
+                        <Input
+                          id="alert-email"
+                          type="email"
+                          placeholder="alerts@yourdomain.com"
+                          defaultValue="admin@yourdomain.com"
+                        />
+                      </div>
+                      <Badge variant="default" className="bg-green-100 text-green-800">Active</Badge>
+                    </div>
+                  </CardContent>
+                </Card>
+
+              </div>
+
+              <Separator />
+
+              <div className="bg-blue-50 p-4 rounded-lg">
+                <div className="flex items-start space-x-3">
+                  <Puzzle className="h-5 w-5 text-blue-600 mt-0.5" />
+                  <div>
+                    <h3 className="font-medium text-blue-900">Need a Custom Plugin?</h3>
+                    <p className="text-sm text-blue-800 mt-1">
+                      Contact our development team to create custom integrations for your specific business needs.
+                    </p>
+                    <Button variant="outline" size="sm" className="mt-3 border-blue-200">
+                      Request Custom Plugin
+                    </Button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex justify-end">
+                <Button onClick={() => {}} disabled={saving}>
+                  <Save className="h-4 w-4 mr-2" />
+                  {saving ? 'Saving...' : 'Save Plugin Settings'}
                 </Button>
               </div>
             </CardContent>

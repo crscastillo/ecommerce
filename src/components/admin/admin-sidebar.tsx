@@ -17,6 +17,7 @@ import {
   FileText,
   X,
   Home,
+  CreditCard,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -28,6 +29,7 @@ const navigation = [
   { name: 'Categories', href: '/admin/categories', icon: Tag },
   { name: 'Analytics', href: '/admin/analytics', icon: BarChart3 },
   { name: 'Pages', href: '/admin/pages', icon: FileText },
+  { name: 'Billing', href: '/admin/billing', icon: CreditCard },
   { name: 'Settings', href: '/admin/settings', icon: Settings },
 ]
 
@@ -119,10 +121,17 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
 
           {/* Subscription info */}
           <div className="border-t border-gray-200 p-4">
-            <div className="flex items-center">
+            <div className="flex items-center justify-between">
               <Badge variant="outline" className="text-xs">
-                {tenant?.subscription_tier || 'Basic'} Plan
+                {tenant?.plan || 'Starter'} Plan
               </Badge>
+              <Link 
+                href="/admin/billing"
+                className="text-xs text-blue-600 hover:text-blue-800"
+                onClick={onClose}
+              >
+                Upgrade
+              </Link>
             </div>
             <p className="mt-1 text-xs text-gray-500">
               {tenant?.subdomain}.{platformConfig.getDomain()}

@@ -18,6 +18,8 @@ CREATE TABLE tenants (
   address JSONB, -- Store address as JSON
   settings JSONB DEFAULT '{}', -- Store-specific settings
   subscription_tier VARCHAR DEFAULT 'basic',
+  plan VARCHAR DEFAULT 'starter',
+  stripe_customer_id VARCHAR,
   is_active BOOLEAN DEFAULT true,
   owner_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
@@ -328,4 +330,27 @@ CREATE TRIGGER update_orders_updated_at BEFORE UPDATE ON orders
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 CREATE TRIGGER update_discounts_updated_at BEFORE UPDATE ON discounts
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- Subscriptions table (for billing and plan management)
+CREATE TABLE IF NOT EXISTS subscriptions (
+  id VARCHAR(255) PRIMARY KEY,
+  tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+  stripe_subscription_id VARCHAR(255) UNIQUE NOT NULL,
+  plan_id VARCHAR(50) NOT NULL,
+  status VARCHAR(50) NOT NULL,
+  current_period_start TIMESTAMP WITH TIME ZONE NOT NULL,
+  current_period_end TIMESTAMP WITH TIME ZONE NOT NULL,
+  cancel_at_period_end BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- Create indexes for subscriptions
+CREATE INDEX IF NOT EXISTS idx_subscriptions_tenant_id ON subscriptions(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_subscriptions_stripe_id ON subscriptions(stripe_subscription_id);
+CREATE INDEX IF NOT EXISTS idx_subscriptions_status ON subscriptions(status);
+
+-- Create trigger for subscriptions updated_at
+CREATE TRIGGER update_subscriptions_updated_at BEFORE UPDATE ON subscriptions
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();

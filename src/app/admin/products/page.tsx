@@ -46,6 +46,7 @@ interface Product {
   name: string
   slug: string
   price: number
+  product_type: 'single' | 'variable' | 'digital'
   inventory_quantity: number
   track_inventory: boolean
   is_active: boolean
@@ -274,6 +275,7 @@ export default function ProductsPage() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Product</TableHead>
+                    <TableHead>Type</TableHead>
                     <TableHead>SKU</TableHead>
                     <TableHead>Price</TableHead>
                     <TableHead>Inventory</TableHead>
@@ -294,6 +296,24 @@ export default function ProductsPage() {
                         </div>
                       </TableCell>
                       <TableCell>
+                        <Badge 
+                          variant={
+                            product.product_type === 'variable' ? 'default' : 
+                            product.product_type === 'digital' ? 'secondary' : 
+                            'outline'
+                          }
+                          className={
+                            product.product_type === 'variable' ? 'bg-blue-100 text-blue-800' :
+                            product.product_type === 'digital' ? 'bg-purple-100 text-purple-800' :
+                            'bg-gray-100 text-gray-800'
+                          }
+                        >
+                          {product.product_type === 'single' && '📦 Single'}
+                          {product.product_type === 'variable' && '🔧 Variable'}
+                          {product.product_type === 'digital' && '💾 Digital'}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
                         <code className="text-xs bg-muted px-1 py-0.5 rounded">
                           {product.sku || 'N/A'}
                         </code>
@@ -301,17 +321,23 @@ export default function ProductsPage() {
                       <TableCell>{formatPrice(product.price, tenant)}</TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          <span className={`text-sm ${
-                            product.inventory_quantity > (tenantSettings.low_stock_threshold || 5)
-                              ? 'text-green-600' 
-                              : product.inventory_quantity > 0 
-                                ? 'text-yellow-600' 
-                                : 'text-red-600'
-                          }`}>
-                            {product.inventory_quantity}
-                          </span>
-                          {product.track_inventory && isProductLowStock(product, { low_stock_threshold: tenantSettings.low_stock_threshold || 5 }) && (
-                            <AlertTriangle className="h-4 w-4 text-orange-500" />
+                          {product.product_type === 'digital' ? (
+                            <Badge variant="outline" className="text-xs">Digital</Badge>
+                          ) : (
+                            <>
+                              <span className={`text-sm ${
+                                product.inventory_quantity > (tenantSettings.low_stock_threshold || 5)
+                                  ? 'text-green-600' 
+                                  : product.inventory_quantity > 0 
+                                    ? 'text-yellow-600' 
+                                    : 'text-red-600'
+                              }`}>
+                                {product.inventory_quantity}
+                              </span>
+                              {product.track_inventory && isProductLowStock(product, { low_stock_threshold: tenantSettings.low_stock_threshold || 5 }) && (
+                                <AlertTriangle className="h-4 w-4 text-orange-500" />
+                              )}
+                            </>
                           )}
                         </div>
                       </TableCell>

@@ -76,6 +76,7 @@ CREATE TABLE products (
   price DECIMAL(10,2) NOT NULL,
   compare_price DECIMAL(10,2), -- For showing discounts
   cost_price DECIMAL(10,2), -- For profit calculations
+  product_type VARCHAR(20) DEFAULT 'single' CHECK (product_type IN ('single', 'variable', 'digital')),
   track_inventory BOOLEAN DEFAULT true,
   inventory_quantity INTEGER DEFAULT 0,
   allow_backorder BOOLEAN DEFAULT false,

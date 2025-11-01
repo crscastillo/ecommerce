@@ -47,6 +47,7 @@ export default function NewProductPage() {
     slug: '',
     description: '',
     short_description: '',
+    product_type: 'single' as 'single' | 'variable' | 'digital',
     sku: '',
     price: '',
     compare_price: '',
@@ -63,6 +64,108 @@ export default function NewProductPage() {
   })
   
   const [productImages, setProductImages] = useState<string[]>([])
+  
+  // Variations state for variable products
+  const [variationOptions, setVariationOptions] = useState<Array<{
+    name: string
+    values: string[]
+  }>>([{ name: '', values: [] }])
+  
+  const [variations, setVariations] = useState<Array<{
+    id: string
+    title: string
+    attributes: Array<{ name: string; value: string }>
+    sku: string
+    price: string
+    compare_price: string
+    cost_price: string
+    stock_quantity: string
+    weight: string
+    is_active: boolean
+  }>>([])
+  
+  // Digital product state
+  const [digitalFiles, setDigitalFiles] = useState<string[]>([])
+
+  // Variation management functions
+  const addVariationOption = () => {
+    setVariationOptions([...variationOptions, { name: '', values: [] }])
+  }
+
+  const removeVariationOption = (index: number) => {
+    if (variationOptions.length > 1) {
+      const newOptions = variationOptions.filter((_, i) => i !== index)
+      setVariationOptions(newOptions)
+      // Clear variations when options change
+      setVariations([])
+    }
+  }
+
+  const updateVariationOption = (index: number, field: 'name' | 'values', value: string | string[]) => {
+    const newOptions = [...variationOptions]
+    if (field === 'name' && typeof value === 'string') {
+      newOptions[index].name = value
+    } else if (field === 'values' && Array.isArray(value)) {
+      newOptions[index].values = value
+    }
+    setVariationOptions(newOptions)
+    // Clear variations when options change
+    setVariations([])
+  }
+
+  const getVariationCombinations = () => {
+    const validOptions = variationOptions.filter(opt => opt.name && opt.values.length > 0)
+    if (validOptions.length === 0) return []
+
+    const combinations: Array<Array<{ name: string; value: string }>> = []
+    
+    const generateCombinations = (index: number, current: Array<{ name: string; value: string }>) => {
+      if (index === validOptions.length) {
+        combinations.push([...current])
+        return
+      }
+
+      const option = validOptions[index]
+      for (const value of option.values) {
+        current.push({ name: option.name, value })
+        generateCombinations(index + 1, current)
+        current.pop()
+      }
+    }
+
+    generateCombinations(0, [])
+    return combinations
+  }
+
+  const generateVariations = () => {
+    const combinations = getVariationCombinations()
+    const newVariations = combinations.map((combo, index) => ({
+      id: `var-${Date.now()}-${index}`,
+      title: combo.map(attr => attr.value).join(' / '),
+      attributes: combo,
+      sku: '',
+      price: formData.price,
+      compare_price: formData.compare_price,
+      cost_price: formData.cost_price,
+      stock_quantity: '0',
+      weight: '',
+      is_active: true
+    }))
+    setVariations(newVariations)
+  }
+
+  const updateVariation = (index: number, field: string, value: string | boolean) => {
+    const newVariations = [...variations]
+    if (field in newVariations[index]) {
+      (newVariations[index] as any)[field] = value
+      setVariations(newVariations)
+    }
+  }
+
+  const removeVariation = (index: number) => {
+    const newVariations = variations.filter((_, i) => i !== index)
+    setVariations(newVariations)
+  }
 
   const router = useRouter()
   const { tenant } = useTenant()
@@ -128,14 +231,35 @@ export default function NewProductPage() {
       setError('Product slug is required')
       return false
     }
-    if (!formData.price || parseFloat(formData.price) <= 0) {
+    
+    // For single and digital products, price is required
+    if (formData.product_type !== 'variable' && (!formData.price || parseFloat(formData.price) <= 0)) {
       setError('Valid price is required')
       return false
     }
-    if (formData.track_inventory && (!formData.inventory_quantity || parseInt(formData.inventory_quantity) < 0)) {
+    
+    // For variable products, check variations
+    if (formData.product_type === 'variable') {
+      if (variations.length === 0) {
+        setError('Variable products must have at least one variation')
+        return false
+      }
+      
+      // Check if all variations have valid prices
+      for (const variation of variations) {
+        if (!variation.price || parseFloat(variation.price) <= 0) {
+          setError('All variations must have valid prices')
+          return false
+        }
+      }
+    }
+    
+    // Only check inventory for non-digital products
+    if (formData.product_type !== 'digital' && formData.product_type !== 'variable' && formData.track_inventory && (!formData.inventory_quantity || parseInt(formData.inventory_quantity) < 0)) {
       setError('Valid inventory quantity is required when tracking inventory')
       return false
     }
+    
     return true
   }
 
@@ -165,12 +289,13 @@ export default function NewProductPage() {
         description: formData.description.trim() || null,
         short_description: formData.short_description.trim() || null,
         sku: formData.sku.trim() || null,
-        price: parseFloat(formData.price),
-        compare_price: formData.compare_price ? parseFloat(formData.compare_price) : null,
-        cost_price: formData.cost_price ? parseFloat(formData.cost_price) : null,
-        track_inventory: formData.track_inventory,
-        inventory_quantity: formData.track_inventory ? parseInt(formData.inventory_quantity) : 0,
-        allow_backorder: formData.allow_backorder,
+        product_type: formData.product_type,
+        price: formData.product_type === 'variable' ? 0 : parseFloat(formData.price),
+        compare_price: formData.product_type === 'variable' ? null : (formData.compare_price ? parseFloat(formData.compare_price) : null),
+        cost_price: formData.product_type === 'variable' ? null : (formData.cost_price ? parseFloat(formData.cost_price) : null),
+        track_inventory: formData.product_type === 'digital' ? false : formData.track_inventory,
+        inventory_quantity: formData.product_type === 'digital' || formData.product_type === 'variable' ? 0 : (formData.track_inventory ? parseInt(formData.inventory_quantity) : 0),
+        allow_backorder: formData.product_type === 'digital' ? false : formData.allow_backorder,
         weight: formData.weight ? parseFloat(formData.weight) : null,
         category_id: formData.category_id || null,
         is_active: formData.is_active,
@@ -178,7 +303,8 @@ export default function NewProductPage() {
         seo_title: formData.seo_title.trim() || null,
         seo_description: formData.seo_description.trim() || null,
         images: prepareImagesForStorage(productImages),
-        variants: {},
+        variants: formData.product_type === 'variable' ? variations : {},
+        digital_files: formData.product_type === 'digital' ? digitalFiles : [],
       }
 
       console.log('Creating product with data:', productData)
@@ -266,6 +392,48 @@ export default function NewProductPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
+                {/* Product Type Selection */}
+                <div>
+                  <Label htmlFor="product_type">Product Type *</Label>
+                  <Select 
+                    value={formData.product_type} 
+                    onValueChange={(value: 'single' | 'variable' | 'digital') => handleInputChange('product_type', value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select product type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="single">
+                        <div className="flex items-center gap-2">
+                          <span>📦</span>
+                          <div>
+                            <div className="font-medium">Single Product</div>
+                            <div className="text-xs text-gray-500">Simple product with one variant</div>
+                          </div>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="variable">
+                        <div className="flex items-center gap-2">
+                          <span>🔧</span>
+                          <div>
+                            <div className="font-medium">Variable Product</div>
+                            <div className="text-xs text-gray-500">Product with multiple variants (size, color, etc.)</div>
+                          </div>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="digital">
+                        <div className="flex items-center gap-2">
+                          <span>💾</span>
+                          <div>
+                            <div className="font-medium">Digital Product</div>
+                            <div className="text-xs text-gray-500">Downloadable digital content</div>
+                          </div>
+                        </div>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div>
                     <Label htmlFor="name">Product Name *</Label>
@@ -313,123 +481,343 @@ export default function NewProductPage() {
             </Card>
 
             {/* Pricing */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Pricing</CardTitle>
-                <CardDescription>
-                  Product pricing and cost information
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid gap-4 sm:grid-cols-3">
-                  <div>
-                    <Label htmlFor="price">Price *</Label>
-                    <Input
-                      id="price"
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      value={formData.price}
-                      onChange={(e) => handleInputChange('price', e.target.value)}
-                      placeholder="0.00"
-                      required
-                    />
+            {formData.product_type !== 'variable' && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Pricing</CardTitle>
+                  <CardDescription>
+                    Product pricing and cost information
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid gap-4 sm:grid-cols-3">
+                    <div>
+                      <Label htmlFor="price">Price *</Label>
+                      <Input
+                        id="price"
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={formData.price}
+                        onChange={(e) => handleInputChange('price', e.target.value)}
+                        placeholder="0.00"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="compare_price">Compare at Price</Label>
+                      <Input
+                        id="compare_price"
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={formData.compare_price}
+                        onChange={(e) => handleInputChange('compare_price', e.target.value)}
+                        placeholder="0.00"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="cost_price">Cost per Item</Label>
+                      <Input
+                        id="cost_price"
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={formData.cost_price}
+                        onChange={(e) => handleInputChange('cost_price', e.target.value)}
+                        placeholder="0.00"
+                      />
+                    </div>
                   </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Variations (for variable products) */}
+            {formData.product_type === 'variable' && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Product Variations</CardTitle>
+                  <CardDescription>
+                    Configure options and variants for this product
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  {/* Variation Options */}
                   <div>
-                    <Label htmlFor="compare_price">Compare at Price</Label>
-                    <Input
-                      id="compare_price"
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      value={formData.compare_price}
-                      onChange={(e) => handleInputChange('compare_price', e.target.value)}
-                      placeholder="0.00"
-                    />
+                    <div className="flex items-center justify-between mb-4">
+                      <Label>Variation Options</Label>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={addVariationOption}
+                      >
+                        Add Option
+                      </Button>
+                    </div>
+                    
+                    <div className="space-y-4">
+                      {variationOptions.map((option, index) => (
+                        <div key={index} className="border rounded-lg p-4">
+                          <div className="flex items-center justify-between mb-3">
+                            <Label>Option {index + 1}</Label>
+                            {variationOptions.length > 1 && (
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => removeVariationOption(index)}
+                                className="text-red-600 hover:text-red-700"
+                              >
+                                Remove
+                              </Button>
+                            )}
+                          </div>
+                          
+                          <div className="grid gap-3 sm:grid-cols-2">
+                            <div>
+                              <Label htmlFor={`option-name-${index}`}>Option Name</Label>
+                              <Input
+                                id={`option-name-${index}`}
+                                value={option.name}
+                                onChange={(e) => updateVariationOption(index, 'name', e.target.value)}
+                                placeholder="e.g., Size, Color, Material"
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor={`option-values-${index}`}>Values (comma separated)</Label>
+                              <Input
+                                id={`option-values-${index}`}
+                                value={option.values.join(', ')}
+                                onChange={(e) => updateVariationOption(index, 'values', e.target.value.split(',').map(v => v.trim()).filter(Boolean))}
+                                placeholder="e.g., Small, Medium, Large"
+                              />
+                            </div>
+                          </div>
+                          
+                          {option.values.length > 0 && (
+                            <div className="mt-3">
+                              <Label className="text-sm">Preview:</Label>
+                              <div className="flex flex-wrap gap-2 mt-1">
+                                {option.values.map((value, valueIndex) => (
+                                  <Badge key={valueIndex} variant="secondary">
+                                    {value}
+                                  </Badge>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                  <div>
-                    <Label htmlFor="cost_price">Cost per Item</Label>
-                    <Input
-                      id="cost_price"
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      value={formData.cost_price}
-                      onChange={(e) => handleInputChange('cost_price', e.target.value)}
-                      placeholder="0.00"
-                    />
+
+                  {/* Generate Variations Button */}
+                  {variationOptions.some(option => option.name && option.values.length > 0) && (
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h4 className="font-medium text-blue-900">Generate Variations</h4>
+                          <p className="text-sm text-blue-600">
+                            This will create {getVariationCombinations().length} variations based on your options
+                          </p>
+                        </div>
+                        <Button
+                          type="button"
+                          onClick={generateVariations}
+                          disabled={variations.length > 0}
+                        >
+                          Generate
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Generated Variations */}
+                  {variations.length > 0 && (
+                    <div>
+                      <Label>Generated Variations ({variations.length})</Label>
+                      <div className="mt-2 space-y-3 max-h-96 overflow-y-auto">
+                        {variations.map((variation, index) => (
+                          <div key={index} className="border rounded-lg p-4 bg-gray-50">
+                            <div className="flex items-center justify-between mb-3">
+                              <div className="flex items-center gap-2">
+                                <Badge variant="outline">
+                                  {variation.attributes.map(attr => `${attr.name}: ${attr.value}`).join(' | ')}
+                                </Badge>
+                              </div>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => removeVariation(index)}
+                                className="text-red-600 hover:text-red-700"
+                              >
+                                Remove
+                              </Button>
+                            </div>
+                            
+                            <div className="grid gap-3 sm:grid-cols-4">
+                              <div>
+                                <Label htmlFor={`var-price-${index}`}>Price *</Label>
+                                <Input
+                                  id={`var-price-${index}`}
+                                  type="number"
+                                  step="0.01"
+                                  min="0"
+                                  value={variation.price}
+                                  onChange={(e) => updateVariation(index, 'price', e.target.value)}
+                                  placeholder="0.00"
+                                  required
+                                />
+                              </div>
+                              <div>
+                                <Label htmlFor={`var-compare-${index}`}>Compare Price</Label>
+                                <Input
+                                  id={`var-compare-${index}`}
+                                  type="number"
+                                  step="0.01"
+                                  min="0"
+                                  value={variation.compare_price}
+                                  onChange={(e) => updateVariation(index, 'compare_price', e.target.value)}
+                                  placeholder="0.00"
+                                />
+                              </div>
+                              <div>
+                                <Label htmlFor={`var-sku-${index}`}>SKU</Label>
+                                <Input
+                                  id={`var-sku-${index}`}
+                                  value={variation.sku}
+                                  onChange={(e) => updateVariation(index, 'sku', e.target.value)}
+                                  placeholder="SKU-001"
+                                />
+                              </div>
+                              <div>
+                                <Label htmlFor={`var-stock-${index}`}>Stock</Label>
+                                <Input
+                                  id={`var-stock-${index}`}
+                                  type="number"
+                                  min="0"
+                                  value={variation.stock_quantity}
+                                  onChange={(e) => updateVariation(index, 'stock_quantity', e.target.value)}
+                                  placeholder="0"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Digital Files (for digital products) */}
+            {formData.product_type === 'digital' && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Digital Files</CardTitle>
+                  <CardDescription>
+                    Uploadable files that customers will receive after purchase
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                    <div className="space-y-2">
+                      <div className="mx-auto h-12 w-12 text-gray-400">
+                        📄
+                      </div>
+                      <div>
+                        <h4 className="font-medium">Upload Digital Files</h4>
+                        <p className="text-sm text-gray-500">
+                          PDF, ZIP, images, videos, or any other files customers will download
+                        </p>
+                      </div>
+                      <Button type="button" variant="outline">
+                        Choose Files
+                      </Button>
+                    </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
+                  
+                  <div className="text-sm text-gray-500">
+                    <p>Supported formats: PDF, ZIP, JPG, PNG, MP4, MP3, DOC, etc.</p>
+                    <p>Maximum file size: 100MB per file</p>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
             {/* Inventory */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Inventory</CardTitle>
-                <CardDescription>
-                  Track and manage product inventory
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center space-x-2">
-                  <Switch
-                    id="track_inventory"
-                    checked={formData.track_inventory}
-                    onCheckedChange={(checked: any) => handleInputChange('track_inventory', checked)}
-                  />
-                  <Label htmlFor="track_inventory">Track quantity</Label>
-                </div>
+            {formData.product_type !== 'digital' && formData.product_type !== 'variable' && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Inventory</CardTitle>
+                  <CardDescription>
+                    Track and manage product inventory
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="track_inventory"
+                      checked={formData.track_inventory}
+                      onCheckedChange={(checked: any) => handleInputChange('track_inventory', checked)}
+                    />
+                    <Label htmlFor="track_inventory">Track quantity</Label>
+                  </div>
 
-                {formData.track_inventory && (
+                  {formData.track_inventory && (
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <div>
+                        <Label htmlFor="inventory_quantity">Quantity</Label>
+                        <Input
+                          id="inventory_quantity"
+                          type="number"
+                          min="0"
+                          value={formData.inventory_quantity}
+                          onChange={(e) => handleInputChange('inventory_quantity', e.target.value)}
+                          placeholder="0"
+                        />
+                      </div>
+                      <div className="flex items-center space-x-2 pt-6">
+                        <Switch
+                          id="allow_backorder"
+                          checked={formData.allow_backorder}
+                          onCheckedChange={(checked: any) => handleInputChange('allow_backorder', checked)}
+                        />
+                        <Label htmlFor="allow_backorder">Continue selling when out of stock</Label>
+                      </div>
+                    </div>
+                  )}
+
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div>
-                      <Label htmlFor="inventory_quantity">Quantity</Label>
+                      <Label htmlFor="sku">SKU</Label>
                       <Input
-                        id="inventory_quantity"
+                        id="sku"
+                        value={formData.sku}
+                        onChange={(e) => handleInputChange('sku', e.target.value)}
+                        placeholder="Product SKU"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="weight">Weight (lbs)</Label>
+                      <Input
+                        id="weight"
                         type="number"
+                        step="0.01"
                         min="0"
-                        value={formData.inventory_quantity}
-                        onChange={(e) => handleInputChange('inventory_quantity', e.target.value)}
-                        placeholder="0"
+                        value={formData.weight}
+                        onChange={(e) => handleInputChange('weight', e.target.value)}
+                        placeholder="0.00"
                       />
                     </div>
-                    <div className="flex items-center space-x-2 pt-6">
-                      <Switch
-                        id="allow_backorder"
-                        checked={formData.allow_backorder}
-                        onCheckedChange={(checked: any) => handleInputChange('allow_backorder', checked)}
-                      />
-                      <Label htmlFor="allow_backorder">Continue selling when out of stock</Label>
-                    </div>
                   </div>
-                )}
-
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div>
-                    <Label htmlFor="sku">SKU</Label>
-                    <Input
-                      id="sku"
-                      value={formData.sku}
-                      onChange={(e) => handleInputChange('sku', e.target.value)}
-                      placeholder="Product SKU"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="weight">Weight (lbs)</Label>
-                    <Input
-                      id="weight"
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      value={formData.weight}
-                      onChange={(e) => handleInputChange('weight', e.target.value)}
-                      placeholder="0.00"
-                    />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            )}
 
             {/* Images */}
             <Card>

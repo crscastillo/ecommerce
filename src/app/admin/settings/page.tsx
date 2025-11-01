@@ -1785,6 +1785,125 @@ export default function SettingsPage() {
 
           <Card>
             <CardHeader>
+              <CardTitle>Password & Security</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div>
+                <h3 className="font-medium mb-3">Change Password</h3>
+                <p className="text-sm text-gray-600 mb-4">
+                  Update your password to keep your account secure. We recommend using a strong, unique password.
+                </p>
+                <Button 
+                  onClick={async () => {
+                    try {
+                      setSaving(true)
+                      
+                      const { error } = await supabase.auth.resetPasswordForEmail(
+                        tenant.contact_email || '',
+                        {
+                          redirectTo: `${window.location.origin}/admin/reset-password`
+                        }
+                      )
+
+                      if (error) {
+                        throw error
+                      }
+
+                      setMessage({ 
+                        type: 'success', 
+                        text: 'Password reset link sent to your email address' 
+                      })
+                    } catch (error) {
+                      console.error('Error sending password reset:', error)
+                      setMessage({ 
+                        type: 'error', 
+                        text: 'Failed to send password reset email' 
+                      })
+                    } finally {
+                      setSaving(false)
+                    }
+                  }}
+                  disabled={saving || !tenant.contact_email}
+                  variant="outline"
+                >
+                  <Shield className="h-4 w-4 mr-2" />
+                  {saving ? 'Sending...' : 'Send Password Reset Email'}
+                </Button>
+                {!tenant.contact_email && (
+                  <p className="text-xs text-orange-600 mt-2">
+                    Please add a contact email in Store settings to enable password reset
+                  </p>
+                )}
+              </div>
+
+              <Separator />
+
+              <div>
+                <h3 className="font-medium mb-3">Two-Factor Authentication</h3>
+                <p className="text-sm text-gray-600 mb-4">
+                  Add an extra layer of security to your account with two-factor authentication.
+                </p>
+                <div className="flex items-center justify-between p-4 border rounded-lg">
+                  <div>
+                    <div className="font-medium">SMS Authentication</div>
+                    <div className="text-sm text-gray-500">Receive codes via SMS</div>
+                  </div>
+                  <Badge variant="outline">Coming Soon</Badge>
+                </div>
+                <div className="flex items-center justify-between p-4 border rounded-lg mt-2">
+                  <div>
+                    <div className="font-medium">Authenticator App</div>
+                    <div className="text-sm text-gray-500">Use Google Authenticator or similar apps</div>
+                  </div>
+                  <Badge variant="outline">Coming Soon</Badge>
+                </div>
+              </div>
+
+              <Separator />
+
+              <div>
+                <h3 className="font-medium mb-3">Login Sessions</h3>
+                <p className="text-sm text-gray-600 mb-4">
+                  Manage active sessions and logout from all devices.
+                </p>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between p-4 border rounded-lg">
+                    <div>
+                      <div className="font-medium">Current Session</div>
+                      <div className="text-sm text-gray-500">
+                        Last active: {new Date().toLocaleString()}
+                      </div>
+                    </div>
+                    <Badge variant="default">Active</Badge>
+                  </div>
+                  <Button 
+                    variant="outline" 
+                    onClick={async () => {
+                      try {
+                        setSaving(true)
+                        await supabase.auth.signOut()
+                        window.location.href = '/login'
+                      } catch (error) {
+                        console.error('Error signing out:', error)
+                        setMessage({ 
+                          type: 'error', 
+                          text: 'Failed to sign out' 
+                        })
+                      } finally {
+                        setSaving(false)
+                      }
+                    }}
+                    disabled={saving}
+                  >
+                    {saving ? 'Signing out...' : 'Logout from All Devices'}
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
               <CardTitle className="text-red-600">Danger Zone</CardTitle>
             </CardHeader>
             <CardContent>

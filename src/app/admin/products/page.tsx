@@ -53,6 +53,7 @@ interface Product {
   is_featured: boolean
   category_id: string
   sku: string
+  variants: any
   created_at: string
 }
 
@@ -62,6 +63,7 @@ export default function ProductsPage() {
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'inactive'>('all')
+  const [filterProductType, setFilterProductType] = useState<'all' | 'single' | 'variable' | 'digital'>('all')
   const [showImportModal, setShowImportModal] = useState(false)
   const [tenantSettings, setTenantSettings] = useState<any>({})
   
@@ -82,6 +84,11 @@ export default function ProductsPage() {
       // Apply status filter
       if (filterStatus !== 'all') {
         query = query.eq('is_active', filterStatus === 'active')
+      }
+      
+      // Apply product type filter
+      if (filterProductType !== 'all') {
+        query = query.eq('product_type', filterProductType)
       }
 
       // Apply search filter
@@ -158,7 +165,7 @@ export default function ProductsPage() {
 
   useEffect(() => {
     loadProducts()
-  }, [tenant?.id, searchQuery, filterStatus])
+  }, [tenant?.id, searchQuery, filterStatus, filterProductType])
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString()
@@ -194,7 +201,7 @@ export default function ProductsPage() {
           <CardTitle className="text-lg">Filter Products</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex flex-col gap-4">
             {/* Search */}
             <div className="flex-1">
               <div className="relative">
@@ -208,29 +215,70 @@ export default function ProductsPage() {
               </div>
             </div>
 
-            {/* Status Filter */}
-            <div className="flex gap-2">
-              <Button
-                variant={filterStatus === 'all' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setFilterStatus('all')}
-              >
-                All
-              </Button>
-              <Button
-                variant={filterStatus === 'active' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setFilterStatus('active')}
-              >
-                Active
-              </Button>
-              <Button
-                variant={filterStatus === 'inactive' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setFilterStatus('inactive')}
-              >
-                Inactive
-              </Button>
+            {/* Filters Row */}
+            <div className="flex flex-col sm:flex-row gap-4">
+              {/* Status Filter */}
+              <div className="flex gap-2">
+                <div className="text-sm font-medium text-muted-foreground mr-2 flex items-center">
+                  Status:
+                </div>
+                <Button
+                  variant={filterStatus === 'all' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setFilterStatus('all')}
+                >
+                  All
+                </Button>
+                <Button
+                  variant={filterStatus === 'active' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setFilterStatus('active')}
+                >
+                  Active
+                </Button>
+                <Button
+                  variant={filterStatus === 'inactive' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setFilterStatus('inactive')}
+                >
+                  Inactive
+                </Button>
+              </div>
+
+              {/* Product Type Filter */}
+              <div className="flex gap-2">
+                <div className="text-sm font-medium text-muted-foreground mr-2 flex items-center">
+                  Type:
+                </div>
+                <Button
+                  variant={filterProductType === 'all' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setFilterProductType('all')}
+                >
+                  All
+                </Button>
+                <Button
+                  variant={filterProductType === 'single' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setFilterProductType('single')}
+                >
+                  📦 Single
+                </Button>
+                <Button
+                  variant={filterProductType === 'variable' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setFilterProductType('variable')}
+                >
+                  🔀 Variable
+                </Button>
+                <Button
+                  variant={filterProductType === 'digital' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setFilterProductType('digital')}
+                >
+                  💾 Digital
+                </Button>
+              </div>
             </div>
           </div>
         </CardContent>
@@ -297,19 +345,15 @@ export default function ProductsPage() {
                       </TableCell>
                       <TableCell>
                         <Badge 
-                          variant={
-                            product.product_type === 'variable' ? 'default' : 
-                            product.product_type === 'digital' ? 'secondary' : 
-                            'outline'
-                          }
+                          variant="outline"
                           className={
-                            product.product_type === 'variable' ? 'bg-blue-100 text-blue-800' :
-                            product.product_type === 'digital' ? 'bg-purple-100 text-purple-800' :
-                            'bg-gray-100 text-gray-800'
+                            product.product_type === 'variable' ? 'bg-blue-50 text-blue-700 border-blue-200' :
+                            product.product_type === 'digital' ? 'bg-purple-50 text-purple-700 border-purple-200' :
+                            'bg-gray-50 text-gray-700 border-gray-200'
                           }
                         >
                           {product.product_type === 'single' && '📦 Single'}
-                          {product.product_type === 'variable' && '🔧 Variable'}
+                          {product.product_type === 'variable' && '� Variable'}
                           {product.product_type === 'digital' && '💾 Digital'}
                         </Badge>
                       </TableCell>
@@ -318,11 +362,84 @@ export default function ProductsPage() {
                           {product.sku || 'N/A'}
                         </code>
                       </TableCell>
-                      <TableCell>{formatPrice(product.price, tenant)}</TableCell>
+                      <TableCell>
+                        {product.product_type === 'variable' ? (
+                          <span className="text-sm text-muted-foreground">
+                            {(() => {
+                              // Parse variants to get price range
+                              let variants = product.variants
+                              if (typeof variants === 'string') {
+                                try {
+                                  variants = JSON.parse(variants)
+                                } catch (e) {
+                                  variants = []
+                                }
+                              }
+                              
+                              if (!Array.isArray(variants)) {
+                                variants = Object.values(variants || {})
+                              }
+                              
+                              const activeVariants = variants.filter((v: any) => v.is_active !== false)
+                              
+                              if (activeVariants.length === 0) return 'No variants'
+                              
+                              const prices = activeVariants.map((v: any) => parseFloat(v.price || 0))
+                              const minPrice = Math.min(...prices)
+                              const maxPrice = Math.max(...prices)
+                              
+                              if (minPrice === maxPrice) {
+                                return formatPrice(minPrice, tenant)
+                              }
+                              return `${formatPrice(minPrice, tenant)} - ${formatPrice(maxPrice, tenant)}`
+                            })()}
+                          </span>
+                        ) : (
+                          formatPrice(product.price, tenant)
+                        )}
+                      </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
                           {product.product_type === 'digital' ? (
                             <Badge variant="outline" className="text-xs">Digital</Badge>
+                          ) : product.product_type === 'variable' ? (
+                            (() => {
+                              // Parse variants to get total count
+                              let variants = product.variants
+                              if (typeof variants === 'string') {
+                                try {
+                                  variants = JSON.parse(variants)
+                                } catch (e) {
+                                  variants = []
+                                }
+                              }
+                              
+                              if (!Array.isArray(variants)) {
+                                variants = Object.values(variants || {})
+                              }
+                              
+                              const activeVariants = variants.filter((v: any) => v.is_active !== false)
+                              const totalStock = activeVariants.reduce((sum: number, v: any) => 
+                                sum + parseInt(v.stock_quantity || 0), 0
+                              )
+                              
+                              return (
+                                <div className="flex items-center gap-1">
+                                  <span className={`text-sm ${
+                                    totalStock > (tenantSettings.low_stock_threshold || 5)
+                                      ? 'text-green-600' 
+                                      : totalStock > 0 
+                                        ? 'text-yellow-600' 
+                                        : 'text-red-600'
+                                  }`}>
+                                    {totalStock}
+                                  </span>
+                                  <span className="text-xs text-muted-foreground">
+                                    ({activeVariants.length} variants)
+                                  </span>
+                                </div>
+                              )
+                            })()
                           ) : (
                             <>
                               <span className={`text-sm ${

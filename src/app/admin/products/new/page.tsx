@@ -71,6 +71,9 @@ export default function NewProductPage() {
     values: string[]
   }>>([{ name: '', values: [] }])
   
+  // Local input state for values to prevent immediate comma processing
+  const [valueInputs, setValueInputs] = useState<string[]>([''])
+  
   const [variations, setVariations] = useState<Array<{
     id: string
     title: string
@@ -90,12 +93,15 @@ export default function NewProductPage() {
   // Variation management functions
   const addVariationOption = () => {
     setVariationOptions([...variationOptions, { name: '', values: [] }])
+    setValueInputs([...valueInputs, ''])
   }
 
   const removeVariationOption = (index: number) => {
     if (variationOptions.length > 1) {
       const newOptions = variationOptions.filter((_, i) => i !== index)
+      const newInputs = valueInputs.filter((_, i) => i !== index)
       setVariationOptions(newOptions)
+      setValueInputs(newInputs)
       // Clear variations when options change
       setVariations([])
     }
@@ -105,12 +111,25 @@ export default function NewProductPage() {
     const newOptions = [...variationOptions]
     if (field === 'name' && typeof value === 'string') {
       newOptions[index].name = value
+      setVariationOptions(newOptions)
     } else if (field === 'values' && Array.isArray(value)) {
       newOptions[index].values = value
+      setVariationOptions(newOptions)
     }
-    setVariationOptions(newOptions)
     // Clear variations when options change
     setVariations([])
+  }
+
+  const updateValueInput = (index: number, value: string) => {
+    const newInputs = [...valueInputs]
+    newInputs[index] = value
+    setValueInputs(newInputs)
+  }
+
+  const processValueInput = (index: number) => {
+    const input = valueInputs[index]
+    const values = input.split(',').map(v => v.trim()).filter(Boolean)
+    updateVariationOption(index, 'values', values)
   }
 
   const getVariationCombinations = () => {
@@ -167,8 +186,55 @@ export default function NewProductPage() {
     setVariations(newVariations)
   }
 
+  // Helper functions for better UX
+  const getPlaceholderForOption = (optionName: string) => {
+    switch (optionName?.toLowerCase()) {
+      case 'size': return 'XS, S, M, L, XL, XXL'
+      case 'color': return 'Red, Blue, Green, Black, White'
+      case 'material': return 'Cotton, Polyester, Silk, Wool'
+      case 'style': return 'Classic, Modern, Vintage, Casual'
+      case 'pattern': return 'Solid, Striped, Floral, Geometric'
+      case 'finish': return 'Matte, Glossy, Satin, Textured'
+      default: return 'Value 1, Value 2, Value 3'
+    }
+  }
+
+  const getExampleForOption = (optionName: string) => {
+    switch (optionName?.toLowerCase()) {
+      case 'size': return 'S, M, L'
+      case 'color': return 'Red, Blue, Green'
+      case 'material': return 'Cotton, Silk'
+      case 'style': return 'Classic, Modern'
+      case 'pattern': return 'Solid, Striped'
+      case 'finish': return 'Matte, Glossy'
+      default: return 'Option1, Option2'
+    }
+  }
+
+  const applyPriceToAll = () => {
+    const price = window.prompt('Enter price to apply to all variations:', formData.price || '0')
+    if (price && !isNaN(parseFloat(price))) {
+      const newVariations = variations.map(v => ({ ...v, price }))
+      setVariations(newVariations)
+    }
+  }
+
+  const generateAllSKUs = () => {
+    const baseSKU = formData.sku || formData.slug || 'PROD'
+    const newVariations = variations.map((variation, index) => ({
+      ...variation,
+      sku: variation.sku || `${baseSKU}-${String(index + 1).padStart(3, '0')}`
+    }))
+    setVariations(newVariations)
+  }
+
   const router = useRouter()
   const { tenant } = useTenant()
+
+  // Sync valueInputs with variationOptions
+  useEffect(() => {
+    setValueInputs(variationOptions.map(option => option.values.join(', ')))
+  }, [variationOptions.length])
 
   // Load categories
   useEffect(() => {
@@ -240,17 +306,28 @@ export default function NewProductPage() {
     
     // For variable products, check variations
     if (formData.product_type === 'variable') {
-      if (variations.length === 0) {
-        setError('Variable products must have at least one variation')
+      const validOptions = variationOptions.filter(opt => opt.name && opt.values.length > 0)
+      if (validOptions.length === 0) {
+        setError('Variable products must have at least one option with values')
         return false
       }
       
-      // Check if all variations have valid prices
-      for (const variation of variations) {
-        if (!variation.price || parseFloat(variation.price) <= 0) {
-          setError('All variations must have valid prices')
-          return false
-        }
+      if (variations.length === 0) {
+        setError('Please generate variations from your options')
+        return false
+      }
+      
+      const activeVariations = variations.filter(v => v.is_active)
+      if (activeVariations.length === 0) {
+        setError('At least one variation must be active')
+        return false
+      }
+      
+      // Check if all active variations have valid prices
+      const missingPrices = activeVariations.filter(v => !v.price || parseFloat(v.price) <= 0)
+      if (missingPrices.length > 0) {
+        setError(`${missingPrices.length} active variation(s) missing valid prices`)
+        return false
       }
     }
     
@@ -303,7 +380,7 @@ export default function NewProductPage() {
         seo_title: formData.seo_title.trim() || null,
         seo_description: formData.seo_description.trim() || null,
         images: prepareImagesForStorage(productImages),
-        variants: formData.product_type === 'variable' ? variations : {},
+        variants: formData.product_type === 'variable' ? variations.filter(v => v.is_active) : {},
         digital_files: formData.product_type === 'digital' ? digitalFiles : [],
       }
 
@@ -539,174 +616,323 @@ export default function NewProductPage() {
                 <CardHeader>
                   <CardTitle>Product Variations</CardTitle>
                   <CardDescription>
-                    Configure options and variants for this product
+                    Define product options (like Size, Color) and we'll generate all possible combinations
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                  {/* Variation Options */}
-                  <div>
-                    <div className="flex items-center justify-between mb-4">
-                      <Label>Variation Options</Label>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={addVariationOption}
-                      >
-                        Add Option
-                      </Button>
+                  {/* Step 1: Define Options */}
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2 mb-4">
+                      <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 text-sm font-medium flex items-center justify-center">1</div>
+                      <h3 className="font-medium">Define Product Options</h3>
                     </div>
                     
-                    <div className="space-y-4">
-                      {variationOptions.map((option, index) => (
-                        <div key={index} className="border rounded-lg p-4">
-                          <div className="flex items-center justify-between mb-3">
-                            <Label>Option {index + 1}</Label>
-                            {variationOptions.length > 1 && (
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => removeVariationOption(index)}
-                                className="text-red-600 hover:text-red-700"
-                              >
-                                Remove
-                              </Button>
-                            )}
-                          </div>
-                          
-                          <div className="grid gap-3 sm:grid-cols-2">
-                            <div>
-                              <Label htmlFor={`option-name-${index}`}>Option Name</Label>
-                              <Input
-                                id={`option-name-${index}`}
-                                value={option.name}
-                                onChange={(e) => updateVariationOption(index, 'name', e.target.value)}
-                                placeholder="e.g., Size, Color, Material"
-                              />
-                            </div>
-                            <div>
-                              <Label htmlFor={`option-values-${index}`}>Values (comma separated)</Label>
-                              <Input
-                                id={`option-values-${index}`}
-                                value={option.values.join(', ')}
-                                onChange={(e) => updateVariationOption(index, 'values', e.target.value.split(',').map(v => v.trim()).filter(Boolean))}
-                                placeholder="e.g., Small, Medium, Large"
-                              />
-                            </div>
-                          </div>
-                          
-                          {option.values.length > 0 && (
-                            <div className="mt-3">
-                              <Label className="text-sm">Preview:</Label>
-                              <div className="flex flex-wrap gap-2 mt-1">
-                                {option.values.map((value, valueIndex) => (
-                                  <Badge key={valueIndex} variant="secondary">
-                                    {value}
-                                  </Badge>
-                                ))}
+                    <div className="bg-gray-50 rounded-lg p-4">
+                      <div className="flex items-center justify-between mb-4">
+                        <Label className="text-sm font-medium">Product Options</Label>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={addVariationOption}
+                          disabled={variationOptions.length >= 3}
+                        >
+                          + Add Option
+                        </Button>
+                      </div>
+                      
+                      <div className="space-y-4">
+                        {variationOptions.map((option, index) => (
+                          <div key={index} className="bg-white border rounded-lg p-4">
+                            <div className="flex items-center justify-between mb-3">
+                              <div className="flex items-center gap-2">
+                                <div className="w-5 h-5 rounded bg-blue-500 text-white text-xs flex items-center justify-center font-medium">
+                                  {String.fromCharCode(65 + index)}
+                                </div>
+                                <Label className="text-sm font-medium">Option {index + 1}</Label>
                               </div>
+                              {variationOptions.length > 1 && (
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => removeVariationOption(index)}
+                                  className="text-red-600 hover:text-red-700 h-8 w-8 p-0"
+                                >
+                                  ×
+                                </Button>
+                              )}
                             </div>
-                          )}
-                        </div>
-                      ))}
+                            
+                            <div className="space-y-3">
+                              <div>
+                                <Label htmlFor={`option-name-${index}`} className="text-sm">Option Name</Label>
+                                <Select 
+                                  value={option.name} 
+                                  onValueChange={(value) => updateVariationOption(index, 'name', value)}
+                                >
+                                  <SelectTrigger className="mt-1">
+                                    <SelectValue placeholder="Choose option type..." />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="Size">Size</SelectItem>
+                                    <SelectItem value="Color">Color</SelectItem>
+                                    <SelectItem value="Material">Material</SelectItem>
+                                    <SelectItem value="Style">Style</SelectItem>
+                                    <SelectItem value="Pattern">Pattern</SelectItem>
+                                    <SelectItem value="Finish">Finish</SelectItem>
+                                    <SelectItem value="custom">Custom...</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                                {option.name === 'custom' && (
+                                  <Input
+                                    className="mt-2"
+                                    placeholder="Enter custom option name"
+                                    onChange={(e) => updateVariationOption(index, 'name', e.target.value)}
+                                  />
+                                )}
+                              </div>
+                              
+                              <div>
+                                <Label htmlFor={`option-values-${index}`} className="text-sm">Values</Label>
+                                <div className="mt-1 space-y-2">
+                                  <Input
+                                    id={`option-values-${index}`}
+                                    value={valueInputs[index] || option.values.join(', ')}
+                                    onChange={(e) => updateValueInput(index, e.target.value)}
+                                    onBlur={() => processValueInput(index)}
+                                    onKeyDown={(e) => {
+                                      if (e.key === 'Enter') {
+                                        e.preventDefault()
+                                        processValueInput(index)
+                                      }
+                                    }}
+                                    placeholder={getPlaceholderForOption(option.name)}
+                                  />
+                                  <div className="text-xs text-gray-500">
+                                    Separate values with commas. Press Enter or click away to apply. Example: {getExampleForOption(option.name)}
+                                  </div>
+                                </div>
+                              </div>
+                              
+                              {option.values.length > 0 && (
+                                <div>
+                                  <Label className="text-xs text-gray-600">Preview ({option.values.length} values):</Label>
+                                  <div className="flex flex-wrap gap-1 mt-1">
+                                    {option.values.slice(0, 6).map((value, valueIndex) => (
+                                      <Badge key={valueIndex} variant="secondary" className="text-xs">
+                                        {value}
+                                      </Badge>
+                                    ))}
+                                    {option.values.length > 6 && (
+                                      <Badge variant="outline" className="text-xs">
+                                        +{option.values.length - 6} more
+                                      </Badge>
+                                    )}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                        
+                        {variationOptions.length === 0 && (
+                          <div className="text-center py-8 text-gray-500">
+                            <div className="text-sm">No options defined yet</div>
+                            <div className="text-xs mt-1">Add an option to get started</div>
+                          </div>
+                        )}
+                        
+                        {variationOptions.length >= 3 && (
+                          <div className="text-xs text-amber-600 bg-amber-50 border border-amber-200 rounded p-2">
+                            Maximum of 3 options allowed to keep variations manageable
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
 
-                  {/* Generate Variations Button */}
+                  {/* Step 2: Generate Variations */}
                   {variationOptions.some(option => option.name && option.values.length > 0) && (
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <h4 className="font-medium text-blue-900">Generate Variations</h4>
-                          <p className="text-sm text-blue-600">
-                            This will create {getVariationCombinations().length} variations based on your options
-                          </p>
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-2">
+                        <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 text-sm font-medium flex items-center justify-center">2</div>
+                        <h3 className="font-medium">Generate Variations</h3>
+                      </div>
+                      
+                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <div className="flex items-center justify-between">
+                          <div className="space-y-1">
+                            <h4 className="font-medium text-blue-900">Ready to Generate</h4>
+                            <p className="text-sm text-blue-700">
+                              {getVariationCombinations().length} variations will be created from your {variationOptions.filter(opt => opt.name && opt.values.length > 0).length} options
+                            </p>
+                            <div className="text-xs text-blue-600">
+                              {variationOptions.filter(opt => opt.name && opt.values.length > 0).map(opt => 
+                                `${opt.name} (${opt.values.length})`
+                              ).join(' × ')} = {getVariationCombinations().length} combinations
+                            </div>
+                          </div>
+                          <div className="flex gap-2">
+                            {variations.length > 0 && (
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setVariations([])}
+                                className="text-red-600 hover:text-red-700"
+                              >
+                                Clear All
+                              </Button>
+                            )}
+                            <Button
+                              type="button"
+                              onClick={generateVariations}
+                              size="sm"
+                              disabled={getVariationCombinations().length > 50}
+                            >
+                              {variations.length > 0 ? 'Regenerate' : 'Generate'} Variations
+                            </Button>
+                          </div>
                         </div>
-                        <Button
-                          type="button"
-                          onClick={generateVariations}
-                          disabled={variations.length > 0}
-                        >
-                          Generate
-                        </Button>
+                        
+                        {getVariationCombinations().length > 50 && (
+                          <div className="mt-3 text-xs text-amber-700 bg-amber-100 border border-amber-300 rounded p-2">
+                            ⚠️ Too many combinations ({getVariationCombinations().length}). Consider reducing option values to keep under 50 variations.
+                          </div>
+                        )}
                       </div>
                     </div>
                   )}
 
-                  {/* Generated Variations */}
+                  {/* Step 3: Configure Variations */}
                   {variations.length > 0 && (
-                    <div>
-                      <Label>Generated Variations ({variations.length})</Label>
-                      <div className="mt-2 space-y-3 max-h-96 overflow-y-auto">
-                        {variations.map((variation, index) => (
-                          <div key={index} className="border rounded-lg p-4 bg-gray-50">
-                            <div className="flex items-center justify-between mb-3">
-                              <div className="flex items-center gap-2">
-                                <Badge variant="outline">
-                                  {variation.attributes.map(attr => `${attr.name}: ${attr.value}`).join(' | ')}
-                                </Badge>
-                              </div>
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => removeVariation(index)}
-                                className="text-red-600 hover:text-red-700"
-                              >
-                                Remove
-                              </Button>
-                            </div>
-                            
-                            <div className="grid gap-3 sm:grid-cols-4">
-                              <div>
-                                <Label htmlFor={`var-price-${index}`}>Price *</Label>
-                                <Input
-                                  id={`var-price-${index}`}
-                                  type="number"
-                                  step="0.01"
-                                  min="0"
-                                  value={variation.price}
-                                  onChange={(e) => updateVariation(index, 'price', e.target.value)}
-                                  placeholder="0.00"
-                                  required
-                                />
-                              </div>
-                              <div>
-                                <Label htmlFor={`var-compare-${index}`}>Compare Price</Label>
-                                <Input
-                                  id={`var-compare-${index}`}
-                                  type="number"
-                                  step="0.01"
-                                  min="0"
-                                  value={variation.compare_price}
-                                  onChange={(e) => updateVariation(index, 'compare_price', e.target.value)}
-                                  placeholder="0.00"
-                                />
-                              </div>
-                              <div>
-                                <Label htmlFor={`var-sku-${index}`}>SKU</Label>
-                                <Input
-                                  id={`var-sku-${index}`}
-                                  value={variation.sku}
-                                  onChange={(e) => updateVariation(index, 'sku', e.target.value)}
-                                  placeholder="SKU-001"
-                                />
-                              </div>
-                              <div>
-                                <Label htmlFor={`var-stock-${index}`}>Stock</Label>
-                                <Input
-                                  id={`var-stock-${index}`}
-                                  type="number"
-                                  min="0"
-                                  value={variation.stock_quantity}
-                                  onChange={(e) => updateVariation(index, 'stock_quantity', e.target.value)}
-                                  placeholder="0"
-                                />
-                              </div>
-                            </div>
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-2">
+                        <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 text-sm font-medium flex items-center justify-center">3</div>
+                        <h3 className="font-medium">Configure Variations</h3>
+                        <Badge variant="secondary" className="ml-auto">
+                          {variations.length} variations
+                        </Badge>
+                      </div>
+                      
+                      <div className="bg-gray-50 rounded-lg p-4">
+                        <div className="flex items-center justify-between mb-4">
+                          <Label className="text-sm font-medium">Bulk Actions</Label>
+                          <div className="flex gap-2">
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={applyPriceToAll}
+                            >
+                              Set All Prices
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={generateAllSKUs}
+                            >
+                              Generate SKUs
+                            </Button>
                           </div>
-                        ))}
+                        </div>
+                        
+                        <div className="space-y-3 max-h-80 overflow-y-auto">
+                          {variations.map((variation, index) => (
+                            <div key={variation.id} className="bg-white border rounded-lg p-4">
+                              <div className="flex items-center justify-between mb-3">
+                                <div className="flex items-center gap-2">
+                                  <div className="text-sm font-medium">#{index + 1}</div>
+                                  <div className="flex flex-wrap gap-1">
+                                    {variation.attributes.map((attr, attrIndex) => (
+                                      <Badge key={attrIndex} variant="outline" className="text-xs">
+                                        {attr.name}: {attr.value}
+                                      </Badge>
+                                    ))}
+                                  </div>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <Switch
+                                    checked={variation.is_active}
+                                    onCheckedChange={(checked) => updateVariation(index, 'is_active', checked)}
+                                  />
+                                  <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => removeVariation(index)}
+                                    className="text-red-600 hover:text-red-700 h-8 w-8 p-0"
+                                  >
+                                    ×
+                                  </Button>
+                                </div>
+                              </div>
+                              
+                              <div className="grid gap-3 sm:grid-cols-4">
+                                <div>
+                                  <Label htmlFor={`var-price-${index}`} className="text-xs">Price *</Label>
+                                  <Input
+                                    id={`var-price-${index}`}
+                                    type="number"
+                                    step="0.01"
+                                    min="0"
+                                    value={variation.price}
+                                    onChange={(e) => updateVariation(index, 'price', e.target.value)}
+                                    placeholder="0.00"
+                                    className="h-8 text-sm"
+                                    required
+                                  />
+                                </div>
+                                <div>
+                                  <Label htmlFor={`var-compare-${index}`} className="text-xs">Compare Price</Label>
+                                  <Input
+                                    id={`var-compare-${index}`}
+                                    type="number"
+                                    step="0.01"
+                                    min="0"
+                                    value={variation.compare_price}
+                                    onChange={(e) => updateVariation(index, 'compare_price', e.target.value)}
+                                    placeholder="0.00"
+                                    className="h-8 text-sm"
+                                  />
+                                </div>
+                                <div>
+                                  <Label htmlFor={`var-sku-${index}`} className="text-xs">SKU</Label>
+                                  <Input
+                                    id={`var-sku-${index}`}
+                                    value={variation.sku}
+                                    onChange={(e) => updateVariation(index, 'sku', e.target.value)}
+                                    placeholder="AUTO"
+                                    className="h-8 text-sm"
+                                  />
+                                </div>
+                                <div>
+                                  <Label htmlFor={`var-stock-${index}`} className="text-xs">Stock</Label>
+                                  <Input
+                                    id={`var-stock-${index}`}
+                                    type="number"
+                                    min="0"
+                                    value={variation.stock_quantity}
+                                    onChange={(e) => updateVariation(index, 'stock_quantity', e.target.value)}
+                                    placeholder="0"
+                                    className="h-8 text-sm"
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                        
+                        <div className="mt-4 flex items-center justify-between text-xs text-gray-500">
+                          <div>
+                            Active variations: {variations.filter(v => v.is_active).length} / {variations.length}
+                          </div>
+                          <div>
+                            Missing prices: {variations.filter(v => !v.price || parseFloat(v.price) <= 0).length}
+                          </div>
+                        </div>
                       </div>
                     </div>
                   )}

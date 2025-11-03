@@ -100,24 +100,48 @@ function PlatformHomepage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 text-white">
-        <div className="container mx-auto px-4 py-20 text-center">
-          <h1 className="text-4xl md:text-6xl font-bold mb-6">
-            Build Your Online Store in Minutes
+      <section className="relative bg-gradient-to-br from-blue-600 via-indigo-700 to-purple-800 text-white overflow-hidden">
+        <div className="absolute inset-0 bg-grid-white/[0.05] bg-[size:40px_40px]"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-blue-600/20 to-transparent"></div>
+        <div className="relative container mx-auto px-4 py-24 md:py-32 text-center">
+          <Badge className="mb-6 bg-white/20 text-white border-white/30 backdrop-blur-sm">
+            🚀 Trusted by 10,000+ businesses worldwide
+          </Badge>
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold mb-6 leading-tight">
+            Build Your Dream Store
+            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-purple-200">
+              In Minutes, Not Months
+            </span>
           </h1>
-          <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto opacity-90">
-            Create a beautiful, fully-functional ecommerce store with your own custom domain. 
-            No coding required, no setup fees.
+          <p className="text-lg md:text-xl lg:text-2xl mb-10 max-w-3xl mx-auto text-blue-100">
+            Launch a professional ecommerce store with everything you need to sell online. 
+            Custom domains, secure payments, and powerful features—all in one platform.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Button size="lg" variant="secondary" asChild className="text-lg px-8 py-4">
-              <Link href="/signup">Start Your Free Store</Link>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
+            <Button size="lg" variant="secondary" asChild className="text-lg px-8 py-6 shadow-2xl hover:shadow-blue-500/50 transition-all">
+              <Link href="/signup">
+                <Zap className="w-5 h-5 mr-2" />
+                Start Your Free Store
+              </Link>
             </Button>
-            <Button size="lg" variant="outline" className="text-white border-white hover:bg-white hover:text-blue-600 text-lg px-8 py-4">
-              View Demo Store
+            <Button size="lg" variant="outline" className="text-white border-white/50 hover:bg-white hover:text-blue-600 text-lg px-8 py-6 backdrop-blur-sm">
+              Watch Demo Video
             </Button>
           </div>
-          <p className="text-sm mt-4 opacity-75">No credit card required • 14-day free trial</p>
+          <div className="flex flex-wrap justify-center gap-6 text-sm text-blue-100">
+            <span className="flex items-center">
+              <CheckCircle className="w-4 h-4 mr-2" />
+              No credit card required
+            </span>
+            <span className="flex items-center">
+              <CheckCircle className="w-4 h-4 mr-2" />
+              14-day free trial
+            </span>
+            <span className="flex items-center">
+              <CheckCircle className="w-4 h-4 mr-2" />
+              Cancel anytime
+            </span>
+          </div>
         </div>
       </section>
 

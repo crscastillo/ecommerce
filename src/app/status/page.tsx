@@ -15,6 +15,28 @@ interface Service {
   icon: any
   lastChecked?: string
   uptime?: string
+  responseTime?: number
+  error?: string
+}
+
+interface StatusResponse {
+  status: ServiceStatus
+  services: Array<{
+    name: string
+    status: ServiceStatus
+    description: string
+    responseTime?: number
+    lastChecked: string
+    uptime?: string
+    error?: string
+  }>
+  timestamp: string
+  summary: {
+    operational: number
+    degraded: number
+    outage: number
+    total: number
+  }
 }
 
 interface Incident {
@@ -27,48 +49,67 @@ interface Incident {
 }
 
 export default function StatusPage() {
-  const [services, setServices] = useState<Service[]>([
-    {
-      name: 'API Services',
-      status: 'operational',
-      description: 'All API endpoints are functioning normally',
-      icon: Zap,
-      lastChecked: 'Just now',
-      uptime: '99.99%'
-    },
-    {
-      name: 'Database',
-      status: 'operational',
-      description: 'Database connections and queries are operating normally',
-      icon: Database,
-      lastChecked: 'Just now',
-      uptime: '99.98%'
-    },
-    {
-      name: 'Web Application',
-      status: 'operational',
-      description: 'Main application is accessible and performing well',
-      icon: Globe,
-      lastChecked: 'Just now',
-      uptime: '99.99%'
-    },
-    {
-      name: 'Payment Processing',
-      status: 'operational',
-      description: 'Stripe payment gateway is operational',
-      icon: Shield,
-      lastChecked: 'Just now',
-      uptime: '100%'
-    },
-    {
-      name: 'File Storage',
-      status: 'operational',
-      description: 'Image and file uploads are working correctly',
-      icon: Activity,
-      lastChecked: 'Just now',
-      uptime: '99.97%'
+  const [services, setServices] = useState<Service[]>([])
+  const [loading, setLoading] = useState(true)
+  const [lastUpdate, setLastUpdate] = useState<string>('')
+  const [overallStatus, setOverallStatus] = useState<ServiceStatus>('operational')
+
+  const getIconForService = (name: string) => {
+    switch (name) {
+      case 'API Services':
+        return Zap
+      case 'Database':
+        return Database
+      case 'Web Application':
+        return Globe
+      case 'Payment Processing':
+        return Shield
+      case 'File Storage':
+        return Activity
+      default:
+        return Activity
     }
-  ])
+  }
+
+  const fetchStatus = async () => {
+    try {
+      const response = await fetch('/api/status')
+      const data: StatusResponse = await response.json()
+      
+      const servicesWithIcons = data.services.map(service => ({
+        ...service,
+        icon: getIconForService(service.name)
+      }))
+      
+      setServices(servicesWithIcons)
+      setOverallStatus(data.status)
+      setLastUpdate(new Date(data.timestamp).toLocaleString())
+      setLoading(false)
+    } catch (error) {
+      console.error('Failed to fetch status:', error)
+      // Set error state
+      setServices([
+        {
+          name: 'System Status',
+          status: 'outage',
+          description: 'Unable to fetch system status',
+          icon: AlertCircle,
+          lastChecked: new Date().toISOString()
+        }
+      ])
+      setOverallStatus('outage')
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchStatus()
+    
+    // Refresh status every 60 seconds
+    const interval = setInterval(fetchStatus, 60000)
+    
+    return () => clearInterval(interval)
+  }, [])
 
   const [incidents, setIncidents] = useState<Incident[]>([
     // Example past incident - you can remove this in production
@@ -155,7 +196,18 @@ export default function StatusPage() {
     }
   }
 
-  const allOperational = services.every(service => service.status === 'operational')
+  const allOperational = overallStatus === 'operational'
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
+        <div className="text-center">
+          <Activity className="w-12 h-12 text-blue-600 mx-auto mb-4 animate-pulse" />
+          <p className="text-gray-600 dark:text-gray-400">Loading system status...</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
@@ -187,10 +239,10 @@ export default function StatusPage() {
                 )}
                 <div>
                   <CardTitle className="text-2xl">
-                    {allOperational ? 'All Systems Operational' : 'Some Systems Affected'}
+                    {allOperational ? 'All Systems Operational' : overallStatus === 'degraded' ? 'Some Systems Degraded' : 'Service Disruption'}
                   </CardTitle>
                   <CardDescription>
-                    Last updated: {new Date().toLocaleString()}
+                    Last updated: {lastUpdate || new Date().toLocaleString()}
                   </CardDescription>
                 </div>
               </div>
@@ -258,14 +310,22 @@ export default function StatusPage() {
                           <span className="text-sm font-medium">{getStatusText(service.status)}</span>
                         </div>
                         <p className="text-sm text-gray-600">{service.description}</p>
+                        {service.error && (
+                          <p className="text-xs text-red-600 mt-1">Error: {service.error}</p>
+                        )}
                       </div>
                     </div>
                     <div className="text-right ml-4">
+                      {service.responseTime !== undefined && (
+                        <div className="text-sm font-semibold text-gray-900">{service.responseTime}ms</div>
+                      )}
                       {service.uptime && (
-                        <div className="text-sm font-semibold text-gray-900">{service.uptime}</div>
+                        <div className="text-sm text-gray-600">{service.uptime} uptime</div>
                       )}
                       {service.lastChecked && (
-                        <div className="text-xs text-gray-500">{service.lastChecked}</div>
+                        <div className="text-xs text-gray-500">
+                          {new Date(service.lastChecked).toLocaleTimeString()}
+                        </div>
                       )}
                     </div>
                   </div>
@@ -330,7 +390,7 @@ export default function StatusPage() {
 
         {/* Footer Note */}
         <div className="mt-8 text-center text-sm text-gray-600">
-          <p>Status updates are refreshed automatically every 60 seconds.</p>
+          <p>Status updates are refreshed automatically every 60 seconds. Last check: {lastUpdate}</p>
           <p className="mt-2">
             Having issues? <Link href="/contact" className="text-blue-600 hover:text-blue-700 font-medium">Contact Support</Link>
           </p>

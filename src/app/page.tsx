@@ -146,72 +146,89 @@ function PlatformHomepage() {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-24 bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Everything You Need to Sell Online</h2>
+            <Badge className="mb-4 bg-blue-100 text-blue-700 border-blue-200">
+              FEATURES
+            </Badge>
+            <h2 className="text-3xl md:text-5xl font-bold mb-6 text-gray-900">
+              Everything You Need to Sell Online
+            </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Our platform provides all the tools you need to create, manage, and grow your online business.
+              Our platform provides all the tools you need to create, manage, and grow your online business with ease.
             </p>
           </div>
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <Card className="text-center">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+            <Card className="border-2 hover:border-blue-300 hover:shadow-xl transition-all duration-300">
               <CardHeader>
-                <Zap className="w-12 h-12 text-blue-600 mx-auto mb-4" />
-                <CardTitle>Lightning Fast Setup</CardTitle>
-                <CardDescription>
-                  Get your store online in under 5 minutes. Choose your subdomain and start selling immediately.
+                <div className="w-14 h-14 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+                  <Zap className="w-8 h-8 text-blue-600" />
+                </div>
+                <CardTitle className="text-xl">Lightning Fast Setup</CardTitle>
+                <CardDescription className="text-base">
+                  Get your store online in under 5 minutes. Choose your subdomain and start selling immediately with our intuitive setup wizard.
                 </CardDescription>
               </CardHeader>
             </Card>
 
-            <Card className="text-center">
+            <Card className="border-2 hover:border-green-300 hover:shadow-xl transition-all duration-300">
               <CardHeader>
-                <Globe className="w-12 h-12 text-green-600 mx-auto mb-4" />
-                <CardTitle>Custom Domains</CardTitle>
-                <CardDescription>
-                  Use your own domain or get a free subdomain. SSL certificates included for secure shopping.
+                <div className="w-14 h-14 bg-green-100 rounded-lg flex items-center justify-center mb-4">
+                  <Globe className="w-8 h-8 text-green-600" />
+                </div>
+                <CardTitle className="text-xl">Custom Domains</CardTitle>
+                <CardDescription className="text-base">
+                  Use your own domain or get a free subdomain. SSL certificates included automatically for secure shopping experiences.
                 </CardDescription>
               </CardHeader>
             </Card>
 
-            <Card className="text-center">
+            <Card className="border-2 hover:border-purple-300 hover:shadow-xl transition-all duration-300">
               <CardHeader>
-                <Shield className="w-12 h-12 text-purple-600 mx-auto mb-4" />
-                <CardTitle>Secure & Reliable</CardTitle>
-                <CardDescription>
-                  Built with enterprise-grade security. Your data and your customers' data are always protected.
+                <div className="w-14 h-14 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
+                  <Shield className="w-8 h-8 text-purple-600" />
+                </div>
+                <CardTitle className="text-xl">Secure & Reliable</CardTitle>
+                <CardDescription className="text-base">
+                  Built with enterprise-grade security. Your data and your customers' information are always protected with industry standards.
                 </CardDescription>
               </CardHeader>
             </Card>
 
-            <Card className="text-center">
+            <Card className="border-2 hover:border-orange-300 hover:shadow-xl transition-all duration-300">
               <CardHeader>
-                <Users className="w-12 h-12 text-orange-600 mx-auto mb-4" />
-                <CardTitle>Team Management</CardTitle>
-                <CardDescription>
-                  Invite team members with different permission levels. Collaborate seamlessly on your store.
+                <div className="w-14 h-14 bg-orange-100 rounded-lg flex items-center justify-center mb-4">
+                  <Users className="w-8 h-8 text-orange-600" />
+                </div>
+                <CardTitle className="text-xl">Team Collaboration</CardTitle>
+                <CardDescription className="text-base">
+                  Invite team members with customizable permission levels. Work together seamlessly on your store operations.
                 </CardDescription>
               </CardHeader>
             </Card>
 
-            <Card className="text-center">
+            <Card className="border-2 hover:border-red-300 hover:shadow-xl transition-all duration-300">
               <CardHeader>
-                <TrendingUp className="w-12 h-12 text-red-600 mx-auto mb-4" />
-                <CardTitle>Analytics & Reports</CardTitle>
-                <CardDescription>
-                  Track sales, monitor performance, and understand your customers with detailed analytics.
+                <div className="w-14 h-14 bg-red-100 rounded-lg flex items-center justify-center mb-4">
+                  <TrendingUp className="w-8 h-8 text-red-600" />
+                </div>
+                <CardTitle className="text-xl">Analytics & Insights</CardTitle>
+                <CardDescription className="text-base">
+                  Track sales, monitor performance, and understand your customers with comprehensive analytics and detailed reports.
                 </CardDescription>
               </CardHeader>
             </Card>
 
-            <Card className="text-center">
+            <Card className="border-2 hover:border-indigo-300 hover:shadow-xl transition-all duration-300">
               <CardHeader>
-                <Store className="w-12 h-12 text-indigo-600 mx-auto mb-4" />
-                <CardTitle>Professional Themes</CardTitle>
-                <CardDescription>
-                  Beautiful, mobile-responsive themes that make your products look amazing on any device.
+                <div className="w-14 h-14 bg-indigo-100 rounded-lg flex items-center justify-center mb-4">
+                  <Store className="w-8 h-8 text-indigo-600" />
+                </div>
+                <CardTitle className="text-xl">Beautiful Themes</CardTitle>
+                <CardDescription className="text-base">
+                  Professional, mobile-responsive themes that make your products look stunning on any device, no design skills needed.
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -220,113 +237,128 @@ function PlatformHomepage() {
       </section>
 
       {/* Pricing Section */}
-      <section className="py-20">
+      <section className="py-24 bg-gradient-to-b from-gray-50 to-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Simple, Transparent Pricing</h2>
-            <p className="text-xl text-gray-600">Choose the plan that fits your business needs</p>
+            <Badge className="mb-4 bg-green-100 text-green-700 border-green-200">
+              PRICING
+            </Badge>
+            <h2 className="text-3xl md:text-5xl font-bold mb-6 text-gray-900">
+              Simple, Transparent Pricing
+            </h2>
+            <p className="text-xl text-gray-600">Choose the perfect plan for your business needs</p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            <Card>
-              <CardHeader className="text-center">
-                <CardTitle className="text-2xl">Starter</CardTitle>
-                <div className="text-4xl font-bold text-blue-600">Free</div>
-                <CardDescription>Perfect for getting started</CardDescription>
+          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            <Card className="hover:shadow-2xl transition-all duration-300">
+              <CardHeader className="text-center pb-8">
+                <CardTitle className="text-2xl mb-2">Starter</CardTitle>
+                <div className="mb-2">
+                  <span className="text-5xl font-bold text-gray-900">Free</span>
+                </div>
+                <CardDescription className="text-base">Perfect for getting started</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <ul className="space-y-3">
-                  <li className="flex items-center">
-                    <CheckCircle className="w-5 h-5 text-green-600 mr-3" />
-                    Up to 10 products
+              <CardContent className="space-y-6">
+                <ul className="space-y-4">
+                  <li className="flex items-start">
+                    <CheckCircle className="w-5 h-5 text-green-600 mr-3 mt-0.5 flex-shrink-0" />
+                    <span className="text-gray-700">Up to 10 products</span>
                   </li>
-                  <li className="flex items-center">
-                    <CheckCircle className="w-5 h-5 text-green-600 mr-3" />
-                    Free subdomain
+                  <li className="flex items-start">
+                    <CheckCircle className="w-5 h-5 text-green-600 mr-3 mt-0.5 flex-shrink-0" />
+                    <span className="text-gray-700">Free subdomain</span>
                   </li>
-                  <li className="flex items-center">
-                    <CheckCircle className="w-5 h-5 text-green-600 mr-3" />
-                    Basic themes
+                  <li className="flex items-start">
+                    <CheckCircle className="w-5 h-5 text-green-600 mr-3 mt-0.5 flex-shrink-0" />
+                    <span className="text-gray-700">Basic themes</span>
                   </li>
-                  <li className="flex items-center">
-                    <CheckCircle className="w-5 h-5 text-green-600 mr-3" />
-                    Email support
+                  <li className="flex items-start">
+                    <CheckCircle className="w-5 h-5 text-green-600 mr-3 mt-0.5 flex-shrink-0" />
+                    <span className="text-gray-700">Email support</span>
                   </li>
                 </ul>
-                <Button className="w-full" asChild>
-                  <Link href="/signup">Start Free</Link>
+                <Button className="w-full h-12 text-base" variant="outline" asChild>
+                  <Link href="/signup">Get Started Free</Link>
                 </Button>
               </CardContent>
             </Card>
 
-            <Card className="border-blue-600 border-2 relative">
-              <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-blue-600">
-                Most Popular
-              </Badge>
-              <CardHeader className="text-center">
-                <CardTitle className="text-2xl">Professional</CardTitle>
-                <div className="text-4xl font-bold text-blue-600">$29<span className="text-lg font-normal text-gray-600">/mo</span></div>
-                <CardDescription>For growing businesses</CardDescription>
+            <Card className="border-2 border-blue-500 shadow-2xl relative scale-105 hover:scale-110 transition-all duration-300">
+              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                <Badge className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-1 text-sm shadow-lg">
+                  Most Popular
+                </Badge>
+              </div>
+              <CardHeader className="text-center pb-8 pt-8">
+                <CardTitle className="text-2xl mb-2">Professional</CardTitle>
+                <div className="mb-2">
+                  <span className="text-5xl font-bold text-gray-900">$29</span>
+                  <span className="text-xl font-normal text-gray-600">/mo</span>
+                </div>
+                <CardDescription className="text-base">For growing businesses</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <ul className="space-y-3">
-                  <li className="flex items-center">
-                    <CheckCircle className="w-5 h-5 text-green-600 mr-3" />
-                    Unlimited products
+              <CardContent className="space-y-6">
+                <ul className="space-y-4">
+                  <li className="flex items-start">
+                    <CheckCircle className="w-5 h-5 text-green-600 mr-3 mt-0.5 flex-shrink-0" />
+                    <span className="text-gray-700">Unlimited products</span>
                   </li>
-                  <li className="flex items-center">
-                    <CheckCircle className="w-5 h-5 text-green-600 mr-3" />
-                    Custom domain
+                  <li className="flex items-start">
+                    <CheckCircle className="w-5 h-5 text-green-600 mr-3 mt-0.5 flex-shrink-0" />
+                    <span className="text-gray-700">Custom domain</span>
                   </li>
-                  <li className="flex items-center">
-                    <CheckCircle className="w-5 h-5 text-green-600 mr-3" />
-                    Premium themes
+                  <li className="flex items-start">
+                    <CheckCircle className="w-5 h-5 text-green-600 mr-3 mt-0.5 flex-shrink-0" />
+                    <span className="text-gray-700">Premium themes</span>
                   </li>
-                  <li className="flex items-center">
-                    <CheckCircle className="w-5 h-5 text-green-600 mr-3" />
-                    Analytics dashboard
+                  <li className="flex items-start">
+                    <CheckCircle className="w-5 h-5 text-green-600 mr-3 mt-0.5 flex-shrink-0" />
+                    <span className="text-gray-700">Analytics dashboard</span>
                   </li>
-                  <li className="flex items-center">
-                    <CheckCircle className="w-5 h-5 text-green-600 mr-3" />
-                    Priority support
+                  <li className="flex items-start">
+                    <CheckCircle className="w-5 h-5 text-green-600 mr-3 mt-0.5 flex-shrink-0" />
+                    <span className="text-gray-700">Priority support</span>
                   </li>
                 </ul>
-                <Button className="w-full" asChild>
+                <Button className="w-full h-12 text-base bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700" asChild>
                   <Link href="/signup">Start 14-Day Trial</Link>
                 </Button>
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader className="text-center">
-                <CardTitle className="text-2xl">Enterprise</CardTitle>
-                <div className="text-4xl font-bold text-blue-600">$99<span className="text-lg font-normal text-gray-600">/mo</span></div>
-                <CardDescription>For large-scale operations</CardDescription>
+            <Card className="hover:shadow-2xl transition-all duration-300">
+              <CardHeader className="text-center pb-8">
+                <CardTitle className="text-2xl mb-2">Enterprise</CardTitle>
+                <div className="mb-2">
+                  <span className="text-5xl font-bold text-gray-900">$99</span>
+                  <span className="text-xl font-normal text-gray-600">/mo</span>
+                </div>
+                <CardDescription className="text-base">For large-scale operations</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <ul className="space-y-3">
-                  <li className="flex items-center">
-                    <CheckCircle className="w-5 h-5 text-green-600 mr-3" />
-                    Everything in Professional
+              <CardContent className="space-y-6">
+                <ul className="space-y-4">
+                  <li className="flex items-start">
+                    <CheckCircle className="w-5 h-5 text-green-600 mr-3 mt-0.5 flex-shrink-0" />
+                    <span className="text-gray-700">Everything in Professional</span>
                   </li>
-                  <li className="flex items-center">
-                    <CheckCircle className="w-5 h-5 text-green-600 mr-3" />
-                    Team management
+                  <li className="flex items-start">
+                    <CheckCircle className="w-5 h-5 text-green-600 mr-3 mt-0.5 flex-shrink-0" />
+                    <span className="text-gray-700">Team management</span>
                   </li>
-                  <li className="flex items-center">
-                    <CheckCircle className="w-5 h-5 text-green-600 mr-3" />
-                    Advanced analytics
+                  <li className="flex items-start">
+                    <CheckCircle className="w-5 h-5 text-green-600 mr-3 mt-0.5 flex-shrink-0" />
+                    <span className="text-gray-700">Advanced analytics</span>
                   </li>
-                  <li className="flex items-center">
-                    <CheckCircle className="w-5 h-5 text-green-600 mr-3" />
-                    API access
+                  <li className="flex items-start">
+                    <CheckCircle className="w-5 h-5 text-green-600 mr-3 mt-0.5 flex-shrink-0" />
+                    <span className="text-gray-700">API access</span>
                   </li>
-                  <li className="flex items-center">
-                    <CheckCircle className="w-5 h-5 text-green-600 mr-3" />
-                    24/7 phone support
+                  <li className="flex items-start">
+                    <CheckCircle className="w-5 h-5 text-green-600 mr-3 mt-0.5 flex-shrink-0" />
+                    <span className="text-gray-700">24/7 phone support</span>
                   </li>
                 </ul>
-                <Button variant="outline" className="w-full" asChild>
+                <Button className="w-full h-12 text-base" variant="outline" asChild>
                   <Link href="/signup">Contact Sales</Link>
                 </Button>
               </CardContent>
@@ -336,17 +368,28 @@ function PlatformHomepage() {
       </section>
 
       {/* CTA Section */}
-      <section className="bg-blue-600 text-white py-20">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+      <section className="relative bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-700 text-white py-24 overflow-hidden">
+        <div className="absolute inset-0 bg-grid-white/[0.05] bg-[size:40px_40px]"></div>
+        <div className="relative container mx-auto px-4 text-center">
+          <h2 className="text-3xl md:text-5xl font-bold mb-6">
             Ready to Start Your Online Store?
           </h2>
-          <p className="text-xl mb-8 max-w-2xl mx-auto opacity-90">
-            Join thousands of entrepreneurs who have already built successful online businesses with our platform.
+          <p className="text-lg md:text-xl mb-10 max-w-3xl mx-auto text-blue-100">
+            Join thousands of successful entrepreneurs who have already built thriving online businesses with our powerful ecommerce platform.
           </p>
-          <Button size="lg" variant="secondary" asChild className="text-lg px-8 py-4">
-            <Link href="/signup">Create Your Store Now</Link>
-          </Button>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <Button size="lg" variant="secondary" asChild className="text-lg px-10 py-6 shadow-2xl hover:shadow-white/50 transition-all">
+              <Link href="/signup">
+                Create Your Store Now
+              </Link>
+            </Button>
+            <Button size="lg" variant="outline" className="text-white border-white/50 hover:bg-white hover:text-blue-600 text-lg px-10 py-6 backdrop-blur-sm">
+              Talk to Sales
+            </Button>
+          </div>
+          <p className="text-sm mt-6 text-blue-100">
+            Questions? Our team is here to help • <Link href="/contact" className="underline hover:text-white">Contact us</Link>
+          </p>
         </div>
       </section>
 

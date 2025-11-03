@@ -522,7 +522,7 @@ function PlatformHomepage() {
               <h3 className="font-semibold mb-4 text-lg">Company</h3>
               <ul className="space-y-3 text-sm text-gray-400">
                 <li><Link href="#" className="hover:text-white transition-colors">About Us</Link></li>
-                <li><Link href="#" className="hover:text-white transition-colors">Privacy Policy</Link></li>
+                <li><Link href="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
               </ul>
             </div>
           </div>
@@ -532,7 +532,7 @@ function PlatformHomepage() {
             </p>
             <div className="flex gap-6 text-sm text-gray-400">
               <Link href="#" className="hover:text-white transition-colors">Terms of Service</Link>
-              <Link href="#" className="hover:text-white transition-colors">Privacy</Link>
+              <Link href="/privacy-policy" className="hover:text-white transition-colors">Privacy</Link>
               <Link href="#" className="hover:text-white transition-colors">Cookies</Link>
             </div>
           </div>

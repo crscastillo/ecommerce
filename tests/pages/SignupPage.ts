@@ -1,5 +1,6 @@
 import { Page, Locator, expect } from '@playwright/test';
 
+
 export class SignupPage {
   readonly page: Page;
   readonly emailInput: Locator;

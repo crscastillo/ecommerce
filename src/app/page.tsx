@@ -146,7 +146,7 @@ function PlatformHomepage() {
       </section>
 
       {/* Features Section */}
-      <section className="py-24 bg-white">
+      <section id="features" className="py-24 bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <Badge className="mb-4 bg-blue-100 text-blue-700 border-blue-200">
@@ -232,6 +232,14 @@ function PlatformHomepage() {
                 </CardDescription>
               </CardHeader>
             </Card>
+          </div>
+
+          <div className="text-center mt-12">
+            <Link href="/features">
+              <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-6 text-lg">
+                View All Features
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
@@ -496,7 +504,7 @@ function PlatformHomepage() {
             <div>
               <h3 className="font-semibold mb-4 text-lg">Product</h3>
               <ul className="space-y-3 text-sm text-gray-400">
-                <li><Link href="#" className="hover:text-white transition-colors">Features</Link></li>
+                <li><Link href="#features" className="hover:text-white transition-colors">Features</Link></li>
                 <li><Link href="#pricing" className="hover:text-white transition-colors">Pricing</Link></li>
                 <li><Link href="/integrations" className="hover:text-white transition-colors">Integrations</Link></li>
               </ul>

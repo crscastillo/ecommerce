@@ -3,8 +3,9 @@
 import { useState, useEffect } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { CheckCircle, XCircle, AlertCircle, Clock, Activity, Database, Globe, Shield, Zap } from 'lucide-react'
+import { CheckCircle, XCircle, AlertCircle, Clock, Activity, Database, Globe, Shield, Zap, Store } from 'lucide-react'
 import Link from 'next/link'
+import { platformConfig } from '@/lib/config/platform'
 
 type ServiceStatus = 'operational' | 'degraded' | 'outage' | 'maintenance'
 
@@ -216,6 +217,10 @@ export default function StatusPage() {
         <div className="container mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
             <div>
+              <div className="flex items-center gap-2 mb-2">
+                <Store className="h-6 w-6 text-blue-600" />
+                <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">{platformConfig.name}</span>
+              </div>
               <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">System Status</h1>
               <p className="text-gray-600 dark:text-gray-400">Real-time status and uptime monitoring</p>
             </div>
@@ -389,10 +394,17 @@ export default function StatusPage() {
         </Card>
 
         {/* Footer Note */}
-        <div className="mt-8 text-center text-sm text-gray-600">
-          <p>Status updates are refreshed automatically every 60 seconds. Last check: {lastUpdate}</p>
-          <p className="mt-2">
+        <div className="mt-8 text-center">
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <Store className="h-5 w-5 text-blue-600" />
+            <span className="text-sm font-semibold text-gray-700">{platformConfig.name} System Status</span>
+          </div>
+          <p className="text-sm text-gray-600">Status updates are refreshed automatically every 60 seconds. Last check: {lastUpdate}</p>
+          <p className="mt-2 text-sm text-gray-600">
             Having issues? <Link href="/contact" className="text-blue-600 hover:text-blue-700 font-medium">Contact Support</Link>
+          </p>
+          <p className="mt-4 text-xs text-gray-500">
+            © 2025 {platformConfig.name}. All systems monitored 24/7.
           </p>
         </div>
       </div>

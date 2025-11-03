@@ -513,7 +513,7 @@ function PlatformHomepage() {
               <h3 className="font-semibold mb-4 text-lg">Support</h3>
               <ul className="space-y-3 text-sm text-gray-400">
                 <li><Link href="#" className="hover:text-white transition-colors">Help Center</Link></li>
-                <li><Link href="#" className="hover:text-white transition-colors">Contact Us</Link></li>
+                <li><Link href="/contact" className="hover:text-white transition-colors">Contact Us</Link></li>
                 <li><Link href="#" className="hover:text-white transition-colors">Documentation</Link></li>
                 <li><Link href="/status" className="hover:text-white transition-colors">System Status</Link></li>
               </ul>

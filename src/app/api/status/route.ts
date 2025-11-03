@@ -13,6 +13,47 @@ interface ServiceHealth {
   error?: string
 }
 
+// Helper function to sanitize error messages
+function sanitizeErrorMessage(error: any, defaultMessage: string): string {
+  if (!error) return defaultMessage
+  
+  let errorMessage: string
+  
+  // Handle different error types
+  if (error instanceof Error) {
+    errorMessage = error.message
+  } else if (typeof error === 'string') {
+    errorMessage = error
+  } else if (error.message) {
+    errorMessage = error.message
+  } else if (error.error) {
+    errorMessage = typeof error.error === 'string' ? error.error : JSON.stringify(error.error)
+  } else {
+    // Try to stringify if it's an object
+    try {
+      errorMessage = JSON.stringify(error)
+      // If it's still just an empty object or [object Object], use default
+      if (errorMessage === '{}' || errorMessage === '[object Object]') {
+        return defaultMessage
+      }
+    } catch {
+      return defaultMessage
+    }
+  }
+  
+  // Check if error message looks like HTML (contains HTML tags)
+  if (errorMessage.includes('<html') || errorMessage.includes('<!DOCTYPE')) {
+    return defaultMessage
+  }
+  
+  // Truncate very long error messages
+  if (errorMessage.length > 200) {
+    return errorMessage.substring(0, 200) + '...'
+  }
+  
+  return errorMessage
+}
+
 async function checkDatabase(): Promise<ServiceHealth> {
   const startTime = Date.now()
   try {
@@ -33,7 +74,7 @@ async function checkDatabase(): Promise<ServiceHealth> {
         description: 'Database connection failed',
         responseTime,
         lastChecked: new Date().toISOString(),
-        error: error.message
+        error: sanitizeErrorMessage(error, 'Unable to connect to database. The service may be paused or temporarily unavailable.')
       }
     }
     
@@ -57,7 +98,7 @@ async function checkDatabase(): Promise<ServiceHealth> {
       description: 'Database connection failed',
       responseTime: Date.now() - startTime,
       lastChecked: new Date().toISOString(),
-      error: error instanceof Error ? error.message : 'Unknown error'
+      error: sanitizeErrorMessage(error, 'Unable to connect to database. The service may be paused or temporarily unavailable.')
     }
   }
 }
@@ -123,7 +164,7 @@ async function checkAPI(): Promise<ServiceHealth> {
       description: 'API endpoints are not responding',
       responseTime: Date.now() - startTime,
       lastChecked: new Date().toISOString(),
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: sanitizeErrorMessage(error, 'API services are temporarily unavailable. Please try again later.'),
       uptime: '99.99%'
     }
   }
@@ -149,7 +190,7 @@ async function checkWebApplication(): Promise<ServiceHealth> {
         responseTime,
         lastChecked: new Date().toISOString(),
         uptime: '99.99%',
-        error: authError.message
+        error: sanitizeErrorMessage(authError, 'Authentication service is experiencing connectivity issues.')
       }
     }
     
@@ -180,7 +221,7 @@ async function checkWebApplication(): Promise<ServiceHealth> {
       description: 'Web application is not accessible',
       responseTime: Date.now() - startTime,
       lastChecked: new Date().toISOString(),
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: sanitizeErrorMessage(error, 'Web application is temporarily unavailable. Please check back shortly.'),
       uptime: '99.99%'
     }
   }
@@ -189,7 +230,7 @@ async function checkWebApplication(): Promise<ServiceHealth> {
 async function checkPaymentProcessing(): Promise<ServiceHealth> {
   const startTime = Date.now()
   try {
-    // Check if Stripe keys are configured
+    // Check if payment gateway keys are configured
     const hasStripeKey = !!process.env.STRIPE_SECRET_KEY
     const hasPublishableKey = !!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
     
@@ -201,11 +242,11 @@ async function checkPaymentProcessing(): Promise<ServiceHealth> {
         responseTime: Date.now() - startTime,
         lastChecked: new Date().toISOString(),
         uptime: '100%',
-        error: 'Missing Stripe API keys'
+        error: 'Missing payment gateway API keys'
       }
     }
     
-    // Attempt to verify Stripe connection by importing and testing
+    // Attempt to verify payment gateway connection
     try {
       const Stripe = (await import('stripe')).default
       const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
@@ -219,7 +260,7 @@ async function checkPaymentProcessing(): Promise<ServiceHealth> {
       return {
         name: 'Payment Processing',
         status: 'operational',
-        description: 'Stripe payment gateway is operational',
+        description: 'Payment gateway is operational',
         responseTime,
         lastChecked: new Date().toISOString(),
         uptime: '100%'
@@ -228,11 +269,11 @@ async function checkPaymentProcessing(): Promise<ServiceHealth> {
       return {
         name: 'Payment Processing',
         status: 'outage',
-        description: 'Stripe API connection failed',
+        description: 'Payment gateway connection failed',
         responseTime: Date.now() - startTime,
         lastChecked: new Date().toISOString(),
         uptime: '100%',
-        error: stripeError instanceof Error ? stripeError.message : 'Stripe connection error'
+        error: sanitizeErrorMessage(stripeError, 'Unable to connect to payment gateway. Payment processing is temporarily unavailable.')
       }
     }
   } catch (error) {
@@ -242,7 +283,7 @@ async function checkPaymentProcessing(): Promise<ServiceHealth> {
       description: 'Payment processing is unavailable',
       responseTime: Date.now() - startTime,
       lastChecked: new Date().toISOString(),
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: sanitizeErrorMessage(error, 'Payment processing service is temporarily unavailable.'),
       uptime: '100%'
     }
   }
@@ -266,7 +307,7 @@ async function checkFileStorage(): Promise<ServiceHealth> {
         responseTime,
         lastChecked: new Date().toISOString(),
         uptime: '99.97%',
-        error: error.message
+        error: sanitizeErrorMessage(error, 'File storage service is experiencing connectivity issues.')
       }
     }
     
@@ -285,7 +326,7 @@ async function checkFileStorage(): Promise<ServiceHealth> {
       description: 'File storage is unavailable',
       responseTime: Date.now() - startTime,
       lastChecked: new Date().toISOString(),
-      error: error instanceof Error ? error.message : 'Unknown error'
+      error: sanitizeErrorMessage(error, 'File storage service is temporarily unavailable.')
     }
   }
 }

@@ -123,7 +123,7 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
           <div className="border-t border-gray-200 p-4">
             <div className="flex items-center justify-between">
               <Badge variant="outline" className="text-xs">
-                {tenant?.plan || 'Starter'} Plan
+                {tenant?.subscription_tier || (tenant?.settings as any)?.plan || 'Starter'} Plan
               </Badge>
               <Link 
                 href="/admin/billing"

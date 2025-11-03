@@ -2,11 +2,14 @@ import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { createClient } from '@/lib/supabase/server'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
+function getStripe() {
+  return new Stripe(process.env.STRIPE_SECRET_KEY!)
+}
 
-const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!
+const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || ''
 
 export async function POST(request: NextRequest) {
+  const stripe = getStripe()
   try {
     const body = await request.text()
     const signature = request.headers.get('stripe-signature')!
@@ -51,9 +54,9 @@ export async function POST(request: NextRequest) {
                 stripe_subscription_id: subscription.id,
                 plan_id: planId,
                 status: subscription.status,
-                current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
-                current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
-                cancel_at_period_end: subscription.cancel_at_period_end,
+                current_period_start: new Date((subscription as any).current_period_start * 1000).toISOString(),
+                current_period_end: new Date((subscription as any).current_period_end * 1000).toISOString(),
+                cancel_at_period_end: (subscription as any).cancel_at_period_end,
                 created_at: new Date().toISOString(),
                 updated_at: new Date().toISOString()
               })
@@ -63,10 +66,10 @@ export async function POST(request: NextRequest) {
       }
 
       case 'invoice.payment_succeeded': {
-        const invoice = event.data.object as Stripe.Invoice
+        const invoice = event.data.object as any // Stripe.Invoice with subscription
         
         if (invoice.subscription) {
-          const subscription = await stripe.subscriptions.retrieve(invoice.subscription as string)
+          const subscription = await stripe.subscriptions.retrieve(invoice.subscription as string) as any
           
           await supabase
             .from('subscriptions')
@@ -82,7 +85,7 @@ export async function POST(request: NextRequest) {
       }
 
       case 'invoice.payment_failed': {
-        const invoice = event.data.object as Stripe.Invoice
+        const invoice = event.data.object as any // Stripe.Invoice with subscription
         
         if (invoice.subscription) {
           await supabase
@@ -97,7 +100,7 @@ export async function POST(request: NextRequest) {
       }
 
       case 'customer.subscription.updated': {
-        const subscription = event.data.object as Stripe.Subscription
+        const subscription = event.data.object as any // Stripe.Subscription
         
         await supabase
           .from('subscriptions')

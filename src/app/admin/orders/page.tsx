@@ -487,12 +487,12 @@ export default function OrdersPage() {
                       </TableCell>
                       <TableCell>
                         <Select 
-                          value={order.financial_status} 
+                          value={order.financial_status || undefined} 
                           onValueChange={(value) => updateOrderStatus(order.id, 'financial_status', value)}
                         >
                           <SelectTrigger className="w-32">
                             <SelectValue>
-                              {getStatusBadge(order.financial_status, 'financial')}
+                              {getStatusBadge(order.financial_status || 'pending', 'financial')}
                             </SelectValue>
                           </SelectTrigger>
                           <SelectContent>
@@ -505,12 +505,12 @@ export default function OrdersPage() {
                       </TableCell>
                       <TableCell>
                         <Select 
-                          value={order.fulfillment_status} 
+                          value={order.fulfillment_status || undefined} 
                           onValueChange={(value) => updateOrderStatus(order.id, 'fulfillment_status', value)}
                         >
                           <SelectTrigger className="w-32">
                             <SelectValue>
-                              {getStatusBadge(order.fulfillment_status, 'fulfillment')}
+                              {getStatusBadge(order.fulfillment_status || 'unfulfilled', 'fulfillment')}
                             </SelectValue>
                           </SelectTrigger>
                           <SelectContent>
@@ -568,11 +568,11 @@ export default function OrdersPage() {
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
                       <span className="text-sm">Payment:</span>
-                      {getStatusBadge(selectedOrder.financial_status, 'financial')}
+                      {getStatusBadge(selectedOrder.financial_status || 'pending', 'financial')}
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="text-sm">Fulfillment:</span>
-                      {getStatusBadge(selectedOrder.fulfillment_status, 'fulfillment')}
+                      {getStatusBadge(selectedOrder.fulfillment_status || 'unfulfilled', 'fulfillment')}
                     </div>
                   </div>
                 </div>
@@ -623,22 +623,22 @@ export default function OrdersPage() {
                     <span>Subtotal:</span>
                     <span>{formatCurrency(selectedOrder.subtotal_price)}</span>
                   </div>
-                  {selectedOrder.total_tax > 0 && (
+                  {(selectedOrder.total_tax ?? 0) > 0 && (
                     <div className="flex justify-between">
                       <span>Tax:</span>
-                      <span>{formatCurrency(selectedOrder.total_tax)}</span>
+                      <span>{formatCurrency(selectedOrder.total_tax || 0)}</span>
                     </div>
                   )}
-                  {selectedOrder.shipping_price > 0 && (
+                  {(selectedOrder.shipping_price ?? 0) > 0 && (
                     <div className="flex justify-between">
                       <span>Shipping:</span>
-                      <span>{formatCurrency(selectedOrder.shipping_price)}</span>
+                      <span>{formatCurrency(selectedOrder.shipping_price || 0)}</span>
                     </div>
                   )}
-                  {selectedOrder.total_discounts > 0 && (
+                  {(selectedOrder.total_discounts ?? 0) > 0 && (
                     <div className="flex justify-between text-green-600">
                       <span>Discount:</span>
-                      <span>-{formatCurrency(selectedOrder.total_discounts)}</span>
+                      <span>-{formatCurrency(selectedOrder.total_discounts || 0)}</span>
                     </div>
                   )}
                   <div className="flex justify-between font-medium border-t pt-1">

@@ -169,7 +169,11 @@ export default function BillingPage() {
       // Redirect to Stripe Checkout
       const stripe = await loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
       if (stripe) {
-        await stripe.redirectToCheckout({ sessionId })
+        // @ts-ignore - redirectToCheckout exists but TypeScript types may be outdated
+        const result = await stripe.redirectToCheckout({ sessionId })
+        if (result?.error) {
+          throw new Error(result.error.message)
+        }
       }
 
     } catch (error) {
@@ -225,7 +229,9 @@ export default function BillingPage() {
   }
 
   const getCurrentPlan = () => {
-    return plans.find(p => p.id === (tenant?.plan || 'starter')) || plans[0]
+    // Get plan from tenant subscription_tier or settings
+    const planId = tenant?.subscription_tier || (tenant?.settings as any)?.plan || 'starter'
+    return plans.find(p => p.id === planId) || plans[0]
   }
 
   const formatDate = (dateString: string) => {

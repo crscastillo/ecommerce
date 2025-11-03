@@ -313,7 +313,7 @@ function PlatformHomepage() {
       </section>
 
       {/* Pricing Section */}
-      <section className="py-24 bg-gradient-to-b from-gray-50 to-white">
+      <section id="pricing" className="py-24 bg-gradient-to-b from-gray-50 to-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <Badge className="mb-4 bg-green-100 text-green-700 border-green-200">
@@ -497,7 +497,7 @@ function PlatformHomepage() {
               <h3 className="font-semibold mb-4 text-lg">Product</h3>
               <ul className="space-y-3 text-sm text-gray-400">
                 <li><Link href="#" className="hover:text-white transition-colors">Features</Link></li>
-                <li><Link href="#" className="hover:text-white transition-colors">Pricing</Link></li>
+                <li><Link href="#pricing" className="hover:text-white transition-colors">Pricing</Link></li>
                 <li><Link href="/integrations" className="hover:text-white transition-colors">Integrations</Link></li>
               </ul>
             </div>

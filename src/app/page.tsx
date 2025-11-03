@@ -432,7 +432,7 @@ function PlatformHomepage() {
                 <li><Link href="#" className="hover:text-white transition-colors">Help Center</Link></li>
                 <li><Link href="#" className="hover:text-white transition-colors">Contact Us</Link></li>
                 <li><Link href="#" className="hover:text-white transition-colors">Documentation</Link></li>
-                <li><Link href="#" className="hover:text-white transition-colors">System Status</Link></li>
+                <li><Link href="/status" className="hover:text-white transition-colors">System Status</Link></li>
               </ul>
             </div>
             <div>

@@ -69,6 +69,11 @@ export function Footer() {
                   Returns
                 </Link>
               </li>
+              <li>
+                <Link href="/status" className="text-muted-foreground hover:text-foreground">
+                  System Status
+                </Link>
+              </li>
             </ul>
           </div>
         </div>

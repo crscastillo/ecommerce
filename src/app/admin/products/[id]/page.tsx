@@ -165,41 +165,58 @@ export default function ProductViewPage() {
         setProductImages(parsedResult.images)
         
         // Parse variations for variable products
-        if (productData.product_type === 'variable' && productData.variants) {
-          console.log('Raw variants data:', productData.variants)
+        if (productData.product_type === 'variable') {
+          console.log('Product type is variable, raw variants data:', productData.variants)
+          console.log('Variants type:', typeof productData.variants)
           
           // Parse variants if it's a string
           let parsedVariants = productData.variants
-          if (typeof parsedVariants === 'string') {
+          
+          // Handle empty/null variants
+          if (!parsedVariants || parsedVariants === null || parsedVariants === undefined) {
+            console.log('No variants data found')
+            parsedVariants = []
+          } else if (typeof parsedVariants === 'string') {
             try {
               parsedVariants = JSON.parse(parsedVariants)
+              console.log('Parsed variants from string:', parsedVariants)
             } catch (e) {
-              console.error('Error parsing variants:', e)
+              console.error('Error parsing variants string:', e)
               parsedVariants = []
             }
           }
           
-          // Convert to array if it's an object
+          // Convert to array if it's an object (but not already an array)
           if (parsedVariants && typeof parsedVariants === 'object' && !Array.isArray(parsedVariants)) {
+            console.log('Converting object to array, keys:', Object.keys(parsedVariants))
             parsedVariants = Object.values(parsedVariants)
           }
           
+          console.log('Final parsed variants:', parsedVariants)
+          console.log('Is array?', Array.isArray(parsedVariants))
+          console.log('Length:', Array.isArray(parsedVariants) ? parsedVariants.length : 'N/A')
+          
           if (Array.isArray(parsedVariants) && parsedVariants.length > 0) {
-            console.log('Parsed variants:', parsedVariants)
+            console.log('Processing', parsedVariants.length, 'variants')
             
             // Extract unique options from variations
             const optionsMap = new Map<string, Set<string>>()
             
-            parsedVariants.forEach((variant: any) => {
+            parsedVariants.forEach((variant: any, idx: number) => {
+              console.log(`Variant ${idx}:`, variant)
               if (variant.attributes && Array.isArray(variant.attributes)) {
                 variant.attributes.forEach((attr: any) => {
-                  if (!optionsMap.has(attr.name)) {
-                    optionsMap.set(attr.name, new Set())
+                  if (attr && attr.name && attr.value) {
+                    if (!optionsMap.has(attr.name)) {
+                      optionsMap.set(attr.name, new Set())
+                    }
+                    optionsMap.get(attr.name)?.add(attr.value)
                   }
-                  optionsMap.get(attr.name)?.add(attr.value)
                 })
               }
             })
+            
+            console.log('Extracted options map:', Array.from(optionsMap.entries()))
             
             // Set variation options
             const options = Array.from(optionsMap.entries()).map(([name, values]) => ({
@@ -208,25 +225,33 @@ export default function ProductViewPage() {
             }))
             
             if (options.length > 0) {
+              console.log('Setting variation options:', options)
               setVariationOptions(options)
               setValueInputs(options.map(opt => opt.values.join(', ')))
             }
             
             // Set variations
-            const formattedVariations = parsedVariants.map((variant: any, index: number) => ({
-              id: variant.id || `var-${Date.now()}-${index}`,
-              title: variant.title || '',
-              attributes: variant.attributes || [],
-              sku: variant.sku || '',
-              price: variant.price?.toString() || '',
-              compare_price: variant.compare_price?.toString() || '',
-              cost_price: variant.cost_price?.toString() || '',
-              stock_quantity: variant.stock_quantity?.toString() || '0',
-              weight: variant.weight?.toString() || '',
-              is_active: variant.is_active !== false,
-            }))
+            const formattedVariations = parsedVariants.map((variant: any, index: number) => {
+              const formatted = {
+                id: variant.id || `var-${Date.now()}-${index}`,
+                title: variant.title || '',
+                attributes: variant.attributes || [],
+                sku: variant.sku || '',
+                price: variant.price?.toString() || '',
+                compare_price: variant.compare_price?.toString() || '',
+                cost_price: variant.cost_price?.toString() || '',
+                stock_quantity: variant.stock_quantity?.toString() || '0',
+                weight: variant.weight?.toString() || '',
+                is_active: variant.is_active !== false,
+              }
+              console.log(`Formatted variation ${index}:`, formatted)
+              return formatted
+            })
             
+            console.log('Setting formatted variations:', formattedVariations)
             setVariations(formattedVariations)
+          } else {
+            console.log('No variations to process or variants is not an array')
           }
         }
         
@@ -1171,108 +1196,110 @@ export default function ProductViewPage() {
             </Card>
           )}
 
-          {/* Inventory */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Inventory</CardTitle>
-              <CardDescription>
-                Track and manage product inventory
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {mode === 'view' ? (
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm">Track quantity:</span>
-                    <Badge variant={product.track_inventory ? "default" : "secondary"}>
-                      {product.track_inventory ? "Yes" : "No"}
-                    </Badge>
+          {/* Inventory - Only show for single and digital products */}
+          {formData.product_type !== 'variable' && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Inventory</CardTitle>
+                <CardDescription>
+                  Track and manage product inventory
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {mode === 'view' ? (
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm">Track quantity:</span>
+                      <Badge variant={product.track_inventory ? "default" : "secondary"}>
+                        {product.track_inventory ? "Yes" : "No"}
+                      </Badge>
+                    </div>
+                    {product.track_inventory && (
+                      <>
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm">Quantity:</span>
+                          <span className="text-sm font-medium">{product.inventory_quantity}</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm">Allow backorder:</span>
+                          <Badge variant={product.allow_backorder ? "default" : "secondary"}>
+                            {product.allow_backorder ? "Yes" : "No"}
+                          </Badge>
+                        </div>
+                      </>
+                    )}
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm">SKU:</span>
+                      <span className="text-sm font-mono">{product.sku || 'Not set'}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm">Weight:</span>
+                      <span className="text-sm">{product.weight ? `${product.weight} lbs` : 'Not set'}</span>
+                    </div>
                   </div>
-                  {product.track_inventory && (
-                    <>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">Quantity:</span>
-                        <span className="text-sm font-medium">{product.inventory_quantity}</span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">Allow backorder:</span>
-                        <Badge variant={product.allow_backorder ? "default" : "secondary"}>
-                          {product.allow_backorder ? "Yes" : "No"}
-                        </Badge>
-                      </div>
-                    </>
-                  )}
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm">SKU:</span>
-                    <span className="text-sm font-mono">{product.sku || 'Not set'}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm">Weight:</span>
-                    <span className="text-sm">{product.weight ? `${product.weight} lbs` : 'Not set'}</span>
-                  </div>
-                </div>
-              ) : (
-                <>
-                  <div className="flex items-center space-x-2">
-                    <Switch
-                      id="track_inventory"
-                      checked={formData.track_inventory}
-                      onCheckedChange={(checked: any) => handleInputChange('track_inventory', checked)}
-                    />
-                    <Label htmlFor="track_inventory">Track quantity</Label>
-                  </div>
+                ) : (
+                  <>
+                    <div className="flex items-center space-x-2">
+                      <Switch
+                        id="track_inventory"
+                        checked={formData.track_inventory}
+                        onCheckedChange={(checked: any) => handleInputChange('track_inventory', checked)}
+                      />
+                      <Label htmlFor="track_inventory">Track quantity</Label>
+                    </div>
 
-                  {formData.track_inventory && (
+                    {formData.track_inventory && (
+                      <div className="grid gap-4 sm:grid-cols-2">
+                        <div>
+                          <Label htmlFor="inventory_quantity">Quantity</Label>
+                          <Input
+                            id="inventory_quantity"
+                            type="number"
+                            min="0"
+                            value={formData.inventory_quantity}
+                            onChange={(e) => handleInputChange('inventory_quantity', e.target.value)}
+                            placeholder="0"
+                          />
+                        </div>
+                        <div className="flex items-center space-x-2 pt-6">
+                          <Switch
+                            id="allow_backorder"
+                            checked={formData.allow_backorder}
+                            onCheckedChange={(checked: any) => handleInputChange('allow_backorder', checked)}
+                          />
+                          <Label htmlFor="allow_backorder">Continue selling when out of stock</Label>
+                        </div>
+                      </div>
+                    )}
+
                     <div className="grid gap-4 sm:grid-cols-2">
                       <div>
-                        <Label htmlFor="inventory_quantity">Quantity</Label>
+                        <Label htmlFor="sku">SKU</Label>
                         <Input
-                          id="inventory_quantity"
+                          id="sku"
+                          value={formData.sku}
+                          onChange={(e) => handleInputChange('sku', e.target.value)}
+                          placeholder="Product SKU"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="weight">Weight (lbs)</Label>
+                        <Input
+                          id="weight"
                           type="number"
+                          step="0.01"
                           min="0"
-                          value={formData.inventory_quantity}
-                          onChange={(e) => handleInputChange('inventory_quantity', e.target.value)}
-                          placeholder="0"
+                          value={formData.weight}
+                          onChange={(e) => handleInputChange('weight', e.target.value)}
+                          placeholder="0.00"
                         />
                       </div>
-                      <div className="flex items-center space-x-2 pt-6">
-                        <Switch
-                          id="allow_backorder"
-                          checked={formData.allow_backorder}
-                          onCheckedChange={(checked: any) => handleInputChange('allow_backorder', checked)}
-                        />
-                        <Label htmlFor="allow_backorder">Continue selling when out of stock</Label>
-                      </div>
                     </div>
-                  )}
-
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <div>
-                      <Label htmlFor="sku">SKU</Label>
-                      <Input
-                        id="sku"
-                        value={formData.sku}
-                        onChange={(e) => handleInputChange('sku', e.target.value)}
-                        placeholder="Product SKU"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="weight">Weight (lbs)</Label>
-                      <Input
-                        id="weight"
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        value={formData.weight}
-                        onChange={(e) => handleInputChange('weight', e.target.value)}
-                        placeholder="0.00"
-                      />
-                    </div>
-                  </div>
-                </>
-              )}
-            </CardContent>
-          </Card>
+                  </>
+                )}
+              </CardContent>
+            </Card>
+          )}
 
           {/* Images */}
           <Card>
@@ -1330,45 +1357,6 @@ export default function ProductViewPage() {
                   />
                 )
               )}
-            </CardContent>
-          </Card>
-
-          {/* SEO */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Search Engine Optimization</CardTitle>
-              <CardDescription>
-                Optimize your product for search engines
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label htmlFor="seo_title">SEO Title</Label>
-                {mode === 'view' ? (
-                  <p className="mt-1 text-sm">{product.seo_title || 'Not set'}</p>
-                ) : (
-                  <Input
-                    id="seo_title"
-                    value={formData.seo_title}
-                    onChange={(e) => handleInputChange('seo_title', e.target.value)}
-                    placeholder="SEO optimized title"
-                  />
-                )}
-              </div>
-              <div>
-                <Label htmlFor="seo_description">SEO Description</Label>
-                {mode === 'view' ? (
-                  <p className="mt-1 text-sm">{product.seo_description || 'Not set'}</p>
-                ) : (
-                  <Textarea
-                    id="seo_description"
-                    value={formData.seo_description}
-                    onChange={(e) => handleInputChange('seo_description', e.target.value)}
-                    placeholder="SEO meta description"
-                    rows={2}
-                  />
-                )}
-              </div>
             </CardContent>
           </Card>
         </div>
@@ -1467,6 +1455,47 @@ export default function ProductViewPage() {
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Product ID:</span>
                 <span className="font-mono text-xs">{product.id}</span>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* SEO */}
+          <Card>
+            <CardHeader>
+              <CardTitle>SEO</CardTitle>
+              <CardDescription>
+                Search engine optimization
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <Label htmlFor="seo_title" className="text-sm">SEO Title</Label>
+                {mode === 'view' ? (
+                  <p className="mt-1 text-sm text-muted-foreground">{product.seo_title || 'Not set'}</p>
+                ) : (
+                  <Input
+                    id="seo_title"
+                    value={formData.seo_title}
+                    onChange={(e) => handleInputChange('seo_title', e.target.value)}
+                    placeholder="SEO optimized title"
+                    className="mt-1"
+                  />
+                )}
+              </div>
+              <div>
+                <Label htmlFor="seo_description" className="text-sm">SEO Description</Label>
+                {mode === 'view' ? (
+                  <p className="mt-1 text-sm text-muted-foreground">{product.seo_description || 'Not set'}</p>
+                ) : (
+                  <Textarea
+                    id="seo_description"
+                    value={formData.seo_description}
+                    onChange={(e) => handleInputChange('seo_description', e.target.value)}
+                    placeholder="SEO meta description"
+                    rows={3}
+                    className="mt-1"
+                  />
+                )}
               </div>
             </CardContent>
           </Card>

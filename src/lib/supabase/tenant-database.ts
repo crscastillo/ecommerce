@@ -24,8 +24,7 @@ export class TenantDatabase {
       .from('products')
       .select(`
         *,
-        category:categories(id, name, slug),
-        variants:product_variants(*)
+        category:categories(id, name, slug)
       `)
       .eq('tenant_id', this.tenantId)
       .order('created_at', { ascending: false })
@@ -57,8 +56,7 @@ export class TenantDatabase {
       .from('products')
       .select(`
         *,
-        category:categories(id, name, slug),
-        variants:product_variants(*)
+        category:categories(id, name, slug)
       `)
       .eq('id', id)
       .eq('tenant_id', this.tenantId)
@@ -70,8 +68,7 @@ export class TenantDatabase {
       .from('products')
       .select(`
         *,
-        category:categories(id, name, slug),
-        variants:product_variants(*)
+        category:categories(id, name, slug)
       `)
       .eq('slug', slug)
       .eq('tenant_id', this.tenantId)

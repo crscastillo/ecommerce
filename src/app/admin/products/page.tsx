@@ -318,8 +318,178 @@ export default function ProductsPage() {
               </Button>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <Table>
+            <>
+              {/* Mobile Card View - Visible only on small screens */}
+              <div className="lg:hidden space-y-4">
+                {products.map((product) => (
+                  <Card key={product.id} className="overflow-hidden">
+                    <CardContent className="p-4">
+                      <div className="flex items-start justify-between gap-4 mb-3">
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-semibold text-base truncate">{product.name}</h3>
+                          <p className="text-xs text-muted-foreground truncate mt-0.5">{product.slug}</p>
+                        </div>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="h-8 w-8 p-0 flex-shrink-0">
+                              <span className="sr-only">Open menu</span>
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                            <DropdownMenuItem asChild>
+                              <Link href={`/admin/products/${product.id}`}>
+                                <Eye className="mr-2 h-4 w-4" />
+                                View
+                              </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                              <Link href={`/admin/products/${product.id}?mode=edit`}>
+                                <Edit className="mr-2 h-4 w-4" />
+                                Edit
+                              </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                              onClick={() => toggleProductStatus(product.id, product.is_active)}
+                            >
+                              {product.is_active ? 'Deactivate' : 'Activate'}
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                              onClick={() => deleteProduct(product.id)}
+                              className="text-red-600"
+                            >
+                              <Trash2 className="mr-2 h-4 w-4" />
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                      
+                      <div className="flex flex-wrap gap-2 mb-3">
+                        <Badge 
+                          variant="outline"
+                          className={
+                            product.product_type === 'variable' ? 'bg-blue-50 text-blue-700 border-blue-200' :
+                            product.product_type === 'digital' ? 'bg-purple-50 text-purple-700 border-purple-200' :
+                            'bg-gray-50 text-gray-700 border-gray-200'
+                          }
+                        >
+                          {product.product_type === 'single' && '📦 Single'}
+                          {product.product_type === 'variable' && '🔀 Variable'}
+                          {product.product_type === 'digital' && '💾 Digital'}
+                        </Badge>
+                        <Badge variant={product.is_active ? 'default' : 'secondary'}>
+                          {product.is_active ? 'Active' : 'Inactive'}
+                        </Badge>
+                        {product.is_featured && (
+                          <Badge variant="outline">Featured</Badge>
+                        )}
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-3 text-sm">
+                        <div>
+                          <span className="text-muted-foreground text-xs">Price</span>
+                          <p className="font-semibold">
+                            {product.product_type === 'variable' ? (
+                              (() => {
+                                let variants = product.variants
+                                if (typeof variants === 'string') {
+                                  try { variants = JSON.parse(variants) } catch (e) { variants = [] }
+                                }
+                                if (!Array.isArray(variants)) {
+                                  variants = Object.values(variants || {})
+                                }
+                                const activeVariants = variants.filter((v: any) => v.is_active !== false)
+                                if (activeVariants.length === 0) return 'No variants'
+                                const prices = activeVariants.map((v: any) => parseFloat(v.price || 0))
+                                const minPrice = Math.min(...prices)
+                                const maxPrice = Math.max(...prices)
+                                if (minPrice === maxPrice) {
+                                  return formatPrice(minPrice, tenant)
+                                }
+                                return `${formatPrice(minPrice, tenant)} - ${formatPrice(maxPrice, tenant)}`
+                              })()
+                            ) : (
+                              formatPrice(product.price, tenant)
+                            )}
+                          </p>
+                        </div>
+                        
+                        <div>
+                          <span className="text-muted-foreground text-xs">Inventory</span>
+                          <div className="flex items-center gap-1">
+                            {product.product_type === 'digital' ? (
+                              <Badge variant="outline" className="text-xs">Digital</Badge>
+                            ) : product.product_type === 'variable' ? (
+                              (() => {
+                                let variants = product.variants
+                                if (typeof variants === 'string') {
+                                  try { variants = JSON.parse(variants) } catch (e) { variants = [] }
+                                }
+                                if (!Array.isArray(variants)) {
+                                  variants = Object.values(variants || {})
+                                }
+                                const activeVariants = variants.filter((v: any) => v.is_active !== false)
+                                const totalStock = activeVariants.reduce((sum: number, v: any) => 
+                                  sum + parseInt(v.stock_quantity || 0), 0
+                                )
+                                return (
+                                  <div className="flex items-center gap-1">
+                                    <span className={`font-semibold ${
+                                      totalStock > (tenantSettings.low_stock_threshold || 5)
+                                        ? 'text-green-600' 
+                                        : totalStock > 0 
+                                          ? 'text-yellow-600' 
+                                          : 'text-red-600'
+                                    }`}>
+                                      {totalStock}
+                                    </span>
+                                    <span className="text-xs text-muted-foreground">
+                                      ({activeVariants.length})
+                                    </span>
+                                  </div>
+                                )
+                              })()
+                            ) : (
+                              <>
+                                <span className={`font-semibold ${
+                                  product.inventory_quantity > (tenantSettings.low_stock_threshold || 5)
+                                    ? 'text-green-600' 
+                                    : product.inventory_quantity > 0 
+                                      ? 'text-yellow-600' 
+                                      : 'text-red-600'
+                                }`}>
+                                  {product.inventory_quantity}
+                                </span>
+                                {product.track_inventory && isProductLowStock(product, { low_stock_threshold: tenantSettings.low_stock_threshold || 5 }) && (
+                                  <AlertTriangle className="h-3 w-3 text-orange-500" />
+                                )}
+                              </>
+                            )}
+                          </div>
+                        </div>
+                        
+                        <div>
+                          <span className="text-muted-foreground text-xs">SKU</span>
+                          <p className="font-mono text-xs truncate">{product.sku || 'N/A'}</p>
+                        </div>
+                        
+                        <div>
+                          <span className="text-muted-foreground text-xs">Created</span>
+                          <p className="text-xs">{formatDate(product.created_at)}</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+
+              {/* Desktop Table View - Hidden on mobile */}
+              <div className="hidden lg:block overflow-x-auto">
+                <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead>Product</TableHead>
@@ -513,6 +683,7 @@ export default function ProductsPage() {
                 </TableBody>
               </Table>
             </div>
+            </>
           )}
         </CardContent>
       </Card>

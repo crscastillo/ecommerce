@@ -70,6 +70,21 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Check if user already has a tenant
+    const { data: userTenant } = await supabase
+      .from('tenants')
+      .select('*')
+      .eq('owner_id', user.id)
+      .maybeSingle()
+
+    if (userTenant) {
+      // User already has a tenant, return it instead of creating a new one
+      return NextResponse.json({
+        success: true,
+        tenant: userTenant
+      })
+    }
+
     // Check if subdomain is available
     const { data: existingTenant } = await supabase
       .from('tenants')

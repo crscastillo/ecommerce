@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -12,11 +12,15 @@ export default function SetupComplete() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
   const [tenantData, setTenantData] = useState<any>(null)
+  const [apiCalling, setApiCalling] = useState(false) // Add API call state
+  const hasRun = useRef(false)
   
   const router = useRouter()
   const supabase = createClient()
 
   useEffect(() => {
+    let ignore = false // Use cleanup flag instead of ref
+    
     const completeTenantSetup = async () => {
       try {
         // Get pending tenant data from localStorage
@@ -30,6 +34,9 @@ export default function SetupComplete() {
         const pendingTenant = JSON.parse(pendingTenantStr)
         console.log('Completing tenant setup:', pendingTenant)
 
+        // Check ignore flag early
+        if (ignore) return
+
         // Verify user is authenticated
         const { data: { user }, error: userError } = await supabase.auth.getUser()
         if (userError || !user) {
@@ -38,54 +45,118 @@ export default function SetupComplete() {
           return
         }
 
-        // Create tenant using API route
-        const response = await fetch('/api/tenants', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            name: pendingTenant.storeName,
-            subdomain: pendingTenant.subdomain,
-            description: pendingTenant.description,
-            contact_email: pendingTenant.contactEmail,
-          }),
-        })
+        // Check ignore flag again
+        if (ignore) return        // Check if tenant already exists for this user
+        const { data: existingTenants } = await supabase
+          .from('tenants')
+          .select('*')
+          .eq('owner_id', user.id)
+          .limit(1)
 
-        const result = await response.json()
+        // Check ignore flag before proceeding
+        if (ignore) return
 
-        if (!response.ok) {
-          throw new Error(result.error || 'Failed to create store')
+        let tenant
+
+        if (existingTenants && existingTenants.length > 0) {
+          // Tenant already exists - just use it and update info if needed
+          tenant = existingTenants[0]
+          
+          // Update tenant with the form data (in case user changed details)
+          const { data: updatedTenant, error: updateError } = await supabase
+            .from('tenants')
+            .update({
+              name: pendingTenant.storeName,
+              description: pendingTenant.description,
+              contact_email: pendingTenant.contactEmail,
+            })
+            .eq('id', tenant.id)
+            .select()
+            .single()
+
+          if (!updateError && updatedTenant) {
+            tenant = updatedTenant
+          }
+        } else {
+          // No tenant exists - create new one
+          // Prevent concurrent API calls
+          if (apiCalling || ignore) {
+            console.log('API call already in progress or component unmounted, skipping...')
+            return
+          }
+          setApiCalling(true)
+          
+          const response = await fetch('/api/tenants', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              name: pendingTenant.storeName,
+              subdomain: pendingTenant.subdomain,
+              description: pendingTenant.description,
+              contact_email: pendingTenant.contactEmail,
+            }),
+          })
+
+          const result = await response.json()
+
+          if (!response.ok) {
+            throw new Error(result.error || 'Failed to create store')
+          }
+          
+          tenant = result.tenant
         }
+
+        // Check ignore flag before setting state
+        if (ignore) return
 
         // Clear pending data
         localStorage.removeItem('pendingTenant')
         
-        setTenantData(result.tenant)
+        setTenantData(tenant)
         setSuccess(true)
 
         // Redirect to admin after a short delay
         setTimeout(() => {
-          const subdomain = result.tenant.subdomain
+          const subdomain = tenant.subdomain
           const host = window.location.host
-          // For development, use subdomain.localhost:3000
-          // For production, it would be subdomain.yourdomain.com
-          const adminUrl = process.env.NODE_ENV === 'development'
-            ? `http://${subdomain}.localhost:3000/admin`
-            : `https://${subdomain}.${host.replace(/^[^.]+\./, '')}/admin`
           
+          // Build the admin URL based on environment
+          let adminUrl: string
+          
+          if (process.env.NODE_ENV === 'development') {
+            // For development: subdomain.localhost:3000/admin
+            adminUrl = `http://${subdomain}.localhost:3000/admin`
+          } else {
+            // For production: subdomain.domain.com/admin
+            const mainDomain = host.replace(/^[^.]*\./, '') // Remove any subdomain
+            adminUrl = `https://${subdomain}.${mainDomain}/admin`
+          }
+          
+          console.log('Redirecting to admin:', adminUrl)
           window.location.href = adminUrl
-        }, 3000)
+        }, 2000) // 2 second delay
+
+        // Don't auto-redirect for now - let user click button
+        console.log('Tenant setup complete!', tenant.name)
 
       } catch (err) {
-        console.error('Error completing setup:', err)
-        setError(err instanceof Error ? err.message : 'Failed to complete store setup')
+        console.error('Setup error:', err)
+        const errorMessage = err instanceof Error ? err.message : 'Failed to complete store setup'
+        setError(errorMessage)
       } finally {
+        setApiCalling(false) // Reset API calling state
         setLoading(false)
       }
     }
 
     completeTenantSetup()
+    
+    // Cleanup function to prevent race conditions
+    return () => {
+      ignore = true
+    }
   }, [])
 
   if (loading) {
@@ -162,9 +233,16 @@ export default function SetupComplete() {
                 onClick={() => {
                   const subdomain = tenantData.subdomain
                   const host = window.location.host
-                  const adminUrl = process.env.NODE_ENV === 'development'
-                    ? `http://${subdomain}.localhost:3000/admin`
-                    : `https://${subdomain}.${host.replace(/^[^.]+\./, '')}/admin`
+                  
+                  let adminUrl: string
+                  if (process.env.NODE_ENV === 'development') {
+                    adminUrl = `http://${subdomain}.localhost:3000/admin`
+                  } else {
+                    const mainDomain = host.replace(/^[^.]*\./, '')
+                    adminUrl = `https://${subdomain}.${mainDomain}/admin`
+                  }
+                  
+                  console.log('Manual redirect to admin:', adminUrl)
                   window.location.href = adminUrl
                 }}
               >

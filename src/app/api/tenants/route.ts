@@ -125,26 +125,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Create tenant_users relationship for the owner
-    const { error: tenantUserError } = await supabase
-      .from('tenant_users')
-      .insert({
-        tenant_id: tenantData.id,
-        user_id: user.id,
-        role: 'owner',
-        is_active: true
-      })
-
-    if (tenantUserError) {
-      console.error('Failed to create tenant_users relationship:', tenantUserError)
-      // This is critical - if we can't create the relationship, the owner won't have access
-      return NextResponse.json(
-        { error: `Failed to create tenant ownership: ${tenantUserError.message}` },
-        { status: 500 }
-      )
-    }
-
-    // Create default categories (now that tenant_users relationship exists)
+    // Create default categories
     const { error: categoriesError } = await supabase
       .from('categories')
       .insert([
@@ -172,8 +153,8 @@ export async function POST(request: NextRequest) {
       ])
 
     if (categoriesError) {
-      console.error('Failed to create default categories:', categoriesError)
-      // Don't fail the entire operation for categories, but log the error
+      console.warn('Failed to create default categories:', categoriesError)
+      // Don't fail the entire operation for categories
     }
 
     return NextResponse.json({

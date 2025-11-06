@@ -79,9 +79,31 @@ CREATE POLICY "Public can view active categories" ON categories
 
 CREATE POLICY "Tenant users can manage categories" ON categories
   FOR ALL USING (
-    tenant_id IN (
-      SELECT tenant_id FROM tenant_users 
-      WHERE user_id = auth.uid() AND is_active = true
+    auth.role() = 'authenticated' AND (
+      -- Allow tenant owners (who don't have tenant_users records)
+      tenant_id IN (
+        SELECT id FROM tenants 
+        WHERE owner_id = auth.uid()
+      ) OR
+      -- Allow tenant users (staff/collaborators)
+      tenant_id IN (
+        SELECT tenant_id FROM tenant_users 
+        WHERE user_id = auth.uid() AND is_active = true
+      )
+    )
+  )
+  WITH CHECK (
+    auth.role() = 'authenticated' AND (
+      -- Allow tenant owners (who don't have tenant_users records)
+      tenant_id IN (
+        SELECT id FROM tenants 
+        WHERE owner_id = auth.uid()
+      ) OR
+      -- Allow tenant users (staff/collaborators)
+      tenant_id IN (
+        SELECT tenant_id FROM tenant_users 
+        WHERE user_id = auth.uid() AND is_active = true
+      )
     )
   );
 

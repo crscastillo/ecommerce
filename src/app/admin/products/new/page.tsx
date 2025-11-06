@@ -1059,28 +1059,6 @@ export default function NewProductPage() {
               </Card>
             )}
 
-            {/* Images */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Product Images</CardTitle>
-                <CardDescription>
-                  Upload images for your product. The first image will be the main product image.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {tenant?.id && (
-                  <ImageUpload
-                    tenantId={tenant.id}
-                    productId={formData.slug || 'new-product'}
-                    initialImages={productImages}
-                    maxImages={10}
-                    onImagesChange={setProductImages}
-                    disabled={loading}
-                  />
-                )}
-              </CardContent>
-            </Card>
-
             {/* SEO */}
             <Card>
               <CardHeader>
@@ -1137,6 +1115,28 @@ export default function NewProductPage() {
                   />
                   <Label htmlFor="is_featured">Featured product</Label>
                 </div>
+              </CardContent>
+            </Card>
+
+            {/* Images */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Product Images</CardTitle>
+                <CardDescription>
+                  Upload images for your product. The first image will be the main product image.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {tenant?.id && (
+                  <ImageUpload
+                    tenantId={tenant.id}
+                    productId={formData.slug || 'new-product'}
+                    initialImages={productImages}
+                    maxImages={10}
+                    onImagesChange={setProductImages}
+                    disabled={loading}
+                  />
+                )}
               </CardContent>
             </Card>
 

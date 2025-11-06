@@ -83,6 +83,45 @@ export async function GET(
 
     console.log('[API] Products by category - Found products:', products?.length || 0)
 
+    // Fetch variants for variable products
+    if (products && products.length > 0) {
+      const productIds = products
+        .filter(product => product.product_type === 'variable')
+        .map(product => product.id)
+
+      if (productIds.length > 0) {
+        console.log('[API] Products by category - Fetching variants for', productIds.length, 'variable products')
+        
+        const { data: variants, error: variantsError } = await supabase
+          .from('product_variants')
+          .select('*')
+          .in('product_id', productIds)
+          .eq('tenant_id', tenantId)
+          .eq('is_active', true)
+
+        if (variantsError) {
+          console.error('[API] Products by category - Variants fetch error:', variantsError)
+        } else {
+          // Group variants by product_id and attach to products
+          const variantsByProduct = variants.reduce((acc, variant) => {
+            if (!acc[variant.product_id]) {
+              acc[variant.product_id] = []
+            }
+            acc[variant.product_id].push(variant)
+            return acc
+          }, {} as Record<string, any[]>)
+
+          // Attach variants to their respective products
+          products.forEach(product => {
+            if (product.product_type === 'variable') {
+              ;(product as any).variants = variantsByProduct[product.id] || []
+              console.log(`[API] Products by category - Product ${product.name} has ${(product as any).variants.length} variants`)
+            }
+          })
+        }
+      }
+    }
+
     return NextResponse.json({ 
       category,
       products: products || []

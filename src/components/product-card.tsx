@@ -35,6 +35,20 @@ interface Product {
   is_featured: boolean
   inventory_quantity: number
   track_inventory: boolean
+  product_type: 'single' | 'variable' | 'digital'
+  variants?: Array<{
+    id: string
+    title: string
+    option1: string | null
+    option2: string | null
+    option3: string | null
+    sku: string | null
+    price: number | null
+    compare_price: number | null
+    inventory_quantity: number
+    image_url: string | null
+    is_active: boolean
+  }>
   tags: string[] | null
 }
 
@@ -51,6 +65,92 @@ export function ProductCard({ product, viewMode = 'grid', tenantSettings = {} }:
   const [isWishlisted, setIsWishlisted] = useState(false)
   const { tenant } = useTenant()
 
+  // Helper functions for variable products
+  const getProductPrice = () => {
+    if (product.product_type === 'variable' && product.variants && product.variants.length > 0) {
+      const activeVariants = product.variants.filter(v => v.is_active && v.price !== null)
+      if (activeVariants.length === 0) return 0
+      
+      const prices = activeVariants.map(v => v.price!).filter(p => p > 0)
+      if (prices.length === 0) return 0
+      
+      return Math.min(...prices)
+    }
+    return product.price
+  }
+
+  const getProductComparePrice = () => {
+    if (product.product_type === 'variable' && product.variants && product.variants.length > 0) {
+      const activeVariants = product.variants.filter(v => v.is_active && v.compare_price !== null)
+      if (activeVariants.length === 0) return null
+      
+      const comparePrices = activeVariants.map(v => v.compare_price!).filter(p => p > 0)
+      if (comparePrices.length === 0) return null
+      
+      return Math.min(...comparePrices)
+    }
+    return product.compare_price
+  }
+
+  const getProductInventoryStatus = () => {
+    console.log('Checking inventory for product:', product.name, {
+      product_type: product.product_type,
+      inventory_quantity: product.inventory_quantity,
+      track_inventory: product.track_inventory,
+      variants: product.variants?.length || 0,
+      variantsData: product.variants
+    })
+    
+    if (product.product_type === 'variable') {
+      // If variants are expected but not loaded, treat as loading state
+      if (!product.variants || !Array.isArray(product.variants)) {
+        console.log('Variable product but no variants array loaded yet')
+        return { isOutOfStock: false, totalStock: 0 }
+      }
+      
+      if (product.variants.length > 0) {
+        const activeVariants = product.variants.filter(v => v.is_active)
+        console.log('Active variants:', activeVariants.length, activeVariants.map(v => ({ id: v.id, inventory_quantity: v.inventory_quantity, is_active: v.is_active })))
+        
+        if (activeVariants.length === 0) return { isOutOfStock: true, totalStock: 0 }
+        
+        const totalStock = activeVariants.reduce((sum, v) => sum + (v.inventory_quantity || 0), 0)
+        const isOutOfStock = totalStock <= 0
+        
+        console.log('Variable product stock calculation:', { totalStock, isOutOfStock })
+        return { isOutOfStock, totalStock }
+      } else {
+        console.log('Variable product has no variants')
+        return { isOutOfStock: true, totalStock: 0 }
+      }
+    }
+    
+    const isOutOfStock = product.track_inventory && product.inventory_quantity <= 0
+    console.log('Single product stock calculation:', { isOutOfStock, inventory_quantity: product.inventory_quantity, track_inventory: product.track_inventory })
+    return { isOutOfStock, totalStock: product.inventory_quantity }
+  }
+
+  const getPriceRange = () => {
+    if (product.product_type === 'variable' && product.variants && product.variants.length > 0) {
+      const activeVariants = product.variants.filter(v => v.is_active && v.price !== null)
+      if (activeVariants.length === 0) return null
+      
+      const prices = activeVariants.map(v => v.price!).filter(p => p > 0)
+      if (prices.length === 0) return null
+      
+      const minPrice = Math.min(...prices)
+      const maxPrice = Math.max(...prices)
+      
+      return { minPrice, maxPrice, hasRange: minPrice !== maxPrice }
+    }
+    return null
+  }
+
+  const currentPrice = getProductPrice()
+  const currentComparePrice = getProductComparePrice()
+  const inventoryStatus = getProductInventoryStatus()
+  const priceRange = getPriceRange()
+
   const getImageUrl = (): string => {
     try {
       if (product.images && Array.isArray(product.images) && product.images.length > 0) {
@@ -65,14 +165,20 @@ export function ProductCard({ product, viewMode = 'grid', tenantSettings = {} }:
     return '/placeholder-product.svg' // SVG placeholder image
   }
 
-  const discountPercentage = product.compare_price 
-    ? Math.round(((product.compare_price - product.price) / product.compare_price) * 100)
+  const discountPercentage = currentComparePrice && currentPrice
+    ? Math.round(((currentComparePrice - currentPrice) / currentComparePrice) * 100)
     : 0
 
-  const isOutOfStock = product.track_inventory && product.inventory_quantity <= 0
+  const { isOutOfStock, totalStock } = inventoryStatus
   const lowStockSettings = { low_stock_threshold: tenantSettings.low_stock_threshold || 5 }
-  const lowStockBadge = getLowStockBadge(product, lowStockSettings)
-  const isLowStockProduct = isProductLowStock(product, lowStockSettings)
+  
+  // For variable products, use total stock for low stock calculation
+  const stockForLowStockCheck = product.product_type === 'variable' 
+    ? { ...product, inventory_quantity: totalStock }
+    : product
+    
+  const lowStockBadge = getLowStockBadge(stockForLowStockCheck, lowStockSettings)
+  const isLowStockProduct = isProductLowStock(stockForLowStockCheck, lowStockSettings)
 
   if (viewMode === 'list') {
     return (
@@ -157,12 +263,18 @@ export function ProductCard({ product, viewMode = 'grid', tenantSettings = {} }:
 
               <div className="text-right">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="text-xl font-bold text-gray-900">
-                    {formatPrice(product.price, tenant)}
-                  </span>
-                  {product.compare_price && product.compare_price > product.price && (
+                  {priceRange && priceRange.hasRange ? (
+                    <span className="text-xl font-bold text-gray-900">
+                      {formatPrice(priceRange.minPrice, tenant)} - {formatPrice(priceRange.maxPrice, tenant)}
+                    </span>
+                  ) : (
+                    <span className="text-xl font-bold text-gray-900">
+                      {formatPrice(currentPrice, tenant)}
+                    </span>
+                  )}
+                  {currentComparePrice && currentComparePrice > currentPrice && (
                     <span className="text-sm text-gray-500 line-through">
-                      {formatPrice(product.compare_price, tenant)}
+                      {formatPrice(currentComparePrice, tenant)}
                     </span>
                   )}
                 </div>
@@ -315,12 +427,18 @@ export function ProductCard({ product, viewMode = 'grid', tenantSettings = {} }:
         {/* Price */}
         <div className="flex items-center justify-between mt-3">
           <div className="flex items-center gap-2">
-            <span className="text-lg font-bold text-gray-900">
-              {formatPrice(product.price, tenant)}
-            </span>
-            {product.compare_price && product.compare_price > product.price && (
+            {priceRange && priceRange.hasRange ? (
+              <span className="text-lg font-bold text-gray-900">
+                {formatPrice(priceRange.minPrice, tenant)} - {formatPrice(priceRange.maxPrice, tenant)}
+              </span>
+            ) : (
+              <span className="text-lg font-bold text-gray-900">
+                {formatPrice(currentPrice, tenant)}
+              </span>
+            )}
+            {currentComparePrice && currentComparePrice > currentPrice && (
               <span className="text-sm text-gray-500 line-through">
-                {formatPrice(product.compare_price, tenant)}
+                {formatPrice(currentComparePrice, tenant)}
               </span>
             )}
           </div>

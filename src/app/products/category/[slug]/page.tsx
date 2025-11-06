@@ -113,6 +113,61 @@ export default function CategoryProductsPage() {
 
   const { category, products } = data
 
+  // Helper functions for variable products (same as ProductCard)
+  const getProductPrice = (product: any) => {
+    if (product.product_type === 'variable' && product.variants && product.variants.length > 0) {
+      const activeVariants = product.variants.filter((v: any) => v.is_active && v.price !== null)
+      if (activeVariants.length === 0) return 0
+      
+      const prices = activeVariants.map((v: any) => v.price!).filter((p: any) => p > 0)
+      if (prices.length === 0) return 0
+      
+      return Math.min(...prices)
+    }
+    return product.price
+  }
+
+  const getProductComparePrice = (product: any) => {
+    if (product.product_type === 'variable' && product.variants && product.variants.length > 0) {
+      const activeVariants = product.variants.filter((v: any) => v.is_active && v.compare_price !== null)
+      if (activeVariants.length === 0) return null
+      
+      const comparePrices = activeVariants.map((v: any) => v.compare_price!).filter((p: any) => p > 0)
+      if (comparePrices.length === 0) return null
+      
+      return Math.min(...comparePrices)
+    }
+    return product.compare_price
+  }
+
+  const getPriceRange = (product: any) => {
+    if (product.product_type === 'variable' && product.variants && product.variants.length > 0) {
+      const activeVariants = product.variants.filter((v: any) => v.is_active && v.price !== null)
+      if (activeVariants.length === 0) return null
+      
+      const prices = activeVariants.map((v: any) => v.price!).filter((p: any) => p > 0)
+      if (prices.length === 0) return null
+      
+      const minPrice = Math.min(...prices)
+      const maxPrice = Math.max(...prices)
+      
+      return { minPrice, maxPrice, hasRange: minPrice !== maxPrice }
+    }
+    return null
+  }
+
+  const isProductOutOfStock = (product: any) => {
+    if (product.product_type === 'variable' && product.variants && product.variants.length > 0) {
+      const activeVariants = product.variants.filter((v: any) => v.is_active)
+      if (activeVariants.length === 0) return true
+      
+      const totalStock = activeVariants.reduce((sum: number, v: any) => sum + (v.inventory_quantity || 0), 0)
+      return totalStock <= 0
+    }
+    
+    return product.track_inventory && product.inventory_quantity <= 0
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -161,6 +216,11 @@ export default function CategoryProductsPage() {
                         Featured
                       </Badge>
                     )}
+                    {isProductOutOfStock(product) && (
+                      <Badge className="absolute top-2 right-2 bg-gray-500 hover:bg-gray-600">
+                        Out of Stock
+                      </Badge>
+                    )}
                   </div>
                 </CardHeader>
                 <CardContent className="p-4">
@@ -173,20 +233,42 @@ export default function CategoryProductsPage() {
                     </p>
                   )}
                   <div className="flex items-center gap-2">
-                    <span className="text-lg font-bold text-gray-900">
-                      {formatPrice(product.price, tenant)}
-                    </span>
-                    {product.compare_price && product.compare_price > product.price && (
-                      <span className="text-sm text-gray-500 line-through">
-                        {formatPrice(product.compare_price, tenant)}
-                      </span>
-                    )}
+                    {(() => {
+                      const currentPrice = getProductPrice(product)
+                      const currentComparePrice = getProductComparePrice(product)
+                      const priceRange = getPriceRange(product)
+                      
+                      return (
+                        <>
+                          {priceRange && priceRange.hasRange ? (
+                            <span className="text-lg font-bold text-gray-900">
+                              {formatPrice(priceRange.minPrice, tenant)} - {formatPrice(priceRange.maxPrice, tenant)}
+                            </span>
+                          ) : (
+                            <span className="text-lg font-bold text-gray-900">
+                              {formatPrice(currentPrice, tenant)}
+                            </span>
+                          )}
+                          {currentComparePrice && currentComparePrice > currentPrice && (
+                            <span className="text-sm text-gray-500 line-through">
+                              {formatPrice(currentComparePrice, tenant)}
+                            </span>
+                          )}
+                        </>
+                      )
+                    })()}
                   </div>
                 </CardContent>
                 <CardFooter className="p-4 pt-0">
-                  <Button asChild className="w-full">
-                    <Link href={`/product/${product.slug}`}>View Details</Link>
-                  </Button>
+                  {isProductOutOfStock(product) ? (
+                    <Button disabled className="w-full">
+                      Out of Stock
+                    </Button>
+                  ) : (
+                    <Button asChild className="w-full">
+                      <Link href={`/product/${product.slug}`}>View Details</Link>
+                    </Button>
+                  )}
                 </CardFooter>
               </Card>
             ))}

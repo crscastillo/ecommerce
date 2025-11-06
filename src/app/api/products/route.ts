@@ -186,6 +186,45 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
+    // Fetch variants for variable products
+    if (data && data.length > 0) {
+      const productIds = data
+        .filter(product => product.product_type === 'variable')
+        .map(product => product.id)
+
+      if (productIds.length > 0) {
+        console.log('API: Fetching variants for', productIds.length, 'variable products')
+        
+        const { data: variants, error: variantsError } = await supabase
+          .from('product_variants')
+          .select('*')
+          .in('product_id', productIds)
+          .eq('tenant_id', tenantId)
+          .eq('is_active', true)
+
+        if (variantsError) {
+          console.error('Variants fetch error:', variantsError)
+        } else {
+          // Group variants by product_id and attach to products
+          const variantsByProduct = variants.reduce((acc, variant) => {
+            if (!acc[variant.product_id]) {
+              acc[variant.product_id] = []
+            }
+            acc[variant.product_id].push(variant)
+            return acc
+          }, {} as Record<string, any[]>)
+
+          // Attach variants to their respective products
+          data.forEach(product => {
+            if (product.product_type === 'variable') {
+              ;(product as any).variants = variantsByProduct[product.id] || []
+              console.log(`API: Product ${product.name} has ${(product as any).variants.length} variants`)
+            }
+          })
+        }
+      }
+    }
+
     console.log('API: Returning products:', data?.length || 0)
     return NextResponse.json({ data })
   } catch (error) {

@@ -76,14 +76,29 @@ export class TenantDatabase {
   }
 
   async createProduct(productData: any) {
-    return this.supabase
-      .from('products')
-      .insert({
-        ...productData,
-        tenant_id: this.tenantId
+    // Use API route to bypass RLS issues with tenant owners
+    try {
+      const response = await fetch('/api/products', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          tenant_id: this.tenantId,
+          ...productData
+        })
       })
-      .select()
-      .single()
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Failed to create product')
+      }
+
+      const result = await response.json()
+      return { data: result.data, error: null }
+    } catch (error: any) {
+      return { data: null, error: { message: error.message } }
+    }
   }
 
   async updateProduct(id: string, productData: any) {

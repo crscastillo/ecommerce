@@ -1,6 +1,56 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json()
+    const { tenant_id, ...productData } = body
+
+    if (!tenant_id) {
+      return NextResponse.json({ error: 'tenant_id is required' }, { status: 400 })
+    }
+
+    // Use service role key to bypass RLS
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false,
+        },
+      }
+    )
+    
+    console.log('API: Creating product for tenant:', tenant_id)
+    
+    const { data, error } = await supabase
+      .from('products')
+      .insert({
+        tenant_id,
+        ...productData
+      })
+      .select()
+      .single()
+
+    console.log('API: Database response:', { data, error })
+
+    if (error) {
+      console.error('Database error:', error)
+      return NextResponse.json({ error: error.message }, { status: 500 })
+    }
+
+    console.log('API: Product created successfully:', data)
+    return NextResponse.json({ data })
+  } catch (error) {
+    console.error('Server error:', error)
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    )
+  }
+}
+
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
   const tenantId = searchParams.get('tenant_id')

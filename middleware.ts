@@ -31,7 +31,7 @@ export async function middleware(request: NextRequest) {
 
   // Handle main domain routing (for tenant signup, main site, etc.)
   if (isMainDomain) {
-    return handleMainDomain(request, supabaseResponse)
+    return await handleMainDomain(request, supabaseResponse)
   }
 
   // Handle tenant subdomain routing
@@ -85,12 +85,15 @@ function extractSubdomain(hostname: string): string | null {
   return null
 }
 
-function handleMainDomain(request: NextRequest, supabaseResponse: NextResponse) {
-  // Main domain routes - platform homepage, tenant onboarding, pricing, etc.
+async function handleMainDomain(request: NextRequest, supabaseResponse: NextResponse) {
   const pathname = request.nextUrl.pathname
   
-  // Allow the platform homepage to render at root
-  // No redirect needed - let the platform homepage render
+  // Handle platform admin routes
+  if (pathname.startsWith('/platform')) {
+    return await handlePlatformAdminRoutes(request, supabaseResponse)
+  }
+  
+  // Allow other main domain routes to render (homepage, pricing, etc.)
   return supabaseResponse
 }
 
@@ -210,6 +213,48 @@ async function handlePublicStoreRoutes(request: NextRequest, supabaseResponse: N
   if (!user && isProtectedRoute && !request.nextUrl.pathname.startsWith('/login')) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
+    return NextResponse.redirect(url)
+  }
+
+  return supabaseResponse
+}
+
+async function handlePlatformAdminRoutes(request: NextRequest, supabaseResponse: NextResponse) {
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll()
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
+          supabaseResponse = NextResponse.next({
+            request,
+          })
+          cookiesToSet.forEach(({ name, value, options }) =>
+            supabaseResponse.cookies.set(name, value, options)
+          )
+        },
+      },
+    }
+  )
+
+  const { data: { user } } = await supabase.auth.getUser()
+  
+  // Platform admin routes require authentication
+  if (!user) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/login'
+    return NextResponse.redirect(url)
+  }
+
+  // Check if user is a platform super admin
+  const platformAdminEmail = process.env.PLATFORM_ADMIN_EMAIL
+  if (!platformAdminEmail || user.email !== platformAdminEmail) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/unauthorized'
     return NextResponse.redirect(url)
   }
 

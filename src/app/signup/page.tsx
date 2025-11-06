@@ -17,6 +17,7 @@ export default function TenantSignup() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
+  const [successMessage, setSuccessMessage] = useState('')
   
   // Form data
   const [email, setEmail] = useState('')
@@ -113,7 +114,59 @@ export default function TenantSignup() {
       return
     }
     
+    // Check if this is the platform admin email
+    const platformAdminEmail = process.env.NEXT_PUBLIC_PLATFORM_ADMIN_EMAIL || 'admin@example.com'
+    if (email.toLowerCase() === platformAdminEmail.toLowerCase()) {
+      // Platform admin signup - skip tenant creation
+      await createPlatformAdminAccount()
+      return
+    }
+    
     setStep(2)
+  }
+
+  const createPlatformAdminAccount = async () => {
+    setLoading(true)
+    setError('')
+    
+    try {
+      // Create the platform admin user account
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: 'Platform Administrator',
+            role: 'platform_admin'
+          },
+          emailRedirectTo: `${window.location.origin}/platform`
+        }
+      })
+
+      if (error) {
+        if (error.message.includes('User already registered')) {
+          setError('An account with this email already exists. Please sign in instead.')
+        } else {
+          setError(error.message)
+        }
+        return
+      }
+
+      if (data?.user && !data?.user?.email_confirmed_at) {
+        // Show success message for platform admin
+        setSuccessMessage(
+          'Platform admin account created! Please check your email and click the confirmation link. You will then be redirected to the platform dashboard.'
+        )
+      } else if (data?.user) {
+        // User is already confirmed, redirect to platform
+        router.push('/platform')
+      }
+    } catch (error) {
+      setError('Something went wrong. Please try again.')
+      console.error('Platform admin signup error:', error)
+    } finally {
+      setLoading(false)
+    }
   }
 
   const handleStep2Submit = async (e: React.FormEvent) => {
@@ -283,9 +336,29 @@ export default function TenantSignup() {
                   </div>
                 )}
 
-                <Button type="submit" className="w-full">
-                  Continue
-                </Button>
+                {successMessage && (
+                  <div className="flex items-center gap-2 text-green-600 text-sm">
+                    <Check className="w-4 h-4" />
+                    {successMessage}
+                  </div>
+                )}
+
+                {successMessage ? (
+                  <Button type="button" className="w-full" disabled>
+                    Check Your Email
+                  </Button>
+                ) : (
+                  <Button type="submit" className="w-full" disabled={loading}>
+                    {loading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Creating Account...
+                      </>
+                    ) : (
+                      'Continue'
+                    )}
+                  </Button>
+                )}
 
                 <p className="text-center text-sm text-gray-600">
                   Already have an account?{' '}

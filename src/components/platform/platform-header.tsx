@@ -13,11 +13,13 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { createClient } from '@/lib/supabase/client'
+import { useRouter } from 'next/navigation'
 
 export function PlatformHeader() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [user, setUser] = useState<any>(null)
   const supabase = createClient()
+  const router = useRouter()
 
   useEffect(() => {
     const getUser = async () => {
@@ -33,6 +35,15 @@ export function PlatformHeader() {
     
     return () => subscription.unsubscribe()
   }, [supabase])
+
+  const handleSignOut = async () => {
+    try {
+      await supabase.auth.signOut()
+      router.push('/login')
+    } catch (error) {
+      console.error('Error signing out:', error)
+    }
+  }
 
   return (
     <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
@@ -95,7 +106,7 @@ export function PlatformHeader() {
                 Platform Settings
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-red-600">
+              <DropdownMenuItem className="text-red-600" onClick={handleSignOut}>
                 Sign Out
               </DropdownMenuItem>
             </DropdownMenuContent>

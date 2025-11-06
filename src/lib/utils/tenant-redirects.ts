@@ -27,7 +27,7 @@ export const redirectToUserTenantAdmin = async (
       .maybeSingle()
 
     if (!tenantsError && userTenants) {
-      redirectToTenantSubdomain(userTenants.subdomain)
+      await redirectToTenantSubdomain(userTenants.subdomain)
       return
     }
 
@@ -46,7 +46,7 @@ export const redirectToUserTenantAdmin = async (
       .maybeSingle()
 
     if (!memberError && memberTenants && memberTenants.tenants) {
-      redirectToTenantSubdomain(memberTenants.tenants.subdomain)
+      await redirectToTenantSubdomain(memberTenants.tenants.subdomain)
       return
     }
 
@@ -63,9 +63,9 @@ export const redirectToUserTenantAdmin = async (
 }
 
 /**
- * Redirects to a specific tenant's subdomain admin panel
+ * Redirects to a specific tenant's subdomain admin panel with session transfer
  */
-export const redirectToTenantSubdomain = (subdomain: string, path: string = '/admin') => {
+export const redirectToTenantSubdomain = async (subdomain: string, path: string = '/admin') => {
   if (typeof window === 'undefined') {
     console.warn('redirectToTenantSubdomain called on server side')
     return
@@ -100,14 +100,30 @@ export const redirectToTenantSubdomain = (subdomain: string, path: string = '/ad
   }
   
   const portSuffix = currentPort ? `:${currentPort}` : ''
-  const redirectUrl = `${protocol}//${tenantHostname}${portSuffix}${path}`
   
-  console.log('Redirecting to tenant subdomain:', redirectUrl)
+  // Get the current session to transfer it
+  const supabase = createClient()
+  const { data: { session } } = await supabase.auth.getSession()
   
-  // Add a small delay to prevent rapid redirects
-  setTimeout(() => {
-    window.location.href = redirectUrl
-  }, 100)
+  if (session) {
+    // Transfer session by redirecting to a session-transfer endpoint on the subdomain
+    const redirectUrl = `${protocol}//${tenantHostname}${portSuffix}/auth/session-transfer?access_token=${session.access_token}&refresh_token=${session.refresh_token}&redirect_to=${encodeURIComponent(path)}`
+    
+    console.log('Redirecting to tenant subdomain with session transfer:', redirectUrl)
+    
+    // Add a small delay to prevent rapid redirects
+    setTimeout(() => {
+      window.location.href = redirectUrl
+    }, 100)
+  } else {
+    // No session, just redirect normally
+    const redirectUrl = `${protocol}//${tenantHostname}${portSuffix}${path}`
+    console.log('Redirecting to tenant subdomain without session:', redirectUrl)
+    
+    setTimeout(() => {
+      window.location.href = redirectUrl
+    }, 100)
+  }
 }
 
 /**

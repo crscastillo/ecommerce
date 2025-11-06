@@ -65,30 +65,36 @@ export default function ProductsPage() {
   const hasFilters = Boolean(filters.search || filters.status !== 'all' || filters.productType !== 'all')
 
   return (
-    <div className="space-y-4 md:space-y-6">
+    <div className="space-y-3 md:space-y-6">
       {/* Header */}
-      <div className="space-y-4 md:space-y-0">
-        {/* Mobile Header */}
-        <div className="flex flex-col space-y-4 md:hidden">
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight">Products</h1>
-            <p className="text-muted-foreground text-sm">
-              Manage your store's product catalog
-            </p>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <Button variant="outline" onClick={() => setShowImportModal(true)} className="flex-1">
-              <Upload className="mr-2 h-4 w-4" />
-              <span className="hidden sm:inline">Import CSV</span>
-              <span className="sm:hidden">Import</span>
-            </Button>
-            <Button asChild className="flex-1">
-              <Link href="/admin/products/new">
-                <Plus className="mr-2 h-4 w-4" />
-                <span className="hidden sm:inline">Add Product</span>
-                <span className="sm:hidden">Add</span>
-              </Link>
-            </Button>
+      <div className="space-y-3 md:space-y-0">
+        {/* Mobile Compact Header */}
+        <div className="flex flex-col space-y-3 md:hidden">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-xl font-bold tracking-tight">Products</h1>
+              {products.length > 0 && (
+                <p className="text-muted-foreground text-xs">
+                  {products.length} products
+                </p>
+              )}
+            </div>
+            <div className="flex gap-2">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setShowImportModal(true)} 
+                className="h-8 px-2"
+              >
+                <Upload className="h-3 w-3" />
+              </Button>
+              <Button asChild size="sm" className="h-8 px-3">
+                <Link href="/admin/products/new">
+                  <Plus className="mr-1 h-3 w-3" />
+                  Add
+                </Link>
+              </Button>
+            </div>
           </div>
         </div>
 
@@ -117,14 +123,12 @@ export default function ProductsPage() {
 
       {/* Error Messages */}
       {(error || actionError) && (
-        <Card className="border-red-200 bg-red-50">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-2 text-red-600">
-              <AlertCircle className="w-4 h-4" />
-              {error || actionError}
-            </div>
-          </CardContent>
-        </Card>
+        <div className="bg-red-50 border border-red-200 rounded-lg p-3 md:p-4">
+          <div className="flex items-center gap-2 text-red-600">
+            <AlertCircle className="w-4 h-4 flex-shrink-0" />
+            <span className="text-sm">{error || actionError}</span>
+          </div>
+        </div>
       )}
 
       {/* Filters */}
@@ -135,16 +139,29 @@ export default function ProductsPage() {
       />
 
       {/* Products List */}
-      <Card>
+      <div className="md:hidden">
+        {/* Mobile: Direct product list without card wrapper */}
+        <ProductList
+          products={products}
+          settings={settings}
+          tenant={tenant}
+          loading={loading}
+          hasFilters={hasFilters}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          onToggleStatus={handleToggleStatus}
+        />
+      </div>
+
+      {/* Desktop: Full card layout */}
+      <Card className="hidden md:block">
         <CardHeader className="pb-4">
-          <CardTitle className="flex items-center gap-2 text-lg md:text-xl">
+          <CardTitle className="flex items-center gap-2 text-xl">
             <Package className="h-5 w-5" />
-            <span className="hidden sm:inline">Products ({products.length})</span>
-            <span className="sm:hidden">Products ({products.length})</span>
+            Products ({products.length})
           </CardTitle>
           <CardDescription className="text-sm">
-            <span className="hidden sm:inline">A list of all products in your store</span>
-            <span className="sm:hidden">All store products</span>
+            A list of all products in your store
           </CardDescription>
         </CardHeader>
         <CardContent className="pt-0">

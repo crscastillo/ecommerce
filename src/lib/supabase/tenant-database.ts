@@ -52,7 +52,8 @@ export class TenantDatabase {
   }
 
   async getProduct(id: string) {
-    return this.supabase
+    // Get the product
+    const productResult = await this.supabase
       .from('products')
       .select(`
         *,
@@ -61,6 +62,30 @@ export class TenantDatabase {
       .eq('id', id)
       .eq('tenant_id', this.tenantId)
       .single()
+
+    if (productResult.error || !productResult.data) {
+      return productResult
+    }
+
+    // If it's a variable product, fetch variants
+    if (productResult.data.product_type === 'variable') {
+      const variantsResult = await this.supabase
+        .from('product_variants')
+        .select('*')
+        .eq('product_id', id)
+        .eq('tenant_id', this.tenantId)
+        .order('created_at', { ascending: true })
+
+      if (variantsResult.error) {
+        console.error('Error fetching variants:', variantsResult.error)
+        // Don't fail the whole request, just return product without variants
+        return { data: { ...productResult.data, variants: [] }, error: null }
+      }
+
+      return { data: { ...productResult.data, variants: variantsResult.data || [] }, error: null }
+    }
+
+    return productResult
   }
 
   async getProductBySlug(slug: string) {

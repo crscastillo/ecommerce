@@ -380,7 +380,21 @@ export default function NewProductPage() {
         seo_title: formData.seo_title.trim() || null,
         seo_description: formData.seo_description.trim() || null,
         images: prepareImagesForStorage(productImages),
-        variants: formData.product_type === 'variable' ? variations.filter(v => v.is_active) : {},
+        variants: formData.product_type === 'variable' 
+          ? variations.filter(v => v.is_active).map(v => ({
+              title: v.title,
+              option1: v.attributes.find(attr => attr.name === 'Size')?.value || null,
+              option2: v.attributes.find(attr => attr.name === 'Color')?.value || null,
+              option3: v.attributes.find(attr => attr.name === 'Material')?.value || null,
+              sku: v.sku,
+              price: parseFloat(v.price) || 0,
+              compare_price: v.compare_price ? parseFloat(v.compare_price) : null,
+              cost_price: v.cost_price ? parseFloat(v.cost_price) : null,
+              inventory_quantity: parseInt(v.stock_quantity) || 0,
+              weight: v.weight ? parseFloat(v.weight) : null,
+              is_active: v.is_active
+            }))
+          : [],
         digital_files: formData.product_type === 'digital' ? digitalFiles : [],
       }
 

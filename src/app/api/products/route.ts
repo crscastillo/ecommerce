@@ -196,3 +196,138 @@ export async function GET(request: NextRequest) {
     )
   }
 }
+
+export async function PUT(request: NextRequest) {
+  try {
+    const body = await request.json()
+    const { tenant_id, product_id, variants, ...productData } = body
+
+    if (!tenant_id || !product_id) {
+      return NextResponse.json({ error: 'tenant_id and product_id are required' }, { status: 400 })
+    }
+
+    // Use service role key to bypass RLS
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false,
+        },
+      }
+    )
+    
+    console.log('API: Updating product for tenant:', tenant_id)
+    console.log('API: Product ID:', product_id)
+    console.log('API: Product type:', productData.product_type)
+    console.log('API: Variants to update:', variants?.length || 0)
+    
+    // Update the product (without variants in JSONB)
+    const { data: product, error: productError } = await supabase
+      .from('products')
+      .update(productData)
+      .eq('id', product_id)
+      .eq('tenant_id', tenant_id)
+      .select()
+      .single()
+
+    if (productError) {
+      console.error('Product update error:', productError)
+      return NextResponse.json({ error: productError.message }, { status: 500 })
+    }
+
+    console.log('API: Product updated successfully:', product.id)
+
+    // Handle variants for variable products
+    if (productData.product_type === 'variable' && variants && Array.isArray(variants)) {
+      console.log('API: Managing variants for variable product')
+      
+      // First, get existing variants
+      const { data: existingVariants, error: existingError } = await supabase
+        .from('product_variants')
+        .select('id')
+        .eq('product_id', product_id)
+        .eq('tenant_id', tenant_id)
+
+      if (existingError) {
+        console.error('Error fetching existing variants:', existingError)
+      }
+
+      // Delete all existing variants
+      if (existingVariants && existingVariants.length > 0) {
+        const { error: deleteError } = await supabase
+          .from('product_variants')
+          .delete()
+          .eq('product_id', product_id)
+          .eq('tenant_id', tenant_id)
+
+        if (deleteError) {
+          console.error('Error deleting existing variants:', deleteError)
+        } else {
+          console.log('API: Deleted existing variants:', existingVariants.length)
+        }
+      }
+
+      // Create new variants
+      if (variants.length > 0) {
+        const variantInserts = variants.map(variant => ({
+          tenant_id,
+          product_id: product.id,
+          title: variant.title || `${variant.option1 || ''} ${variant.option2 || ''} ${variant.option3 || ''}`.trim(),
+          option1: variant.option1 || null,
+          option2: variant.option2 || null,
+          option3: variant.option3 || null,
+          sku: variant.sku || null,
+          price: variant.price || productData.price || 0,
+          compare_price: variant.compare_price || null,
+          cost_price: variant.cost_price || null,
+          inventory_quantity: variant.inventory_quantity || 0,
+          weight: variant.weight || null,
+          image_url: variant.image_url || null,
+          is_active: variant.is_active !== false // Default to true unless explicitly false
+        }))
+
+        const { data: createdVariants, error: variantsError } = await supabase
+          .from('product_variants')
+          .insert(variantInserts)
+          .select()
+
+        if (variantsError) {
+          console.error('Variants creation error:', variantsError)
+          return NextResponse.json({ error: 'Failed to create variants: ' + variantsError.message }, { status: 500 })
+        } else {
+          console.log('API: Created variants:', createdVariants.length)
+        }
+
+        // Return the product with the created variants
+        return NextResponse.json({ 
+          data: {
+            ...product,
+            variants: createdVariants || []
+          }
+        })
+      }
+    } else if (productData.product_type !== 'variable') {
+      // For non-variable products, remove any existing variants
+      const { error: deleteError } = await supabase
+        .from('product_variants')
+        .delete()
+        .eq('product_id', product_id)
+        .eq('tenant_id', tenant_id)
+
+      if (deleteError) {
+        console.error('Error deleting variants for non-variable product:', deleteError)
+      }
+    }
+
+    // Return the updated product
+    return NextResponse.json({ data: product })
+  } catch (error) {
+    console.error('Server error:', error)
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    )
+  }
+}

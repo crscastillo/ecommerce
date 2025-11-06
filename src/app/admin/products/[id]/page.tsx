@@ -165,54 +165,40 @@ export default function ProductViewPage() {
         setProductImages(parsedResult.images)
         
         // Parse variations for variable products
-        if (productData.product_type === 'variable') {
+        if (productData.product_type === 'variable' && productData.variants) {
           console.log('Product type is variable, raw variants data:', productData.variants)
           console.log('Variants type:', typeof productData.variants)
           
-          // Parse variants if it's a string
-          let parsedVariants = productData.variants
+          // Variants should now be an array from product_variants table
+          const variants = Array.isArray(productData.variants) ? productData.variants : []
           
-          // Handle empty/null variants
-          if (!parsedVariants || parsedVariants === null || parsedVariants === undefined) {
-            console.log('No variants data found')
-            parsedVariants = []
-          } else if (typeof parsedVariants === 'string') {
-            try {
-              parsedVariants = JSON.parse(parsedVariants)
-              console.log('Parsed variants from string:', parsedVariants)
-            } catch (e) {
-              console.error('Error parsing variants string:', e)
-              parsedVariants = []
-            }
-          }
+          console.log('Processing variants from product_variants table:', variants.length)
           
-          // Convert to array if it's an object (but not already an array)
-          if (parsedVariants && typeof parsedVariants === 'object' && !Array.isArray(parsedVariants)) {
-            console.log('Converting object to array, keys:', Object.keys(parsedVariants))
-            parsedVariants = Object.values(parsedVariants)
-          }
-          
-          console.log('Final parsed variants:', parsedVariants)
-          console.log('Is array?', Array.isArray(parsedVariants))
-          console.log('Length:', Array.isArray(parsedVariants) ? parsedVariants.length : 'N/A')
-          
-          if (Array.isArray(parsedVariants) && parsedVariants.length > 0) {
-            console.log('Processing', parsedVariants.length, 'variants')
-            
+          if (variants.length > 0) {
             // Extract unique options from variations
             const optionsMap = new Map<string, Set<string>>()
             
-            parsedVariants.forEach((variant: any, idx: number) => {
+            variants.forEach((variant: any, idx: number) => {
               console.log(`Variant ${idx}:`, variant)
-              if (variant.attributes && Array.isArray(variant.attributes)) {
-                variant.attributes.forEach((attr: any) => {
-                  if (attr && attr.name && attr.value) {
-                    if (!optionsMap.has(attr.name)) {
-                      optionsMap.set(attr.name, new Set())
-                    }
-                    optionsMap.get(attr.name)?.add(attr.value)
-                  }
-                })
+              
+              // Check for option1, option2, option3 fields
+              if (variant.option1) {
+                if (!optionsMap.has('option1')) {
+                  optionsMap.set('option1', new Set())
+                }
+                optionsMap.get('option1')?.add(variant.option1)
+              }
+              if (variant.option2) {
+                if (!optionsMap.has('option2')) {
+                  optionsMap.set('option2', new Set())
+                }
+                optionsMap.get('option2')?.add(variant.option2)
+              }
+              if (variant.option3) {
+                if (!optionsMap.has('option3')) {
+                  optionsMap.set('option3', new Set())
+                }
+                optionsMap.get('option3')?.add(variant.option3)
               }
             })
             
@@ -220,7 +206,7 @@ export default function ProductViewPage() {
             
             // Set variation options
             const options = Array.from(optionsMap.entries()).map(([name, values]) => ({
-              name,
+              name: name === 'option1' ? 'Size' : name === 'option2' ? 'Color' : name === 'option3' ? 'Material' : name,
               values: Array.from(values)
             }))
             
@@ -231,16 +217,20 @@ export default function ProductViewPage() {
             }
             
             // Set variations
-            const formattedVariations = parsedVariants.map((variant: any, index: number) => {
+            const formattedVariations = variants.map((variant: any, index: number) => {
               const formatted = {
                 id: variant.id || `var-${Date.now()}-${index}`,
                 title: variant.title || '',
-                attributes: variant.attributes || [],
+                attributes: [
+                  ...(variant.option1 ? [{ name: 'Size', value: variant.option1 }] : []),
+                  ...(variant.option2 ? [{ name: 'Color', value: variant.option2 }] : []),
+                  ...(variant.option3 ? [{ name: 'Material', value: variant.option3 }] : [])
+                ],
                 sku: variant.sku || '',
                 price: variant.price?.toString() || '',
                 compare_price: variant.compare_price?.toString() || '',
                 cost_price: variant.cost_price?.toString() || '',
-                stock_quantity: variant.stock_quantity?.toString() || '0',
+                stock_quantity: variant.inventory_quantity?.toString() || '0',
                 weight: variant.weight?.toString() || '',
                 is_active: variant.is_active !== false,
               }
@@ -498,16 +488,45 @@ export default function ProductViewPage() {
         seo_title: formData.seo_title.trim() || null,
         seo_description: formData.seo_description.trim() || null,
         images: prepareImagesForStorage(productImages),
-        variants: formData.product_type === 'variable' ? variations.filter(v => v.is_active) : {},
       }
 
       console.log('Saving product with images:', productImages)
       console.log('Prepared images for storage:', prepareImagesForStorage(productImages))
 
-      const { error: updateError } = await tenantDb.updateProduct(product.id, updateData)
+      // Use the new API endpoint for updates
+      const transformedVariants = formData.product_type === 'variable' 
+        ? variations.filter(v => v.is_active).map(v => ({
+            title: v.title,
+            option1: v.attributes.find(attr => attr.name === 'Size')?.value || null,
+            option2: v.attributes.find(attr => attr.name === 'Color')?.value || null,
+            option3: v.attributes.find(attr => attr.name === 'Material')?.value || null,
+            sku: v.sku,
+            price: parseFloat(v.price) || 0,
+            compare_price: v.compare_price ? parseFloat(v.compare_price) : null,
+            cost_price: v.cost_price ? parseFloat(v.cost_price) : null,
+            inventory_quantity: parseInt(v.stock_quantity) || 0,
+            weight: v.weight ? parseFloat(v.weight) : null,
+            is_active: v.is_active
+          }))
+        : []
 
-      if (updateError) {
-        setError(`Failed to update product: ${updateError.message}`)
+      const response = await fetch('/api/products', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          tenant_id: tenant.id,
+          product_id: product.id,
+          variants: transformedVariants,
+          ...updateData
+        }),
+      })
+
+      const result = await response.json()
+
+      if (!response.ok) {
+        setError(`Failed to update product: ${result.error || 'Unknown error'}`)
         return
       }
 

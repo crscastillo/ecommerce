@@ -124,8 +124,11 @@ async function handleTenantSubdomain(request: NextRequest, supabaseResponse: Nex
     .eq('is_active', true)
     .maybeSingle()
 
+  console.log('[Middleware] Tenant lookup:', { subdomain, tenant, error })
+
   if (error || !tenant) {
     // Tenant not found or inactive - redirect to error page or main site
+    console.log('[Middleware] Tenant not found, redirecting')
     const url = new URL('/tenant-not-found', request.url)
     url.hostname = getMainDomain(request.headers.get('host') || '')
     return NextResponse.redirect(url)
@@ -135,6 +138,12 @@ async function handleTenantSubdomain(request: NextRequest, supabaseResponse: Nex
   supabaseResponse.headers.set('x-tenant-id', tenant.id)
   supabaseResponse.headers.set('x-tenant-subdomain', tenant.subdomain)
   supabaseResponse.headers.set('x-tenant-name', tenant.name)
+  
+  console.log('[Middleware] Tenant found, setting headers:', {
+    'x-tenant-id': tenant.id,
+    'x-tenant-subdomain': tenant.subdomain,
+    'x-tenant-name': tenant.name
+  })
 
   const pathname = request.nextUrl.pathname
 

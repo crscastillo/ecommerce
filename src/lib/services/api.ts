@@ -20,6 +20,20 @@ export interface Category {
   tenant_id: string
 }
 
+export interface ProductVariant {
+  id: string
+  title: string
+  option1: string | null
+  option2: string | null
+  option3: string | null
+  sku: string | null
+  price: number | null
+  compare_price: number | null
+  inventory_quantity: number
+  image_url: string | null
+  is_active: boolean
+}
+
 export interface Product {
   id: string
   name: string
@@ -39,6 +53,8 @@ export interface Product {
   is_featured: boolean
   inventory_quantity: number
   track_inventory: boolean
+  product_type: 'single' | 'variable' | 'digital'
+  variants?: ProductVariant[]
   tags: string[] | null
   created_at: string
   updated_at: string

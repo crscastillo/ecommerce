@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Migration</title>
+</head>
+<body>
+    <h1>Test Variant Migration</h1>
+    <button onclick="runMigration()">Run Migration</button>
+    <div id="result"></div>
+
+    <script>
+        async function runMigration() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Running migration...';
+            
+            try {
+                const response = await fetch('/api/migrate-variants', {
+                    method: 'POST'
+                });
+                const result = await response.json();
+                resultDiv.innerHTML = '<pre>' + JSON.stringify(result, null, 2) + '</pre>';
+            } catch (error) {
+                resultDiv.innerHTML = 'Error: ' + error.message;
+            }
+        }
+    </script>
+</body>
+</html>

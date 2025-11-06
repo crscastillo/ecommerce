@@ -66,6 +66,9 @@ export async function GET(
         compare_price,
         images,
         is_featured,
+        product_type,
+        inventory_quantity,
+        track_inventory,
         created_at
       `)
       .eq('tenant_id', tenantId)

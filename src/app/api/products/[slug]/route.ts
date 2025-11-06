@@ -12,6 +12,8 @@ export async function GET(
     // Get tenant from headers (set by middleware) or query params
     const tenantId = request.headers.get('x-tenant-id') || new URL(request.url).searchParams.get('tenant_id')
     console.log('[API] Product detail - Tenant ID:', tenantId)
+    console.log('[API] Product detail - Headers:', Object.fromEntries(request.headers.entries()))
+    console.log('[API] Product detail - URL:', request.url)
     
     if (!tenantId) {
       console.error('[API] Product detail - No tenant ID found')
@@ -30,7 +32,7 @@ export async function GET(
       }
     )
 
-    // Fetch product with category information
+    // Fetch product with category information and product type
     console.log('[API] Product detail - Fetching product with slug:', slug)
     const { data: product, error: productError } = await supabase
       .from('products')
@@ -47,6 +49,7 @@ export async function GET(
         is_active,
         inventory_quantity,
         track_inventory,
+        product_type,
         tags,
         created_at,
         category:categories(
@@ -73,10 +76,55 @@ export async function GET(
       return NextResponse.json({ error: 'Product not found' }, { status: 404 })
     }
 
-    console.log('[API] Product detail - Found product:', product.name)
+    console.log('[API] Product detail - Found product:', {
+      name: product.name,
+      product_type: product.product_type,
+      id: product.id
+    })
+
+    // If it's a variable product, fetch its variants
+    let variants: any[] = []
+    if (product.product_type === 'variable') {
+      console.log('[API] Product detail - Fetching variants for variable product')
+      const { data: variantData, error: variantError } = await supabase
+        .from('product_variants')
+        .select(`
+          id,
+          title,
+          option1,
+          option2,
+          option3,
+          sku,
+          price,
+          compare_price,
+          inventory_quantity,
+          image_url,
+          is_active
+        `)
+        .eq('tenant_id', tenantId)
+        .eq('product_id', product.id)
+        .eq('is_active', true)
+        .order('title')
+
+      if (variantError) {
+        console.error('[API] Product detail - Variant fetch error:', variantError)
+      } else {
+        variants = variantData || []
+        console.log('[API] Product detail - Found variants:', variants.length)
+      }
+    } else {
+      console.log('[API] Product detail - Product type is:', product.product_type, '- not variable, skipping variant fetch')
+    }
 
     return NextResponse.json({ 
-      product
+      product: {
+        ...product,
+        variants
+      }
+    }, {
+      headers: {
+        'Cache-Control': 'no-cache'
+      }
     })
   } catch (error) {
     console.error('[API] Product detail - Unexpected error:', error)

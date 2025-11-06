@@ -22,7 +22,7 @@ import {
   Star,
   ChevronLeft
 } from 'lucide-react'
-import { getProductBySlug, type Product } from '@/lib/services/api'
+import { getProductBySlug, type Product, type ProductVariant } from '@/lib/services/api'
 
 export default function ProductPage() {
   const params = useParams()
@@ -36,6 +36,7 @@ export default function ProductPage() {
   const [quantity, setQuantity] = useState(1)
   const [isWishlisted, setIsWishlisted] = useState(false)
   const [addingToCart, setAddingToCart] = useState(false)
+  const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null)
 
   const productSlug = params?.slug as string
 
@@ -55,6 +56,14 @@ export default function ProductPage() {
 
         if (result.data) {
           setProduct(result.data.product)
+          
+          // For variable products, auto-select the first available variant
+          if (result.data.product.product_type === 'variable' && result.data.product.variants?.length) {
+            const firstAvailableVariant = result.data.product.variants.find(
+              v => v.is_active && (!v.inventory_quantity || v.inventory_quantity > 0)
+            ) || result.data.product.variants[0]
+            setSelectedVariant(firstAvailableVariant)
+          }
         }
       } catch (err) {
         console.error('Error fetching product:', err)
@@ -67,24 +76,94 @@ export default function ProductPage() {
     fetchProduct()
   }, [tenant?.id, productSlug])
 
+  // Helper functions for variable products
+  const getTotalStock = () => {
+    if (!product) return 0
+    
+    if (product.product_type === 'variable' && product.variants) {
+      return product.variants.reduce((total, variant) => {
+        return total + (variant.inventory_quantity || 0)
+      }, 0)
+    }
+    
+    return product.inventory_quantity
+  }
+
+  const getCurrentPrice = () => {
+    if (product?.product_type === 'variable' && selectedVariant) {
+      return selectedVariant.price || product.price
+    }
+    return product?.price || 0
+  }
+
+  const getCurrentComparePrice = () => {
+    if (product?.product_type === 'variable' && selectedVariant) {
+      return selectedVariant.compare_price || product.compare_price
+    }
+    return product?.compare_price
+  }
+
+  const getCurrentStock = () => {
+    if (product?.product_type === 'variable' && selectedVariant) {
+      return selectedVariant.inventory_quantity || 0
+    }
+    return product?.inventory_quantity || 0
+  }
+
+  const isCurrentlyOutOfStock = () => {
+    if (!product?.track_inventory) return false
+    
+    if (product.product_type === 'variable') {
+      if (selectedVariant) {
+        return selectedVariant.inventory_quantity <= 0
+      }
+      return getTotalStock() <= 0
+    }
+    
+    return product.inventory_quantity <= 0
+  }
+
+  const isCurrentlyLowStock = () => {
+    if (!product?.track_inventory) return false
+    
+    const currentStock = getCurrentStock()
+    return currentStock > 0 && currentStock <= 5
+  }
+
   const handleAddToCart = async () => {
     if (!product) return
     
     setAddingToCart(true)
     
     try {
-      // Get the main product image
-      const productImage = product.images && product.images.length > 0 
+      // Get the main product image or variant image
+      let productImage = product.images && product.images.length > 0 
         ? product.images[0] 
         : undefined
 
+      // For variable products, use variant image if available
+      if (product.product_type === 'variable' && selectedVariant?.image_url) {
+        productImage = selectedVariant.image_url
+      }
+
+      // Determine the price and max quantity
+      const price = getCurrentPrice()
+      const maxQuantity = product.track_inventory ? getCurrentStock() : undefined
+
+      // Create a unique cart item ID for variants
+      const cartItemId = product.product_type === 'variable' && selectedVariant
+        ? `${product.id}-${selectedVariant.id}`
+        : product.id
+
       addToCart({
-        id: product.id,
-        name: product.name,
+        id: cartItemId,
+        name: product.product_type === 'variable' && selectedVariant
+          ? `${product.name} - ${selectedVariant.title}`
+          : product.name,
         slug: product.slug,
-        price: product.price,
+        price: price,
         image: productImage,
-        maxQuantity: product.track_inventory ? product.inventory_quantity : undefined
+        maxQuantity: maxQuantity
       }, quantity)
 
       // Show success toast
@@ -108,7 +187,8 @@ export default function ProductPage() {
 
   const handleQuantityChange = (newQuantity: number) => {
     if (product && product.track_inventory) {
-      setQuantity(Math.min(Math.max(1, newQuantity), product.inventory_quantity))
+      const maxStock = getCurrentStock()
+      setQuantity(Math.min(Math.max(1, newQuantity), maxStock))
     } else {
       setQuantity(Math.max(1, newQuantity))
     }
@@ -176,10 +256,12 @@ export default function ProductPage() {
     )
   }
 
-  const isOutOfStock = product.track_inventory && product.inventory_quantity <= 0
-  const isLowStock = product.track_inventory && product.inventory_quantity > 0 && product.inventory_quantity <= 5
-  const discountPercentage = product.compare_price 
-    ? Math.round(((product.compare_price - product.price) / product.compare_price) * 100)
+  const isOutOfStock = isCurrentlyOutOfStock()
+  const isLowStock = isCurrentlyLowStock()
+  const currentPrice = getCurrentPrice()
+  const currentComparePrice = getCurrentComparePrice()
+  const discountPercentage = currentComparePrice 
+    ? Math.round(((currentComparePrice - currentPrice) / currentComparePrice) * 100)
     : 0
 
   return (
@@ -284,11 +366,11 @@ export default function ProductPage() {
             {/* Price */}
             <div className="flex items-center space-x-4">
               <span className="text-3xl font-bold text-gray-900">
-                {formatPrice(product.price, tenant)}
+                {formatPrice(currentPrice, tenant)}
               </span>
-              {product.compare_price && product.compare_price > product.price && (
+              {currentComparePrice && currentComparePrice > currentPrice && (
                 <span className="text-xl text-gray-500 line-through">
-                  {formatPrice(product.compare_price, tenant)}
+                  {formatPrice(currentComparePrice, tenant)}
                 </span>
               )}
             </div>
@@ -304,11 +386,14 @@ export default function ProductPage() {
                 <Badge variant="destructive">Out of Stock</Badge>
               ) : isLowStock ? (
                 <Badge variant="outline" className="border-orange-500 text-orange-600">
-                  Only {product.inventory_quantity} left in stock
+                  Only {getCurrentStock()} left in stock
                 </Badge>
               ) : (
                 <Badge variant="outline" className="border-green-500 text-green-600">
                   In Stock
+                  {product.product_type === 'variable' && (
+                    <span className="ml-1">({getTotalStock()} total)</span>
+                  )}
                 </Badge>
               )}
               
@@ -319,6 +404,76 @@ export default function ProductPage() {
                 </Badge>
               )}
             </div>
+
+            {/* Variant Selection for Variable Products */}
+            {product.product_type === 'variable' && product.variants && product.variants.length > 0 && (
+              <Card>
+                <CardContent className="p-6">
+                  <h3 className="font-medium text-gray-900 mb-4">Select Variant:</h3>
+                  <div className="grid grid-cols-1 gap-3">
+                    {product.variants.map((variant) => {
+                      const variantOutOfStock = variant.inventory_quantity <= 0
+                      const isSelected = selectedVariant?.id === variant.id
+                      
+                      return (
+                        <button
+                          key={variant.id}
+                          onClick={() => setSelectedVariant(variant)}
+                          disabled={variantOutOfStock}
+                          className={`
+                            p-4 border-2 rounded-lg text-left transition-colors
+                            ${isSelected 
+                              ? 'border-blue-600 bg-blue-50' 
+                              : variantOutOfStock
+                              ? 'border-gray-200 bg-gray-50 cursor-not-allowed'
+                              : 'border-gray-200 hover:border-gray-300'
+                            }
+                          `}
+                        >
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <div className="font-medium text-gray-900">
+                                {variant.title}
+                              </div>
+                              {variant.sku && (
+                                <div className="text-sm text-gray-500 mt-1">
+                                  SKU: {variant.sku}
+                                </div>
+                              )}
+                              <div className="flex items-center space-x-2 mt-2">
+                                {variant.price && (
+                                  <span className="font-bold text-gray-900">
+                                    {formatPrice(variant.price, tenant)}
+                                  </span>
+                                )}
+                                {variant.compare_price && variant.compare_price > (variant.price || 0) && (
+                                  <span className="text-sm text-gray-500 line-through">
+                                    {formatPrice(variant.compare_price, tenant)}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              {variantOutOfStock ? (
+                                <Badge variant="destructive" className="text-xs">Out of Stock</Badge>
+                              ) : variant.inventory_quantity <= 5 ? (
+                                <Badge variant="outline" className="text-xs border-orange-500 text-orange-600">
+                                  {variant.inventory_quantity} left
+                                </Badge>
+                              ) : (
+                                <Badge variant="outline" className="text-xs border-green-500 text-green-600">
+                                  In Stock
+                                </Badge>
+                              )}
+                            </div>
+                          </div>
+                        </button>
+                      )
+                    })}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
             {/* Quantity and Add to Cart */}
             <Card>
@@ -340,7 +495,7 @@ export default function ProductPage() {
                         variant="outline"
                         size="sm"
                         onClick={() => handleQuantityChange(quantity + 1)}
-                        disabled={product.track_inventory && quantity >= product.inventory_quantity}
+                        disabled={product.track_inventory && quantity >= getCurrentStock()}
                       >
                         +
                       </Button>
@@ -352,13 +507,15 @@ export default function ProductPage() {
                       className="flex-1" 
                       size="lg"
                       onClick={handleAddToCart}
-                      disabled={isOutOfStock || addingToCart}
+                      disabled={isOutOfStock || addingToCart || (product.product_type === 'variable' && !selectedVariant)}
                     >
                       <ShoppingCart className="w-5 h-5 mr-2" />
                       {addingToCart 
                         ? 'Adding...' 
                         : isOutOfStock 
-                        ? 'Out of Stock' 
+                        ? 'Out of Stock'
+                        : product.product_type === 'variable' && !selectedVariant
+                        ? 'Select Variant'
                         : isInCart(product.id)
                         ? 'Add More to Cart'
                         : 'Add to Cart'

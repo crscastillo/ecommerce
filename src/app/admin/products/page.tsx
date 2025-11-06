@@ -65,26 +65,53 @@ export default function ProductsPage() {
   const hasFilters = Boolean(filters.search || filters.status !== 'all' || filters.productType !== 'all')
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Products</h1>
-          <p className="text-muted-foreground">
-            Manage your store's product catalog
-          </p>
+      <div className="space-y-4 md:space-y-0">
+        {/* Mobile Header */}
+        <div className="flex flex-col space-y-4 md:hidden">
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight">Products</h1>
+            <p className="text-muted-foreground text-sm">
+              Manage your store's product catalog
+            </p>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <Button variant="outline" onClick={() => setShowImportModal(true)} className="flex-1">
+              <Upload className="mr-2 h-4 w-4" />
+              <span className="hidden sm:inline">Import CSV</span>
+              <span className="sm:hidden">Import</span>
+            </Button>
+            <Button asChild className="flex-1">
+              <Link href="/admin/products/new">
+                <Plus className="mr-2 h-4 w-4" />
+                <span className="hidden sm:inline">Add Product</span>
+                <span className="sm:hidden">Add</span>
+              </Link>
+            </Button>
+          </div>
         </div>
-        <div className="flex items-center gap-3">
-          <Button variant="outline" onClick={() => setShowImportModal(true)}>
-            <Upload className="mr-2 h-4 w-4" />
-            Import CSV
-          </Button>
-          <Button asChild>
-            <Link href="/admin/products/new">
-              <Plus className="mr-2 h-4 w-4" />
-              Add Product
-            </Link>
-          </Button>
+
+        {/* Desktop Header */}
+        <div className="hidden md:flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Products</h1>
+            <p className="text-muted-foreground">
+              Manage your store's product catalog
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <Button variant="outline" onClick={() => setShowImportModal(true)}>
+              <Upload className="mr-2 h-4 w-4" />
+              Import CSV
+            </Button>
+            <Button asChild>
+              <Link href="/admin/products/new">
+                <Plus className="mr-2 h-4 w-4" />
+                Add Product
+              </Link>
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -109,16 +136,18 @@ export default function ProductsPage() {
 
       {/* Products List */}
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+        <CardHeader className="pb-4">
+          <CardTitle className="flex items-center gap-2 text-lg md:text-xl">
             <Package className="h-5 w-5" />
-            Products ({products.length})
+            <span className="hidden sm:inline">Products ({products.length})</span>
+            <span className="sm:hidden">Products ({products.length})</span>
           </CardTitle>
-          <CardDescription>
-            A list of all products in your store
+          <CardDescription className="text-sm">
+            <span className="hidden sm:inline">A list of all products in your store</span>
+            <span className="sm:hidden">All store products</span>
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-0">
           <ProductList
             products={products}
             settings={settings}

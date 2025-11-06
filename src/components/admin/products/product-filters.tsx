@@ -49,36 +49,81 @@ export function ProductFiltersComponent({
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+      <CardHeader className="pb-4">
+        <CardTitle className="flex items-center gap-2 text-lg">
           <Filter className="h-5 w-5" />
-          Filter Products
+          <span className="hidden sm:inline">Filter Products</span>
+          <span className="sm:hidden">Filters</span>
           {totalCount > 0 && (
             <span className="text-sm font-normal text-muted-foreground">
-              ({totalCount} products)
+              ({totalCount})
             </span>
           )}
         </CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="flex flex-col gap-4">
+      <CardContent className="pt-0">
+        <div className="space-y-4">
           {/* Search */}
-          <div className="flex-1">
+          <div className="w-full">
             <div className="relative">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search products by name or SKU..."
+                placeholder="Search products..."
                 value={filters.search}
                 onChange={(e) => handleSearchChange(e.target.value)}
-                className="pl-9"
+                className="pl-9 h-10"
               />
             </div>
           </div>
 
-          {/* Filters Row */}
-          <div className="flex flex-col sm:flex-row gap-4">
+          {/* Mobile Filter Buttons - Stacked Layout */}
+          <div className="space-y-4 md:hidden">
             {/* Status Filter */}
-            <div className="flex gap-2 items-center">
+            <div className="space-y-2">
+              <div className="text-sm font-medium text-muted-foreground">
+                Status
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                {statusOptions.map((option) => (
+                  <Button
+                    key={option.value}
+                    variant={filters.status === option.value ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => handleStatusChange(option.value as any)}
+                    className="h-9 text-xs"
+                  >
+                    {option.label}
+                  </Button>
+                ))}
+              </div>
+            </div>
+
+            {/* Product Type Filter */}
+            <div className="space-y-2">
+              <div className="text-sm font-medium text-muted-foreground">
+                Product Type
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                {productTypeOptions.map((option) => (
+                  <Button
+                    key={option.value}
+                    variant={filters.productType === option.value ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => handleProductTypeChange(option.value as any)}
+                    className="h-9 justify-start text-xs"
+                  >
+                    <span className="mr-1.5">{option.icon}</span>
+                    {option.label}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Desktop Filter Layout */}
+          <div className="hidden md:flex md:flex-col lg:flex-row gap-4">
+            {/* Status Filter */}
+            <div className="flex gap-2 items-center flex-wrap">
               <div className="text-sm font-medium text-muted-foreground mr-2 whitespace-nowrap">
                 Status:
               </div>
@@ -96,7 +141,7 @@ export function ProductFiltersComponent({
             </div>
 
             {/* Product Type Filter */}
-            <div className="flex gap-2 items-center">
+            <div className="flex gap-2 items-center flex-wrap">
               <div className="text-sm font-medium text-muted-foreground mr-2 whitespace-nowrap">
                 Type:
               </div>
@@ -117,12 +162,12 @@ export function ProductFiltersComponent({
 
           {/* Active Filters Display */}
           {hasActiveFilters && (
-            <div className="flex items-center gap-2 text-sm text-muted-foreground border-t pt-4">
-              <span>Active filters:</span>
-              <div className="flex gap-2 flex-wrap">
+            <div className="flex items-start gap-2 text-sm text-muted-foreground border-t pt-4">
+              <span className="flex-shrink-0 mt-1">Active filters:</span>
+              <div className="flex gap-2 flex-wrap flex-1">
                 {filters.search && (
                   <span className="bg-muted px-2 py-1 rounded text-xs">
-                    Search: "{filters.search}"
+                    Search: "{filters.search.length > 15 ? filters.search.substring(0, 15) + '...' : filters.search}"
                   </span>
                 )}
                 {filters.status !== 'all' && (
@@ -140,7 +185,7 @@ export function ProductFiltersComponent({
                 variant="ghost"
                 size="sm"
                 onClick={clearAllFilters}
-                className="h-6 px-2 text-xs ml-auto"
+                className="h-7 px-2 text-xs flex-shrink-0"
               >
                 Clear all
               </Button>

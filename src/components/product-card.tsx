@@ -243,7 +243,7 @@ export function ProductCard({ product, viewMode = 'grid', tenantSettings = {} }:
             <div className="flex justify-between items-start mb-2">
               <div className="flex-1">
                 <Link 
-                  href={`/product/${product.slug}`}
+                  href={`/products/${product.slug}`}
                   className="hover:underline"
                 >
                   <h3 className="text-lg font-semibold text-gray-900 mb-1">
@@ -401,7 +401,7 @@ export function ProductCard({ product, viewMode = 'grid', tenantSettings = {} }:
       {/* Content */}
       <CardContent className="p-4">
         <Link 
-          href={`/product/${product.slug}`}
+          href={`/products/${product.slug}`}
           className="hover:underline"
         >
           <h3 className="font-semibold text-gray-900 mb-1 line-clamp-2">

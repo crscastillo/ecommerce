@@ -147,7 +147,7 @@ export function ProductTable({
                     <DropdownMenuContent align="end">
                       <DropdownMenuLabel>Actions</DropdownMenuLabel>
                       <DropdownMenuItem asChild>
-                        <Link href={`/product/${product.slug}`} target="_blank">
+                        <Link href={`/products/${product.slug}`} target="_blank">
                           <Eye className="mr-2 h-4 w-4" />
                           View in Store
                         </Link>

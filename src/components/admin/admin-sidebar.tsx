@@ -18,6 +18,7 @@ import {
   X,
   Home,
   CreditCard,
+  BadgeCheck,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -27,6 +28,7 @@ const navigation = [
   { name: 'Orders', href: '/admin/orders', icon: ShoppingCart },
   { name: 'Customers', href: '/admin/customers', icon: Users },
   { name: 'Categories', href: '/admin/categories', icon: Tag },
+  { name: 'Brands', href: '/admin/brands', icon: BadgeCheck },
   { name: 'Analytics', href: '/admin/analytics', icon: BarChart3 },
   { name: 'Pages', href: '/admin/pages', icon: FileText },
   { name: 'Billing', href: '/admin/billing', icon: CreditCard },

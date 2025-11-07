@@ -84,11 +84,10 @@ export function CategoryMobileCard({
                 <div className="flex-shrink-0 flex gap-1">
                   <Button 
                     asChild
-                    size="sm" 
                     variant="ghost" 
                     className="h-7 w-7 p-0"
                   >
-                    <Link href={`/admin/categories/${category.id}?mode=edit`}>
+                    <Link href={`/admin/categories/${category.id}/edit`}>
                       <Edit className="h-3 w-3" />
                     </Link>
                   </Button>

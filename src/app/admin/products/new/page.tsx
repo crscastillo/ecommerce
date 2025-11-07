@@ -28,6 +28,7 @@ import {
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { prepareImagesForStorage } from '@/lib/utils/image-utils'
+import { createClient } from '@/lib/supabase/client'
 
 interface Category {
   id: string
@@ -35,9 +36,17 @@ interface Category {
   slug: string
 }
 
+interface Brand {
+  id: string
+  name: string
+  slug: string
+  is_active: boolean
+}
+
 export default function NewProductPage() {
   const [loading, setLoading] = useState(false)
   const [categories, setCategories] = useState<Category[]>([])
+  const [brands, setBrands] = useState<Brand[]>([])
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
   
@@ -57,6 +66,7 @@ export default function NewProductPage() {
     allow_backorder: false,
     weight: '',
     category_id: '',
+    brand_id: '',
     is_active: true,
     is_featured: false,
     seo_title: '',
@@ -64,6 +74,10 @@ export default function NewProductPage() {
   })
   
   const [productImages, setProductImages] = useState<string[]>([])
+  const [slugManuallyEdited, setSlugManuallyEdited] = useState(false)
+  const [slugValidating, setSlugValidating] = useState(false)
+  const [slugValidationTimeout, setSlugValidationTimeout] = useState<NodeJS.Timeout | null>(null)
+  const [slugError, setSlugError] = useState('')
   
   // Variations state for variable products
   const [variationOptions, setVariationOptions] = useState<Array<{
@@ -236,31 +250,41 @@ export default function NewProductPage() {
     setValueInputs(variationOptions.map(option => option.values.join(', ')))
   }, [variationOptions.length])
 
-  // Load categories
+  // Load categories and brands
   useEffect(() => {
-    const loadCategories = async () => {
-      console.log('Loading categories, tenant ID:', tenant?.id)
+    const loadCategoriesAndBrands = async () => {
+      console.log('Loading categories and brands, tenant ID:', tenant?.id)
       if (!tenant?.id) {
-        console.log('No tenant ID available for loading categories')
+        console.log('No tenant ID available for loading categories and brands')
         return
       }
 
       try {
         const tenantDb = new TenantDatabase(tenant.id)
-        const result = await tenantDb.getCategories({ is_active: true })
-
-        if (result.error) {
-          console.error('Error loading categories:', result.error)
+        
+        // Load categories
+        const categoriesResult = await tenantDb.getCategories({ is_active: true })
+        if (categoriesResult.error) {
+          console.error('Error loading categories:', categoriesResult.error)
         } else {
-          console.log('Categories loaded:', result.data)
-          setCategories(result.data || [])
+          console.log('Categories loaded:', categoriesResult.data)
+          setCategories(categoriesResult.data || [])
+        }
+
+        // Load brands
+        const brandsResult = await tenantDb.getBrands({ is_active: true })
+        if (brandsResult.error) {
+          console.error('Error loading brands:', brandsResult.error)
+        } else {
+          console.log('Brands loaded:', brandsResult.data)
+          setBrands(brandsResult.data || [])
         }
       } catch (error) {
-        console.error('Error loading categories:', error)
+        console.error('Error loading categories and brands:', error)
       }
     }
 
-    loadCategories()
+    loadCategoriesAndBrands()
   }, [tenant?.id])
 
   // Auto-generate slug from name
@@ -279,13 +303,63 @@ export default function NewProductPage() {
       [field]: value
     }))
 
-    // Auto-generate slug when name changes
-    if (field === 'name' && !formData.slug) {
+    // Auto-generate slug when name changes (only if slug hasn't been manually edited)
+    if (field === 'name' && !slugManuallyEdited) {
+      const newSlug = generateSlug(value)
       setFormData(prev => ({
         ...prev,
-        slug: generateSlug(value)
+        slug: newSlug
       }))
+      // Validate auto-generated slug
+      if (newSlug.trim()) {
+        validateSlugUniqueness(newSlug.trim())
+      }
     }
+
+    // Mark slug as manually edited when user changes it
+    if (field === 'slug') {
+      setSlugManuallyEdited(true)
+      // Validate slug uniqueness
+      if (value.trim()) {
+        validateSlugUniqueness(value.trim())
+      }
+    }
+  }
+
+  const validateSlugUniqueness = async (slug: string) => {
+    if (!tenant?.id || !slug) return
+
+    // Clear existing timeout
+    if (slugValidationTimeout) {
+      clearTimeout(slugValidationTimeout)
+    }
+
+    // Set new timeout for debounced validation
+    const timeout = setTimeout(async () => {
+      setSlugValidating(true)
+      
+      try {
+        const supabase = createClient()
+        
+        // Query directly for the slug
+        const { data: existingProducts } = await supabase
+          .from('products')
+          .select('id, slug')
+          .eq('tenant_id', tenant.id)
+          .eq('slug', slug)
+        
+        // Check if slug exists
+        const isDuplicate = existingProducts && existingProducts.length > 0
+        
+        setSlugError(isDuplicate ? 'This slug is already in use by another product' : '')
+      } catch (error) {
+        console.error('Error validating slug:', error)
+      } finally {
+        setSlugValidating(false)
+      }
+    }, 500) // 500ms debounce
+
+    setSlugValidationTimeout(timeout)
   }
 
   const validateForm = () => {
@@ -295,6 +369,10 @@ export default function NewProductPage() {
     }
     if (!formData.slug.trim()) {
       setError('Product slug is required')
+      return false
+    }
+    if (slugError) {
+      setError(slugError)
       return false
     }
     
@@ -375,6 +453,7 @@ export default function NewProductPage() {
         allow_backorder: formData.product_type === 'digital' ? false : formData.allow_backorder,
         weight: formData.weight ? parseFloat(formData.weight) : null,
         category_id: formData.category_id || null,
+        brand_id: formData.brand_id || null,
         is_active: formData.is_active,
         is_featured: formData.is_featured,
         seo_title: formData.seo_title.trim() || null,
@@ -538,13 +617,27 @@ export default function NewProductPage() {
                   </div>
                   <div>
                     <Label htmlFor="slug">URL Slug *</Label>
-                    <Input
-                      id="slug"
-                      value={formData.slug}
-                      onChange={(e) => handleInputChange('slug', e.target.value)}
-                      placeholder="product-url-slug"
-                      required
-                    />
+                    <div className="relative">
+                      <Input
+                        id="slug"
+                        value={formData.slug}
+                        onChange={(e) => handleInputChange('slug', e.target.value)}
+                        placeholder="product-url-slug"
+                        className={slugError ? 'border-red-500' : ''}
+                        required
+                      />
+                      {slugValidating && (
+                        <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                          <div className="animate-spin h-4 w-4 border-2 border-gray-300 border-t-blue-600 rounded-full"></div>
+                        </div>
+                      )}
+                    </div>
+                    {slugError && (
+                      <p className="text-sm text-red-600 mt-1">{slugError}</p>
+                    )}
+                    {!slugError && formData.slug && !slugValidating && (
+                      <p className="text-sm text-green-600 mt-1">✓ Slug is available</p>
+                    )}
                   </div>
                 </div>
 
@@ -1059,6 +1152,28 @@ export default function NewProductPage() {
               </Card>
             )}
 
+            {/* Product Images */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Product Images</CardTitle>
+                <CardDescription>
+                  Upload images for your product. The first image will be the main product image.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {tenant?.id && (
+                  <ImageUpload
+                    tenantId={tenant.id}
+                    productId={formData.slug || 'new-product'}
+                    initialImages={productImages}
+                    maxImages={10}
+                    onImagesChange={setProductImages}
+                    disabled={loading}
+                  />
+                )}
+              </CardContent>
+            </Card>
+
             {/* SEO */}
             <Card>
               <CardHeader>
@@ -1118,50 +1233,49 @@ export default function NewProductPage() {
               </CardContent>
             </Card>
 
-            {/* Images */}
+            {/* Product Organization */}
             <Card>
               <CardHeader>
-                <CardTitle>Product Images</CardTitle>
-                <CardDescription>
-                  Upload images for your product. The first image will be the main product image.
-                </CardDescription>
+                <CardTitle>Product Organization</CardTitle>
               </CardHeader>
-              <CardContent>
-                {tenant?.id && (
-                  <ImageUpload
-                    tenantId={tenant.id}
-                    productId={formData.slug || 'new-product'}
-                    initialImages={productImages}
-                    maxImages={10}
-                    onImagesChange={setProductImages}
-                    disabled={loading}
-                  />
-                )}
-              </CardContent>
-            </Card>
+              <CardContent className="space-y-4">
+                <div>
+                  <Label htmlFor="category_id">Category</Label>
+                  <Select
+                    value={formData.category_id}
+                    onValueChange={(value: any) => handleInputChange('category_id', value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {categories.map((category) => (
+                        <SelectItem key={category.id} value={category.id}>
+                          {category.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
 
-            {/* Category */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Product Category</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Label htmlFor="category_id">Category</Label>
-                <Select
-                  value={formData.category_id}
-                  onValueChange={(value: any) => handleInputChange('category_id', value)}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categories.map((category) => (
-                      <SelectItem key={category.id} value={category.id}>
-                        {category.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <div>
+                  <Label htmlFor="brand_id">Brand</Label>
+                  <Select
+                    value={formData.brand_id}
+                    onValueChange={(value: any) => handleInputChange('brand_id', value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a brand" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {brands.map((brand) => (
+                        <SelectItem key={brand.id} value={brand.id}>
+                          {brand.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </CardContent>
             </Card>
 

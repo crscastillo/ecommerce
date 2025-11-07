@@ -59,6 +59,7 @@ export function ProductTable({
         <TableHeader>
           <TableRow>
             <TableHead>Product</TableHead>
+            <TableHead>Brand</TableHead>
             <TableHead>Type</TableHead>
             <TableHead>SKU</TableHead>
             <TableHead>Price</TableHead>
@@ -80,6 +81,11 @@ export function ProductTable({
                     <div className="text-sm text-muted-foreground">
                       {product.slug}
                     </div>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <div className="text-sm">
+                    {product.brand?.name || '—'}
                   </div>
                 </TableCell>
                 <TableCell>

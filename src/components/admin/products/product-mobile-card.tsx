@@ -134,6 +134,11 @@ export function ProductMobileCard({
                       {getProductPriceRange(product, tenant)}
                     </span>
                   </div>
+                  {product.brand && (
+                    <div className="text-muted-foreground">
+                      <span className="text-xs">Brand: {product.brand.name}</span>
+                    </div>
+                  )}
                   <div className="flex items-center gap-1">
                     {inventory.status === 'digital' ? (
                       <span className="text-muted-foreground">Digital</span>

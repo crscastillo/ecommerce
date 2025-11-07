@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useTenant } from '@/lib/contexts/tenant-context'
+import { TenantDatabase } from '@/lib/supabase/tenant-database'
 import { 
   ProductWithVariants, 
   ProductFilters, 
@@ -36,35 +37,38 @@ export function useProducts(filters: ProductFilters): UseProductsReturn {
       setLoading(true)
       setError('')
 
-      let query = supabase
-        .from('products')
-        .select('*')
-        .eq('tenant_id', tenant.id)
-        .order('created_at', { ascending: false })
-
+      const tenantDb = new TenantDatabase(tenant.id)
+      
+      // Build filters for TenantDatabase
+      const dbFilters: any = {}
+      
       // Apply status filter
       if (filters.is_active !== undefined) {
-        query = query.eq('is_active', filters.is_active)
+        dbFilters.is_active = filters.is_active
       }
       
-      // Apply product type filter
-      if (filters.product_type) {
-        query = query.eq('product_type', filters.product_type)
-      }
-
       // Apply search filter
       if (filters.search) {
-        query = query.or(`name.ilike.%${filters.search}%,sku.ilike.%${filters.search}%`)
+        dbFilters.search = filters.search
       }
-
-      const { data, error: dbError } = await query
-
+      
+      const { data: productsData, error: dbError } = await tenantDb.getProducts(dbFilters)
+      
       if (dbError) {
         throw new Error(dbError.message)
       }
 
+      let filteredProducts = productsData || []
+      
+      // Apply product type filter client-side
+      if (filters.productType && filters.productType !== 'all') {
+        filteredProducts = filteredProducts.filter((product: any) => 
+          product.product_type === filters.productType
+        )
+      }
+
       // Parse variants for each product
-      const productsWithParsedVariants = (data || []).map(product => ({
+      const productsWithParsedVariants = filteredProducts.map((product: any) => ({
         ...product,
         parsed_variants: parseProductVariants(product.variants)
       }))

@@ -11,6 +11,7 @@ export interface Product {
   is_active: boolean
   is_featured: boolean
   category_id: string
+  brand_id: string | null
   sku: string | null
   variants: any // Will be typed more specifically later
   created_at: string
@@ -33,6 +34,11 @@ export interface ProductVariant {
 
 export interface ProductWithVariants extends Product {
   parsed_variants?: ProductVariant[]
+  brand?: {
+    id: string
+    name: string
+    slug: string
+  }
 }
 
 export interface ProductFilters {

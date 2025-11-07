@@ -14,6 +14,7 @@ export class TenantDatabase {
   // Products
   async getProducts(filters: {
     category_id?: string
+    brand_id?: string
     is_active?: boolean
     is_featured?: boolean
     search?: string
@@ -24,13 +25,17 @@ export class TenantDatabase {
       .from('products')
       .select(`
         *,
-        category:categories(id, name, slug)
+        category:categories(id, name, slug),
+        brand:brands(id, name, slug)
       `)
       .eq('tenant_id', this.tenantId)
       .order('created_at', { ascending: false })
 
     if (filters.category_id) {
       query = query.eq('category_id', filters.category_id)
+    }
+    if (filters.brand_id) {
+      query = query.eq('brand_id', filters.brand_id)
     }
     if (filters.is_active !== undefined) {
       query = query.eq('is_active', filters.is_active)
@@ -57,7 +62,8 @@ export class TenantDatabase {
       .from('products')
       .select(`
         *,
-        category:categories(id, name, slug)
+        category:categories(id, name, slug),
+        brand:brands(id, name, slug)
       `)
       .eq('id', id)
       .eq('tenant_id', this.tenantId)
@@ -201,6 +207,68 @@ export class TenantDatabase {
   async deleteCategory(id: string) {
     return this.supabase
       .from('categories')
+      .delete()
+      .eq('id', id)
+      .eq('tenant_id', this.tenantId)
+  }
+
+  // Brands
+  async getBrands(filters: { is_active?: boolean } = {}) {
+    let query = this.supabase
+      .from('brands')
+      .select('*')
+      .eq('tenant_id', this.tenantId)
+      .order('sort_order', { ascending: true })
+
+    if (filters.is_active !== undefined) {
+      query = query.eq('is_active', filters.is_active)
+    }
+
+    return await query
+  }
+
+  async getBrand(id: string) {
+    return this.supabase
+      .from('brands')
+      .select('*')
+      .eq('id', id)
+      .eq('tenant_id', this.tenantId)
+      .single()
+  }
+
+  async getBrandBySlug(slug: string) {
+    return this.supabase
+      .from('brands')
+      .select('*')
+      .eq('slug', slug)
+      .eq('tenant_id', this.tenantId)
+      .single()
+  }
+
+  async createBrand(brandData: any) {
+    return this.supabase
+      .from('brands')
+      .insert({
+        ...brandData,
+        tenant_id: this.tenantId
+      })
+      .select()
+      .single()
+  }
+
+  async updateBrand(id: string, brandData: any) {
+    return this.supabase
+      .from('brands')
+      .update(brandData)
+      .eq('id', id)
+      .eq('tenant_id', this.tenantId)
+      .select()
+      .single()
+  }
+
+  async deleteBrand(id: string) {
+    return this.supabase
+      .from('brands')
       .delete()
       .eq('id', id)
       .eq('tenant_id', this.tenantId)

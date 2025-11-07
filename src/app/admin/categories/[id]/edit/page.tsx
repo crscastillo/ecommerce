@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { useTenant } from '@/lib/contexts/tenant-context'
 import { TenantDatabase } from '@/lib/supabase/tenant-database'
+import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -50,6 +51,16 @@ export default function CategoryEditPage() {
   const [deleting, setDeleting] = useState(false)
   const [error, setError] = useState('')
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+  const [slugManuallyEdited, setSlugManuallyEdited] = useState(true) // Start as true for edit mode
+  const [slugValidation, setSlugValidation] = useState<{
+    isValidating: boolean;
+    isValid: boolean;
+    message: string;
+  }>({
+    isValidating: false,
+    isValid: true,
+    message: ''
+  })
 
   // Load category data
   useEffect(() => {
@@ -96,13 +107,92 @@ export default function CategoryEditPage() {
     loadCategory()
   }, [tenant?.id, categoryId])
 
-  const generateSlug = (name: string) => {
-    return name
+  const normalizeSlug = (text: string): string => {
+    return text
       .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
       .replace(/[^a-z0-9\s-]/g, '')
       .replace(/\s+/g, '-')
       .replace(/-+/g, '-')
-      .trim()
+      .replace(/^-|-$/g, '')
+  }
+
+  const validateSlugUniqueness = async (slug: string) => {
+    if (!tenant?.id || !slug || !categoryId) return
+
+    setSlugValidation(prev => ({ ...prev, isValidating: true }))
+
+    try {
+      const supabase = createClient()
+      
+      // Query directly for the slug
+      const { data: existingCategories, error } = await supabase
+        .from('categories')
+        .select('id, slug')
+        .eq('tenant_id', tenant.id)
+        .eq('slug', slug)
+      
+      if (error) {
+        setSlugValidation({
+          isValidating: false,
+          isValid: false,
+          message: 'Error checking slug availability'
+        })
+        return
+      }
+
+      // Check if slug exists and it's not the current category being edited
+      const isDuplicate = existingCategories && existingCategories.length > 0 && 
+        existingCategories[0].id !== categoryId
+      
+      setSlugValidation({
+        isValidating: false,
+        isValid: !isDuplicate,
+        message: isDuplicate ? 'A category with this slug already exists' : ''
+      })
+    } catch (err) {
+      setSlugValidation({
+        isValidating: false,
+        isValid: false,
+        message: 'Error checking slug availability'
+      })
+    }
+  }
+
+  useEffect(() => {
+    if (!formData.slug || loading) return
+
+    const timeoutId = setTimeout(() => {
+      validateSlugUniqueness(formData.slug)
+    }, 500)
+
+    return () => clearTimeout(timeoutId)
+  }, [formData.slug, tenant?.id, categoryId, loading])
+
+  const handleNameChange = (value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      name: value
+    }))
+
+    // Auto-generate slug when name changes and slug hasn't been manually edited
+    if (!slugManuallyEdited) {
+      const normalizedSlug = normalizeSlug(value)
+      setFormData(prev => ({
+        ...prev,
+        slug: normalizedSlug
+      }))
+    }
+  }
+
+  const handleSlugChange = (value: string) => {
+    const normalizedSlug = normalizeSlug(value)
+    setSlugManuallyEdited(true)
+    setFormData(prev => ({
+      ...prev,
+      slug: normalizedSlug
+    }))
   }
 
   const handleInputChange = (field: keyof typeof formData, value: any) => {
@@ -136,6 +226,11 @@ export default function CategoryEditPage() {
     const validationError = validateForm()
     if (validationError) {
       setError(validationError)
+      return
+    }
+
+    if (!slugValidation.isValid) {
+      setError('Please fix the slug validation errors before saving')
       return
     }
 
@@ -314,7 +409,7 @@ export default function CategoryEditPage() {
                   <Input
                     id="name"
                     value={formData.name}
-                    onChange={(e) => handleInputChange('name', e.target.value)}
+                    onChange={(e) => handleNameChange(e.target.value)}
                     placeholder="Enter category name"
                     disabled={saving}
                   />
@@ -324,13 +419,22 @@ export default function CategoryEditPage() {
                   <Input
                     id="slug"
                     value={formData.slug}
-                    onChange={(e) => handleInputChange('slug', e.target.value)}
+                    onChange={(e) => handleSlugChange(e.target.value)}
                     placeholder="category-url-slug"
                     disabled={saving}
+                    className={!slugValidation.isValid ? 'border-red-500' : ''}
                   />
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Only lowercase letters, numbers, and hyphens allowed
-                  </p>
+                  <div className="flex items-center gap-2 mt-1">
+                    {slugValidation.isValidating && (
+                      <Loader2 className="h-3 w-3 animate-spin" />
+                    )}
+                    {!slugValidation.isValid && (
+                      <AlertCircle className="h-3 w-3 text-red-500" />
+                    )}
+                    <p className={`text-xs ${slugValidation.isValid ? 'text-muted-foreground' : 'text-red-500'}`}>
+                      {slugValidation.message || 'Only lowercase letters, numbers, and hyphens allowed'}
+                    </p>
+                  </div>
                 </div>
               </div>
 

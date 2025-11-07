@@ -35,11 +35,19 @@ import {
 import Link from 'next/link'
 import Image from 'next/image'
 import { parseProductImages, prepareImagesForStorage, createImagePlaceholder, isSupabaseStorageUrl } from '@/lib/utils/image-utils'
+import { createClient } from '@/lib/supabase/client'
 
 interface Category {
   id: string
   name: string
   slug: string
+}
+
+interface Brand {
+  id: string
+  name: string
+  slug: string
+  is_active: boolean
 }
 
 interface Product {
@@ -58,6 +66,7 @@ interface Product {
   allow_backorder: boolean
   weight: number | null
   category_id: string | null
+  brand_id: string | null
   is_active: boolean
   is_featured: boolean
   seo_title: string | null
@@ -78,6 +87,7 @@ export default function ProductViewPage() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [categories, setCategories] = useState<Category[]>([])
+  const [brands, setBrands] = useState<Brand[]>([])
   const [product, setProduct] = useState<Product | null>(null)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
@@ -101,6 +111,7 @@ export default function ProductViewPage() {
     allow_backorder: false,
     weight: '',
     category_id: 'none',
+    brand_id: 'none',
     is_active: true,
     is_featured: false,
     seo_title: '',
@@ -108,6 +119,10 @@ export default function ProductViewPage() {
   })
 
   const [productImages, setProductImages] = useState<string[]>([])
+  const [slugManuallyEdited, setSlugManuallyEdited] = useState(false)
+  const [slugValidating, setSlugValidating] = useState(false)
+  const [slugValidationTimeout, setSlugValidationTimeout] = useState<NodeJS.Timeout | null>(null)
+  const [slugError, setSlugError] = useState('')
 
   // Variations state for variable products
   const [variationOptions, setVariationOptions] = useState<Array<{
@@ -261,15 +276,22 @@ export default function ProductViewPage() {
           allow_backorder: productData.allow_backorder,
           weight: productData.weight?.toString() || '',
           category_id: productData.category_id || 'none',
+          brand_id: productData.brand_id || 'none',
           is_active: productData.is_active,
           is_featured: productData.is_featured,
           seo_title: productData.seo_title || '',
           seo_description: productData.seo_description || '',
         })
 
-        // Load categories
+        // Mark slug as manually edited if product has existing slug
+        setSlugManuallyEdited(!!productData.slug)
+
+        // Load categories and brands
         const { data: categoriesData } = await tenantDb.getCategories({ is_active: true })
         setCategories(categoriesData || [])
+
+        const { data: brandsData } = await tenantDb.getBrands({ is_active: true })
+        setBrands(brandsData || [])
 
       } catch (err) {
         console.error('Error loading product:', err)
@@ -288,12 +310,21 @@ export default function ProductViewPage() {
       [field]: value
     }))
 
-    // Auto-generate slug when name changes (only in edit mode)
-    if (field === 'name' && mode === 'edit' && !formData.slug) {
+    // Auto-generate slug when name changes (only in edit mode and if slug hasn't been manually edited)
+    if (field === 'name' && mode === 'edit' && !slugManuallyEdited) {
       setFormData(prev => ({
         ...prev,
         slug: generateSlug(value)
       }))
+    }
+
+    // Mark slug as manually edited when user changes it
+    if (field === 'slug') {
+      setSlugManuallyEdited(true)
+      // Validate slug uniqueness
+      if (value.trim()) {
+        validateSlugUniqueness(value.trim())
+      }
     }
     
     // Clear variations when switching away from variable product type
@@ -302,6 +333,43 @@ export default function ProductViewPage() {
       setVariationOptions([{ name: '', values: [] }])
       setValueInputs([''])
     }
+  }
+
+  const validateSlugUniqueness = async (slug: string) => {
+    if (!tenant?.id || !slug) return
+
+    // Clear existing timeout
+    if (slugValidationTimeout) {
+      clearTimeout(slugValidationTimeout)
+    }
+
+    // Set new timeout for debounced validation
+    const timeout = setTimeout(async () => {
+      setSlugValidating(true)
+      
+      try {
+        const supabase = createClient()
+        
+        // Query directly for the slug
+        const { data: existingProducts } = await supabase
+          .from('products')
+          .select('id, slug')
+          .eq('tenant_id', tenant.id)
+          .eq('slug', slug)
+        
+        // Check if slug exists and it's not the current product being edited
+        const isDuplicate = existingProducts && existingProducts.length > 0 && 
+          (!product || existingProducts[0].id !== product.id)
+        
+        setSlugError(isDuplicate ? 'This slug is already in use by another product' : '')
+      } catch (error) {
+        console.error('Error validating slug:', error)
+      } finally {
+        setSlugValidating(false)
+      }
+    }, 500) // 500ms debounce
+
+    setSlugValidationTimeout(timeout)
   }
 
   const generateSlug = (name: string) => {
@@ -483,6 +551,7 @@ export default function ProductViewPage() {
         allow_backorder: formData.product_type === 'digital' ? false : formData.allow_backorder,
         weight: formData.weight ? parseFloat(formData.weight) : null,
         category_id: formData.category_id === 'none' ? null : formData.category_id,
+        brand_id: formData.brand_id === 'none' ? null : formData.brand_id,
         is_active: formData.is_active,
         is_featured: formData.is_featured,
         seo_title: formData.seo_title.trim() || null,
@@ -1320,6 +1389,174 @@ export default function ProductViewPage() {
             </Card>
           )}
 
+          {/* Product Images */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Product Images</CardTitle>
+              <CardDescription>
+                {mode === 'view' ? 'Product image gallery' : 'Upload and manage product images'}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {mode === 'view' ? (
+                productImages.length > 0 ? (
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {productImages.map((imageUrl, index) => (
+                      <div key={imageUrl || index} className="relative">
+                        <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden">
+                          {imageUrl ? (
+                            <Image
+                              src={imageUrl}
+                              alt={`${product.name} image ${index + 1}`}
+                              fill
+                              className="object-cover"
+                              unoptimized={isSupabaseStorageUrl(imageUrl)}
+                              onError={(e) => {
+                                console.error('Failed to load image:', imageUrl)
+                                const target = e.currentTarget as HTMLImageElement
+                                target.src = createImagePlaceholder(`${index + 1}`)
+                              }}
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-gray-400">
+                              <Package className="w-6 h-6" />
+                            </div>
+                          )}
+                          {index === 0 && (
+                            <Badge className="absolute top-2 left-2 text-xs">
+                              Main
+                            </Badge>
+                          )}
+                        </div>
+                        <p className="text-xs text-gray-500 mt-1 text-center">
+                          Image {index + 1}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-gray-500 text-sm">No images uploaded</p>
+                )
+              ) : (
+                <div className="space-y-4">
+                  {/* Upload Area */}
+                  <div 
+                    className="border-2 border-dashed border-gray-300 hover:border-gray-400 rounded-lg p-6 text-center transition-colors"
+                    onDrop={(e) => {
+                      e.preventDefault()
+                      const files = e.dataTransfer.files
+                      if (files && files.length > 0) {
+                        const fileInput = document.createElement('input')
+                        fileInput.type = 'file'
+                        fileInput.multiple = true
+                        fileInput.accept = 'image/*'
+                        fileInput.files = files
+                        fileInput.dispatchEvent(new Event('change'))
+                      }
+                    }}
+                    onDragOver={(e) => e.preventDefault()}
+                  >
+                    <Package className="h-12 w-12 mx-auto text-gray-400 mb-4" />
+                    <p className="text-lg font-medium text-gray-600 mb-2">Drop images here</p>
+                    <p className="text-sm text-gray-500 mb-4">or click to browse files</p>
+                    <Button 
+                      type="button" 
+                      variant="outline"
+                      disabled={saving}
+                      onClick={() => {
+                        const input = document.createElement('input')
+                        input.type = 'file'
+                        input.multiple = true
+                        input.accept = 'image/*'
+                        input.onchange = (e) => {
+                          const target = e.target as HTMLInputElement
+                          if (target.files) {
+                            // Process files similar to ImageUpload component
+                            Array.from(target.files).forEach(async (file) => {
+                              const reader = new FileReader()
+                              reader.onload = (e) => {
+                                if (e.target?.result) {
+                                  setProductImages(prev => [...prev, e.target!.result as string])
+                                }
+                              }
+                              reader.readAsDataURL(file)
+                            })
+                          }
+                        }
+                        input.click()
+                      }}
+                    >
+                      Choose Files
+                    </Button>
+                    <p className="text-xs text-gray-500 mt-3">
+                      JPEG, PNG, WebP • Max {10 - productImages.length} more images
+                    </p>
+                  </div>
+
+                  {/* Image Grid */}
+                  {productImages.length > 0 && (
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <h4 className="text-sm font-medium">Uploaded Images ({productImages.length})</h4>
+                        <p className="text-xs text-gray-500">Drag to reorder</p>
+                      </div>
+                      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                        {productImages.map((imageUrl, index) => (
+                          <div key={imageUrl || index} className="group relative">
+                            <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden">
+                              {imageUrl ? (
+                                <Image
+                                  src={imageUrl}
+                                  alt={`Image ${index + 1}`}
+                                  fill
+                                  className="object-cover"
+                                  unoptimized={isSupabaseStorageUrl(imageUrl)}
+                                  onError={(e) => {
+                                    const target = e.currentTarget as HTMLImageElement
+                                    target.src = createImagePlaceholder(`${index + 1}`)
+                                  }}
+                                />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center">
+                                  <Package className="w-4 h-4 text-gray-400" />
+                                </div>
+                              )}
+                              {index === 0 && (
+                                <Badge className="absolute top-2 left-2 text-xs">
+                                  Main
+                                </Badge>
+                              )}
+                            </div>
+                            <Button
+                              type="button"
+                              variant="destructive"
+                              size="sm"
+                              className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6 p-0"
+                              onClick={() => {
+                                setProductImages(prev => prev.filter((_, i) => i !== index))
+                              }}
+                              disabled={saving}
+                            >
+                              <X className="h-3 w-3" />
+                            </Button>
+                            <p className="text-xs text-gray-500 mt-1 text-center">
+                              {index + 1}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Status */}
+                  <div className="text-sm text-gray-500 text-center">
+                    {productImages.length} of 10 images uploaded
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
         </div>
 
         {/* Sidebar */}
@@ -1368,245 +1605,65 @@ export default function ProductViewPage() {
             </CardContent>
           </Card>
 
-          {/* Images */}
+          {/* Organization */}
           <Card>
             <CardHeader>
-              <CardTitle>Product Images</CardTitle>
-              <CardDescription>
-                {mode === 'view' ? 'Product image gallery' : 'Upload and manage product images'}
-              </CardDescription>
+              <CardTitle>Organization</CardTitle>
             </CardHeader>
-            <CardContent>
-              {mode === 'view' ? (
-                productImages.length > 0 ? (
-                  productImages.length === 1 ? (
-                    // Single image - show large
-                    <div className="relative">
-                      <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden">
-                        {productImages[0] ? (
-                          <Image
-                            src={productImages[0]}
-                            alt={`${product.name} main image`}
-                            fill
-                            className="object-cover"
-                            unoptimized={isSupabaseStorageUrl(productImages[0])}
-                            onError={(e) => {
-                              console.error('Failed to load image:', productImages[0])
-                              const target = e.currentTarget as HTMLImageElement
-                              target.src = createImagePlaceholder('Main Image')
-                            }}
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-gray-400">
-                            <Package className="w-8 h-8" />
-                          </div>
-                        )}
-                        <Badge className="absolute top-2 left-2 text-xs">
-                          Main
-                        </Badge>
-                      </div>
-                      <p className="text-xs text-gray-500 mt-1 text-center">
-                        Main Image
-                      </p>
-                    </div>
-                  ) : (
-                    // Multiple images - show compact grid
-                    <div className="space-y-2">
-                      <h4 className="text-sm font-medium">Images ({productImages.length})</h4>
-                      <div className="grid grid-cols-2 gap-2">
-                        {productImages.map((imageUrl, index) => (
-                          <div key={imageUrl || index} className="relative">
-                            <div className="aspect-square bg-gray-100 rounded overflow-hidden">
-                              {imageUrl ? (
-                                <Image
-                                  src={imageUrl}
-                                  alt={`${product.name} image ${index + 1}`}
-                                  fill
-                                  className="object-cover"
-                                  unoptimized={isSupabaseStorageUrl(imageUrl)}
-                                  onError={(e) => {
-                                    console.error('Failed to load image:', imageUrl)
-                                    const target = e.currentTarget as HTMLImageElement
-                                    target.src = createImagePlaceholder(`${index + 1}`)
-                                  }}
-                                />
-                              ) : (
-                                <div className="w-full h-full flex items-center justify-center text-gray-400">
-                                  <Package className="w-4 h-4" />
-                                </div>
-                              )}
-                              {index === 0 && (
-                                <Badge className="absolute top-1 left-1 text-xs">
-                                  Main
-                                </Badge>
-                              )}
-                            </div>
-                            <p className="text-xs text-gray-500 mt-1 text-center">
-                              {index + 1}
-                            </p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )
+            <CardContent className="space-y-4">
+              {/* Category */}
+              <div>
+                <Label className="text-sm font-medium">Category</Label>
+                {mode === 'view' ? (
+                  <p className="text-sm mt-1">
+                    {categories.find(c => c.id === product.category_id)?.name || 'No category assigned'}
+                  </p>
                 ) : (
-                  <p className="text-gray-500 text-sm">No images uploaded</p>
-                )
-              ) : (
-                <div className="space-y-4">
-                  {/* Compact Upload Area */}
-                  <div 
-                    className="border-2 border-dashed border-gray-300 hover:border-gray-400 rounded-lg p-4 text-center transition-colors"
-                    onDrop={(e) => {
-                      e.preventDefault()
-                      const files = e.dataTransfer.files
-                      if (files && files.length > 0) {
-                        const fileInput = document.createElement('input')
-                        fileInput.type = 'file'
-                        fileInput.multiple = true
-                        fileInput.accept = 'image/*'
-                        fileInput.files = files
-                        fileInput.dispatchEvent(new Event('change'))
-                      }
-                    }}
-                    onDragOver={(e) => e.preventDefault()}
+                  <Select
+                    value={formData.category_id}
+                    onValueChange={(value) => handleInputChange('category_id', value)}
                   >
-                    <Package className="h-8 w-8 mx-auto text-gray-400 mb-2" />
-                    <p className="text-sm text-gray-600 mb-2">Drop images here</p>
-                    <Button 
-                      type="button" 
-                      variant="outline" 
-                      size="sm"
-                      disabled={saving}
-                      onClick={() => {
-                        const input = document.createElement('input')
-                        input.type = 'file'
-                        input.multiple = true
-                        input.accept = 'image/*'
-                        input.onchange = (e) => {
-                          const target = e.target as HTMLInputElement
-                          if (target.files) {
-                            // Process files similar to ImageUpload component
-                            Array.from(target.files).forEach(async (file) => {
-                              const reader = new FileReader()
-                              reader.onload = (e) => {
-                                if (e.target?.result) {
-                                  setProductImages(prev => [...prev, e.target!.result as string])
-                                }
-                              }
-                              reader.readAsDataURL(file)
-                            })
-                          }
-                        }
-                        input.click()
-                      }}
-                    >
-                      Choose Files
-                    </Button>
-                    <p className="text-xs text-gray-500 mt-2">
-                      JPEG, PNG, WebP • Max {10 - productImages.length} more
-                    </p>
-                  </div>
+                    <SelectTrigger className="mt-1">
+                      <SelectValue placeholder="Select category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">No category</SelectItem>
+                      {categories.map((category) => (
+                        <SelectItem key={category.id} value={category.id}>
+                          {category.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              </div>
 
-                  {/* Compact Image List */}
-                  {productImages.length > 0 && (
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <h4 className="text-sm font-medium">Images ({productImages.length})</h4>
-                        <p className="text-xs text-gray-500">Drag to reorder</p>
-                      </div>
-                      <div className="space-y-2 max-h-64 overflow-y-auto">
-                        {productImages.map((imageUrl, index) => (
-                          <div key={imageUrl || index} className="group relative">
-                            <div className="flex items-center gap-3 p-2 bg-gray-50 rounded-lg">
-                              <div className="relative w-12 h-12 bg-gray-200 rounded overflow-hidden flex-shrink-0">
-                                {imageUrl ? (
-                                  <Image
-                                    src={imageUrl}
-                                    alt={`Image ${index + 1}`}
-                                    fill
-                                    className="object-cover"
-                                    unoptimized={isSupabaseStorageUrl(imageUrl)}
-                                    onError={(e) => {
-                                      const target = e.currentTarget as HTMLImageElement
-                                      target.src = createImagePlaceholder(`${index + 1}`)
-                                    }}
-                                  />
-                                ) : (
-                                  <div className="w-full h-full flex items-center justify-center">
-                                    <Package className="w-4 h-4 text-gray-400" />
-                                  </div>
-                                )}
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <p className="text-sm font-medium truncate">
-                                  Image {index + 1}
-                                  {index === 0 && (
-                                    <Badge variant="secondary" className="ml-2 text-xs">
-                                      Main
-                                    </Badge>
-                                  )}
-                                </p>
-                                <p className="text-xs text-gray-500">
-                                  {imageUrl ? 'Uploaded' : 'Processing...'}
-                                </p>
-                              </div>
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                size="sm"
-                                className="opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8 p-0 text-red-600 hover:text-red-700"
-                                onClick={() => {
-                                  setProductImages(prev => prev.filter((_, i) => i !== index))
-                                }}
-                                disabled={saving}
-                              >
-                                <X className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Status */}
-                  <div className="text-xs text-gray-500 text-center">
-                    {productImages.length} of 10 images uploaded
-                  </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Category */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Category</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {mode === 'view' ? (
-                <p className="text-sm">
-                  {categories.find(c => c.id === product.category_id)?.name || 'No category assigned'}
-                </p>
-              ) : (
-                <Select
-                  value={formData.category_id}
-                  onValueChange={(value) => handleInputChange('category_id', value)}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">No category</SelectItem>
-                    {categories.map((category) => (
-                      <SelectItem key={category.id} value={category.id}>
-                        {category.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
+              {/* Brand */}
+              <div>
+                <Label className="text-sm font-medium">Brand</Label>
+                {mode === 'view' ? (
+                  <p className="text-sm mt-1">
+                    {brands.find(b => b.id === product.brand_id)?.name || 'No brand assigned'}
+                  </p>
+                ) : (
+                  <Select
+                    value={formData.brand_id}
+                    onValueChange={(value) => handleInputChange('brand_id', value)}
+                  >
+                    <SelectTrigger className="mt-1">
+                      <SelectValue placeholder="Select brand" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">No brand</SelectItem>
+                      {brands.map((brand) => (
+                        <SelectItem key={brand.id} value={brand.id}>
+                          {brand.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              </div>
             </CardContent>
           </Card>
 

@@ -100,8 +100,10 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
   const tenantId = searchParams.get('tenant_id')
-  const categoryId = searchParams.get('category_id')
-  const brandSlug = searchParams.get('brand_slug')
+  const categoryIds = searchParams.get('category_ids')
+  const brandSlugs = searchParams.get('brand_slugs')
+  const categoryId = searchParams.get('category_id') // Keep for backward compatibility
+  const brandSlug = searchParams.get('brand_slug') // Keep for backward compatibility
   const search = searchParams.get('search')
   const sortBy = searchParams.get('sort_by') || 'newest'
 
@@ -124,25 +126,28 @@ export async function GET(request: NextRequest) {
     
     console.log('API: Fetching products for tenant:', tenantId)
     
-    // If filtering by brand slug, first get the brand ID
-    let brandId = null
-    if (brandSlug) {
+    // Handle multiple brand slugs
+    let brandIds: string[] = []
+    const allBrandSlugs = brandSlugs ? brandSlugs.split(',') : (brandSlug ? [brandSlug] : [])
+    
+    if (allBrandSlugs.length > 0) {
       const { data: brandData, error: brandError } = await supabase
         .from('brands')
-        .select('id')
+        .select('id, slug')
         .eq('tenant_id', tenantId)
-        .eq('slug', brandSlug)
+        .in('slug', allBrandSlugs)
         .eq('is_active', true)
-        .single()
       
-      if (brandError || !brandData) {
-        console.log('Brand not found for slug:', brandSlug)
-        return NextResponse.json({ data: [] })
+      if (brandError) {
+        console.error('Error fetching brands:', brandError)
+      } else if (brandData) {
+        brandIds = brandData.map(brand => brand.id)
+        console.log('Found brand IDs for slugs:', allBrandSlugs, '→', brandIds)
       }
-      
-      brandId = brandData.id
-      console.log('Found brand ID for slug:', brandSlug, '→', brandId)
     }
+    
+    // Handle multiple category IDs
+    const allCategoryIds = categoryIds ? categoryIds.split(',') : (categoryId ? [categoryId] : [])
     
     let query = supabase
       .from('products')
@@ -179,12 +184,12 @@ export async function GET(request: NextRequest) {
       .eq('is_active', true)
 
     // Apply filters
-    if (categoryId) {
-      query = query.eq('category_id', categoryId)
+    if (allCategoryIds.length > 0) {
+      query = query.in('category_id', allCategoryIds)
     }
 
-    if (brandId) {
-      query = query.eq('brand_id', brandId)
+    if (brandIds.length > 0) {
+      query = query.in('brand_id', brandIds)
     }
 
     if (search) {

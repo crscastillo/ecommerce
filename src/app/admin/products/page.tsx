@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useTenant } from '@/lib/contexts/tenant-context'
+import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Package, Plus, Upload, AlertCircle } from 'lucide-react'
@@ -21,6 +22,7 @@ import {
 export default function ProductsPage() {
   const { tenant } = useTenant()
   const router = useRouter()
+  const t = useTranslations()
   
   // State for filters and modals
   const [filters, setFilters] = useState<ProductFilters>(defaultProductFilters)
@@ -72,10 +74,10 @@ export default function ProductsPage() {
         <div className="flex flex-col space-y-3 md:hidden">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-xl font-bold tracking-tight">Products</h1>
+              <h1 className="text-xl font-bold tracking-tight">{t('navigation.products')}</h1>
               {products.length > 0 && (
                 <p className="text-muted-foreground text-xs">
-                  {products.length} products
+                  {t('products.productCount', { count: products.length })}
                 </p>
               )}
             </div>
@@ -91,7 +93,7 @@ export default function ProductsPage() {
               <Button asChild size="sm" className="h-8 px-3">
                 <Link href="/admin/products/new">
                   <Plus className="mr-1 h-3 w-3" />
-                  Add
+                  {t('common.add')}
                 </Link>
               </Button>
             </div>
@@ -101,20 +103,20 @@ export default function ProductsPage() {
         {/* Desktop Header */}
         <div className="hidden md:flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Products</h1>
+            <h1 className="text-3xl font-bold tracking-tight">{t('navigation.products')}</h1>
             <p className="text-muted-foreground">
-              Manage your store's product catalog
+              {t('products.manageProductCatalog')}
             </p>
           </div>
           <div className="flex items-center gap-3">
             <Button variant="outline" onClick={() => setShowImportModal(true)}>
               <Upload className="mr-2 h-4 w-4" />
-              Import CSV
+              {t('products.importCsv')}
             </Button>
             <Button asChild>
               <Link href="/admin/products/new">
                 <Plus className="mr-2 h-4 w-4" />
-                Add Product
+                {t('products.addProduct')}
               </Link>
             </Button>
           </div>
@@ -158,10 +160,10 @@ export default function ProductsPage() {
         <CardHeader className="pb-4">
           <CardTitle className="flex items-center gap-2 text-xl">
             <Package className="h-5 w-5" />
-            Products ({products.length})
+            {t('products.productsWithCount', { count: products.length })}
           </CardTitle>
           <CardDescription className="text-sm">
-            A list of all products in your store
+            {t('products.productsListDescription')}
           </CardDescription>
         </CardHeader>
         <CardContent className="pt-0">

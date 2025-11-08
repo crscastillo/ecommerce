@@ -122,7 +122,7 @@ async function handleTenantSubdomain(request: NextRequest, supabaseResponse: Nex
   // Validate tenant exists and is active
   const { data: tenant, error } = await supabase
     .from('tenants')
-    .select('id, name, subdomain, is_active, settings, owner_id')
+    .select('id, name, subdomain, is_active, settings, owner_id, language, admin_language, store_language')
     .eq('subdomain', subdomain)
     .eq('is_active', true)
     .maybeSingle()
@@ -141,6 +141,20 @@ async function handleTenantSubdomain(request: NextRequest, supabaseResponse: Nex
   supabaseResponse.headers.set('x-tenant-id', tenant.id)
   supabaseResponse.headers.set('x-tenant-subdomain', tenant.subdomain)
   supabaseResponse.headers.set('x-tenant-name', tenant.name)
+  
+  // Determine locale based on route type (admin vs store) and tenant preferences
+  const currentPath = request.nextUrl.pathname
+  let locale = 'en'
+  
+  if (currentPath.startsWith('/admin')) {
+    // Use admin language for admin routes
+    locale = tenant.admin_language || tenant.language || 'en'
+  } else {
+    // Use store language for public routes
+    locale = tenant.store_language || tenant.language || 'en'
+  }
+  
+  supabaseResponse.headers.set('x-locale', locale)
   
   console.log('[Middleware] Tenant found, setting headers:', {
     'x-tenant-id': tenant.id,

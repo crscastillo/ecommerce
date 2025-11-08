@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { platformConfig } from '@/lib/config/platform'
+import { useTranslations } from 'next-intl'
 import { 
   DollarSign, 
   Package, 
@@ -16,6 +17,7 @@ import {
 import Link from 'next/link'
 
 export default function AdminDashboard() {
+  const t = useTranslations()
   const tenant = { name: 'My Store', subdomain: 'mystore', is_active: true, subscription_tier: 'basic' }
   const isLoading = false
 
@@ -37,16 +39,16 @@ export default function AdminDashboard() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+          <h1 className="text-3xl font-bold tracking-tight">{t('dashboard.title')}</h1>
           <p className="text-muted-foreground">
-            Welcome back to {tenant?.name}
+            {t('dashboard.welcomeBack', { storeName: tenant?.name })}
           </p>
         </div>
         <div className="flex items-center space-x-2">
           <Button asChild>
             <Link href="/admin/products/new">
               <Plus className="mr-2 h-4 w-4" />
-              Add Product
+              {t('products.addProduct')}
             </Link>
           </Button>
         </div>
@@ -56,24 +58,24 @@ export default function AdminDashboard() {
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center justify-between">
-            <span>Store Status</span>
+            <span>{t('dashboard.storeStatus')}</span>
             <Badge variant={tenant?.is_active ? "default" : "secondary"}>
-              {tenant?.is_active ? "Live" : "Inactive"}
+              {tenant?.is_active ? t('dashboard.live') : t('dashboard.inactive')}
             </Badge>
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid gap-4 md:grid-cols-2">
             <div>
-              <p className="text-sm text-muted-foreground">Store URL</p>
+              <p className="text-sm text-muted-foreground">{t('dashboard.storeUrl')}</p>
               <p className="font-medium">
                 {tenant?.subdomain}.{platformConfig.getDomain()}
               </p>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Subscription</p>
+              <p className="text-sm text-muted-foreground">{t('dashboard.subscription')}</p>
               <p className="font-medium capitalize">
-                {tenant?.subscription_tier} Plan
+                {tenant?.subscription_tier} {t('dashboard.plan')}
               </p>
             </div>
           </div>
@@ -85,56 +87,56 @@ export default function AdminDashboard() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Total Revenue
+              {t('dashboard.totalRevenue')}
             </CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">$0.00</div>
             <p className="text-xs text-muted-foreground">
-              +0% from last month
+              {t('dashboard.fromLastMonth', { percentage: '+0%' })}
             </p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Products
+              {t('navigation.products')}
             </CardTitle>
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">0</div>
             <p className="text-xs text-muted-foreground">
-              Start adding products to your store
+              {t('dashboard.startAddingProducts')}
             </p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Orders
+              {t('navigation.orders')}
             </CardTitle>
             <ShoppingCart className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">0</div>
             <p className="text-xs text-muted-foreground">
-              No orders yet
+              {t('dashboard.noOrdersYet')}
             </p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Customers
+              {t('navigation.customers')}
             </CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">0</div>
             <p className="text-xs text-muted-foreground">
-              No customers yet
+              {t('dashboard.noCustomersYet')}
             </p>
           </CardContent>
         </Card>
@@ -144,9 +146,9 @@ export default function AdminDashboard() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Quick Setup</CardTitle>
+            <CardTitle className="text-base">{t('dashboard.quickSetup')}</CardTitle>
             <CardDescription>
-              Get your store ready for customers
+              {t('dashboard.quickSetupDescription')}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -154,13 +156,13 @@ export default function AdminDashboard() {
               <Button variant="outline" size="sm" className="w-full justify-start" asChild>
                 <Link href="/admin/products">
                   <Package className="mr-2 h-4 w-4" />
-                  Add your first product
+                  {t('dashboard.addFirstProduct')}
                 </Link>
               </Button>
               <Button variant="outline" size="sm" className="w-full justify-start" asChild>
                 <Link href="/admin/settings">
                   <ArrowUpRight className="mr-2 h-4 w-4" />
-                  Configure store settings
+                  {t('dashboard.configureStoreSettings')}
                 </Link>
               </Button>
             </div>
@@ -169,32 +171,32 @@ export default function AdminDashboard() {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Recent Activity</CardTitle>
+            <CardTitle className="text-base">{t('dashboard.recentActivity')}</CardTitle>
             <CardDescription>
-              What's happening in your store
+              {t('dashboard.recentActivityDescription')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground">
-              No recent activity. Start by adding products to see activity here.
+              {t('dashboard.noRecentActivity')}
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Performance</CardTitle>
+            <CardTitle className="text-base">{t('dashboard.performance')}</CardTitle>
             <CardDescription>
-              Store metrics overview
+              {t('dashboard.performanceDescription')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="flex items-center space-x-2">
               <TrendingUp className="h-4 w-4 text-green-500" />
-              <span className="text-sm">Store is ready for launch</span>
+              <span className="text-sm">{t('dashboard.storeReadyForLaunch')}</span>
             </div>
             <p className="text-xs text-muted-foreground mt-2">
-              Complete the setup to start selling
+              {t('dashboard.completeSetupToStartSelling')}
             </p>
           </CardContent>
         </Card>

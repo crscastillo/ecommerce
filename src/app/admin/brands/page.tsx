@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useTenant } from '@/lib/contexts/tenant-context'
+import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { 
@@ -21,6 +22,7 @@ import { useToast } from '@/lib/contexts/toast-context'
 export default function BrandsPage() {
   const { tenant } = useTenant()
   const { success, error: showError } = useToast()
+  const t = useTranslations()
   
   // State for filters
   const [filters, setFilters] = useState<BrandFilters>({
@@ -41,9 +43,9 @@ export default function BrandsPage() {
     try {
       const brand = brands.find(b => b.id === brandId)
       await deleteBrand(brandId)
-      success(`Brand "${brand?.name}" has been deleted.`)
+      success(t('brands.deletedSuccessfully', { name: brand?.name || '' }))
     } catch (err: any) {
-      showError(err.message || 'Failed to delete brand')
+      showError(err.message || t('brands.failedToDelete'))
     }
   }
 
@@ -52,17 +54,17 @@ export default function BrandsPage() {
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold">Brands</h1>
+          <h1 className="text-3xl font-bold">{t('navigation.brands')}</h1>
         </div>
         <Card>
           <CardContent className="p-8 text-center">
             <AlertCircle className="mx-auto h-12 w-12 text-orange-500 mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">Tenant Access Required</h3>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">{t('errors.tenantAccessRequired')}</h3>
             <p className="text-gray-600 mb-4">
-              Brand management requires access via your store subdomain.
+              {t('brands.managementRequiresAccess')}
             </p>
             <Button onClick={() => window.location.href = '/'}>
-              Go to Main Site
+              {t('common.goToMainSite')}
             </Button>
           </CardContent>
         </Card>
@@ -83,10 +85,10 @@ export default function BrandsPage() {
             <div className="flex items-center gap-2">
               <Package className="h-5 w-5 text-gray-600" />
               <div>
-                <h1 className="text-xl font-bold tracking-tight">Brands</h1>
+                <h1 className="text-xl font-bold tracking-tight">{t('navigation.brands')}</h1>
                 {brands.length > 0 && (
                   <p className="text-muted-foreground text-xs">
-                    {brands.length} brands
+                    {t('brands.brandCount', { count: brands.length })}
                   </p>
                 )}
               </div>
@@ -94,7 +96,7 @@ export default function BrandsPage() {
             <Button asChild size="sm" className="h-8 px-3">
               <Link href="/admin/brands/new">
                 <Plus className="mr-1 h-3 w-3" />
-                Add
+                {t('common.add')}
               </Link>
             </Button>
           </div>
@@ -104,12 +106,12 @@ export default function BrandsPage() {
         <div className="hidden md:flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <Package className="h-8 w-8 text-gray-600" />
-            <h1 className="text-3xl font-bold">Brands</h1>
+            <h1 className="text-3xl font-bold">{t('navigation.brands')}</h1>
           </div>
           <Button asChild>
             <Link href="/admin/brands/new">
               <Plus className="mr-2 h-4 w-4" />
-              Add Brand
+              {t('brands.addBrand')}
             </Link>
           </Button>
         </div>
@@ -148,10 +150,10 @@ export default function BrandsPage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Package className="h-5 w-5" />
-            Brands ({brands.length})
+            {t('brands.brandsWithCount', { count: brands.length })}
           </CardTitle>
           <CardDescription>
-            Manage your brand portfolio and product associations
+            {t('brands.manageBrandPortfolio')}
           </CardDescription>
         </CardHeader>
         <CardContent>

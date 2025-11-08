@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { useTranslations } from 'next-intl';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
@@ -19,9 +20,10 @@ interface StoreHomepageProps {
 export default function StoreHomepage({ tenant }: StoreHomepageProps) {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
+  const t = useTranslations();
   
-  const storeName = tenant?.name || "Our Store";
-  const storeDescription = tenant?.description || "Discover amazing products at unbeatable prices. Quality guaranteed with fast shipping.";
+  const storeName = tenant?.name || t('store.defaultStoreName');
+  const storeDescription = tenant?.description || t('store.defaultDescription');
 
   useEffect(() => {
     async function fetchCategories() {
@@ -58,12 +60,12 @@ export default function StoreHomepage({ tenant }: StoreHomepageProps) {
 
   // Predefined color schemes for categories
   const colorSchemes = [
-    { bg: 'from-blue-100 to-blue-200', badge: 'New Arrivals' },
-    { bg: 'from-pink-100 to-pink-200', badge: 'Trending' },
-    { bg: 'from-green-100 to-green-200', badge: 'Best Sellers' },
-    { bg: 'from-purple-100 to-purple-200', badge: 'Featured' },
-    { bg: 'from-orange-100 to-orange-200', badge: 'Popular' },
-    { bg: 'from-indigo-100 to-indigo-200', badge: 'Hot Deals' },
+    { bg: 'from-blue-100 to-blue-200', badge: t('store.newArrivals') },
+    { bg: 'from-pink-100 to-pink-200', badge: t('store.trending') },
+    { bg: 'from-green-100 to-green-200', badge: t('store.bestSellers') },
+    { bg: 'from-purple-100 to-purple-200', badge: t('store.featured') },
+    { bg: 'from-orange-100 to-orange-200', badge: t('store.popular') },
+    { bg: 'from-indigo-100 to-indigo-200', badge: t('store.hotDeals') },
   ];
 
   return (
@@ -71,17 +73,17 @@ export default function StoreHomepage({ tenant }: StoreHomepageProps) {
       {/* Hero Section */}
       <section className="text-center py-20 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg mb-12">
         <h1 className="text-4xl md:text-6xl font-bold mb-4">
-          Welcome to {storeName}
+          {t('store.welcomeTo', { storeName })}
         </h1>
         <p className="text-xl mb-8 max-w-2xl mx-auto">
           {storeDescription}
         </p>
         <div className="space-x-4">
           <Button size="lg" variant="secondary" asChild>
-            <Link href="/products">Shop Now</Link>
+            <Link href="/products">{t('store.shopNow')}</Link>
           </Button>
           <Button size="lg" variant="outline" className="text-white border-white hover:bg-white hover:text-blue-600">
-            Learn More
+            {t('common.learnMore')}
           </Button>
         </div>
       </section>
@@ -89,7 +91,7 @@ export default function StoreHomepage({ tenant }: StoreHomepageProps) {
       {/* Featured Categories */}
       <section className="mb-12">
         <h2 className="text-3xl font-bold text-center mb-8">
-          {categories.length > 0 ? 'Featured Categories' : 'Our Store'}
+          {categories.length > 0 ? t('store.featuredCategories') : t('store.ourStore')}
         </h2>
         
         {loading ? (
@@ -125,7 +127,7 @@ export default function StoreHomepage({ tenant }: StoreHomepageProps) {
                   <CardHeader>
                     <CardTitle>{category.name}</CardTitle>
                     <CardDescription>
-                      {category.description || `Explore our ${category.name.toLowerCase()} collection`}
+                      {category.description || t('store.exploreCollection', { categoryName: category.name.toLowerCase() })}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -135,7 +137,7 @@ export default function StoreHomepage({ tenant }: StoreHomepageProps) {
                   <CardFooter>
                     <Button asChild className="w-full">
                       <Link href={`/products/category/${category.slug}`}>
-                        Browse {category.name}
+                        {t('store.browseCategory', { categoryName: category.name })}
                       </Link>
                     </Button>
                   </CardFooter>
@@ -146,10 +148,10 @@ export default function StoreHomepage({ tenant }: StoreHomepageProps) {
         ) : (
           <div className="text-center py-12">
             <p className="text-gray-600 mb-8">
-              This store is being set up. Categories will appear here once they're added.
+              {t('store.storeBeingSetup')}
             </p>
             <Button asChild variant="outline">
-              <Link href="/products">View All Products</Link>
+              <Link href="/products">{t('store.viewAllProducts')}</Link>
             </Button>
           </div>
         )}
@@ -157,16 +159,16 @@ export default function StoreHomepage({ tenant }: StoreHomepageProps) {
 
       {/* Call to Action */}
       <section className="text-center py-16 bg-gray-50 rounded-lg">
-        <h2 className="text-3xl font-bold mb-4">Ready to Start Shopping?</h2>
+        <h2 className="text-3xl font-bold mb-4">{t('store.readyToStartShopping')}</h2>
         <p className="text-gray-600 mb-8 max-w-2xl mx-auto">
-          Join thousands of satisfied customers. Create an account today and get exclusive access to deals and offers.
+          {t('store.joinCustomers')}
         </p>
         <div className="space-x-4">
           <Button size="lg" asChild>
-            <Link href="/signup">Sign Up Now</Link>
+            <Link href="/signup">{t('auth.signUpNow')}</Link>
           </Button>
           <Button size="lg" variant="outline" asChild>
-            <Link href="/products">Continue as Guest</Link>
+            <Link href="/products">{t('store.continueAsGuest')}</Link>
           </Button>
         </div>
       </section>

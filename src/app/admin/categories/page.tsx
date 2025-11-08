@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useTenant } from '@/lib/contexts/tenant-context'
+import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { 
@@ -23,6 +24,7 @@ import {
 
 export default function CategoriesPage() {
   const { tenant } = useTenant()
+  const t = useTranslations()
   
   // State for filters
   const [filters, setFilters] = useState<CategoryFilters>({
@@ -53,17 +55,17 @@ export default function CategoriesPage() {
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold">Categories</h1>
+          <h1 className="text-3xl font-bold">{t('navigation.categories')}</h1>
         </div>
         <Card>
           <CardContent className="p-8 text-center">
             <AlertCircle className="mx-auto h-12 w-12 text-orange-500 mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">Tenant Access Required</h3>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">{t('errors.tenantAccessRequired')}</h3>
             <p className="text-gray-600 mb-4">
-              Categories management requires access via your store subdomain.
+              {t('categories.managementRequiresAccess')}
             </p>
             <Button onClick={() => window.location.href = '/'}>
-              Go to Main Site
+              {t('common.goToMainSite')}
             </Button>
           </CardContent>
         </Card>
@@ -84,10 +86,10 @@ export default function CategoriesPage() {
             <div className="flex items-center gap-2">
               <FolderOpen className="h-5 w-5 text-gray-600" />
               <div>
-                <h1 className="text-xl font-bold tracking-tight">Categories</h1>
+                <h1 className="text-xl font-bold tracking-tight">{t('navigation.categories')}</h1>
                 {categories.length > 0 && (
                   <p className="text-muted-foreground text-xs">
-                    {categories.length} categories
+                    {t('categories.categoryCount', { count: categories.length })}
                   </p>
                 )}
               </div>
@@ -95,7 +97,7 @@ export default function CategoriesPage() {
             <Button asChild size="sm" className="h-8 px-3">
               <Link href="/admin/categories/new">
                 <Plus className="mr-1 h-3 w-3" />
-                Add
+                {t('common.add')}
               </Link>
             </Button>
           </div>
@@ -105,12 +107,12 @@ export default function CategoriesPage() {
         <div className="hidden md:flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <FolderOpen className="h-8 w-8 text-gray-600" />
-            <h1 className="text-3xl font-bold">Categories</h1>
+            <h1 className="text-3xl font-bold">{t('navigation.categories')}</h1>
           </div>
           <Button asChild>
             <Link href="/admin/categories/new">
               <Plus className="mr-2 h-4 w-4" />
-              Add Category
+              {t('categories.addCategory')}
             </Link>
           </Button>
         </div>
@@ -150,10 +152,10 @@ export default function CategoriesPage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Package className="h-5 w-5" />
-            Categories ({categories.length})
+            {t('categories.categoriesWithCount', { count: categories.length })}
           </CardTitle>
           <CardDescription>
-            Manage your store categories and organization
+            {t('categories.manageStoreCategories')}
           </CardDescription>
         </CardHeader>
         <CardContent>

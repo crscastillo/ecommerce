@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useTenant } from '@/lib/contexts/tenant-context'
+import { useTranslations } from 'next-intl'
 import { formatPrice } from '@/lib/utils/currency'
 import { ProductCard } from '@/components/product-card'
 import { Button } from '@/components/ui/button'
@@ -43,6 +44,7 @@ interface Brand {
 
 export default function ProductsPage() {
   const { tenant } = useTenant()
+  const t = useTranslations()
   const [products, setProducts] = useState<Product[]>([])
   const [categories, setCategories] = useState<Category[]>([])
   const [brands, setBrands] = useState<Brand[]>([])
@@ -162,9 +164,9 @@ export default function ProductsPage() {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
           <Package className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-          <h3 className="text-lg font-semibold mb-2">Store not found</h3>
+          <h3 className="text-lg font-semibold mb-2">{t('errors.storeNotFound')}</h3>
           <p className="text-muted-foreground">
-            The store you're looking for could not be found.
+            {t('errors.storeNotFoundDescription')}
           </p>
         </div>
       </div>
@@ -175,9 +177,9 @@ export default function ProductsPage() {
     <div className="container mx-auto px-4 py-8">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Products</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('navigation.products')}</h1>
         <p className="text-gray-600">
-          Discover our amazing collection of products
+          {t('products.discoverCollection')}
         </p>
       </div>
 
@@ -187,7 +189,7 @@ export default function ProductsPage() {
           <div className="sticky top-8">
             <div className="bg-white rounded-lg border p-6 space-y-6">
               <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-gray-900">Filters</h2>
+                <h2 className="text-lg font-semibold text-gray-900">{t('products.filters')}</h2>
                 {hasActiveFilters && (
                   <Button
                     variant="ghost"
@@ -195,19 +197,19 @@ export default function ProductsPage() {
                     onClick={clearFilters}
                     className="text-xs"
                   >
-                    Clear all
+                    {t('products.clearAll')}
                   </Button>
                 )}
               </div>
 
               {/* Search */}
               <div>
-                <Label className="text-sm font-medium text-gray-700 mb-2 block">Search</Label>
+                <Label className="text-sm font-medium text-gray-700 mb-2 block">{t('products.search')}</Label>
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                   <Input
                     type="text"
-                    placeholder="Search products..."
+                    placeholder={t('products.searchPlaceholder')}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="pl-10"
@@ -217,7 +219,7 @@ export default function ProductsPage() {
 
               {/* Categories */}
               <div>
-                <Label className="text-sm font-medium text-gray-700 mb-3 block">Categories</Label>
+                <Label className="text-sm font-medium text-gray-700 mb-3 block">{t('navigation.categories')}</Label>
                 <div className="space-y-2">
                   {categories.map((category) => (
                     <label key={category.id} className="flex items-center space-x-2">
@@ -235,7 +237,7 @@ export default function ProductsPage() {
 
               {/* Brands */}
               <div>
-                <Label className="text-sm font-medium text-gray-700 mb-3 block">Brands</Label>
+                <Label className="text-sm font-medium text-gray-700 mb-3 block">{t('navigation.brands')}</Label>
                 <div className="space-y-2">
                   {brands.map((brand) => (
                     <label key={brand.id} className="flex items-center space-x-2">
@@ -267,7 +269,7 @@ export default function ProductsPage() {
                 className="lg:hidden flex items-center gap-2"
               >
                 <Filter className="h-4 w-4" />
-                Filters
+                {t('products.filters')}
                 {hasActiveFilters && (
                   <Badge variant="secondary" className="ml-1 h-5 w-5 p-0 flex items-center justify-center text-xs">
                     {selectedCategories.length + selectedBrands.length + (searchQuery ? 1 : 0)}
@@ -279,13 +281,13 @@ export default function ProductsPage() {
               <div className="flex gap-3 items-center">
                 <Select value={sortBy} onValueChange={(value: SortOption) => setSortBy(value)}>
                   <SelectTrigger className="w-48">
-                    <SelectValue placeholder="Sort by" />
+                    <SelectValue placeholder={t('products.sortBy')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="newest">Newest First</SelectItem>
-                    <SelectItem value="price-low">Price: Low to High</SelectItem>
-                    <SelectItem value="price-high">Price: High to Low</SelectItem>
-                    <SelectItem value="name">Name: A to Z</SelectItem>
+                    <SelectItem value="newest">{t('products.sortNewest')}</SelectItem>
+                    <SelectItem value="price-low">{t('products.sortPriceLowHigh')}</SelectItem>
+                    <SelectItem value="price-high">{t('products.sortPriceHighLow')}</SelectItem>
+                    <SelectItem value="name">{t('products.sortNameAZ')}</SelectItem>
                   </SelectContent>
                 </Select>
 
@@ -313,12 +315,12 @@ export default function ProductsPage() {
             {/* Active Filters - Mobile */}
             {hasActiveFilters && (
               <div className="mt-4 flex items-center gap-2 flex-wrap">
-                <span className="text-sm text-gray-600">Active filters:</span>
+                <span className="text-sm text-gray-600">{t('products.activeFilters')}:</span>
                 {selectedCategories.map(categoryId => {
                   const category = categories.find(c => c.id === categoryId)
                   return category ? (
                     <Badge key={categoryId} variant="secondary" className="gap-1">
-                      Category: {category.name}
+                      {t('products.category')}: {category.name}
                       <button
                         onClick={() => handleCategoryChange(categoryId, false)}
                         className="ml-1 hover:text-red-600"
@@ -332,7 +334,7 @@ export default function ProductsPage() {
                   const brand = brands.find(b => b.id === brandId)
                   return brand ? (
                     <Badge key={brandId} variant="secondary" className="gap-1">
-                      Brand: {brand.name}
+                      {t('products.brand')}: {brand.name}
                       <button
                         onClick={() => handleBrandChange(brandId, false)}
                         className="ml-1 hover:text-red-600"
@@ -344,7 +346,7 @@ export default function ProductsPage() {
                 })}
                 {searchQuery && (
                   <Badge variant="secondary" className="gap-1">
-                    Search: "{searchQuery}"
+                    {t('products.search')}: "{searchQuery}"
                     <button
                       onClick={() => setSearchQuery('')}
                       className="ml-1 hover:text-red-600"
@@ -359,7 +361,7 @@ export default function ProductsPage() {
                   onClick={clearFilters}
                   className="text-xs lg:hidden"
                 >
-                  Clear all
+                  {t('products.clearAll')}
                 </Button>
               </div>
             )}
@@ -373,16 +375,16 @@ export default function ProductsPage() {
       ) : products.length === 0 ? (
         <div className="text-center py-12">
           <Package className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-          <h3 className="text-lg font-semibold mb-2">No products found</h3>
+          <h3 className="text-lg font-semibold mb-2">{t('products.noProductsFound')}</h3>
           <p className="text-muted-foreground mb-4">
             {searchQuery || selectedCategories.length > 0 || selectedBrands.length > 0
-              ? 'No products match your current filters.'
-              : 'This store doesn\'t have any products yet.'
+              ? t('products.noProductsMatchFilters')
+              : t('products.storeNoProductsYet')
             }
           </p>
           {(searchQuery || selectedCategories.length > 0 || selectedBrands.length > 0) && (
             <Button variant="outline" onClick={clearFilters}>
-              Clear filters
+              {t('products.clearFilters')}
             </Button>
           )}
         </div>
@@ -407,7 +409,7 @@ export default function ProductsPage() {
           {/* Results count */}
           {!loading && products.length > 0 && (
             <div className="mt-8 text-center text-sm text-gray-600">
-              Showing {products.length} product{products.length !== 1 ? 's' : ''}
+              {t('products.showingResults', { count: products.length })}
             </div>
           )}
         </main>
@@ -420,7 +422,7 @@ export default function ProductsPage() {
           <div className="fixed inset-y-0 right-0 w-80 max-w-full bg-white shadow-xl">
             <div className="flex h-full flex-col">
               <div className="flex items-center justify-between px-6 py-4 border-b">
-                <h2 className="text-lg font-semibold">Filters</h2>
+                <h2 className="text-lg font-semibold">{t('products.filters')}</h2>
                 <Button
                   variant="ghost"
                   size="sm"
@@ -433,12 +435,12 @@ export default function ProductsPage() {
               <div className="flex-1 overflow-y-auto p-6 space-y-6">
                 {/* Search */}
                 <div>
-                  <Label className="text-sm font-medium text-gray-700 mb-2 block">Search</Label>
+                  <Label className="text-sm font-medium text-gray-700 mb-2 block">{t('products.search')}</Label>
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                     <Input
                       type="text"
-                      placeholder="Search products..."
+                      placeholder={t('products.searchPlaceholder')}
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       className="pl-10"
@@ -448,7 +450,7 @@ export default function ProductsPage() {
 
                 {/* Categories */}
                 <div>
-                  <Label className="text-sm font-medium text-gray-700 mb-3 block">Categories</Label>
+                  <Label className="text-sm font-medium text-gray-700 mb-3 block">{t('navigation.categories')}</Label>
                   <div className="space-y-2">
                     {categories.map((category) => (
                       <label key={category.id} className="flex items-center space-x-2">
@@ -466,7 +468,7 @@ export default function ProductsPage() {
 
                 {/* Brands */}
                 <div>
-                  <Label className="text-sm font-medium text-gray-700 mb-3 block">Brands</Label>
+                  <Label className="text-sm font-medium text-gray-700 mb-3 block">{t('navigation.brands')}</Label>
                   <div className="space-y-2">
                     {brands.map((brand) => (
                       <label key={brand.id} className="flex items-center space-x-2">
@@ -490,13 +492,13 @@ export default function ProductsPage() {
                     onClick={clearFilters}
                     className="flex-1"
                   >
-                    Clear All
+                    {t('products.clearAll')}
                   </Button>
                   <Button
                     onClick={() => setShowMobileFilters(false)}
                     className="flex-1"
                   >
-                    Apply Filters
+                    {t('products.applyFilters')}
                   </Button>
                 </div>
               </div>

@@ -67,6 +67,8 @@ interface StoreSettings {
   contact_email: string
   contact_phone: string
   country: string
+  admin_language: string
+  store_language: string
   address: {
     street?: string
     city?: string
@@ -135,6 +137,8 @@ export default function SettingsPage() {
     contact_email: '',
     contact_phone: '',
     country: '',
+    admin_language: 'en',
+    store_language: 'en',
     address: {},
     settings: {
       currency: 'USD',
@@ -188,6 +192,8 @@ export default function SettingsPage() {
         contact_email: tenant.contact_email || '',
         contact_phone: tenant.contact_phone || '',
         country: tenant.country || 'US',
+        admin_language: (tenant as any).admin_language || (tenant as any).language || 'en',
+        store_language: (tenant as any).store_language || (tenant as any).language || 'en',
         address: (tenant.address as any) || {},
         settings: {
           currency: 'USD',
@@ -300,6 +306,8 @@ export default function SettingsPage() {
           contact_email: storeSettings.contact_email,
           contact_phone: storeSettings.contact_phone,
           country: storeSettings.country,
+          admin_language: storeSettings.admin_language,
+          store_language: storeSettings.store_language,
           address: storeSettings.address,
           settings: storeSettings.settings,
           updated_at: new Date().toISOString()
@@ -670,6 +678,63 @@ export default function SettingsPage() {
                       <SelectItem value="CL">🇨🇱 Chile</SelectItem>
                       <SelectItem value="CO">🇨🇴 Colombia</SelectItem>
                       <SelectItem value="PE">🇵🇪 Peru</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="admin-language">Admin Language</Label>
+                  <Select 
+                    value={storeSettings.admin_language || 'en'} 
+                    onValueChange={(value) => setStoreSettings(prev => ({ ...prev, admin_language: value }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select admin language" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="en">🇺🇸 English</SelectItem>
+                      <SelectItem value="es">🇨🇷 Español (Costa Rica)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-gray-500 mt-1">Language for admin interface</p>
+                </div>
+                <div>
+                  <Label htmlFor="store-language">Store Language</Label>
+                  <Select 
+                    value={storeSettings.store_language || 'en'} 
+                    onValueChange={(value) => setStoreSettings(prev => ({ ...prev, store_language: value }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select store language" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="en">🇺🇸 English</SelectItem>
+                      <SelectItem value="es">🇨🇷 Español (Costa Rica)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-gray-500 mt-1">Language for public store</p>
+                </div>
+                <div>
+                  <Label htmlFor="timezone">Timezone</Label>
+                  <Select 
+                    value={storeSettings.settings.timezone} 
+                    onValueChange={(value) => setStoreSettings(prev => ({ 
+                      ...prev, 
+                      settings: { ...prev.settings, timezone: value }
+                    }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="America/New_York">Eastern Time</SelectItem>
+                      <SelectItem value="America/Chicago">Central Time</SelectItem>
+                      <SelectItem value="America/Denver">Mountain Time</SelectItem>
+                      <SelectItem value="America/Los_Angeles">Pacific Time</SelectItem>
+                      <SelectItem value="America/Costa_Rica">Costa Rica Time</SelectItem>
+                      <SelectItem value="UTC">UTC</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

@@ -2,12 +2,14 @@
 
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { AlertCircle, ArrowLeft, Home } from 'lucide-react'
 
 export default function AdminUnauthorized() {
   const router = useRouter()
+  const t = useTranslations()
 
   useEffect(() => {
     // Auto-redirect after 10 seconds
@@ -25,14 +27,14 @@ export default function AdminUnauthorized() {
           <div className="mx-auto w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mb-4">
             <AlertCircle className="w-6 h-6 text-red-600" />
           </div>
-          <CardTitle className="text-2xl font-bold text-gray-900">Access Denied</CardTitle>
+          <CardTitle className="text-2xl font-bold text-gray-900">{t('errors.accessDenied')}</CardTitle>
           <CardDescription className="text-gray-600">
-            You don't have permission to access this store's admin panel.
+            {t('errors.noAdminPermission')}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-sm text-gray-500">
-            You need to be the store owner or have admin permissions to access this area.
+            {t('errors.needAdminAccess')}
           </p>
           
           <div className="flex flex-col sm:flex-row gap-3">
@@ -42,19 +44,19 @@ export default function AdminUnauthorized() {
               className="flex items-center justify-center gap-2"
             >
               <ArrowLeft className="w-4 h-4" />
-              Go Back
+              {t('common.goBack')}
             </Button>
             <Button 
               onClick={() => router.push('/')}
               className="flex items-center justify-center gap-2"
             >
               <Home className="w-4 h-4" />
-              Home
+              {t('navigation.home')}
             </Button>
           </div>
           
           <p className="text-xs text-gray-400 mt-4">
-            Redirecting to homepage in 10 seconds...
+            {t('common.redirectingToHomepage')}
           </p>
         </CardContent>
       </Card>

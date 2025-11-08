@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useTenant } from '@/lib/contexts/tenant-context'
+import { useTranslations } from 'next-intl'
 import { createClient } from '@/lib/supabase/client'
 import { Database } from '@/lib/types/database'
 import { Button } from '@/components/ui/button'
@@ -43,6 +44,7 @@ type OrderStats = {
 
 export default function OrdersPage() {
   const { tenant, isLoading: tenantLoading, error } = useTenant()
+  const t = useTranslations()
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
@@ -229,10 +231,10 @@ export default function OrdersPage() {
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold">Orders</h1>
+          <h1 className="text-3xl font-bold">{t('navigation.orders')}</h1>
         </div>
         <div className="text-center py-8">
-          <p>Loading tenant information...</p>
+          <p>{t('common.loadingTenantInfo')}</p>
         </div>
       </div>
     )
@@ -243,38 +245,38 @@ export default function OrdersPage() {
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold">Orders</h1>
+          <h1 className="text-3xl font-bold">{t('navigation.orders')}</h1>
         </div>
         <Card>
           <CardContent className="p-8 text-center">
             <AlertCircle className="mx-auto h-12 w-12 text-orange-500 mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">Tenant Access Required</h3>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">{t('errors.tenantAccessRequired')}</h3>
             <p className="text-gray-600 mb-4">
-              {error || 'No tenant found. This admin panel requires access via your store subdomain.'}
+              {error || t('orders.requiresStoreAccess')}
             </p>
             <div className="bg-gray-50 rounded-lg p-4 mb-4">
-              <p className="text-sm text-gray-700 mb-2"><strong>How to access:</strong></p>
+              <p className="text-sm text-gray-700 mb-2"><strong>{t('orders.howToAccess')}:</strong></p>
               <ol className="text-sm text-gray-600 space-y-1 text-left max-w-md mx-auto">
-                <li>1. Set up a tenant/store first at the main domain</li>
-                <li>2. Access via subdomain: <code className="bg-gray-200 px-1 rounded">yourstore.localhost:3000</code></li>
-                <li>3. Then navigate to <code className="bg-gray-200 px-1 rounded">/admin/orders</code></li>
+                <li>1. {t('orders.setupTenantFirst')}</li>
+                <li>2. {t('orders.accessViaSubdomain')}: <code className="bg-gray-200 px-1 rounded">yourstore.localhost:3000</code></li>
+                <li>3. {t('orders.navigateToAdmin')}: <code className="bg-gray-200 px-1 rounded">/admin/orders</code></li>
               </ol>
             </div>
             <p className="text-xs text-gray-500">
-              Current URL: {typeof window !== 'undefined' ? window.location.href : 'Unknown'}
+              {t('orders.currentUrl')}: {typeof window !== 'undefined' ? window.location.href : t('common.unknown')}
             </p>
             <div className="mt-4">
               <Button 
                 onClick={() => window.location.href = '/'}
                 className="mr-2"
               >
-                Go to Main Site
+                {t('common.goToMainSite')}
               </Button>
               <Button 
                 variant="outline"
                 onClick={() => window.location.reload()}
               >
-                Retry
+                {t('common.retry')}
               </Button>
             </div>
           </CardContent>
@@ -287,7 +289,7 @@ export default function OrdersPage() {
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold">Orders</h1>
+          <h1 className="text-3xl font-bold">{t('navigation.orders')}</h1>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           {[1, 2, 3, 4].map(i => (
@@ -318,7 +320,7 @@ export default function OrdersPage() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Orders</h1>
+        <h1 className="text-3xl font-bold">{t('navigation.orders')}</h1>
       </div>
 
       {/* Stats Cards */}
@@ -328,7 +330,7 @@ export default function OrdersPage() {
             <div className="flex items-center space-x-2">
               <Package className="h-5 w-5 text-blue-500" />
               <div>
-                <p className="text-sm font-medium text-gray-600">Total Orders</p>
+                <p className="text-sm font-medium text-gray-600">{t('orders.totalOrders')}</p>
                 <p className="text-2xl font-bold">{stats.total}</p>
               </div>
             </div>
@@ -339,7 +341,7 @@ export default function OrdersPage() {
             <div className="flex items-center space-x-2">
               <AlertCircle className="h-5 w-5 text-orange-500" />
               <div>
-                <p className="text-sm font-medium text-gray-600">Pending Payment</p>
+                <p className="text-sm font-medium text-gray-600">{t('orders.pendingPayment')}</p>
                 <p className="text-2xl font-bold">{stats.pending}</p>
               </div>
             </div>
@@ -350,7 +352,7 @@ export default function OrdersPage() {
             <div className="flex items-center space-x-2">
               <CheckCircle className="h-5 w-5 text-green-500" />
               <div>
-                <p className="text-sm font-medium text-gray-600">Fulfilled</p>
+                <p className="text-sm font-medium text-gray-600">{t('orders.fulfilled')}</p>
                 <p className="text-2xl font-bold">{stats.fulfilled}</p>
               </div>
             </div>
@@ -361,7 +363,7 @@ export default function OrdersPage() {
             <div className="flex items-center space-x-2">
               <DollarSign className="h-5 w-5 text-green-500" />
               <div>
-                <p className="text-sm font-medium text-gray-600">Total Revenue</p>
+                <p className="text-sm font-medium text-gray-600">{t('dashboard.totalRevenue')}</p>
                 <p className="text-2xl font-bold">{formatCurrency(stats.totalRevenue)}</p>
               </div>
             </div>

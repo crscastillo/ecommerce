@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { useTenant } from '@/lib/contexts/tenant-context'
 import { TenantDatabase } from '@/lib/supabase/tenant-database'
 import { Button } from '@/components/ui/button'
@@ -49,6 +50,7 @@ export default function CategoryViewPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { tenant } = useTenant()
+  const t = useTranslations()
   
   const categoryId = params.id as string
   
@@ -138,16 +140,16 @@ export default function CategoryViewPage() {
 
   const validateForm = (): string | null => {
     if (!formData.name.trim()) {
-      return 'Category name is required'
+      return t('errors.categoryNameRequired')
     }
     if (!formData.slug.trim()) {
-      return 'Category slug is required'
+      return t('errors.categorySlugRequired')
     }
     if (formData.slug.trim() !== formData.slug.trim().toLowerCase()) {
-      return 'Slug must be lowercase'
+      return t('errors.slugMustBeLowercase')
     }
     if (!/^[a-z0-9-]+$/.test(formData.slug.trim())) {
-      return 'Slug can only contain lowercase letters, numbers, and hyphens'
+      return t('errors.slugInvalidCharacters')
     }
     return null
   }
@@ -182,7 +184,7 @@ export default function CategoryViewPage() {
       const { error: updateError } = await tenantDb.updateCategory(categoryId, categoryData)
       
       if (updateError) {
-        setError(`Failed to update category: ${updateError.message}`)
+        setError(`${t('errors.failedToUpdateCategory')}: ${updateError.message}`)
         return
       }
 
@@ -198,7 +200,7 @@ export default function CategoryViewPage() {
       setTimeout(() => setSuccess(false), 3000)
     } catch (err: any) {
       console.error('Error updating category:', err)
-      setError('An unexpected error occurred')
+      setError(t('errors.unexpectedError'))
     } finally {
       setSaving(false)
     }
@@ -214,7 +216,7 @@ export default function CategoryViewPage() {
       const { error: deleteError } = await tenantDb.deleteCategory(categoryId)
       
       if (deleteError) {
-        setError(`Failed to delete category: ${deleteError.message}`)
+        setError(`${t('errors.failedToDeleteCategory')}: ${deleteError.message}`)
         return
       }
 
@@ -222,7 +224,7 @@ export default function CategoryViewPage() {
       router.push('/admin/categories')
     } catch (err: any) {
       console.error('Error deleting category:', err)
-      setError('Failed to delete category')
+      setError(t('errors.failedToDeleteCategory'))
     } finally {
       setDeleting(false)
       setShowDeleteDialog(false)
@@ -234,7 +236,7 @@ export default function CategoryViewPage() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="mx-auto h-8 w-8 animate-spin mb-4" />
-          <p className="text-muted-foreground">Loading category...</p>
+          <p className="text-muted-foreground">{t('common.loadingCategory')}</p>
         </div>
       </div>
     )
@@ -246,12 +248,12 @@ export default function CategoryViewPage() {
         <Card className="w-full max-w-md">
           <CardContent className="pt-6 text-center">
             <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-            <h2 className="text-lg font-semibold mb-2">Category Not Found</h2>
+            <h2 className="text-lg font-semibold mb-2">{t('errors.categoryNotFound')}</h2>
             <p className="text-gray-600 mb-4">{error}</p>
             <Button asChild>
               <Link href="/admin/categories">
                 <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to Categories
+                {t('common.backToCategories')}
               </Link>
             </Button>
           </CardContent>
@@ -270,13 +272,13 @@ export default function CategoryViewPage() {
           <Button variant="ghost" size="sm" asChild>
             <Link href="/admin/categories">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Categories
+              {t('common.backToCategories')}
             </Link>
           </Button>
           <div>
             <h1 className="text-3xl font-bold tracking-tight">{category.name}</h1>
             <p className="text-muted-foreground">
-              {mode === 'view' ? 'View category details' : 'Edit category details'}
+              {mode === 'view' ? t('categories.viewCategoryDetails') : t('categories.editCategoryDetails')}
             </p>
           </div>
         </div>
@@ -290,7 +292,7 @@ export default function CategoryViewPage() {
               >
                 <Link href={`/products/${category.slug}`} target="_blank">
                   <Eye className="mr-2 h-4 w-4" />
-                  View in Store
+                  {t('categories.viewInStore')}
                 </Link>
               </Button>
               <Button 
@@ -298,7 +300,7 @@ export default function CategoryViewPage() {
                 onClick={() => setMode('edit')}
               >
                 <Edit className="mr-2 h-4 w-4" />
-                Edit
+                {t('common.edit')}
               </Button>
               <Button 
                 variant="outline"
@@ -307,7 +309,7 @@ export default function CategoryViewPage() {
                 className="text-red-600 hover:text-red-700"
               >
                 <Trash2 className="mr-2 h-4 w-4" />
-                Delete
+                {t('common.delete')}
               </Button>
             </>
           ) : (
@@ -319,7 +321,7 @@ export default function CategoryViewPage() {
                   setError('')
                 }}
               >
-                Cancel
+                {t('common.cancel')}
               </Button>
               <Button 
                 onClick={handleSave} 
@@ -328,12 +330,12 @@ export default function CategoryViewPage() {
                 {saving ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Saving...
+                    {t('common.saving')}
                   </>
                 ) : (
                   <>
                     <Save className="mr-2 h-4 w-4" />
-                    Save Changes
+                    {t('common.saveChanges')}
                   </>
                 )}
               </Button>
@@ -359,7 +361,7 @@ export default function CategoryViewPage() {
           <CardContent className="pt-6">
             <div className="flex items-center gap-2 text-green-600">
               <FolderOpen className="w-4 h-4" />
-              Category updated successfully!
+              {t('success.categoryUpdated')}
             </div>
           </CardContent>
         </Card>

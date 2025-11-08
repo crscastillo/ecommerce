@@ -5,6 +5,7 @@ import { ConditionalLayout } from "@/components/conditional-layout";
 import { TenantProvider } from "@/lib/contexts/tenant-provider";
 import { CartProvider } from "@/lib/contexts/cart-context";
 import { ToastProvider } from "@/lib/contexts/toast-context";
+import { IntlProvider } from "@/lib/providers/intl-provider";
 import { platformConfig } from "@/lib/config/platform";
 
 const geistSans = Geist({
@@ -39,13 +40,15 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <TenantProvider>
-          <ToastProvider>
-            <CartProvider>
-              <ConditionalLayout>
-                {children}
-              </ConditionalLayout>
-            </CartProvider>
-          </ToastProvider>
+          <IntlProvider>
+            <ToastProvider>
+              <CartProvider>
+                <ConditionalLayout>
+                  {children}
+                </ConditionalLayout>
+              </CartProvider>
+            </ToastProvider>
+          </IntlProvider>
         </TenantProvider>
       </body>
     </html>

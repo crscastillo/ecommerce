@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { useTenant } from '@/lib/contexts/tenant-context'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -22,17 +23,18 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-const navigation = [
-  { name: 'Dashboard', href: '/admin', icon: Home },
-  { name: 'Products', href: '/admin/products', icon: Package },
-  { name: 'Orders', href: '/admin/orders', icon: ShoppingCart },
-  { name: 'Customers', href: '/admin/customers', icon: Users },
-  { name: 'Categories', href: '/admin/categories', icon: Tag },
-  { name: 'Brands', href: '/admin/brands', icon: BadgeCheck },
-  { name: 'Analytics', href: '/admin/analytics', icon: BarChart3 },
-  { name: 'Pages', href: '/admin/pages', icon: FileText },
-  { name: 'Billing', href: '/admin/billing', icon: CreditCard },
-  { name: 'Settings', href: '/admin/settings', icon: Settings },
+// Navigation items with translation keys
+const navigationItems = [
+  { key: 'dashboard', href: '/admin', icon: Home },
+  { key: 'products', href: '/admin/products', icon: Package },
+  { key: 'orders', href: '/admin/orders', icon: ShoppingCart },
+  { key: 'customers', href: '/admin/customers', icon: Users },
+  { key: 'categories', href: '/admin/categories', icon: Tag },
+  { key: 'brands', href: '/admin/brands', icon: BadgeCheck },
+  { key: 'analytics', href: '/admin/analytics', icon: BarChart3 },
+  { key: 'pages', href: '/admin/pages', icon: FileText },
+  { key: 'billing', href: '/admin/billing', icon: CreditCard },
+  { key: 'settings', href: '/admin/settings', icon: Settings },
 ]
 
 interface AdminSidebarProps {
@@ -43,6 +45,7 @@ interface AdminSidebarProps {
 export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
   const pathname = usePathname()
   const { tenant, isLoading } = useTenant()
+  const t = useTranslations('navigation')
 
   if (isLoading) {
     return (
@@ -95,11 +98,11 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
 
           {/* Navigation */}
           <nav className="flex-1 space-y-1 px-2 py-4">
-            {navigation.map((item) => {
+            {navigationItems.map((item) => {
               const isActive = pathname === item.href
               return (
                 <Link
-                  key={item.name}
+                  key={item.key}
                   href={item.href}
                   className={cn(
                     "group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors",
@@ -115,7 +118,7 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
                       isActive ? "text-blue-500" : "text-gray-400 group-hover:text-gray-500"
                     )}
                   />
-                  {item.name}
+                  {t(item.key)}
                 </Link>
               )
             })}

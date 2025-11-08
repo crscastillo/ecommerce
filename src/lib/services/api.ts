@@ -43,7 +43,13 @@ export interface Product {
   price: number
   compare_price: number | null
   category_id: string | null
+  brand_id: string | null
   category?: {
+    id: string
+    name: string
+    slug: string
+  }
+  brand?: {
     id: string
     name: string
     slug: string
@@ -164,6 +170,7 @@ export class ApiService {
     tenantId: string,
     filters: {
       category_id?: string
+      brand_slug?: string
       is_active?: boolean
       is_featured?: boolean
       search?: string
@@ -250,6 +257,7 @@ export class ApiService {
     query: string,
     filters: {
       category_id?: string
+      brand_slug?: string
       is_active?: boolean
       is_featured?: boolean
       sort_by?: 'newest' | 'price-low' | 'price-high' | 'name'

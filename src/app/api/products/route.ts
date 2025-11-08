@@ -101,6 +101,7 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
   const tenantId = searchParams.get('tenant_id')
   const categoryId = searchParams.get('category_id')
+  const brandSlug = searchParams.get('brand_slug')
   const search = searchParams.get('search')
   const sortBy = searchParams.get('sort_by') || 'newest'
 
@@ -123,6 +124,26 @@ export async function GET(request: NextRequest) {
     
     console.log('API: Fetching products for tenant:', tenantId)
     
+    // If filtering by brand slug, first get the brand ID
+    let brandId = null
+    if (brandSlug) {
+      const { data: brandData, error: brandError } = await supabase
+        .from('brands')
+        .select('id')
+        .eq('tenant_id', tenantId)
+        .eq('slug', brandSlug)
+        .eq('is_active', true)
+        .single()
+      
+      if (brandError || !brandData) {
+        console.log('Brand not found for slug:', brandSlug)
+        return NextResponse.json({ data: [] })
+      }
+      
+      brandId = brandData.id
+      console.log('Found brand ID for slug:', brandSlug, '→', brandId)
+    }
+    
     let query = supabase
       .from('products')
       .select(`
@@ -134,7 +155,13 @@ export async function GET(request: NextRequest) {
         price,
         compare_price,
         category_id,
+        brand_id,
         category:categories(
+          id,
+          name,
+          slug
+        ),
+        brand:brands(
           id,
           name,
           slug
@@ -154,6 +181,10 @@ export async function GET(request: NextRequest) {
     // Apply filters
     if (categoryId) {
       query = query.eq('category_id', categoryId)
+    }
+
+    if (brandId) {
+      query = query.eq('brand_id', brandId)
     }
 
     if (search) {

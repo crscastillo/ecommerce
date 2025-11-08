@@ -64,12 +64,18 @@ export async function GET(
         short_description,
         price,
         compare_price,
+        brand_id,
         images,
         is_featured,
         product_type,
         inventory_quantity,
         track_inventory,
-        created_at
+        created_at,
+        brand:brands(
+          id,
+          name,
+          slug
+        )
       `)
       .eq('tenant_id', tenantId)
       .eq('category_id', category.id)

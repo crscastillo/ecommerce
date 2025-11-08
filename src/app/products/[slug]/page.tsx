@@ -272,6 +272,17 @@ export default function ProductPage() {
           <Link href="/" className="hover:text-gray-900">Home</Link>
           <span>/</span>
           <Link href="/products" className="hover:text-gray-900">Products</Link>
+          {product.brand && (
+            <>
+              <span>/</span>
+              <Link 
+                href={`/brands/${product.brand.slug}`} 
+                className="hover:text-gray-900"
+              >
+                {product.brand.name}
+              </Link>
+            </>
+          )}
           {product.category && (
             <>
               <span>/</span>
@@ -353,14 +364,31 @@ export default function ProductPage() {
           <div className="space-y-6">
             <div>
               <h1 className="text-3xl font-bold text-gray-900 mb-2">{product.name}</h1>
-              {product.category && (
-                <Link 
-                  href={`/products/category/${product.category.slug}`}
-                  className="text-blue-600 hover:text-blue-800 font-medium"
-                >
-                  {product.category.name}
-                </Link>
-              )}
+              <div className="flex items-center gap-2 text-sm">
+                {product.brand && (
+                  <>
+                    <span className="text-gray-600">by</span>
+                    <Link 
+                      href={`/brands/${product.brand.slug}`}
+                      className="font-medium text-blue-600 hover:text-blue-800"
+                    >
+                      {product.brand.name}
+                    </Link>
+                  </>
+                )}
+                {product.category && (
+                  <>
+                    {product.brand && <span className="text-gray-400">•</span>}
+                    <span className="text-gray-600">in</span>
+                    <Link 
+                      href={`/products/category/${product.category.slug}`}
+                      className="font-medium text-blue-600 hover:text-blue-800"
+                    >
+                      {product.category.name}
+                    </Link>
+                  </>
+                )}
+              </div>
             </div>
 
             {/* Price */}

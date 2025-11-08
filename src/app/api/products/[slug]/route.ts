@@ -44,6 +44,7 @@ export async function GET(
         short_description,
         price,
         compare_price,
+        brand_id,
         images,
         is_featured,
         is_active,
@@ -53,6 +54,11 @@ export async function GET(
         tags,
         created_at,
         category:categories(
+          id,
+          name,
+          slug
+        ),
+        brand:brands(
           id,
           name,
           slug

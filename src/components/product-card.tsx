@@ -25,7 +25,13 @@ interface Product {
   price: number
   compare_price: number | null
   category_id: string | null
+  brand_id: string | null
   category?: {
+    id: string
+    name: string
+    slug: string
+  }
+  brand?: {
     id: string
     name: string
     slug: string
@@ -251,14 +257,31 @@ export function ProductCard({ product, viewMode = 'grid', tenantSettings = {} }:
                   </h3>
                 </Link>
                 
-                {product.category && (
-                  <Link 
-                    href={`/products/category/${product.category.slug}`}
-                    className="text-sm text-gray-600 hover:text-gray-900"
-                  >
-                    {product.category.name}
-                  </Link>
-                )}
+                <div className="flex items-center gap-2 text-sm">
+                  {product.brand && (
+                    <>
+                      <span className="text-gray-600">by</span>
+                      <Link 
+                        href={`/brands/${product.brand.slug}`}
+                        className="font-medium text-blue-600 hover:text-blue-800"
+                      >
+                        {product.brand.name}
+                      </Link>
+                    </>
+                  )}
+                  {product.category && (
+                    <>
+                      {product.brand && <span className="text-gray-400">•</span>}
+                      <span className="text-gray-600">in</span>
+                      <Link 
+                        href={`/products/category/${product.category.slug}`}
+                        className="text-gray-600 hover:text-gray-900"
+                      >
+                        {product.category.name}
+                      </Link>
+                    </>
+                  )}
+                </div>
               </div>
 
               <div className="text-right">
@@ -409,14 +432,28 @@ export function ProductCard({ product, viewMode = 'grid', tenantSettings = {} }:
           </h3>
         </Link>
         
-        {product.category && (
-          <Link 
-            href={`/products/category/${product.category.slug}`}
-            className="text-sm text-gray-600 hover:text-gray-900"
-          >
-            {product.category.name}
-          </Link>
-        )}
+        <div className="space-y-1">
+          {product.brand && (
+            <div className="text-sm">
+              <span className="text-gray-500">by </span>
+              <Link 
+                href={`/brands/${product.brand.slug}`}
+                className="font-medium text-blue-600 hover:text-blue-800"
+              >
+                {product.brand.name}
+              </Link>
+            </div>
+          )}
+          
+          {product.category && (
+            <Link 
+              href={`/products/category/${product.category.slug}`}
+              className="text-sm text-gray-600 hover:text-gray-900 block"
+            >
+              {product.category.name}
+            </Link>
+          )}
+        </div>
 
         {product.short_description && (
           <p className="text-gray-600 text-sm mt-2 line-clamp-2">

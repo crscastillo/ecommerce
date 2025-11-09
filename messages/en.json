@@ -46,6 +46,9 @@
     "brands": "Brands",
     "orders": "Orders",
     "customers": "Customers",
+    "analytics": "Analytics",
+    "pages": "Pages",
+    "billing": "Billing",
     "settings": "Settings",
     "logout": "Logout",
     "profile": "Profile",
@@ -79,7 +82,9 @@
     "recentActivityDescription": "Latest updates and activities",
     "noRecentActivity": "No recent activity",
     "performance": "Performance",
-    "performanceDescription": "Store metrics and analytics"
+    "performanceDescription": "Store metrics and analytics",
+    "storeReadyForLaunch": "Your store is ready for launch!",
+    "completeSetupToStartSelling": "Complete the setup to start selling"
   },
   "products": {
     "title": "Products",

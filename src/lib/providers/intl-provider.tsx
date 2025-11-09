@@ -20,8 +20,8 @@ interface Props {
 export function IntlProvider({ children }: Props) {
   const { tenant } = useTenant()
   
-  // Get locale from tenant settings, default to 'en'
-  const locale = (tenant as any)?.language || 'en'
+  // Get locale from tenant store language settings, default to 'en'
+  const locale = (tenant as any)?.store_language || 'en'
   
   // Get messages for the current locale, fallback to English
   const messages = messagesMap[locale] || messagesMap.en

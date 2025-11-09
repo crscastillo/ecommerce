@@ -206,6 +206,8 @@
     "currency": "Moneda",
     "country": "País",
     "language": "Idioma",
+    "adminLanguage": "Idioma del Administrador",
+    "storeLanguage": "Idioma de la Tienda",
     "timezone": "Zona Horaria",
     "email": "Correo Electrónico",
     "phone": "Teléfono",
@@ -214,7 +216,11 @@
     "state": "Provincia",
     "postalCode": "Código Postal",
     "saveSettings": "Guardar Configuración",
-    "settingsUpdated": "Configuración actualizada exitosamente"
+    "settingsUpdated": "Configuración actualizada con éxito",
+    "languageOptions": {
+      "en": "🇺🇸 English",
+      "es": "🇨🇷 Español (Costa Rica)"
+    }
   },
   "auth": {
     "login": "Iniciar Sesión",

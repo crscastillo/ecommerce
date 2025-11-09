@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useTenant } from '@/lib/contexts/tenant-context'
 import { createClient } from '@/lib/supabase/client'
+import { useTranslations } from 'next-intl'
 import { Database } from '@/lib/types/database'
 import { PaymentMethodsService } from '@/lib/services/payment-methods'
 import { Button } from '@/components/ui/button'
@@ -118,6 +119,7 @@ interface PaymentSettings {
 
 export default function SettingsPage() {
   const { tenant, isLoading: tenantLoading, error, refreshTenant } = useTenant()
+  const t = useTranslations('settings')
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
@@ -192,8 +194,8 @@ export default function SettingsPage() {
         contact_email: tenant.contact_email || '',
         contact_phone: tenant.contact_phone || '',
         country: tenant.country || 'US',
-        admin_language: (tenant as any).admin_language || (tenant as any).language || 'en',
-        store_language: (tenant as any).store_language || (tenant as any).language || 'en',
+        admin_language: (tenant as any).admin_language || 'en',
+        store_language: (tenant as any).store_language || 'en',
         address: (tenant.address as any) || {},
         settings: {
           currency: 'USD',
@@ -685,7 +687,7 @@ export default function SettingsPage() {
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="admin-language">Admin Language</Label>
+                  <Label htmlFor="admin-language">{t('adminLanguage')}</Label>
                   <Select 
                     value={storeSettings.admin_language || 'en'} 
                     onValueChange={(value) => setStoreSettings(prev => ({ ...prev, admin_language: value }))}
@@ -694,14 +696,14 @@ export default function SettingsPage() {
                       <SelectValue placeholder="Select admin language" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="en">🇺🇸 English</SelectItem>
-                      <SelectItem value="es">🇨🇷 Español (Costa Rica)</SelectItem>
+                      <SelectItem value="en">{t('languageOptions.en')}</SelectItem>
+                      <SelectItem value="es">{t('languageOptions.es')}</SelectItem>
                     </SelectContent>
                   </Select>
                   <p className="text-xs text-gray-500 mt-1">Language for admin interface</p>
                 </div>
                 <div>
-                  <Label htmlFor="store-language">Store Language</Label>
+                  <Label htmlFor="store-language">{t('storeLanguage')}</Label>
                   <Select 
                     value={storeSettings.store_language || 'en'} 
                     onValueChange={(value) => setStoreSettings(prev => ({ ...prev, store_language: value }))}
@@ -710,8 +712,8 @@ export default function SettingsPage() {
                       <SelectValue placeholder="Select store language" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="en">🇺🇸 English</SelectItem>
-                      <SelectItem value="es">🇨🇷 Español (Costa Rica)</SelectItem>
+                      <SelectItem value="en">{t('languageOptions.en')}</SelectItem>
+                      <SelectItem value="es">{t('languageOptions.es')}</SelectItem>
                     </SelectContent>
                   </Select>
                   <p className="text-xs text-gray-500 mt-1">Language for public store</p>

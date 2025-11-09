@@ -168,8 +168,8 @@ async function handleTenantSubdomain(request: NextRequest, supabaseResponse: Nex
     if (basicTenant) {
       tenant = {
         ...basicTenant,
-        admin_language: basicTenant.language || 'en',
-        store_language: basicTenant.language || 'en'
+        admin_language: 'en',
+        store_language: 'en'
       }
     } else {
       tenant = basicTenant
@@ -199,7 +199,7 @@ async function handleTenantSubdomain(request: NextRequest, supabaseResponse: Nex
       }
     })
   }
-  
+
 
   if (!tenant) {
     // Tenant not found or inactive - redirect to main site with error
@@ -221,10 +221,10 @@ async function handleTenantSubdomain(request: NextRequest, supabaseResponse: Nex
   
   if (currentPath.startsWith('/admin')) {
     // Use admin language for admin routes
-    locale = tenant.admin_language || tenant.language || 'en'
+    locale = tenant.admin_language || 'en'
   } else {
     // Use store language for public routes
-    locale = tenant.store_language || tenant.language || 'en'
+    locale = tenant.store_language || 'en'
   }
   
   supabaseResponse.headers.set('x-locale', locale)
@@ -232,7 +232,12 @@ async function handleTenantSubdomain(request: NextRequest, supabaseResponse: Nex
   console.log('[Middleware] Tenant found, setting headers:', {
     'x-tenant-id': tenant.id,
     'x-tenant-subdomain': tenant.subdomain,
-    'x-tenant-name': tenant.name
+    'x-tenant-name': tenant.name,
+    'x-locale': locale,
+    'currentPath': currentPath,
+    'isAdmin': currentPath.startsWith('/admin'),
+    'admin_language': tenant.admin_language,
+    'store_language': tenant.store_language
   })
 
   const pathname = request.nextUrl.pathname

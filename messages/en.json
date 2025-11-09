@@ -204,6 +204,8 @@
     "currency": "Currency",
     "country": "Country",
     "language": "Language",
+    "adminLanguage": "Admin Language",
+    "storeLanguage": "Store Language",
     "timezone": "Timezone",
     "email": "Email",
     "phone": "Phone",
@@ -212,7 +214,11 @@
     "state": "State",
     "postalCode": "Postal Code",
     "saveSettings": "Save Settings",
-    "settingsUpdated": "Settings updated successfully"
+    "settingsUpdated": "Settings updated successfully",
+    "languageOptions": {
+      "en": "🇺🇸 English",
+      "es": "🇨🇷 Español (Costa Rica)"
+    }
   },
   "auth": {
     "login": "Login",

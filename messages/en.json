@@ -56,10 +56,30 @@
   "dashboard": {
     "title": "Dashboard",
     "welcome": "Welcome back",
+    "welcomeBack": "Welcome back to {storeName}",
+    "storeStatus": "Store Status",
+    "live": "Live",
+    "inactive": "Inactive",
+    "storeUrl": "Store URL",
+    "subscription": "Subscription",
+    "plan": "Plan",
+    "totalRevenue": "Total Revenue",
+    "fromLastMonth": "{percentage} from last month",
     "totalProducts": "Total Products",
     "totalCategories": "Total Categories",
     "totalBrands": "Total Brands",
-    "recentActivity": "Recent Activity"
+    "startAddingProducts": "Start adding products to your store",
+    "noOrdersYet": "No orders yet",
+    "noCustomersYet": "No customers yet",
+    "quickSetup": "Quick Setup",
+    "quickSetupDescription": "Get your store ready in minutes",
+    "addFirstProduct": "Add your first product",
+    "configureStoreSettings": "Configure store settings",
+    "recentActivity": "Recent Activity",
+    "recentActivityDescription": "Latest updates and activities",
+    "noRecentActivity": "No recent activity",
+    "performance": "Performance",
+    "performanceDescription": "Store metrics and analytics"
   },
   "products": {
     "title": "Products",
@@ -141,7 +161,23 @@
     "noParent": "No Parent",
     "sortOrder": "Sort Order",
     "allCategories": "All Categories",
-    "noCategoriesFound": "No categories found"
+    "noCategoriesFound": "No categories found",
+    "categoryCount": "{count} categories",
+    "categoriesWithCount": "{count} categories",
+    "manageStoreCategories": "Manage your store categories",
+    "managementRequiresAccess": "Category management requires store access",
+    "viewCategoryDetails": "View Category Details",
+    "editCategoryDetails": "Edit Category Details",
+    "viewInStore": "View in Store"
+  },
+  "orders": {
+    "title": "Orders",
+    "requiresStoreAccess": "Order management requires store access",
+    "howToAccess": "How to access",
+    "setupTenantFirst": "Set up your tenant/store first",
+    "accessViaSubdomain": "Access via subdomain",
+    "navigateToAdmin": "Navigate to admin",
+    "currentUrl": "Current URL"
   },
   "brands": {
     "title": "Brands",

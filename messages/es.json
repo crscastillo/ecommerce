@@ -56,10 +56,30 @@
   "dashboard": {
     "title": "Panel de Control",
     "welcome": "Bienvenido de nuevo",
+    "welcomeBack": "Bienvenido de nuevo a {storeName}",
+    "storeStatus": "Estado de la Tienda",
+    "live": "Activa",
+    "inactive": "Inactiva",
+    "storeUrl": "URL de la Tienda",
+    "subscription": "Suscripción",
+    "plan": "Plan",
+    "totalRevenue": "Ingresos Totales",
+    "fromLastMonth": "{percentage} del mes pasado",
     "totalProducts": "Total de Productos",
     "totalCategories": "Total de Categorías",
     "totalBrands": "Total de Marcas",
-    "recentActivity": "Actividad Reciente"
+    "startAddingProducts": "Comienza agregando productos a tu tienda",
+    "noOrdersYet": "Aún no hay pedidos",
+    "noCustomersYet": "Aún no hay clientes",
+    "quickSetup": "Configuración Rápida",
+    "quickSetupDescription": "Prepara tu tienda en minutos",
+    "addFirstProduct": "Agrega tu primer producto",
+    "configureStoreSettings": "Configura los ajustes de la tienda",
+    "recentActivity": "Actividad Reciente",
+    "recentActivityDescription": "Últimas actualizaciones y actividades",
+    "noRecentActivity": "No hay actividad reciente",
+    "performance": "Rendimiento",
+    "performanceDescription": "Métricas y analíticas de la tienda"
   },
   "products": {
     "title": "Productos",
@@ -138,7 +158,23 @@
     "noParent": "Sin Padre",
     "sortOrder": "Orden",
     "allCategories": "Todas las Categorías",
-    "noCategoriesFound": "No se encontraron categorías"
+    "noCategoriesFound": "No se encontraron categorías",
+    "categoryCount": "{count} categorías",
+    "categoriesWithCount": "{count} categorías",
+    "manageStoreCategories": "Administra las categorías de tu tienda",
+    "managementRequiresAccess": "La gestión de categorías requiere acceso a la tienda",
+    "viewCategoryDetails": "Ver Detalles de la Categoría",
+    "editCategoryDetails": "Editar Detalles de la Categoría",
+    "viewInStore": "Ver en la Tienda"
+  },
+  "orders": {
+    "title": "Pedidos",
+    "requiresStoreAccess": "La gestión de pedidos requiere acceso a la tienda",
+    "howToAccess": "Cómo acceder",
+    "setupTenantFirst": "Configura tu inquilino/tienda primero",
+    "accessViaSubdomain": "Accede vía subdominio",
+    "navigateToAdmin": "Navega al admin",
+    "currentUrl": "URL actual"
   },
   "brands": {
     "title": "Marcas",

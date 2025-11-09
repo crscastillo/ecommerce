@@ -111,9 +111,20 @@ async function handleMainDomain(request: NextRequest, supabaseResponse: NextResp
 }
 
 async function handleTenantSubdomain(request: NextRequest, supabaseResponse: NextResponse, subdomain: string) {
+  // Validate environment variables
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  
+  if (!supabaseUrl || !supabaseKey) {
+    console.error('[Middleware] Missing Supabase environment variables')
+    return new NextResponse('Missing database configuration', { status: 500 })
+  }
+  
+  console.log('[Middleware] Using Supabase URL:', supabaseUrl)
+  
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    supabaseUrl,
+    supabaseKey,
     {
       cookies: {
         getAll() {
@@ -134,12 +145,37 @@ async function handleTenantSubdomain(request: NextRequest, supabaseResponse: Nex
 
   // Validate tenant exists and is active
   console.log('[Middleware] Looking up tenant:', subdomain)
-  const { data: tenant, error } = await supabase
+  
+  // Try with all columns first, fallback if columns don't exist
+  let { data: tenant, error } = await supabase
     .from('tenants')
     .select('id, name, subdomain, is_active, settings, owner_id, language, admin_language, store_language')
     .eq('subdomain', subdomain)
     .eq('is_active', true)
     .maybeSingle()
+
+  // If error might be due to missing columns, try with basic columns only
+  if (error && error.message.includes('column')) {
+    console.log('[Middleware] Trying basic tenant lookup due to column error:', error.message)
+    const { data: basicTenant, error: basicError } = await supabase
+      .from('tenants')
+      .select('id, name, subdomain, is_active, settings, owner_id, language')
+      .eq('subdomain', subdomain)
+      .eq('is_active', true)
+      .maybeSingle()
+    
+    // Add missing properties for compatibility
+    if (basicTenant) {
+      tenant = {
+        ...basicTenant,
+        admin_language: basicTenant.language || 'en',
+        store_language: basicTenant.language || 'en'
+      }
+    } else {
+      tenant = basicTenant
+    }
+    error = basicError
+  }
 
   console.log('[Middleware] Tenant lookup result:', { 
     subdomain, 
@@ -150,8 +186,18 @@ async function handleTenantSubdomain(request: NextRequest, supabaseResponse: Nex
 
   if (error) {
     console.error('[Middleware] Database error:', error)
-    // Return error page instead of redirect for database errors
-    return new NextResponse('Database connection error', { status: 500 })
+    // Return error page with more details for debugging
+    const errorDetails = {
+      error: error.message,
+      subdomain,
+      timestamp: new Date().toISOString()
+    }
+    return new NextResponse(`Database error: ${error.message}. Details: ${JSON.stringify(errorDetails)}`, { 
+      status: 500,
+      headers: {
+        'Content-Type': 'text/plain'
+      }
+    })
   }
 
   if (!tenant) {

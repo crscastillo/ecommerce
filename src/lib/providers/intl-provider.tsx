@@ -2,6 +2,7 @@
 
 import { ReactNode, useState, useEffect } from 'react'
 import { NextIntlClientProvider } from 'next-intl'
+import { usePathname } from 'next/navigation'
 import { useTenant } from '@/lib/contexts/tenant-context'
 
 // Import all messages statically
@@ -19,9 +20,15 @@ interface Props {
 
 export function IntlProvider({ children }: Props) {
   const { tenant } = useTenant()
+  const pathname = usePathname()
   
-  // Get locale from tenant store language settings, default to 'en'
-  const locale = (tenant as any)?.store_language || 'en'
+  // Determine if we're in admin area
+  const isAdminRoute = pathname?.startsWith('/admin')
+  
+  // Use admin_language for admin routes, store_language for store routes
+  const locale = isAdminRoute 
+    ? (tenant as any)?.admin_language || 'en'
+    : (tenant as any)?.store_language || 'en'
   
   // Get messages for the current locale, fallback to English
   const messages = messagesMap[locale] || messagesMap.en

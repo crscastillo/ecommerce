@@ -18,16 +18,15 @@ export async function middleware(request: NextRequest) {
     return supabaseResponse
   }
 
-  // Debug logging for Vercel deployment issues
-  if (process.env.NODE_ENV === 'development' || process.env.VERCEL) {
-    console.log('Middleware Debug:', {
-      hostname,
-      subdomain,
-      isMainDomain,
-      pathname: request.nextUrl.pathname,
-      url: request.url
-    })
-  }
+  // Debug logging for production issues
+  console.log('[Middleware] Request Info:', {
+    hostname,
+    subdomain,
+    isMainDomain,
+    pathname: request.nextUrl.pathname,
+    url: request.url,
+    userAgent: request.headers.get('user-agent')?.slice(0, 50)
+  })
 
   // Handle main domain routing (for tenant signup, main site, etc.)
   if (isMainDomain) {
@@ -42,46 +41,60 @@ function extractSubdomain(hostname: string): string | null {
   // Remove port if present
   const host = hostname.split(':')[0]
   
+  console.log('[Middleware] Extracting subdomain from:', host)
+  
   // Get domains from environment or use defaults
-  const appDomain = process.env.NEXT_PUBLIC_APP_DOMAIN || 'localhost:3000'
   const productionDomain = process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN || 'aluro.shop'
   const devDomain = 'localhost'
   
-  // Handle production domain
+  // Handle production domain (aluro.shop)
   if (host === productionDomain || host === `www.${productionDomain}`) {
+    console.log('[Middleware] Main domain detected:', host)
     return null // Main domain
   }
   
+  // Handle subdomains of production domain (peakmode.aluro.shop)
   if (host.endsWith(`.${productionDomain}`)) {
     const parts = host.split('.')
+    console.log('[Middleware] Production subdomain parts:', parts)
     if (parts.length >= 3) {
-      return parts[0] // Extract subdomain from subdomain.domain.com
+      const subdomain = parts[0]
+      console.log('[Middleware] Extracted subdomain:', subdomain)
+      return subdomain
     }
   }
   
-  // Handle Vercel deployments - any .vercel.app domain without a subdomain is main
+  // Handle Vercel preview deployments
   if (host.endsWith('.vercel.app')) {
     const parts = host.split('.')
+    console.log('[Middleware] Vercel domain parts:', parts)
     // If it's just project-name.vercel.app (3 parts), it's the main domain
     if (parts.length === 3) {
+      console.log('[Middleware] Vercel main domain')
       return null
     }
     // If it's subdomain.project-name.vercel.app (4+ parts), extract subdomain
     if (parts.length > 3) {
-      return parts[0]
+      const subdomain = parts[0]
+      console.log('[Middleware] Vercel subdomain:', subdomain)
+      return subdomain
     }
   }
   
   // Handle development
   if (host === devDomain || host.startsWith(`${devDomain}:`)) {
+    console.log('[Middleware] Development main domain')
     return null // Main domain for localhost
   }
   
   // For localhost development like tenant.localhost:3000
   if (host.includes('.localhost') && host.split('.').length > 1) {
-    return host.split('.')[0]
+    const subdomain = host.split('.')[0]
+    console.log('[Middleware] Development subdomain:', subdomain)
+    return subdomain
   }
   
+  console.log('[Middleware] No subdomain found for:', host)
   return null
 }
 
@@ -120,6 +133,7 @@ async function handleTenantSubdomain(request: NextRequest, supabaseResponse: Nex
   )
 
   // Validate tenant exists and is active
+  console.log('[Middleware] Looking up tenant:', subdomain)
   const { data: tenant, error } = await supabase
     .from('tenants')
     .select('id, name, subdomain, is_active, settings, owner_id, language, admin_language, store_language')
@@ -127,14 +141,26 @@ async function handleTenantSubdomain(request: NextRequest, supabaseResponse: Nex
     .eq('is_active', true)
     .maybeSingle()
 
-  console.log('[Middleware] Tenant lookup:', { subdomain, tenant, error })
+  console.log('[Middleware] Tenant lookup result:', { 
+    subdomain, 
+    found: !!tenant, 
+    error: error?.message,
+    tenant: tenant ? { id: tenant.id, name: tenant.name, subdomain: tenant.subdomain } : null
+  })
 
-  if (error || !tenant) {
-    // Tenant not found or inactive - redirect to error page or main site
-    console.log('[Middleware] Tenant not found, redirecting')
-    const url = new URL('/tenant-not-found', request.url)
-    url.hostname = getMainDomain(request.headers.get('host') || '')
-    return NextResponse.redirect(url)
+  if (error) {
+    console.error('[Middleware] Database error:', error)
+    // Return error page instead of redirect for database errors
+    return new NextResponse('Database connection error', { status: 500 })
+  }
+
+  if (!tenant) {
+    // Tenant not found or inactive - redirect to main site with error
+    console.log('[Middleware] Tenant not found, redirecting to main domain')
+    const mainDomain = getMainDomain(request.headers.get('host') || '')
+    const redirectUrl = `https://${mainDomain}/tenant-not-found?subdomain=${subdomain}`
+    console.log('[Middleware] Redirecting to:', redirectUrl)
+    return NextResponse.redirect(redirectUrl)
   }
 
   // Add tenant info to headers for use in the application

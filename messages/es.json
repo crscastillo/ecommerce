@@ -82,7 +82,9 @@
     "recentActivityDescription": "Últimas actualizaciones y actividades",
     "noRecentActivity": "No hay actividad reciente",
     "performance": "Rendimiento",
-    "performanceDescription": "Métricas y analíticas de la tienda"
+    "performanceDescription": "Métricas y analíticas de la tienda",
+    "storeReadyForLaunch": "¡Tu tienda está lista para lanzar!",
+    "completeSetupToStartSelling": "Completa la configuración para empezar a vender"
   },
   "products": {
     "title": "Productos",

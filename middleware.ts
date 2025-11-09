@@ -199,6 +199,7 @@ async function handleTenantSubdomain(request: NextRequest, supabaseResponse: Nex
       }
     })
   }
+  
 
   if (!tenant) {
     // Tenant not found or inactive - redirect to main site with error

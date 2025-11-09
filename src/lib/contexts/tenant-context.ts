@@ -16,7 +16,6 @@ export interface Tenant {
   is_active: boolean
   owner_id: string
   country?: string
-  language?: string // Legacy single language field
   admin_language?: string // Language for admin interface
   store_language?: string // Language for public store
   created_at: string

@@ -149,7 +149,7 @@ async function handleTenantSubdomain(request: NextRequest, supabaseResponse: Nex
   // Try with all columns first, fallback if columns don't exist
   let { data: tenant, error } = await supabase
     .from('tenants')
-    .select('id, name, subdomain, is_active, settings, owner_id, language, admin_language, store_language')
+    .select('id, name, subdomain, is_active, settings, owner_id, admin_language, store_language')
     .eq('subdomain', subdomain)
     .eq('is_active', true)
     .maybeSingle()
@@ -159,7 +159,7 @@ async function handleTenantSubdomain(request: NextRequest, supabaseResponse: Nex
     console.log('[Middleware] Trying basic tenant lookup due to column error:', error.message)
     const { data: basicTenant, error: basicError } = await supabase
       .from('tenants')
-      .select('id, name, subdomain, is_active, settings, owner_id, language')
+      .select('id, name, subdomain, is_active, settings, owner_id')
       .eq('subdomain', subdomain)
       .eq('is_active', true)
       .maybeSingle()

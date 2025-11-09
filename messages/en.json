@@ -152,6 +152,7 @@
     "manageProductCatalog": "Manage your store's product catalog",
     "importCsv": "Import CSV",
     "productsWithCount": "Products ({count})",
+    "productsListDescription": "View and manage all products in your store",
         "brandsListDescription": "A list of all brands in your store",
     "viewCategoryDetails": "View category details",
     "editCategoryDetails": "Edit category details",

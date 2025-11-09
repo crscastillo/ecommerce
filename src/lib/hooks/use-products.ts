@@ -111,7 +111,6 @@ export function useProductActions(onSuccess?: () => void): UseProductActionsRetu
 
   const deleteProduct = async (productId: string) => {
     if (!tenant?.id) throw new Error('No tenant available')
-    if (!confirm('Are you sure you want to delete this product?')) return
 
     setLoading(true)
     setError('')

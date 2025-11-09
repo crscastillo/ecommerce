@@ -14,7 +14,7 @@ interface ProductListProps {
   loading: boolean
   hasFilters: boolean
   onEdit: (productId: string) => void
-  onDelete: (productId: string) => void
+  onDelete: (product: ProductWithVariants) => Promise<void>
   onToggleStatus: (productId: string, currentStatus: boolean) => void
 }
 

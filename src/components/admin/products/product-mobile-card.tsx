@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
@@ -11,6 +12,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 import { 
   MoreHorizontal,
   Edit,
@@ -34,7 +45,7 @@ interface ProductMobileCardProps {
   settings: TenantSettings
   tenant: any
   onEdit: (productId: string) => void
-  onDelete: (productId: string) => void
+  onDelete: (product: ProductWithVariants) => Promise<void>
   onToggleStatus: (productId: string, currentStatus: boolean) => void
 }
 
@@ -46,6 +57,22 @@ export function ProductMobileCard({
   onDelete, 
   onToggleStatus 
 }: ProductMobileCardProps) {
+  const [deleteProduct, setDeleteProduct] = useState<ProductWithVariants | null>(null)
+  const [deleting, setDeleting] = useState(false)
+
+  const handleDelete = async () => {
+    if (!deleteProduct) return
+
+    setDeleting(true)
+    try {
+      await onDelete(deleteProduct)
+      setDeleteProduct(null)
+    } catch (error) {
+      // Error handling is done in the parent component
+    } finally {
+      setDeleting(false)
+    }
+  }
   return (
     <div className="lg:hidden space-y-2">
       {products.map((product) => {
@@ -115,7 +142,7 @@ export function ProductMobileCard({
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem
-                        onClick={() => onDelete(product.id)}
+                        onClick={() => setDeleteProduct(product)}
                         className="text-red-600 text-xs"
                       >
                         <Trash2 className="mr-2 h-3 w-3" />
@@ -160,6 +187,28 @@ export function ProductMobileCard({
           </Card>
         )
       })}
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={!!deleteProduct} onOpenChange={() => setDeleteProduct(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Product</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete "{deleteProduct?.name}"? This action cannot be undone and will permanently remove this product from your store.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              disabled={deleting}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              {deleting ? 'Deleting...' : 'Delete Product'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

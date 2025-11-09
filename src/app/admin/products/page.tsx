@@ -16,7 +16,8 @@ import { CSVImportModal } from '@/components/admin/csv-import-modal'
 import { useProducts, useProductActions, useTenantSettings } from '@/lib/hooks/use-products'
 import { 
   ProductFilters, 
-  defaultProductFilters 
+  defaultProductFilters,
+  ProductWithVariants
 } from '@/lib/types/product'
 
 export default function ProductsPage() {
@@ -43,9 +44,9 @@ export default function ProductsPage() {
     router.push(`/admin/products/${productId}?mode=edit`)
   }
 
-  const handleDelete = async (productId: string) => {
+  const handleDelete = async (product: ProductWithVariants) => {
     try {
-      await deleteProduct(productId)
+      await deleteProduct(product.id)
     } catch (error) {
       // Error handling is done in the hook
     }

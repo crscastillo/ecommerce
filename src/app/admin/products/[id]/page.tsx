@@ -17,6 +17,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
 import { ImageUpload } from '@/components/admin/image-upload'
@@ -91,6 +101,7 @@ export default function ProductViewPage() {
   const [product, setProduct] = useState<Product | null>(null)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [mode, setMode] = useState<'view' | 'edit'>(
     searchParams.get('mode') === 'edit' ? 'edit' : 'view'
   )
@@ -618,12 +629,12 @@ export default function ProductViewPage() {
     }
   }
 
-  const handleDelete = async () => {
+  const handleDeleteClick = () => {
+    setShowDeleteModal(true)
+  }
+
+  const confirmDelete = async () => {
     if (!tenant?.id || !product) return
-    
-    if (!confirm('Are you sure you want to delete this product? This action cannot be undone.')) {
-      return
-    }
 
     try {
       setSaving(true)
@@ -633,6 +644,7 @@ export default function ProductViewPage() {
       
       if (deleteError) {
         setError(`Failed to delete product: ${deleteError.message}`)
+        setShowDeleteModal(false)
         return
       }
 
@@ -644,6 +656,7 @@ export default function ProductViewPage() {
       setError('Failed to delete product')
     } finally {
       setSaving(false)
+      setShowDeleteModal(false)
     }
   }
 
@@ -720,7 +733,7 @@ export default function ProductViewPage() {
               </Button>
               <Button 
                 variant="outline"
-                onClick={handleDelete}
+                onClick={handleDeleteClick}
                 disabled={saving}
               >
                 <Trash2 className="mr-2 h-4 w-4" />
@@ -1730,6 +1743,28 @@ export default function ProductViewPage() {
           </Card>
         </div>
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Product</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete "{product?.name}"? This action cannot be undone and will permanently remove this product from your store.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={saving}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDelete}
+              disabled={saving}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              {saving ? 'Deleting...' : 'Delete Product'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

@@ -152,7 +152,7 @@
     "manageProductCatalog": "Administre el catálogo de productos de su tienda",
     "importCsv": "Importar CSV",
     "productsWithCount": "Productos ({count})",
-    "productsListDescription": "Una lista de todos los productos en su tienda"
+    "productsListDescription": "Vea y administre todos los productos en su tienda"
   },
   "categories": {
     "title": "Categorías",

@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Switch } from '@/components/ui/switch'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
+import { getPlatformAdminEmail } from '@/lib/actions/admin-check'
 import { 
   Settings,
   Save,
@@ -83,12 +84,24 @@ export default function PlatformSettingsPage() {
   const [message, setMessage] = useState('')
   const [messageType, setMessageType] = useState<'success' | 'error'>('success')
   const [showSecrets, setShowSecrets] = useState(false)
+  const [adminEmail, setAdminEmail] = useState('')
 
   const supabase = createClient()
 
   useEffect(() => {
     loadSettings()
+    loadAdminEmail()
   }, [])
+
+  const loadAdminEmail = async () => {
+    try {
+      const email = await getPlatformAdminEmail()
+      setAdminEmail(email)
+    } catch (error) {
+      console.error('Error loading admin email:', error)
+      setAdminEmail('error-loading-email')
+    }
+  }
 
   const loadSettings = async () => {
     try {
@@ -572,7 +585,7 @@ export default function PlatformSettingsPage() {
                 <div>
                   <Label>Platform Admin Email</Label>
                   <Input
-                    value={process.env.PLATFORM_ADMIN_EMAIL || 'your-email@domain.com'}
+                    value={adminEmail || 'Loading...'}
                     readOnly
                     className="bg-gray-50"
                   />

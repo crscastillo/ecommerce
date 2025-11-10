@@ -8,8 +8,9 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { platformConfig } from '@/lib/config/platform'
-import { Check, Loader2, AlertCircle, Store } from 'lucide-react'
+import { Store, Mail, Building, User, CheckCircle2, ArrowLeft, ArrowRight, Check, AlertCircle, Loader2 } from 'lucide-react'
 import Link from 'next/link'
+import { isPlatformAdmin } from '@/lib/actions/admin-check'
 import { useRouter } from 'next/navigation'
 
 export default function TenantSignup() {
@@ -115,8 +116,8 @@ export default function TenantSignup() {
     }
     
     // Check if this is the platform admin email
-    const platformAdminEmail = process.env.NEXT_PUBLIC_PLATFORM_ADMIN_EMAIL || 'admin@example.com'
-    if (email.toLowerCase() === platformAdminEmail.toLowerCase()) {
+    const isAdmin = await isPlatformAdmin(email)
+    if (isAdmin) {
       // Platform admin signup - skip tenant creation
       await createPlatformAdminAccount()
       return

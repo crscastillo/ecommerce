@@ -82,21 +82,28 @@ export default function Login() {
             }
           } else if (!isOnTenantSubdomain) {
             // On main domain - handle platform admin vs tenant user
-            const platformAdminEmail = process.env.NEXT_PUBLIC_PLATFORM_ADMIN_EMAIL
-            if (user.email === platformAdminEmail) {
-              router.push('/platform')
-              return
-            }
-            
-            // Redirect tenant users to their subdomain
-            await redirectToUserTenantAdmin(user, {
-              fallbackPath: '/signup',
-              onError: (error) => {
-                console.error('Redirect failed:', error)
-                router.push('/signup')
+            try {
+              const response = await fetch('/api/auth/check-platform-admin')
+              const { isPlatformAdmin } = await response.json()
+              
+              if (isPlatformAdmin) {
+                router.push('/platform')
+                return
               }
-            })
-            return
+              
+              // Redirect tenant users to their subdomain
+              await redirectToUserTenantAdmin(user, {
+                fallbackPath: '/signup',
+                onError: (error) => {
+                  console.error('Redirect failed:', error)
+                  router.push('/signup')
+                }
+              })
+              return
+            } catch (error) {
+              console.error('Error checking admin status:', error)
+              setMessage('Error checking authentication. Please try again.')
+            }
           }
         }
       } catch (error) {
@@ -259,25 +266,33 @@ export default function Login() {
         router.push('/admin')
       } else {
         // MAIN DOMAIN LOGIN - Check user type and redirect accordingly
-        const platformAdminEmail = process.env.NEXT_PUBLIC_PLATFORM_ADMIN_EMAIL
-        if (data.user.email === platformAdminEmail) {
-          // Platform admin - session stays on main domain, redirect to platform
-          setMessage('Welcome, Platform Administrator!')
-          router.push('/platform')
-          return
-        }
-        
-        // For tenant users - DO NOT store session on main domain
-        // Instead, redirect to their tenant subdomain with session transfer
-        setMessage('Redirecting to your store...')
-        await redirectToUserTenantAdmin(data.user, {
-          fallbackPath: '/signup', // If no tenant found, redirect to signup
-          onError: (error) => {
-            console.error('Redirect failed:', error)
-            setMessage('Unable to find your tenant. Please contact support or create a new store.')
-            setLoading(false)
+        try {
+          const response = await fetch('/api/auth/check-platform-admin')
+          const { isPlatformAdmin } = await response.json()
+          
+          if (isPlatformAdmin) {
+            // Platform admin - session stays on main domain, redirect to platform
+            setMessage('Welcome, Platform Administrator!')
+            router.push('/platform')
+            return
           }
-        })
+          
+          // For tenant users - DO NOT store session on main domain
+          // Instead, redirect to their tenant subdomain with session transfer
+          setMessage('Redirecting to your store...')
+          await redirectToUserTenantAdmin(data.user, {
+            fallbackPath: '/signup', // If no tenant found, redirect to signup
+            onError: (error) => {
+              console.error('Redirect failed:', error)
+              setMessage('Unable to find your tenant. Please contact support or create a new store.')
+              setLoading(false)
+            }
+          })
+        } catch (adminCheckError) {
+          console.error('Error checking admin status:', adminCheckError)
+          setMessage('Error verifying authentication. Please try again.')
+          setLoading(false)
+        }
       }
     } catch (error) {
       console.error('Login error:', error)

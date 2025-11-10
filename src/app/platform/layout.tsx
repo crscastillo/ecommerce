@@ -27,9 +27,11 @@ export default function PlatformLayout({
           return
         }
 
-        // Check if user is platform admin
-        const platformAdminEmail = process.env.NEXT_PUBLIC_PLATFORM_ADMIN_EMAIL
-        if (user.email !== platformAdminEmail) {
+        // Check if user is platform admin via API
+        const response = await fetch('/api/auth/check-platform-admin')
+        const { isPlatformAdmin } = await response.json()
+        
+        if (!isPlatformAdmin) {
           router.push('/unauthorized')
           return
         }

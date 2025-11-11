@@ -32,6 +32,7 @@ interface AdminHeaderProps {
 
 export default function AdminHeader({ onMenuClick }: AdminHeaderProps) {
   const { tenant, isOwner, isAdmin } = useTenant()
+  const t = useTranslations('settings')
   const router = useRouter()
   const supabase = createClient()
 
@@ -116,22 +117,22 @@ export default function AdminHeader({ onMenuClick }: AdminHeaderProps) {
                       {tenant?.contact_email || 'Admin'}
                     </p>
                     <p className="text-xs leading-none text-muted-foreground">
-                      {isOwner ? 'Owner' : isAdmin ? 'Admin' : 'Staff'}
+                      {isOwner ? t('roles.owner') : isAdmin ? t('roles.admin') : t('roles.staff')}
                     </p>
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={visitStore}>
                   <ExternalLink className="mr-2 h-4 w-4" />
-                  <span>Visit Store</span>
+                  <span>{t('header.visitStore')}</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => router.push('/admin/settings')}>
                   <User className="mr-2 h-4 w-4" />
-                  <span>Account Settings</span>
+                  <span>{t('header.accountSettings')}</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleSignOut}>
-                  <span>Sign Out</span>
+                  <span>{t('header.signOut')}</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

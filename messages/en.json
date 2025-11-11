@@ -245,6 +245,16 @@
       "storeName": "Store Name",
       "subdomain": "Subdomain",
       "country": "Country"
+    },
+    "roles": {
+      "owner": "Owner",
+      "admin": "Admin",
+      "staff": "Staff"
+    },
+    "header": {
+      "visitStore": "Visit Store",
+      "accountSettings": "Account Settings",
+      "signOut": "Sign Out"
     }
   },
   "auth": {

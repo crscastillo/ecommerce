@@ -11,6 +11,8 @@ import { createClient } from "@/lib/supabase/client";
 import { redirectToUserTenantAdmin } from "@/lib/utils/tenant-redirects";
 import StoreHomepage from "@/components/store/store-homepage";
 import { platformConfig } from "@/lib/config/platform";
+import { useTranslations } from "next-intl";
+import { PublicLanguageToggle } from "@/components/public/language-toggle";
 
 export default function HomePage() {
   const { tenant, isLoading } = useTenant();
@@ -36,6 +38,15 @@ export default function HomePage() {
 function PlatformHomepage() {
   const [user, setUser] = useState<any>(null);
   const supabase = createClient();
+  
+  // Import translations hooks
+  const tHeader = useTranslations('homepage.header')
+  const tHero = useTranslations('homepage.hero')
+  const tFeatures = useTranslations('homepage.features')
+  const tIntegrations = useTranslations('homepage.integrations')
+  const tPricing = useTranslations('homepage.pricing')
+  const tCta = useTranslations('homepage.cta')
+  const tFooter = useTranslations('homepage.footer')
 
   // Function to redirect to user's tenant admin
   const handleGoToAdmin = async () => {
@@ -80,17 +91,18 @@ function PlatformHomepage() {
               </span>
             </div>
             <div className="flex items-center space-x-4">
+              <PublicLanguageToggle />
               {user ? (
                 <Button variant="default" onClick={handleGoToAdmin}>
-                  Go to admin
+                  {tHeader('goToAdmin')}
                 </Button>
               ) : (
                 <>
                   <Link href="/login">
-                    <Button variant="ghost">Sign In</Button>
+                    <Button variant="ghost">{tHeader('signIn')}</Button>
                   </Link>
                   <Link href="/signup">
-                    <Button variant="default">Get Started</Button>
+                    <Button variant="default">{tHeader('getStarted')}</Button>
                   </Link>
                 </>
               )}
@@ -105,41 +117,40 @@ function PlatformHomepage() {
         <div className="absolute inset-0 bg-gradient-to-t from-blue-600/20 to-transparent"></div>
         <div className="relative container mx-auto px-4 py-24 md:py-32 text-center">
           <Badge className="mb-6 bg-white/20 text-white border-white/30 backdrop-blur-sm">
-            🚀 Trusted by 10,000+ businesses worldwide
+            {tHero('badge')}
           </Badge>
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold mb-6 leading-tight">
-            Build Your Dream Store
+            {tHero('title')}
             <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-purple-200">
-              In Minutes, Not Months
+              {tHero('titleHighlight')}
             </span>
           </h1>
           <p className="text-lg md:text-xl lg:text-2xl mb-10 max-w-3xl mx-auto text-blue-100">
-            Launch a professional ecommerce store with everything you need to sell online. 
-            Custom domains, secure payments, and powerful features—all in one platform.
+            {tHero('subtitle')}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
             <Button size="lg" variant="secondary" asChild className="text-lg px-8 py-6 shadow-2xl hover:shadow-blue-500/50 transition-all">
               <Link href="/signup">
                 <Zap className="w-5 h-5 mr-2" />
-                Start Your Free Store
+                {tHero('startFreeStore')}
               </Link>
             </Button>
             <Button size="lg" variant="outline" className="text-white border-white/50 hover:bg-white hover:text-blue-600 text-lg px-8 py-6 backdrop-blur-sm">
-              Watch Demo Video
+              {tHero('watchDemo')}
             </Button>
           </div>
           <div className="flex flex-wrap justify-center gap-6 text-sm text-blue-100">
             <span className="flex items-center">
               <CheckCircle className="w-4 h-4 mr-2" />
-              No credit card required
+              {tHero('benefits.noCard')}
             </span>
             <span className="flex items-center">
               <CheckCircle className="w-4 h-4 mr-2" />
-              14-day free trial
+              {tHero('benefits.trial')}
             </span>
             <span className="flex items-center">
               <CheckCircle className="w-4 h-4 mr-2" />
-              Cancel anytime
+              {tHero('benefits.cancel')}
             </span>
           </div>
         </div>
@@ -150,13 +161,13 @@ function PlatformHomepage() {
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <Badge className="mb-4 bg-blue-100 text-blue-700 border-blue-200">
-              FEATURES
+              {tFeatures('badge')}
             </Badge>
             <h2 className="text-3xl md:text-5xl font-bold mb-6 text-gray-900">
-              Everything You Need to Sell Online
+              {tFeatures('title')}
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Our platform provides all the tools you need to create, manage, and grow your online business with ease.
+              {tFeatures('subtitle')}
             </p>
           </div>
           
@@ -166,9 +177,9 @@ function PlatformHomepage() {
                 <div className="w-14 h-14 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
                   <Zap className="w-8 h-8 text-blue-600" />
                 </div>
-                <CardTitle className="text-xl">Lightning Fast Setup</CardTitle>
+                <CardTitle className="text-xl">{tFeatures('fast.title')}</CardTitle>
                 <CardDescription className="text-base">
-                  Get your store online in under 5 minutes. Choose your subdomain and start selling immediately with our intuitive setup wizard.
+                  {tFeatures('fast.description')}
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -178,9 +189,9 @@ function PlatformHomepage() {
                 <div className="w-14 h-14 bg-green-100 rounded-lg flex items-center justify-center mb-4">
                   <Globe className="w-8 h-8 text-green-600" />
                 </div>
-                <CardTitle className="text-xl">Custom Domains</CardTitle>
+                <CardTitle className="text-xl">{tFeatures('domain.title')}</CardTitle>
                 <CardDescription className="text-base">
-                  Use your own domain or get a free subdomain. SSL certificates included automatically for secure shopping experiences.
+                  {tFeatures('domain.description')}
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -190,9 +201,9 @@ function PlatformHomepage() {
                 <div className="w-14 h-14 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
                   <Shield className="w-8 h-8 text-purple-600" />
                 </div>
-                <CardTitle className="text-xl">Secure & Reliable</CardTitle>
+                <CardTitle className="text-xl">{tFeatures('security.title')}</CardTitle>
                 <CardDescription className="text-base">
-                  Built with enterprise-grade security. Your data and your customers' information are always protected with industry standards.
+                  {tFeatures('security.description')}
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -202,9 +213,9 @@ function PlatformHomepage() {
                 <div className="w-14 h-14 bg-orange-100 rounded-lg flex items-center justify-center mb-4">
                   <Users className="w-8 h-8 text-orange-600" />
                 </div>
-                <CardTitle className="text-xl">Team Collaboration</CardTitle>
+                <CardTitle className="text-xl">{tFeatures('team.title')}</CardTitle>
                 <CardDescription className="text-base">
-                  Invite team members with customizable permission levels. Work together seamlessly on your store operations.
+                  {tFeatures('team.description')}
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -214,9 +225,9 @@ function PlatformHomepage() {
                 <div className="w-14 h-14 bg-red-100 rounded-lg flex items-center justify-center mb-4">
                   <TrendingUp className="w-8 h-8 text-red-600" />
                 </div>
-                <CardTitle className="text-xl">Analytics & Insights</CardTitle>
+                <CardTitle className="text-xl">{tFeatures('analytics.title')}</CardTitle>
                 <CardDescription className="text-base">
-                  Track sales, monitor performance, and understand your customers with comprehensive analytics and detailed reports.
+                  {tFeatures('analytics.description')}
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -226,9 +237,9 @@ function PlatformHomepage() {
                 <div className="w-14 h-14 bg-indigo-100 rounded-lg flex items-center justify-center mb-4">
                   <Store className="w-8 h-8 text-indigo-600" />
                 </div>
-                <CardTitle className="text-xl">Beautiful Themes</CardTitle>
+                <CardTitle className="text-xl">{tFeatures('themes.title')}</CardTitle>
                 <CardDescription className="text-base">
-                  Professional, mobile-responsive themes that make your products look stunning on any device, no design skills needed.
+                  {tFeatures('themes.description')}
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -237,7 +248,7 @@ function PlatformHomepage() {
           <div className="text-center mt-12">
             <Link href="/features">
               <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-6 text-lg">
-                View All Features
+                {tFeatures('viewAll')}
               </Button>
             </Link>
           </div>

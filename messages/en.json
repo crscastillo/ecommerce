@@ -382,5 +382,160 @@
       "systemStatus": "System Status"
     },
     "copyright": "© {year} {storeName}. All rights reserved."
+  },
+  "homepage": {
+    "header": {
+      "signIn": "Sign In",
+      "getStarted": "Get Started",
+      "goToAdmin": "Go to admin",
+      "languageToggle": "Change language"
+    },
+    "hero": {
+      "badge": "🚀 Trusted by 10,000+ businesses worldwide",
+      "title": "Build Your Dream Store",
+      "titleHighlight": "In Minutes, Not Months",
+      "subtitle": "Launch a professional ecommerce store with everything you need to sell online. Custom domains, secure payments, and powerful features—all in one platform.",
+      "startFreeStore": "Start Your Free Store",
+      "watchDemo": "Watch Demo Video",
+      "benefits": {
+        "noCard": "No credit card required",
+        "trial": "14-day free trial",
+        "cancel": "Cancel anytime"
+      }
+    },
+    "features": {
+      "badge": "FEATURES",
+      "title": "Everything You Need to Sell Online",
+      "subtitle": "Our platform provides all the tools you need to create, manage, and grow your online business with ease.",
+      "fast": {
+        "title": "Lightning Fast Setup",
+        "description": "Get your store online in under 5 minutes. Choose your subdomain and start selling immediately with our intuitive setup wizard."
+      },
+      "domain": {
+        "title": "Custom Domains",
+        "description": "Use your own domain or get a free subdomain. SSL certificates included automatically for secure shopping experiences."
+      },
+      "security": {
+        "title": "Secure & Reliable",
+        "description": "Built with enterprise-grade security. Your data and your customers' information are always protected with industry standards."
+      },
+      "team": {
+        "title": "Team Collaboration",
+        "description": "Invite team members with customizable permission levels. Work together seamlessly on your store operations."
+      },
+      "analytics": {
+        "title": "Analytics & Insights",
+        "description": "Track sales, monitor performance, and understand your customers with comprehensive analytics and detailed reports."
+      },
+      "themes": {
+        "title": "Beautiful Themes",
+        "description": "Professional, mobile-responsive themes that make your products look stunning on any device, no design skills needed."
+      },
+      "viewAll": "View All Features"
+    },
+    "integrations": {
+      "badge": "INTEGRATIONS",
+      "title": "Connect With Your Favorite Tools",
+      "subtitle": "Seamlessly integrate with the tools you already use to run your business more efficiently.",
+      "payment": {
+        "title": "Payment Processing",
+        "description": "Secure payments with industry-leading gateway"
+      },
+      "analytics": {
+        "title": "Analytics",
+        "description": "Track performance with powerful analytics tools"
+      },
+      "social": {
+        "title": "Social Media",
+        "description": "Connect your social accounts for marketing"
+      },
+      "email": {
+        "title": "Email Marketing",
+        "description": "Automated email campaigns and newsletters"
+      },
+      "moreIntegrations": "Plus many more integrations to power your business",
+      "viewAll": "View All Integrations →"
+    },
+    "pricing": {
+      "badge": "PRICING",
+      "title": "Simple, Transparent Pricing",
+      "subtitle": "Choose the perfect plan for your business needs",
+      "starter": {
+        "name": "Starter",
+        "price": "Free",
+        "description": "Perfect for getting started",
+        "features": [
+          "Up to 10 products",
+          "Free subdomain",
+          "Basic themes",
+          "Email support"
+        ],
+        "cta": "Get Started Free"
+      },
+      "professional": {
+        "name": "Professional",
+        "price": "$29",
+        "priceUnit": "/mo",
+        "description": "For growing businesses",
+        "badge": "Most Popular",
+        "features": [
+          "Unlimited products",
+          "Custom domain",
+          "Premium themes",
+          "Analytics dashboard",
+          "Priority support"
+        ],
+        "cta": "Start 14-Day Trial"
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "price": "$99",
+        "priceUnit": "/mo",
+        "description": "For large-scale operations",
+        "features": [
+          "Everything in Professional",
+          "Team management",
+          "Advanced analytics",
+          "API access",
+          "24/7 phone support"
+        ],
+        "cta": "Contact Sales"
+      }
+    },
+    "cta": {
+      "badge": "START TODAY",
+      "title": "Ready to Start Your Online Store?",
+      "subtitle": "Join thousands of successful entrepreneurs who have already built thriving online businesses with our powerful ecommerce platform.",
+      "createStore": "Create Your Store Now →",
+      "talkSales": "Talk to Sales",
+      "benefits": {
+        "trial": "Free 14-day trial",
+        "noCard": "No credit card required",
+        "cancel": "Cancel anytime"
+      },
+      "questions": "Questions? Our team is here to help • ",
+      "contactUs": "Contact us"
+    },
+    "footer": {
+      "description": "The easiest way to create and manage your online store. Trusted by thousands of businesses worldwide.",
+      "product": "Product",
+      "support": "Support",
+      "company": "Company",
+      "links": {
+        "features": "Features",
+        "pricing": "Pricing",
+        "integrations": "Integrations",
+        "helpCenter": "Help Center",
+        "contactUs": "Contact Us",
+        "documentation": "Documentation",
+        "systemStatus": "System Status",
+        "aboutUs": "About Us",
+        "privacyPolicy": "Privacy Policy",
+        "termsOfService": "Terms of Service",
+        "privacy": "Privacy",
+        "cookies": "Cookies"
+      },
+      "copyright": "© 2025 {platformName}. All rights reserved."
+    }
   }
 }

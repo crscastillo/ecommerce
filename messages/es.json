@@ -384,5 +384,160 @@
       "systemStatus": "Estado del Sistema"
     },
     "copyright": "© {year} {storeName}. Todos los derechos reservados."
+  },
+  "homepage": {
+    "header": {
+      "signIn": "Iniciar Sesión",
+      "getStarted": "Empezar",
+      "goToAdmin": "Ir al Admin",
+      "languageToggle": "Cambiar idioma"
+    },
+    "hero": {
+      "badge": "🚀 Confiado por más de 10,000 empresas en todo el mundo",
+      "title": "Construye la Tienda de tus Sueños",
+      "titleHighlight": "En Minutos, No Meses",
+      "subtitle": "Lanza una tienda de comercio electrónico profesional con todo lo que necesitas para vender en línea. Dominios personalizados, pagos seguros y funciones poderosas, todo en una plataforma.",
+      "startFreeStore": "Comienza tu Tienda Gratis",
+      "watchDemo": "Ver Video Demo",
+      "benefits": {
+        "noCard": "No se requiere tarjeta de crédito",
+        "trial": "Prueba gratuita de 14 días",
+        "cancel": "Cancela en cualquier momento"
+      }
+    },
+    "features": {
+      "badge": "CARACTERÍSTICAS",
+      "title": "Todo lo que Necesitas para Vender en Línea",
+      "subtitle": "Nuestra plataforma proporciona todas las herramientas que necesitas para crear, administrar y hacer crecer tu negocio en línea con facilidad.",
+      "fast": {
+        "title": "Configuración Súper Rápida",
+        "description": "Pon tu tienda en línea en menos de 5 minutos. Elige tu subdominio y comienza a vender inmediatamente con nuestro asistente de configuración intuitivo."
+      },
+      "domain": {
+        "title": "Dominios Personalizados",
+        "description": "Usa tu propio dominio o obtén un subdominio gratuito. Certificados SSL incluidos automáticamente para experiencias de compra seguras."
+      },
+      "security": {
+        "title": "Seguro y Confiable",
+        "description": "Construido con seguridad de nivel empresarial. Tus datos y la información de tus clientes siempre están protegidos con estándares de la industria."
+      },
+      "team": {
+        "title": "Colaboración en Equipo",
+        "description": "Invita miembros del equipo con niveles de permisos personalizables. Trabajen juntos sin problemas en las operaciones de tu tienda."
+      },
+      "analytics": {
+        "title": "Analíticas e Insights",
+        "description": "Rastrea ventas, monitorea rendimiento y entiende a tus clientes con analíticas integrales y reportes detallados."
+      },
+      "themes": {
+        "title": "Temas Hermosos",
+        "description": "Temas profesionales y responsivos que hacen que tus productos se vean increíbles en cualquier dispositivo, sin necesidad de habilidades de diseño."
+      },
+      "viewAll": "Ver Todas las Características"
+    },
+    "integrations": {
+      "badge": "INTEGRACIONES",
+      "title": "Conéctate con tus Herramientas Favoritas",
+      "subtitle": "Integra sin problemas con las herramientas que ya usas para manejar tu negocio de manera más eficiente.",
+      "payment": {
+        "title": "Procesamiento de Pagos",
+        "description": "Pagos seguros con pasarela líder en la industria"
+      },
+      "analytics": {
+        "title": "Analíticas",
+        "description": "Rastrea el rendimiento con herramientas de analíticas poderosas"
+      },
+      "social": {
+        "title": "Redes Sociales",
+        "description": "Conecta tus cuentas sociales para marketing"
+      },
+      "email": {
+        "title": "Marketing por Email",
+        "description": "Campañas de email automatizadas y boletines"
+      },
+      "moreIntegrations": "Además muchas más integraciones para potenciar tu negocio",
+      "viewAll": "Ver Todas las Integraciones →"
+    },
+    "pricing": {
+      "badge": "PRECIOS",
+      "title": "Precios Simples y Transparentes",
+      "subtitle": "Elige el plan perfecto para las necesidades de tu negocio",
+      "starter": {
+        "name": "Starter",
+        "price": "Gratis",
+        "description": "Perfecto para empezar",
+        "features": [
+          "Hasta 10 productos",
+          "Subdominio gratis",
+          "Temas básicos",
+          "Soporte por email"
+        ],
+        "cta": "Comenzar Gratis"
+      },
+      "professional": {
+        "name": "Profesional",
+        "price": "$29",
+        "priceUnit": "/mes",
+        "description": "Para negocios en crecimiento",
+        "badge": "Más Popular",
+        "features": [
+          "Productos ilimitados",
+          "Dominio personalizado",
+          "Temas premium",
+          "Panel de analíticas",
+          "Soporte prioritario"
+        ],
+        "cta": "Prueba de 14 Días"
+      },
+      "enterprise": {
+        "name": "Empresarial",
+        "price": "$99",
+        "priceUnit": "/mes",
+        "description": "Para operaciones a gran escala",
+        "features": [
+          "Todo en Profesional",
+          "Gestión de equipos",
+          "Analíticas avanzadas",
+          "Acceso API",
+          "Soporte telefónico 24/7"
+        ],
+        "cta": "Contactar Ventas"
+      }
+    },
+    "cta": {
+      "badge": "EMPIEZA HOY",
+      "title": "¿Listo para Comenzar tu Tienda en Línea?",
+      "subtitle": "Únete a miles de emprendedores exitosos que ya han construido prósperos negocios en línea con nuestra poderosa plataforma de comercio electrónico.",
+      "createStore": "Crea tu Tienda Ahora →",
+      "talkSales": "Hablar con Ventas",
+      "benefits": {
+        "trial": "Prueba gratuita de 14 días",
+        "noCard": "No se requiere tarjeta de crédito",
+        "cancel": "Cancela en cualquier momento"
+      },
+      "questions": "¿Preguntas? Nuestro equipo está aquí para ayudar • ",
+      "contactUs": "Contáctanos"
+    },
+    "footer": {
+      "description": "La manera más fácil de crear y gestionar tu tienda en línea. Confiado por miles de negocios en todo el mundo.",
+      "product": "Producto",
+      "support": "Soporte",
+      "company": "Empresa",
+      "links": {
+        "features": "Características",
+        "pricing": "Precios",
+        "integrations": "Integraciones",
+        "helpCenter": "Centro de Ayuda",
+        "contactUs": "Contáctanos",
+        "documentation": "Documentación",
+        "systemStatus": "Estado del Sistema",
+        "aboutUs": "Acerca de Nosotros",
+        "privacyPolicy": "Política de Privacidad",
+        "termsOfService": "Términos de Servicio",
+        "privacy": "Privacidad",
+        "cookies": "Cookies"
+      },
+      "copyright": "© 2025 {platformName}. Todos los derechos reservados."
+    }
   }
 }

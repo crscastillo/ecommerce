@@ -247,6 +247,16 @@
       "storeName": "Nombre de la Tienda",
       "subdomain": "Subdominio",
       "country": "País"
+    },
+    "roles": {
+      "owner": "Propietario",
+      "admin": "Administrador",
+      "staff": "Personal"
+    },
+    "header": {
+      "visitStore": "Visitar Tienda",
+      "accountSettings": "Configuración de Cuenta",
+      "signOut": "Cerrar Sesión"
     }
   },
   "auth": {

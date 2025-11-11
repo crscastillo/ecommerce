@@ -1,6 +1,7 @@
 'use client'
 
 import { useTenant } from '@/lib/contexts/tenant-context'
+import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { platformConfig } from '@/lib/config/platform'

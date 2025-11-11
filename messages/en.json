@@ -218,6 +218,33 @@
     "languageOptions": {
       "en": "🇺🇸 English",
       "es": "🇨🇷 Español (Costa Rica)"
+    },
+    "tabs": {
+      "store": "Store",
+      "config": "Config",
+      "theme": "Theme",
+      "payments": "Payments",
+      "plugins": "Plugins",
+      "users": "Users",
+      "security": "Security"
+    },
+    "sections": {
+      "storeInformation": "Store Information",
+      "storeConfiguration": "Store Configuration",
+      "brandAssets": "Brand Assets",
+      "colorScheme": "Color Scheme",
+      "typography": "Typography",
+      "customCss": "Custom CSS",
+      "paymentMethods": "Payment Methods",
+      "inviteNewUser": "Invite New User",
+      "teamMembers": "Team Members",
+      "accountInformation": "Account Information",
+      "dangerZone": "Danger Zone"
+    },
+    "labels": {
+      "storeName": "Store Name",
+      "subdomain": "Subdomain",
+      "country": "Country"
     }
   },
   "auth": {

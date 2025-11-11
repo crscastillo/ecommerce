@@ -220,6 +220,33 @@
     "languageOptions": {
       "en": "🇺🇸 English",
       "es": "🇨🇷 Español (Costa Rica)"
+    },
+    "tabs": {
+      "store": "Tienda",
+      "config": "Configuración",
+      "theme": "Tema",
+      "payments": "Pagos",
+      "plugins": "Plugins",
+      "users": "Usuarios",
+      "security": "Seguridad"
+    },
+    "sections": {
+      "storeInformation": "Información de la Tienda",
+      "storeConfiguration": "Configuración de la Tienda",
+      "brandAssets": "Activos de Marca",
+      "colorScheme": "Esquema de Colores",
+      "typography": "Tipografía",
+      "customCss": "CSS Personalizado",
+      "paymentMethods": "Métodos de Pago",
+      "inviteNewUser": "Invitar Nuevo Usuario",
+      "teamMembers": "Miembros del Equipo",
+      "accountInformation": "Información de la Cuenta",
+      "dangerZone": "Zona de Peligro"
+    },
+    "labels": {
+      "storeName": "Nombre de la Tienda",
+      "subdomain": "Subdominio",
+      "country": "País"
     }
   },
   "auth": {

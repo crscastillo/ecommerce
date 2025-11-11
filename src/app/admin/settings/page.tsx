@@ -600,31 +600,31 @@ export default function SettingsPage() {
         <TabsList className="grid w-full grid-cols-7">
           <TabsTrigger value="store" className="flex items-center space-x-2">
             <Store className="h-4 w-4" />
-            <span>Store</span>
+            <span>{t('settings.tabs.store')}</span>
           </TabsTrigger>
           <TabsTrigger value="config" className="flex items-center space-x-2">
             <Cog className="h-4 w-4" />
-            <span>Config</span>
+            <span>{t('settings.tabs.config')}</span>
           </TabsTrigger>
           <TabsTrigger value="theme" className="flex items-center space-x-2">
             <Palette className="h-4 w-4" />
-            <span>Theme</span>
+            <span>{t('settings.tabs.theme')}</span>
           </TabsTrigger>
           <TabsTrigger value="payments" className="flex items-center space-x-2">
             <CreditCard className="h-4 w-4" />
-            <span>Payments</span>
+            <span>{t('settings.tabs.payments')}</span>
           </TabsTrigger>
           <TabsTrigger value="plugins" className="flex items-center space-x-2">
             <Puzzle className="h-4 w-4" />
-            <span>Plugins</span>
+            <span>{t('settings.tabs.plugins')}</span>
           </TabsTrigger>
           <TabsTrigger value="users" className="flex items-center space-x-2">
             <Users className="h-4 w-4" />
-            <span>Users</span>
+            <span>{t('settings.tabs.users')}</span>
           </TabsTrigger>
           <TabsTrigger value="security" className="flex items-center space-x-2">
             <Shield className="h-4 w-4" />
-            <span>Security</span>
+            <span>{t('settings.tabs.security')}</span>
           </TabsTrigger>
         </TabsList>
 
@@ -632,12 +632,12 @@ export default function SettingsPage() {
         <TabsContent value="store" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Store Information</CardTitle>
+              <CardTitle>{t('settings.sections.storeInformation')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <Label htmlFor="store-name">Store Name</Label>
+                  <Label htmlFor="store-name">{t('settings.labels.storeName')}</Label>
                   <Input
                     id="store-name"
                     value={storeSettings.name}
@@ -646,7 +646,7 @@ export default function SettingsPage() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="subdomain">Subdomain</Label>
+                  <Label htmlFor="subdomain">{t('settings.labels.subdomain')}</Label>
                   <Input
                     id="subdomain"
                     value={tenant.subdomain}
@@ -656,7 +656,7 @@ export default function SettingsPage() {
                   <p className="text-xs text-gray-500 mt-1">Subdomain cannot be changed after creation</p>
                 </div>
                 <div>
-                  <Label htmlFor="country">Country</Label>
+                  <Label htmlFor="country">{t('settings.labels.country')}</Label>
                   <Select 
                     value={storeSettings.country} 
                     onValueChange={(value) => setStoreSettings(prev => ({ ...prev, country: value }))}
@@ -855,7 +855,7 @@ export default function SettingsPage() {
         <TabsContent value="config" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Store Configuration</CardTitle>
+              <CardTitle>{t('settings.sections.storeConfiguration')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1024,7 +1024,7 @@ export default function SettingsPage() {
         <TabsContent value="theme" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Brand Assets</CardTitle>
+              <CardTitle>{t('settings.sections.brandAssets')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
@@ -1050,7 +1050,7 @@ export default function SettingsPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Color Scheme</CardTitle>
+              <CardTitle>{t('settings.sections.colorScheme')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -1111,7 +1111,7 @@ export default function SettingsPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Typography</CardTitle>
+              <CardTitle>{t('settings.sections.typography')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
@@ -1137,7 +1137,7 @@ export default function SettingsPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Custom CSS</CardTitle>
+              <CardTitle>{t('settings.sections.customCss')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div>
@@ -1163,7 +1163,7 @@ export default function SettingsPage() {
         <TabsContent value="payments" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Payment Methods</CardTitle>
+              <CardTitle>{t('settings.sections.paymentMethods')}</CardTitle>
               <p className="text-sm text-muted-foreground">
                 Configure which payment methods are available to your customers.
               </p>
@@ -1707,7 +1707,7 @@ export default function SettingsPage() {
         <TabsContent value="users" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Invite New User</CardTitle>
+              <CardTitle>{t('settings.sections.inviteNewUser')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex space-x-4">
@@ -1738,7 +1738,7 @@ export default function SettingsPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Team Members</CardTitle>
+              <CardTitle>{t('settings.sections.teamMembers')}</CardTitle>
             </CardHeader>
             <CardContent>
               {tenantUsers.length === 0 ? (
@@ -1817,7 +1817,7 @@ export default function SettingsPage() {
         <TabsContent value="security" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Account Information</CardTitle>
+              <CardTitle>{t('settings.sections.accountInformation')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>

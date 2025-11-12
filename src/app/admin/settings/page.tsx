@@ -600,31 +600,31 @@ export default function SettingsPage() {
         <TabsList className="grid w-full grid-cols-7">
           <TabsTrigger value="store" className="flex items-center space-x-2">
             <Store className="h-4 w-4" />
-            <span>{t('settings.tabs.store')}</span>
+            <span>{t('tabs.store')}</span>
           </TabsTrigger>
           <TabsTrigger value="config" className="flex items-center space-x-2">
             <Cog className="h-4 w-4" />
-            <span>{t('settings.tabs.config')}</span>
+            <span>{t('tabs.config')}</span>
           </TabsTrigger>
           <TabsTrigger value="theme" className="flex items-center space-x-2">
             <Palette className="h-4 w-4" />
-            <span>{t('settings.tabs.theme')}</span>
+            <span>{t('tabs.theme')}</span>
           </TabsTrigger>
           <TabsTrigger value="payments" className="flex items-center space-x-2">
             <CreditCard className="h-4 w-4" />
-            <span>{t('settings.tabs.payments')}</span>
+            <span>{t('tabs.payments')}</span>
           </TabsTrigger>
           <TabsTrigger value="plugins" className="flex items-center space-x-2">
             <Puzzle className="h-4 w-4" />
-            <span>{t('settings.tabs.plugins')}</span>
+            <span>{t('tabs.plugins')}</span>
           </TabsTrigger>
           <TabsTrigger value="users" className="flex items-center space-x-2">
             <Users className="h-4 w-4" />
-            <span>{t('settings.tabs.users')}</span>
+            <span>{t('tabs.users')}</span>
           </TabsTrigger>
           <TabsTrigger value="security" className="flex items-center space-x-2">
             <Shield className="h-4 w-4" />
-            <span>{t('settings.tabs.security')}</span>
+            <span>{t('tabs.security')}</span>
           </TabsTrigger>
         </TabsList>
 
@@ -632,12 +632,12 @@ export default function SettingsPage() {
         <TabsContent value="store" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>{t('settings.sections.storeInformation')}</CardTitle>
+              <CardTitle>{t('sections.storeInformation')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <Label htmlFor="store-name">{t('settings.labels.storeName')}</Label>
+                  <Label htmlFor="store-name">{t('labels.storeName')}</Label>
                   <Input
                     id="store-name"
                     value={storeSettings.name}
@@ -646,7 +646,7 @@ export default function SettingsPage() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="subdomain">{t('settings.labels.subdomain')}</Label>
+                  <Label htmlFor="subdomain">{t('labels.subdomain')}</Label>
                   <Input
                     id="subdomain"
                     value={tenant.subdomain}
@@ -656,7 +656,7 @@ export default function SettingsPage() {
                   <p className="text-xs text-gray-500 mt-1">Subdomain cannot be changed after creation</p>
                 </div>
                 <div>
-                  <Label htmlFor="country">{t('settings.labels.country')}</Label>
+                  <Label htmlFor="country">{t('labels.country')}</Label>
                   <Select 
                     value={storeSettings.country} 
                     onValueChange={(value) => setStoreSettings(prev => ({ ...prev, country: value }))}
@@ -719,7 +719,7 @@ export default function SettingsPage() {
                   <p className="text-xs text-gray-500 mt-1">Language for public store</p>
                 </div>
                 <div>
-                  <Label htmlFor="timezone">Timezone</Label>
+                  <Label htmlFor="timezone">{t('labels.timezone')}</Label>
                   <Select 
                     value={storeSettings.settings.timezone} 
                     onValueChange={(value) => setStoreSettings(prev => ({ 
@@ -743,7 +743,7 @@ export default function SettingsPage() {
               </div>
               
               <div>
-                <Label htmlFor="description">Description</Label>
+                <Label htmlFor="description">{t('labels.description')}</Label>
                 <Textarea
                   id="description"
                   value={storeSettings.description}
@@ -755,7 +755,7 @@ export default function SettingsPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="contact-email">Contact Email</Label>
+                  <Label htmlFor="contact-email">{t('labels.contactEmail')}</Label>
                   <Input
                     id="contact-email"
                     type="email"
@@ -765,7 +765,7 @@ export default function SettingsPage() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="contact-phone">Contact Phone</Label>
+                  <Label htmlFor="contact-phone">{t('labels.contactPhone')}</Label>
                   <Input
                     id="contact-phone"
                     value={storeSettings.contact_phone}
@@ -778,10 +778,10 @@ export default function SettingsPage() {
               <Separator />
 
               <div>
-                <h3 className="text-lg font-medium mb-3">Address</h3>
+                <h3 className="text-lg font-medium mb-3">{t('labels.address')}</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="md:col-span-2">
-                    <Label htmlFor="street">Street Address</Label>
+                    <Label htmlFor="street">{t('labels.streetAddress')}</Label>
                     <Input
                       id="street"
                       value={storeSettings.address.street || ''}
@@ -793,7 +793,7 @@ export default function SettingsPage() {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="city">City</Label>
+                    <Label htmlFor="city">{t('labels.city')}</Label>
                     <Input
                       id="city"
                       value={storeSettings.address.city || ''}
@@ -805,7 +805,7 @@ export default function SettingsPage() {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="state">State</Label>
+                    <Label htmlFor="state">{t('labels.state')}</Label>
                     <Input
                       id="state"
                       value={storeSettings.address.state || ''}
@@ -817,7 +817,7 @@ export default function SettingsPage() {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="zip">ZIP Code</Label>
+                    <Label htmlFor="zip">{t('labels.zipCode')}</Label>
                     <Input
                       id="zip"
                       value={storeSettings.address.zip || ''}
@@ -829,7 +829,7 @@ export default function SettingsPage() {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="country">Country</Label>
+                    <Label htmlFor="country">{t('labels.country')}</Label>
                     <Input
                       id="country"
                       value={storeSettings.address.country || ''}
@@ -855,12 +855,12 @@ export default function SettingsPage() {
         <TabsContent value="config" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>{t('settings.sections.storeConfiguration')}</CardTitle>
+              <CardTitle>{t('sections.storeConfiguration')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="currency">Default Currency</Label>
+                  <Label htmlFor="currency">{t('labels.defaultCurrency')}</Label>
                   <Select 
                     value={storeSettings.settings.currency} 
                     onValueChange={(value) => setStoreSettings(prev => ({ 
@@ -893,7 +893,7 @@ export default function SettingsPage() {
                   </Select>
                 </div>
                 <div>
-                  <Label htmlFor="timezone">Timezone</Label>
+                  <Label htmlFor="timezone">{t('labels.timezone')}</Label>
                   <Select 
                     value={storeSettings.settings.timezone} 
                     onValueChange={(value) => setStoreSettings(prev => ({ 
@@ -916,7 +916,7 @@ export default function SettingsPage() {
               </div>
 
               <div>
-                <Label htmlFor="tax-rate">Tax Rate (%)</Label>
+                <Label htmlFor="tax-rate">{t('labels.taxRate')}</Label>
                 <Input
                   id="tax-rate"
                   type="number"
@@ -933,7 +933,7 @@ export default function SettingsPage() {
               </div>
 
               <div>
-                <Label htmlFor="low-stock-threshold">Low Stock Threshold</Label>
+                <Label htmlFor="low-stock-threshold">{t('labels.lowStockThreshold')}</Label>
                 <Input
                   id="low-stock-threshold"
                   type="number"
@@ -957,7 +957,7 @@ export default function SettingsPage() {
                 
                 <div className="flex items-center justify-between">
                   <div>
-                    <Label>Inventory Tracking</Label>
+                    <Label>{t('labels.inventoryTracking')}</Label>
                     <p className="text-sm text-gray-500">Track product quantities and stock levels</p>
                   </div>
                   <Switch
@@ -971,7 +971,7 @@ export default function SettingsPage() {
 
                 <div className="flex items-center justify-between">
                   <div>
-                    <Label>Allow Backorders</Label>
+                    <Label>{t('labels.allowBackorders')}</Label>
                     <p className="text-sm text-gray-500">Allow customers to order out-of-stock items</p>
                   </div>
                   <Switch
@@ -985,7 +985,7 @@ export default function SettingsPage() {
 
                 <div className="flex items-center justify-between">
                   <div>
-                    <Label>Auto-fulfill Orders</Label>
+                    <Label>{t('labels.autoFulfillOrders')}</Label>
                     <p className="text-sm text-gray-500">Automatically mark orders as fulfilled</p>
                   </div>
                   <Switch
@@ -999,7 +999,7 @@ export default function SettingsPage() {
 
                 <div className="flex items-center justify-between">
                   <div>
-                    <Label>Email Notifications</Label>
+                    <Label>{t('labels.emailNotifications')}</Label>
                     <p className="text-sm text-gray-500">Send email notifications for order updates</p>
                   </div>
                   <Switch
@@ -1024,11 +1024,11 @@ export default function SettingsPage() {
         <TabsContent value="theme" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>{t('settings.sections.brandAssets')}</CardTitle>
+              <CardTitle>{t('sections.brandAssets')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <Label htmlFor="logo-url">Logo URL</Label>
+                <Label htmlFor="logo-url">{t('labels.logoUrl')}</Label>
                 <Input
                   id="logo-url"
                   value={themeSettings.logo_url}
@@ -1037,7 +1037,7 @@ export default function SettingsPage() {
                 />
               </div>
               <div>
-                <Label htmlFor="favicon-url">Favicon URL</Label>
+                <Label htmlFor="favicon-url">{t('labels.faviconUrl')}</Label>
                 <Input
                   id="favicon-url"
                   value={themeSettings.favicon_url}
@@ -1050,12 +1050,12 @@ export default function SettingsPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle>{t('settings.sections.colorScheme')}</CardTitle>
+              <CardTitle>{t('sections.colorScheme')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 <div>
-                  <Label htmlFor="primary-color">Primary Color</Label>
+                  <Label htmlFor="primary-color">{t('labels.primaryColor')}</Label>
                   <div className="flex space-x-2">
                     <Input
                       id="primary-color"
@@ -1072,7 +1072,7 @@ export default function SettingsPage() {
                   </div>
                 </div>
                 <div>
-                  <Label htmlFor="secondary-color">Secondary Color</Label>
+                  <Label htmlFor="secondary-color">{t('labels.secondaryColor')}</Label>
                   <div className="flex space-x-2">
                     <Input
                       id="secondary-color"
@@ -1089,7 +1089,7 @@ export default function SettingsPage() {
                   </div>
                 </div>
                 <div>
-                  <Label htmlFor="accent-color">Accent Color</Label>
+                  <Label htmlFor="accent-color">{t('labels.accentColor')}</Label>
                   <div className="flex space-x-2">
                     <Input
                       id="accent-color"
@@ -1111,11 +1111,11 @@ export default function SettingsPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle>{t('settings.sections.typography')}</CardTitle>
+              <CardTitle>{t('sections.typography')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <Label htmlFor="font-family">Font Family</Label>
+                <Label htmlFor="font-family">{t('labels.fontFamily')}</Label>
                 <Select 
                   value={themeSettings.font_family} 
                   onValueChange={(value) => setThemeSettings(prev => ({ ...prev, font_family: value }))}
@@ -1137,11 +1137,11 @@ export default function SettingsPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle>{t('settings.sections.customCss')}</CardTitle>
+              <CardTitle>{t('sections.customCss')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div>
-                <Label htmlFor="custom-css">Custom CSS</Label>
+                <Label htmlFor="custom-css">{t('labels.customCss')}</Label>
                 <Textarea
                   id="custom-css"
                   value={themeSettings.custom_css}
@@ -1163,7 +1163,7 @@ export default function SettingsPage() {
         <TabsContent value="payments" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>{t('settings.sections.paymentMethods')}</CardTitle>
+              <CardTitle>{t('sections.paymentMethods')}</CardTitle>
               <p className="text-sm text-muted-foreground">
                 Configure which payment methods are available to your customers.
               </p>
@@ -1707,7 +1707,7 @@ export default function SettingsPage() {
         <TabsContent value="users" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>{t('settings.sections.inviteNewUser')}</CardTitle>
+              <CardTitle>{t('sections.inviteNewUser')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex space-x-4">
@@ -1738,7 +1738,7 @@ export default function SettingsPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle>{t('settings.sections.teamMembers')}</CardTitle>
+              <CardTitle>{t('sections.teamMembers')}</CardTitle>
             </CardHeader>
             <CardContent>
               {tenantUsers.length === 0 ? (
@@ -1817,7 +1817,7 @@ export default function SettingsPage() {
         <TabsContent value="security" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>{t('settings.sections.accountInformation')}</CardTitle>
+              <CardTitle>{t('sections.accountInformation')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>

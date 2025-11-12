@@ -243,6 +243,9 @@
       "accountInformation": "Información de la Cuenta",
       "dangerZone": "Zona de Peligro"
     },
+    "descriptions": {
+      "paymentMethods": "Configure qué métodos de pago están disponibles para sus clientes."
+    },
     "labels": {
       "storeName": "Nombre de la Tienda",
       "subdomain": "Subdominio",

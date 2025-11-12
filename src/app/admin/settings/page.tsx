@@ -1165,7 +1165,7 @@ export default function SettingsPage() {
             <CardHeader>
               <CardTitle>{t('sections.paymentMethods')}</CardTitle>
               <p className="text-sm text-muted-foreground">
-                Configure which payment methods are available to your customers.
+                {t('descriptions.paymentMethods')}
               </p>
             </CardHeader>
             <CardContent className="space-y-6">

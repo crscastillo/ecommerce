@@ -244,6 +244,26 @@
     "descriptions": {
       "paymentMethods": "Configure which payment methods are available to your customers."
     },
+    "paymentMethods": {
+      "cashOnDelivery": {
+        "name": "Cash on Delivery",
+        "description": "Allow customers to pay when they receive their order"
+      },
+      "stripe": {
+        "name": "Stripe",
+        "description": "Accept credit cards and other payment methods with Stripe"
+      },
+      "tilopay": {
+        "name": "TiloPay",
+        "description": "Costa Rican payment gateway for local and international cards"
+      },
+      "publishableKey": "Publishable Key",
+      "secretKey": "Secret Key",
+      "apiKey": "API Key",
+      "showKeys": "Show Keys",
+      "hideKeys": "Hide Keys",
+      "tilopaySupports": "TiloPay supports CRC and USD payments for Costa Rica."
+    },
     "labels": {
       "storeName": "Store Name",
       "subdomain": "Subdomain",

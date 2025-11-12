@@ -1176,9 +1176,9 @@ export default function SettingsPage() {
                     💵
                   </div>
                   <div>
-                    <h3 className="font-medium">Cash on Delivery</h3>
+                    <h3 className="font-medium">{t('paymentMethods.cashOnDelivery.name')}</h3>
                     <p className="text-sm text-gray-500">
-                      Allow customers to pay when they receive their order
+                      {t('paymentMethods.cashOnDelivery.description')}
                     </p>
                   </div>
                 </div>
@@ -1199,9 +1199,9 @@ export default function SettingsPage() {
                       <CreditCard className="h-6 w-6 text-blue-600" />
                     </div>
                     <div>
-                      <h3 className="font-medium">Stripe</h3>
+                      <h3 className="font-medium">{t('paymentMethods.stripe.name')}</h3>
                       <p className="text-sm text-gray-500">
-                        Accept credit cards and other payment methods with Stripe
+                        {t('paymentMethods.stripe.description')}
                       </p>
                     </div>
                   </div>
@@ -1226,12 +1226,12 @@ export default function SettingsPage() {
                         {showStripeKeys ? (
                           <>
                             <EyeOff className="h-4 w-4 mr-2" />
-                            Hide Keys
+                            {t('paymentMethods.hideKeys')}
                           </>
                         ) : (
                           <>
                             <Eye className="h-4 w-4 mr-2" />
-                            Show Keys
+                            {t('paymentMethods.showKeys')}
                           </>
                         )}
                       </Button>
@@ -1240,7 +1240,7 @@ export default function SettingsPage() {
                     <div className="space-y-3">
                       <div>
                         <Label htmlFor="stripe-publishable-key" className="text-sm">
-                          Publishable Key
+                          {t('paymentMethods.publishableKey')}
                         </Label>
                         <Input
                           id="stripe-publishable-key"
@@ -1256,7 +1256,7 @@ export default function SettingsPage() {
                       </div>
                       <div>
                         <Label htmlFor="stripe-secret-key" className="text-sm">
-                          Secret Key
+                          {t('paymentMethods.secretKey')}
                         </Label>
                         <Input
                           id="stripe-secret-key"
@@ -1306,9 +1306,9 @@ export default function SettingsPage() {
                       🏦
                     </div>
                     <div>
-                      <h3 className="font-medium">TiloPay</h3>
+                      <h3 className="font-medium">{t('paymentMethods.tilopay.name')}</h3>
                       <p className="text-sm text-gray-500">
-                        Costa Rican payment gateway for local and international cards
+                        {t('paymentMethods.tilopay.description')}
                       </p>
                     </div>
                   </div>
@@ -1333,12 +1333,12 @@ export default function SettingsPage() {
                         {showTiloPayKeys ? (
                           <>
                             <EyeOff className="h-4 w-4 mr-2" />
-                            Hide Keys
+                            {t('paymentMethods.hideKeys')}
                           </>
                         ) : (
                           <>
                             <Eye className="h-4 w-4 mr-2" />
-                            Show Keys
+                            {t('paymentMethods.showKeys')}
                           </>
                         )}
                       </Button>
@@ -1347,7 +1347,7 @@ export default function SettingsPage() {
                     <div className="space-y-3">
                       <div>
                         <Label htmlFor="tilopay-api-key" className="text-sm">
-                          API Key
+                          {t('paymentMethods.apiKey')}
                         </Label>
                         <Input
                           id="tilopay-api-key"
@@ -1363,7 +1363,7 @@ export default function SettingsPage() {
                       </div>
                       <div>
                         <Label htmlFor="tilopay-secret-key" className="text-sm">
-                          Secret Key
+                          {t('paymentMethods.secretKey')}
                         </Label>
                         <Input
                           id="tilopay-secret-key"
@@ -1396,7 +1396,7 @@ export default function SettingsPage() {
                             >
                               TiloPay Portal
                             </a>
-                            . TiloPay supports CRC and USD payments for Costa Rica.
+                            . {t('paymentMethods.tilopaySupports')}
                           </p>
                         </div>
                       </div>

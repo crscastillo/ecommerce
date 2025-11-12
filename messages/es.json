@@ -246,6 +246,26 @@
     "descriptions": {
       "paymentMethods": "Configure qué métodos de pago están disponibles para sus clientes."
     },
+    "paymentMethods": {
+      "cashOnDelivery": {
+        "name": "Pago Contra Entrega",
+        "description": "Permitir a los clientes pagar cuando reciban su pedido"
+      },
+      "stripe": {
+        "name": "Stripe",
+        "description": "Acepte tarjetas de crédito y otros métodos de pago con Stripe"
+      },
+      "tilopay": {
+        "name": "TiloPay",
+        "description": "Pasarela de pagos costarricense para tarjetas locales e internacionales"
+      },
+      "publishableKey": "Clave Pública",
+      "secretKey": "Clave Secreta",
+      "apiKey": "Clave API",
+      "showKeys": "Mostrar Claves",
+      "hideKeys": "Ocultar Claves",
+      "tilopaySupports": "TiloPay soporta pagos en CRC y USD para Costa Rica."
+    },
     "labels": {
       "storeName": "Nombre de la Tienda",
       "subdomain": "Subdominio",

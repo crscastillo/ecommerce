@@ -76,7 +76,7 @@ export default function AdminHeader({ onMenuClick }: AdminHeaderProps) {
                   id="search"
                   name="search"
                   className="block w-full rounded-md border-gray-300 pl-10 text-sm"
-                  placeholder="Search products, orders..."
+                  placeholder={t('header.searchPlaceholder')}
                   type="search"
                 />
               </div>
@@ -92,7 +92,7 @@ export default function AdminHeader({ onMenuClick }: AdminHeaderProps) {
               className="hidden md:flex"
             >
               <ExternalLink className="h-4 w-4 mr-2" />
-              Visit Store
+              {t('header.visitStore')}
             </Button>
 
             {/* Notifications */}

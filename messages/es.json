@@ -37,7 +37,16 @@
     "saving": "Guardando...",
     "saveChanges": "Guardar Cambios",
     "goBack": "Volver",
-    "redirectingToHomepage": "Redirigiendo a la página principal en 10 segundos..."
+    "redirectingToHomepage": "Redirigiendo a la página principal en 10 segundos...",
+    "saveStoreInformation": "Guardar Información de la Tienda",
+    "saveConfiguration": "Guardar Configuración",
+    "saveThemeSettings": "Guardar Configuración del Tema",
+    "savePaymentSettings": "Guardar Configuración de Pagos",
+    "savePluginSettings": "Guardar Configuración de Plugins",
+    "deleteStore": "Eliminar Tienda",
+    "deleteStoreConfirm": "Esto eliminará permanentemente su tienda \"{storeName}\" y todos los datos asociados, incluidos productos, pedidos y clientes. Esta acción no se puede deshacer.",
+    "deleteStorePermanently": "Eliminar permanentemente su tienda y todos los datos asociados. Esta acción no se puede deshacer.",
+    "remove": "Eliminar"
   },
   "navigation": {
     "dashboard": "Panel de Control",
@@ -241,7 +250,9 @@
       "inviteNewUser": "Invitar Nuevo Usuario",
       "teamMembers": "Miembros del Equipo",
       "accountInformation": "Información de la Cuenta",
-      "dangerZone": "Zona de Peligro"
+      "dangerZone": "Zona de Peligro",
+      "availablePlugins": "Plugins Disponibles",
+      "passwordSecurity": "Contraseña y Seguridad"
     },
     "descriptions": {
       "paymentMethods": "Configure qué métodos de pago están disponibles para sus clientes."
@@ -265,6 +276,76 @@
       "showKeys": "Mostrar Claves",
       "hideKeys": "Ocultar Claves",
       "tilopaySupports": "TiloPay soporta pagos en CRC y USD para Costa Rica."
+    },
+    "plugins": {
+      "googleAnalytics": {
+        "name": "Google Analytics",
+        "description": "Rastrea el rendimiento de la tienda y el comportamiento de los visitantes"
+      },
+      "facebookPixel": {
+        "name": "Facebook Pixel",
+        "description": "Rastrea conversiones y optimiza anuncios"
+      },
+      "mailchimp": {
+        "name": "Integración con Mailchimp",
+        "description": "Sincroniza clientes y envía boletines"
+      },
+      "whatsapp": {
+        "name": "WhatsApp Business",
+        "description": "Conecta con clientes a través de WhatsApp"
+      },
+      "proFeature": "Característica Pro"
+    },
+    "users": {
+      "inviteEmail": "Ingrese dirección de correo electrónico",
+      "inviteButton": "Invitar",
+      "noTeamMembers": "Sin miembros del equipo",
+      "inviteUsersHelp": "Invite usuarios para ayudar a administrar su tienda.",
+      "pendingInvitation": "Invitación pendiente",
+      "invited": "Invitado",
+      "removeTeamMember": "Eliminar Miembro del Equipo",
+      "removeConfirmation": "¿Está seguro de que desea eliminar este miembro del equipo? Esta acción no se puede deshacer.",
+      "roles": {
+        "admin": "Administrador",
+        "staff": "Personal",
+        "viewer": "Visualizador"
+      },
+      "status": {
+        "pending": "Pendiente",
+        "active": "Activo"
+      }
+    },
+    "security": {
+      "changePassword": "Cambiar Contraseña",
+      "changePasswordDescription": "Actualice su contraseña para mantener su cuenta segura. Recomendamos usar una contraseña fuerte y única.",
+      "updatePassword": "Actualizar Contraseña",
+      "twoFactorAuth": "Autenticación de Dos Factores",
+      "twoFactorDescription": "Agregue una capa adicional de seguridad a su cuenta con autenticación de dos factores.",
+      "enable": "Habilitar",
+      "plan": "Plan",
+      "active": "Activo",
+      "inactive": "Inactivo",
+      "sendPasswordReset": "Enviar Enlace de Restablecimiento",
+      "sending": "Enviando...",
+      "addContactEmailFirst": "Agregue un correo de contacto en la configuración de la tienda para habilitar el restablecimiento de contraseña",
+      "smsAuth": "Autenticación SMS",
+      "smsDescription": "Recibir códigos vía SMS",
+      "authenticatorApp": "Aplicación Autenticadora",
+      "authenticatorDescription": "Usar Google Authenticator o aplicaciones similares",
+      "comingSoon": "Próximamente",
+      "loginSessions": "Sesiones de Inicio",
+      "loginSessionsDescription": "Administre sesiones activas y cierre sesión en todos los dispositivos.",
+      "currentSession": "Sesión Actual",
+      "lastActive": "Última actividad",
+      "logoutAllDevices": "Cerrar Sesión en Todos los Dispositivos",
+      "subscriptionTier": "Nivel de Suscripción",
+      "storeStatus": "Estado de la Tienda",
+      "created": "Creado",
+      "sendPasswordResetEmail": "Enviar Correo de Restablecimiento de Contraseña",
+      "passwordResetSent": "Enlace de restablecimiento de contraseña enviado a su correo electrónico",
+      "failedToSendPasswordReset": "Error al enviar correo de restablecimiento de contraseña",
+      "signingOut": "Cerrando sesión...",
+      "failedToSignOut": "Error al cerrar sesión"
     },
     "labels": {
       "storeName": "Nombre de la Tienda",
@@ -317,7 +398,8 @@
     "header": {
       "visitStore": "Visitar Tienda",
       "accountSettings": "Configuración de Cuenta",
-      "signOut": "Cerrar Sesión"
+      "signOut": "Cerrar Sesión",
+      "searchPlaceholder": "Buscar productos, pedidos..."
     }
   },
   "auth": {

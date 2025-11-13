@@ -120,6 +120,7 @@ interface PaymentSettings {
 export default function SettingsPage() {
   const { tenant, isLoading: tenantLoading, error, refreshTenant } = useTenant()
   const t = useTranslations('settings')
+  const tCommon = useTranslations('common')
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
@@ -845,7 +846,7 @@ export default function SettingsPage() {
 
               <Button onClick={saveStoreSettings} disabled={saving} className="w-full md:w-auto">
                 <Save className="h-4 w-4 mr-2" />
-                {saving ? 'Saving...' : 'Save Store Information'}
+                {saving ? tCommon('saving') : tCommon('saveStoreInformation')}
               </Button>
             </CardContent>
           </Card>
@@ -1014,7 +1015,7 @@ export default function SettingsPage() {
 
               <Button onClick={saveStoreSettings} disabled={saving} className="w-full md:w-auto">
                 <Save className="h-4 w-4 mr-2" />
-                {saving ? 'Saving...' : 'Save Configuration'}
+                {saving ? tCommon('saving') : tCommon('saveConfiguration')}
               </Button>
             </CardContent>
           </Card>
@@ -1153,7 +1154,7 @@ export default function SettingsPage() {
               </div>
               <Button onClick={saveThemeSettings} disabled={saving} className="mt-4">
                 <Save className="h-4 w-4 mr-2" />
-                {saving ? 'Saving...' : 'Save Theme Settings'}
+                {saving ? tCommon('saving') : tCommon('saveThemeSettings')}
               </Button>
             </CardContent>
           </Card>
@@ -1408,7 +1409,7 @@ export default function SettingsPage() {
               <div className="flex justify-end">
                 <Button onClick={savePaymentSettings} disabled={saving}>
                   <Save className="h-4 w-4 mr-2" />
-                  {saving ? 'Saving...' : 'Save Payment Settings'}
+                  {saving ? tCommon('saving') : tCommon('savePaymentSettings')}
                 </Button>
               </div>
             </CardContent>
@@ -1421,7 +1422,7 @@ export default function SettingsPage() {
             <CardHeader>
               <CardTitle className="flex items-center">
                 <Puzzle className="h-5 w-5 mr-2" />
-                Available Plugins
+                {t('sections.availablePlugins')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -1436,8 +1437,8 @@ export default function SettingsPage() {
                           <Globe className="h-5 w-5 text-blue-600" />
                         </div>
                         <div>
-                          <h3 className="font-medium">Google Analytics</h3>
-                          <p className="text-sm text-gray-600">Track store performance and visitor behavior</p>
+                          <h3 className="font-medium">{t('plugins.googleAnalytics.name')}</h3>
+                          <p className="text-sm text-gray-600">{t('plugins.googleAnalytics.description')}</p>
                         </div>
                       </div>
                       <Switch 
@@ -1458,7 +1459,7 @@ export default function SettingsPage() {
                           disabled
                         />
                       </div>
-                      <Badge variant="outline">Pro Feature</Badge>
+                      <Badge variant="outline">{t('plugins.proFeature')}</Badge>
                     </div>
                   </CardContent>
                 </Card>
@@ -1472,8 +1473,8 @@ export default function SettingsPage() {
                           <Globe className="h-5 w-5 text-blue-600" />
                         </div>
                         <div>
-                          <h3 className="font-medium">Facebook Pixel</h3>
-                          <p className="text-sm text-gray-600">Track conversions and optimize ads</p>
+                          <h3 className="font-medium">{t('plugins.facebookPixel.name')}</h3>
+                          <p className="text-sm text-gray-600">{t('plugins.facebookPixel.description')}</p>
                         </div>
                       </div>
                       <Switch 
@@ -1494,7 +1495,7 @@ export default function SettingsPage() {
                           disabled
                         />
                       </div>
-                      <Badge variant="outline">Pro Feature</Badge>
+                      <Badge variant="outline">{t('plugins.proFeature')}</Badge>
                     </div>
                   </CardContent>
                 </Card>
@@ -1508,8 +1509,8 @@ export default function SettingsPage() {
                           <Mail className="h-5 w-5 text-green-600" />
                         </div>
                         <div>
-                          <h3 className="font-medium">Mailchimp Integration</h3>
-                          <p className="text-sm text-gray-600">Sync customers and send newsletters</p>
+                          <h3 className="font-medium">{t('plugins.mailchimp.name')}</h3>
+                          <p className="text-sm text-gray-600">{t('plugins.mailchimp.description')}</p>
                         </div>
                       </div>
                       <Switch 
@@ -1539,7 +1540,7 @@ export default function SettingsPage() {
                           disabled
                         />
                       </div>
-                      <Badge variant="outline">Pro Feature</Badge>
+                      <Badge variant="outline">{t('plugins.proFeature')}</Badge>
                     </div>
                   </CardContent>
                 </Card>
@@ -1553,8 +1554,8 @@ export default function SettingsPage() {
                           <Mail className="h-5 w-5 text-green-600" />
                         </div>
                         <div>
-                          <h3 className="font-medium">WhatsApp Business</h3>
-                          <p className="text-sm text-gray-600">Customer support via WhatsApp</p>
+                          <h3 className="font-medium">{t('plugins.whatsapp.name')}</h3>
+                          <p className="text-sm text-gray-600">{t('plugins.whatsapp.description')}</p>
                         </div>
                       </div>
                       <Switch 
@@ -1696,7 +1697,7 @@ export default function SettingsPage() {
               <div className="flex justify-end">
                 <Button onClick={() => {}} disabled={saving}>
                   <Save className="h-4 w-4 mr-2" />
-                  {saving ? 'Saving...' : 'Save Plugin Settings'}
+                  {saving ? tCommon('saving') : tCommon('savePluginSettings')}
                 </Button>
               </div>
             </CardContent>
@@ -1713,7 +1714,7 @@ export default function SettingsPage() {
               <div className="flex space-x-4">
                 <div className="flex-1">
                   <Input
-                    placeholder="Enter email address"
+                    placeholder={t('users.inviteEmail')}
                     value={inviteEmail}
                     onChange={(e) => setInviteEmail(e.target.value)}
                   />
@@ -1723,14 +1724,14 @@ export default function SettingsPage() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="admin">Admin</SelectItem>
-                    <SelectItem value="staff">Staff</SelectItem>
-                    <SelectItem value="viewer">Viewer</SelectItem>
+                    <SelectItem value="admin">{t('users.roles.admin')}</SelectItem>
+                    <SelectItem value="staff">{t('users.roles.staff')}</SelectItem>
+                    <SelectItem value="viewer">{t('users.roles.viewer')}</SelectItem>
                   </SelectContent>
                 </Select>
                 <Button onClick={inviteUser} disabled={saving || !inviteEmail.trim()}>
                   <Plus className="h-4 w-4 mr-2" />
-                  Invite
+                  {t('users.inviteButton')}
                 </Button>
               </div>
             </CardContent>
@@ -1744,9 +1745,9 @@ export default function SettingsPage() {
               {tenantUsers.length === 0 ? (
                 <div className="text-center py-8">
                   <Users className="mx-auto h-12 w-12 text-gray-400" />
-                  <h3 className="mt-2 text-sm font-medium text-gray-900">No team members</h3>
+                  <h3 className="mt-2 text-sm font-medium text-gray-900">{t('users.noTeamMembers')}</h3>
                   <p className="mt-1 text-sm text-gray-500">
-                    Invite users to help manage your store.
+                    {t('users.inviteUsersHelp')}
                   </p>
                 </div>
               ) : (
@@ -1756,17 +1757,17 @@ export default function SettingsPage() {
                       <div>
                         <div className="flex items-center space-x-2">
                           <span className="font-medium">
-                            {user.user?.email || `Pending invitation (${user.user_id})`}
+                            {user.user?.email || `${t('users.pendingInvitation')} (${user.user_id})`}
                           </span>
                           <Badge variant={getRoleBadgeVariant(user.role)}>
                             {user.role}
                           </Badge>
                           {!user.is_active && (
-                            <Badge variant="secondary">Pending</Badge>
+                            <Badge variant="secondary">{t('users.status.pending')}</Badge>
                           )}
                         </div>
                         <p className="text-sm text-gray-500">
-                          Invited {new Date(user.invited_at).toLocaleDateString()}
+                          {t('users.invited')} {new Date(user.invited_at).toLocaleDateString()}
                         </p>
                       </div>
                       <div className="flex items-center space-x-2">
@@ -1778,9 +1779,9 @@ export default function SettingsPage() {
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="admin">Admin</SelectItem>
-                            <SelectItem value="staff">Staff</SelectItem>
-                            <SelectItem value="viewer">Viewer</SelectItem>
+                            <SelectItem value="admin">{t('users.roles.admin')}</SelectItem>
+                            <SelectItem value="staff">{t('users.roles.staff')}</SelectItem>
+                            <SelectItem value="viewer">{t('users.roles.viewer')}</SelectItem>
                           </SelectContent>
                         </Select>
                         <AlertDialog>
@@ -1791,15 +1792,15 @@ export default function SettingsPage() {
                           </AlertDialogTrigger>
                           <AlertDialogContent>
                             <AlertDialogHeader>
-                              <AlertDialogTitle>Remove Team Member</AlertDialogTitle>
+                              <AlertDialogTitle>{t('users.removeTeamMember')}</AlertDialogTitle>
                               <AlertDialogDescription>
-                                Are you sure you want to remove this team member? This action cannot be undone.
+                                {t('users.removeConfirmation')}
                               </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
-                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogCancel>{tCommon('cancel')}</AlertDialogCancel>
                               <AlertDialogAction onClick={() => removeUser(user.id)}>
-                                Remove
+                                {tCommon('remove')}
                               </AlertDialogAction>
                             </AlertDialogFooter>
                           </AlertDialogContent>
@@ -1821,24 +1822,24 @@ export default function SettingsPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <Label>Subscription Tier</Label>
+                <Label>{t('security.subscriptionTier')}</Label>
                 <div className="flex items-center space-x-2 mt-1">
                   <Badge variant="outline" className="capitalize">
                     {tenant.subscription_tier}
                   </Badge>
-                  <span className="text-sm text-gray-500">Plan</span>
+                  <span className="text-sm text-gray-500">{t('security.plan')}</span>
                 </div>
               </div>
               <div>
-                <Label>Store Status</Label>
+                <Label>{t('security.storeStatus')}</Label>
                 <div className="flex items-center space-x-2 mt-1">
                   <Badge variant={tenant.is_active ? "default" : "secondary"}>
-                    {tenant.is_active ? "Active" : "Inactive"}
+                    {tenant.is_active ? t('security.active') : t('security.inactive')}
                   </Badge>
                 </div>
               </div>
               <div>
-                <Label>Created</Label>
+                <Label>{t('security.created')}</Label>
                 <p className="text-sm text-gray-600 mt-1">
                   {new Date(tenant.created_at).toLocaleDateString('en-US', {
                     year: 'numeric',
@@ -1852,13 +1853,13 @@ export default function SettingsPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Password & Security</CardTitle>
+              <CardTitle>{t('sections.passwordSecurity')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               <div>
-                <h3 className="font-medium mb-3">Change Password</h3>
+                <h3 className="font-medium mb-3">{t('security.changePassword')}</h3>
                 <p className="text-sm text-gray-600 mb-4">
-                  Update your password to keep your account secure. We recommend using a strong, unique password.
+                  {t('security.changePasswordDescription')}
                 </p>
                 <Button 
                   onClick={async () => {
@@ -1878,13 +1879,13 @@ export default function SettingsPage() {
 
                       setMessage({ 
                         type: 'success', 
-                        text: 'Password reset link sent to your email address' 
+                        text: t('security.passwordResetSent')
                       })
                     } catch (error) {
                       console.error('Error sending password reset:', error)
                       setMessage({ 
                         type: 'error', 
-                        text: 'Failed to send password reset email' 
+                        text: t('security.failedToSendPasswordReset')
                       })
                     } finally {
                       setSaving(false)
@@ -1894,11 +1895,11 @@ export default function SettingsPage() {
                   variant="outline"
                 >
                   <Shield className="h-4 w-4 mr-2" />
-                  {saving ? 'Sending...' : 'Send Password Reset Email'}
+                  {saving ? t('security.sending') : t('security.sendPasswordResetEmail')}
                 </Button>
                 {!tenant.contact_email && (
                   <p className="text-xs text-orange-600 mt-2">
-                    Please add a contact email in Store settings to enable password reset
+                    {t('security.addContactEmailFirst')}
                   </p>
                 )}
               </div>
@@ -1906,42 +1907,42 @@ export default function SettingsPage() {
               <Separator />
 
               <div>
-                <h3 className="font-medium mb-3">Two-Factor Authentication</h3>
+                <h3 className="font-medium mb-3">{t('security.twoFactorAuth')}</h3>
                 <p className="text-sm text-gray-600 mb-4">
-                  Add an extra layer of security to your account with two-factor authentication.
+                  {t('security.twoFactorDescription')}
                 </p>
                 <div className="flex items-center justify-between p-4 border rounded-lg">
                   <div>
-                    <div className="font-medium">SMS Authentication</div>
-                    <div className="text-sm text-gray-500">Receive codes via SMS</div>
+                    <div className="font-medium">{t('security.smsAuth')}</div>
+                    <div className="text-sm text-gray-500">{t('security.smsDescription')}</div>
                   </div>
-                  <Badge variant="outline">Coming Soon</Badge>
+                  <Badge variant="outline">{t('security.comingSoon')}</Badge>
                 </div>
                 <div className="flex items-center justify-between p-4 border rounded-lg mt-2">
                   <div>
-                    <div className="font-medium">Authenticator App</div>
-                    <div className="text-sm text-gray-500">Use Google Authenticator or similar apps</div>
+                    <div className="font-medium">{t('security.authenticatorApp')}</div>
+                    <div className="text-sm text-gray-500">{t('security.authenticatorDescription')}</div>
                   </div>
-                  <Badge variant="outline">Coming Soon</Badge>
+                  <Badge variant="outline">{t('security.comingSoon')}</Badge>
                 </div>
               </div>
 
               <Separator />
 
               <div>
-                <h3 className="font-medium mb-3">Login Sessions</h3>
+                <h3 className="font-medium mb-3">{t('security.loginSessions')}</h3>
                 <p className="text-sm text-gray-600 mb-4">
-                  Manage active sessions and logout from all devices.
+                  {t('security.loginSessionsDescription')}
                 </p>
                 <div className="space-y-3">
                   <div className="flex items-center justify-between p-4 border rounded-lg">
                     <div>
-                      <div className="font-medium">Current Session</div>
+                      <div className="font-medium">{t('security.currentSession')}</div>
                       <div className="text-sm text-gray-500">
-                        Last active: {new Date().toLocaleString()}
+                        {t('security.lastActive')}: {new Date().toLocaleString()}
                       </div>
                     </div>
-                    <Badge variant="default">Active</Badge>
+                    <Badge variant="default">{t('security.active')}</Badge>
                   </div>
                   <Button 
                     variant="outline" 
@@ -1954,7 +1955,7 @@ export default function SettingsPage() {
                         console.error('Error signing out:', error)
                         setMessage({ 
                           type: 'error', 
-                          text: 'Failed to sign out' 
+                          text: t('security.failedToSignOut')
                         })
                       } finally {
                         setSaving(false)
@@ -1962,7 +1963,7 @@ export default function SettingsPage() {
                     }}
                     disabled={saving}
                   >
-                    {saving ? 'Signing out...' : 'Logout from All Devices'}
+                    {saving ? t('security.signingOut') : t('security.logoutAllDevices')}
                   </Button>
                 </div>
               </div>
@@ -1971,33 +1972,33 @@ export default function SettingsPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-red-600">Danger Zone</CardTitle>
+              <CardTitle className="text-red-600">{t('sections.dangerZone')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 <div>
-                  <h3 className="font-medium text-red-600">Delete Store</h3>
+                  <h3 className="font-medium text-red-600">{tCommon('deleteStore')}</h3>
                   <p className="text-sm text-gray-600 mb-4">
-                    Permanently delete your store and all associated data. This action cannot be undone.
+                    {tCommon('deleteStorePermanently')}
                   </p>
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
                       <Button variant="destructive">
                         <Trash2 className="h-4 w-4 mr-2" />
-                        Delete Store
+                        {tCommon('deleteStore')}
                       </Button>
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                       <AlertDialogHeader>
-                        <AlertDialogTitle>Delete Store</AlertDialogTitle>
+                        <AlertDialogTitle>{tCommon('deleteStore')}</AlertDialogTitle>
                         <AlertDialogDescription>
-                          This will permanently delete your store "{tenant.name}" and all associated data including products, orders, and customers. This action cannot be undone.
+                          {tCommon('deleteStoreConfirm', { storeName: tenant.name })}
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogCancel>{tCommon('cancel')}</AlertDialogCancel>
                         <AlertDialogAction className="bg-red-600 hover:bg-red-700">
-                          Delete Store
+                          {tCommon('deleteStore')}
                         </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>

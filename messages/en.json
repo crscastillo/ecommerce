@@ -37,7 +37,16 @@
     "saving": "Saving...",
     "saveChanges": "Save Changes",
     "goBack": "Go Back",
-    "redirectingToHomepage": "Redirecting to homepage in 10 seconds..."
+    "redirectingToHomepage": "Redirecting to homepage in 10 seconds...",
+    "saveStoreInformation": "Save Store Information",
+    "saveConfiguration": "Save Configuration",
+    "saveThemeSettings": "Save Theme Settings",
+    "savePaymentSettings": "Save Payment Settings",
+    "savePluginSettings": "Save Plugin Settings",
+    "deleteStore": "Delete Store",
+    "deleteStoreConfirm": "This will permanently delete your store \"{storeName}\" and all associated data including products, orders, and customers. This action cannot be undone.",
+    "deleteStorePermanently": "Permanently delete your store and all associated data. This action cannot be undone.",
+    "remove": "Remove"
   },
   "navigation": {
     "dashboard": "Dashboard",
@@ -239,7 +248,9 @@
       "inviteNewUser": "Invite New User",
       "teamMembers": "Team Members",
       "accountInformation": "Account Information",
-      "dangerZone": "Danger Zone"
+      "dangerZone": "Danger Zone",
+      "availablePlugins": "Available Plugins",
+      "passwordSecurity": "Password & Security"
     },
     "descriptions": {
       "paymentMethods": "Configure which payment methods are available to your customers."
@@ -263,6 +274,76 @@
       "showKeys": "Show Keys",
       "hideKeys": "Hide Keys",
       "tilopaySupports": "TiloPay supports CRC and USD payments for Costa Rica."
+    },
+    "plugins": {
+      "googleAnalytics": {
+        "name": "Google Analytics",
+        "description": "Track store performance and visitor behavior"
+      },
+      "facebookPixel": {
+        "name": "Facebook Pixel",
+        "description": "Track conversions and optimize ads"
+      },
+      "mailchimp": {
+        "name": "Mailchimp Integration",
+        "description": "Sync customers and send newsletters"
+      },
+      "whatsapp": {
+        "name": "WhatsApp Business",
+        "description": "Connect with customers via WhatsApp"
+      },
+      "proFeature": "Pro Feature"
+    },
+    "users": {
+      "inviteEmail": "Enter email address",
+      "inviteButton": "Invite",
+      "noTeamMembers": "No team members",
+      "inviteUsersHelp": "Invite users to help manage your store.",
+      "pendingInvitation": "Pending invitation",
+      "invited": "Invited",
+      "removeTeamMember": "Remove Team Member",
+      "removeConfirmation": "Are you sure you want to remove this team member? This action cannot be undone.",
+      "roles": {
+        "admin": "Admin",
+        "staff": "Staff",
+        "viewer": "Viewer"
+      },
+      "status": {
+        "pending": "Pending",
+        "active": "Active"
+      }
+    },
+    "security": {
+      "changePassword": "Change Password",
+      "changePasswordDescription": "Update your password to keep your account secure. We recommend using a strong, unique password.",
+      "updatePassword": "Update Password",
+      "twoFactorAuth": "Two-Factor Authentication",
+      "twoFactorDescription": "Add an extra layer of security to your account with two-factor authentication.",
+      "enable": "Enable",
+      "plan": "Plan",
+      "active": "Active",
+      "inactive": "Inactive",
+      "sendPasswordReset": "Send Reset Link",
+      "sending": "Sending...",
+      "addContactEmailFirst": "Please add a contact email in Store settings to enable password reset",
+      "smsAuth": "SMS Authentication",
+      "smsDescription": "Receive codes via SMS",
+      "authenticatorApp": "Authenticator App",
+      "authenticatorDescription": "Use Google Authenticator or similar apps",
+      "comingSoon": "Coming Soon",
+      "loginSessions": "Login Sessions",
+      "loginSessionsDescription": "Manage active sessions and logout from all devices.",
+      "currentSession": "Current Session",
+      "lastActive": "Last active",
+      "logoutAllDevices": "Logout from All Devices",
+      "subscriptionTier": "Subscription Tier",
+      "storeStatus": "Store Status",
+      "created": "Created",
+      "sendPasswordResetEmail": "Send Password Reset Email",
+      "passwordResetSent": "Password reset link sent to your email address",
+      "failedToSendPasswordReset": "Failed to send password reset email",
+      "signingOut": "Signing out...",
+      "failedToSignOut": "Failed to sign out"
     },
     "labels": {
       "storeName": "Store Name",
@@ -315,7 +396,8 @@
     "header": {
       "visitStore": "Visit Store",
       "accountSettings": "Account Settings",
-      "signOut": "Sign Out"
+      "signOut": "Sign Out",
+      "searchPlaceholder": "Search products, orders..."
     }
   },
   "auth": {

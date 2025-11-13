@@ -1,0 +1,7 @@
+export { PlatformNavigation } from './platform-navigation'
+export { HeroSection } from './hero-section'
+export { FeaturesSection } from './features-section'
+export { IntegrationsSection } from './integrations-section'
+export { PricingSection } from './pricing-section'
+export { CtaSection } from './cta-section'
+export { PlatformFooter } from './platform-footer'

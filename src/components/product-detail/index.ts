@@ -1,0 +1,8 @@
+export { ProductBreadcrumb } from './product-breadcrumb'
+export { ProductImageGallery } from './product-image-gallery'
+export { ProductInfoHeader } from './product-info-header'
+export { VariantSelector } from './variant-selector'
+export { AddToCartSection } from './add-to-cart-section'
+export { ProductFeatures } from './product-features'
+export { ProductTags } from './product-tags'
+export { ProductDescription } from './product-description'

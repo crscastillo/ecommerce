@@ -82,10 +82,7 @@ export default function TenantsPage() {
       // Get all tenants
       const { data: tenantsData, error: tenantsError } = await supabase
         .from('tenants')
-        .select(`
-          *,
-          profiles:owner_id(email, full_name)
-        `)
+        .select('*')
         .order('created_at', { ascending: false })
 
       if (tenantsError) throw tenantsError

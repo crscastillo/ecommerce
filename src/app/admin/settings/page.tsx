@@ -121,6 +121,7 @@ export default function SettingsPage() {
   const { tenant, isLoading: tenantLoading, error, refreshTenant } = useTenant()
   const t = useTranslations('settings')
   const tCommon = useTranslations('common')
+  const [mounted, setMounted] = useState(false)
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
@@ -173,6 +174,11 @@ export default function SettingsPage() {
   const [inviteRole, setInviteRole] = useState('staff')
 
   const supabase = createClient()
+
+  // Track when component is mounted to prevent SSR flash
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   useEffect(() => {
     if (tenant?.id) {
@@ -533,8 +539,13 @@ export default function SettingsPage() {
     }
   }
 
+  // Don't render anything until mounted (prevents SSR flash)
+  if (!mounted) {
+    return null
+  }
+
   // Show tenant loading state
-  if (tenantLoading) {
+  if (tenantLoading || !tenant) {
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
@@ -547,8 +558,8 @@ export default function SettingsPage() {
     )
   }
 
-  // Show tenant error state
-  if (error || !tenant) {
+  // Show tenant error state only if there's an actual error
+  if (error) {
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">

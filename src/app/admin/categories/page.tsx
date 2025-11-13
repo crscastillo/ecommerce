@@ -23,7 +23,7 @@ import {
 } from '@/lib/types/category'
 
 export default function CategoriesPage() {
-  const { tenant } = useTenant()
+  const { tenant, isLoading: tenantLoading } = useTenant()
   const t = useTranslations()
   
   // State for filters
@@ -50,8 +50,22 @@ export default function CategoriesPage() {
     await toggleCategoryStatus(categoryId, currentStatus)
   }
 
-  // Show tenant access required message if no tenant
-  if (!tenant) {
+  // Show loading state while tenant is loading
+  if (tenantLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h1 className="text-3xl font-bold">{t('navigation.categories')}</h1>
+        </div>
+        <div className="text-center py-8">
+          <p>Loading...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Show tenant access required message if no tenant after loading
+  if (!tenantLoading && !tenant) {
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
@@ -71,6 +85,11 @@ export default function CategoriesPage() {
         </Card>
       </div>
     )
+  }
+
+  // Don't render until we have a tenant
+  if (!tenant) {
+    return null
   }
 
   // Check if filters are active

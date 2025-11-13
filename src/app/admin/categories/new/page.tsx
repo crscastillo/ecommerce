@@ -33,7 +33,7 @@ import {
 
 export default function NewCategoryPage() {
   const router = useRouter()
-  const { tenant } = useTenant()
+  const { tenant, isLoading: tenantLoading } = useTenant()
   
   // State
   const [formData, setFormData] = useState(defaultCategoryFormData)
@@ -215,8 +215,22 @@ export default function NewCategoryPage() {
     }
   }
 
-  // Show tenant access required message if no tenant
-  if (!tenant) {
+  // Show loading state while tenant is loading
+  if (tenantLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h1 className="text-3xl font-bold">Create Category</h1>
+        </div>
+        <div className="text-center py-8">
+          <p>Loading...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Show tenant access required message if no tenant after loading
+  if (!tenantLoading && !tenant) {
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
@@ -236,6 +250,11 @@ export default function NewCategoryPage() {
         </Card>
       </div>
     )
+  }
+
+  // Don't render until we have a tenant
+  if (!tenant) {
+    return null
   }
 
   return (

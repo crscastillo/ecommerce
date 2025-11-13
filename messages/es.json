@@ -181,6 +181,14 @@
     "editCategoryDetails": "Editar Detalles de la Categoría",
     "viewInStore": "Ver en la Tienda"
   },
+  "category": {
+    "notFound": "Categoría No Encontrada",
+    "notFoundDescription": "La categoría que está buscando no existe.",
+    "productsFound": "{count, plural, one {# producto} other {# productos}} encontrado{count, plural, one {} other {s}}",
+    "noProducts": "No se encontraron productos",
+    "noProductsDescription": "Esta categoría no tiene productos aún.",
+    "browseOtherCategories": "Explorar Otras Categorías"
+  },
   "orders": {
     "title": "Pedidos",
     "requiresStoreAccess": "La gestión de pedidos requiere acceso a la tienda",
@@ -461,6 +469,33 @@
     "clearFilters": "Limpiar Todos los Filtros",
     "showingResults": "Mostrando {count} resultados",
     "noResults": "No se encontraron productos que coincidan con sus criterios"
+  },
+  "product": {
+    "featured": "Destacado",
+    "off": "DESC",
+    "outOfStock": "Agotado",
+    "lowStock": "Stock Bajo",
+    "inStock": "En Stock",
+    "by": "por",
+    "in": "en",
+  "onlyXLeftInStock": "Solo {count, plural, one {1 disponible} other {{count} disponibles}}",
+    "total": "total",
+    "inCart": "en carrito",
+    "selectVariant": "Seleccionar Variante",
+    "left": "quedan",
+    "quantity": "Cantidad",
+    "adding": "Agregando...",
+    "addToCart": "Agregar al Carrito",
+    "addMoreToCart": "Agregar Más al Carrito",
+    "freeShippingOver": "Envío gratis en pedidos sobre {amount}",
+    "warrantyIncluded": "Garantía de 1 año incluida",
+    "returnPolicy": "Política de devolución de 30 días",
+    "tags": "Etiquetas",
+    "description": "Descripción",
+    "notFound": "Producto No Encontrado",
+    "notFoundDescription": "El producto que está buscando no existe.",
+    "backToProducts": "Volver a Productos",
+    "returnToHome": "Volver al Inicio"
   },
   "cart": {
     "title": "Carrito de Compras",

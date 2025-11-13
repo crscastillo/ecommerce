@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation'
 import { useTenant } from '@/lib/contexts/tenant-context'
 import { useCart } from '@/lib/contexts/cart-context'
 import { useToast } from '@/lib/contexts/toast-context'
+import { useTranslations } from 'next-intl'
 import { formatPrice } from '@/lib/utils/currency'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
@@ -26,6 +27,7 @@ export default function ProductPage() {
   const { tenant } = useTenant()
   const { addToCart, isInCart, getCartItem } = useCart()
   const { success, error: showError } = useToast()
+  const t = useTranslations()
   const [product, setProduct] = useState<Product | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -231,20 +233,20 @@ export default function ProductPage() {
           <div className="text-center">
             <Package className="mx-auto h-12 w-12 text-gray-400 mb-4" />
             <h1 className="text-2xl font-bold text-gray-900 mb-4">
-              {error || 'Product Not Found'}
+              {error || t('product.notFound')}
             </h1>
             <p className="text-gray-600 mb-8">
-              {error ? error : "The product you're looking for doesn't exist."}
+              {error ? error : t('product.notFoundDescription')}
             </p>
             <div className="space-x-4">
               <Button asChild variant="outline">
                 <Link href="/products">
                   <ChevronLeft className="w-4 h-4 mr-2" />
-                  Back to Products
+                  {t('product.backToProducts')}
                 </Link>
               </Button>
               <Button asChild>
-                <Link href="/">Return to Home</Link>
+                <Link href="/">{t('product.returnToHome')}</Link>
               </Button>
             </div>
           </div>
@@ -269,6 +271,7 @@ export default function ProductPage() {
           productName={product.name}
           brand={product.brand}
           category={product.category}
+          t={t}
         />
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
@@ -280,6 +283,7 @@ export default function ProductPage() {
             discountPercentage={discountPercentage}
             isOutOfStock={isOutOfStock}
             isLowStock={isLowStock}
+            t={t}
           />
 
           {/* Product Information */}
@@ -298,6 +302,7 @@ export default function ProductPage() {
               isVariableProduct={product.product_type === 'variable'}
               isInCart={isInCart(product.id)}
               cartQuantity={getCartItem(product.id)?.quantity}
+              t={t}
             />
 
             {/* Variant Selection for Variable Products */}
@@ -308,6 +313,7 @@ export default function ProductPage() {
                 onSelectVariant={setSelectedVariant}
                 formatPrice={formatPrice}
                 tenant={tenant}
+                t={t}
               />
             )}
 
@@ -324,18 +330,19 @@ export default function ProductPage() {
               isVariableProduct={product.product_type === 'variable'}
               hasSelectedVariant={!!selectedVariant}
               isInCart={isInCart(product.id)}
+              t={t}
             />
 
             {/* Features */}
-            <ProductFeatures shippingThreshold={formatPrice(50, tenant)} />
+            <ProductFeatures shippingThreshold={formatPrice(50, tenant)} t={t} />
 
             {/* Tags */}
-            <ProductTags tags={product.tags || undefined} />
+            <ProductTags tags={product.tags || undefined} t={t} />
           </div>
         </div>
 
         {/* Product Description */}
-        <ProductDescription description={product.description || undefined} />
+        <ProductDescription description={product.description || undefined} t={t} />
       </div>
     </div>
   )

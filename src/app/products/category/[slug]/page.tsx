@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import { useTenant } from '@/lib/contexts/tenant-context'
+import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { ProductCard } from '@/components/product-card'
 import Link from 'next/link'
@@ -11,6 +12,7 @@ import { getProductsByCategory, type ProductsByCategoryResponse } from '@/lib/se
 export default function CategoryProductsPage() {
   const params = useParams()
   const { tenant } = useTenant()
+  const t = useTranslations()
   const [data, setData] = useState<ProductsByCategoryResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -74,10 +76,10 @@ export default function CategoryProductsPage() {
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-gray-900 mb-4">Error</h1>
+            <h1 className="text-2xl font-bold text-gray-900 mb-4">{t('errors.unexpectedError')}</h1>
             <p className="text-gray-600 mb-8">{error}</p>
             <Button asChild>
-              <Link href="/">Return to Home</Link>
+              <Link href="/">{t('product.returnToHome')}</Link>
             </Button>
           </div>
         </div>
@@ -90,10 +92,10 @@ export default function CategoryProductsPage() {
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-gray-900 mb-4">Category Not Found</h1>
-            <p className="text-gray-600 mb-8">The category you're looking for doesn't exist.</p>
+            <h1 className="text-2xl font-bold text-gray-900 mb-4">{t('category.notFound')}</h1>
+            <p className="text-gray-600 mb-8">{t('category.notFoundDescription')}</p>
             <Button asChild>
-              <Link href="/">Return to Home</Link>
+              <Link href="/">{t('product.returnToHome')}</Link>
             </Button>
           </div>
         </div>
@@ -113,17 +115,17 @@ export default function CategoryProductsPage() {
             <p className="text-lg text-gray-600">{category.description}</p>
           )}
           <p className="text-sm text-gray-500 mt-2">
-            {products.length} {products.length === 1 ? 'product' : 'products'} found
+            {t('category.productsFound', { count: products.length })}
           </p>
         </div>
 
         {/* Products Grid */}
         {products.length === 0 ? (
           <div className="text-center py-12">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">No products found</h2>
-            <p className="text-gray-600 mb-8">This category doesn't have any products yet.</p>
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">{t('category.noProducts')}</h2>
+            <p className="text-gray-600 mb-8">{t('category.noProductsDescription')}</p>
             <Button asChild>
-              <Link href="/">Browse Other Categories</Link>
+              <Link href="/">{t('category.browseOtherCategories')}</Link>
             </Button>
           </div>
         ) : (

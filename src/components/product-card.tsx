@@ -13,6 +13,7 @@ import {
 } from 'lucide-react'
 import { useState } from 'react'
 import { useTenant } from '@/lib/contexts/tenant-context'
+import { useTranslations } from 'next-intl'
 import { formatPrice } from '@/lib/utils/currency'
 import { isProductLowStock, getLowStockBadge } from '@/lib/utils/low-stock'
 
@@ -70,6 +71,7 @@ export function ProductCard({ product, viewMode = 'grid', tenantSettings = {} }:
   const [imageError, setImageError] = useState(false)
   const [isWishlisted, setIsWishlisted] = useState(false)
   const { tenant } = useTenant()
+  const t = useTranslations()
 
   // Helper functions for variable products
   const getProductPrice = () => {
@@ -210,7 +212,7 @@ export function ProductCard({ product, viewMode = 'grid', tenantSettings = {} }:
             <div className="absolute top-2 left-2 flex flex-col gap-1">
               {product.is_featured && (
                 <Badge variant="default" className="text-xs">
-                  Featured
+                  {t('product.featured')}
                 </Badge>
               )}
               {discountPercentage > 0 && (
@@ -220,15 +222,15 @@ export function ProductCard({ product, viewMode = 'grid', tenantSettings = {} }:
               )}
               {isOutOfStock && (
                 <Badge variant="secondary" className="text-xs">
-                  Out of Stock
+                  {t('product.outOfStock')}
                 </Badge>
               )}
-              {lowStockBadge.show && (
+              {lowStockBadge.show && lowStockBadge.translationKey && (
                 <Badge 
                   variant={lowStockBadge.variant === 'destructive' ? 'destructive' : 'outline'} 
                   className={`text-xs ${lowStockBadge.variant === 'warning' ? 'border-orange-500 text-orange-600' : ''}`}
                 >
-                  {lowStockBadge.text}
+                  {t(lowStockBadge.translationKey, lowStockBadge.translationParams)}
                 </Badge>
               )}
             </div>
@@ -260,7 +262,7 @@ export function ProductCard({ product, viewMode = 'grid', tenantSettings = {} }:
                 <div className="flex items-center gap-2 text-sm">
                   {product.brand && (
                     <>
-                      <span className="text-gray-600">by</span>
+                      <span className="text-gray-600">{t('product.by')}</span>
                       <Link 
                         href={`/brands/${product.brand.slug}`}
                         className="font-medium text-blue-600 hover:text-blue-800"
@@ -272,7 +274,7 @@ export function ProductCard({ product, viewMode = 'grid', tenantSettings = {} }:
                   {product.category && (
                     <>
                       {product.brand && <span className="text-gray-400">•</span>}
-                      <span className="text-gray-600">in</span>
+                      <span className="text-gray-600">{t('product.in')}</span>
                       <Link 
                         href={`/products/category/${product.category.slug}`}
                         className="text-gray-600 hover:text-gray-900"
@@ -329,11 +331,11 @@ export function ProductCard({ product, viewMode = 'grid', tenantSettings = {} }:
             <div className="flex items-center justify-between">
               <div className="text-sm text-gray-600">
                 {isOutOfStock ? (
-                  <span className="text-red-600">Out of stock</span>
+                  <span className="text-red-600">{t('product.outOfStock')}</span>
                 ) : lowStockBadge.show ? (
-                  <span className="text-orange-600">{lowStockBadge.text}</span>
+                  <span className="text-orange-600">{lowStockBadge.translationKey ? t(lowStockBadge.translationKey, lowStockBadge.translationParams) : ''}</span>
                 ) : (
-                  <span className="text-green-600">In stock</span>
+                  <span className="text-green-600">{t('product.inStock')}</span>
                 )}
               </div>
 
@@ -343,7 +345,7 @@ export function ProductCard({ product, viewMode = 'grid', tenantSettings = {} }:
                 className="flex items-center gap-2"
               >
                 <ShoppingCart className="h-4 w-4" />
-                {isOutOfStock ? 'Out of Stock' : 'Add to Cart'}
+                {isOutOfStock ? t('product.outOfStock') : t('product.addToCart')}
               </Button>
             </div>
           </CardContent>
@@ -375,7 +377,7 @@ export function ProductCard({ product, viewMode = 'grid', tenantSettings = {} }:
         <div className="absolute top-2 left-2 flex flex-col gap-1">
           {product.is_featured && (
             <Badge variant="default" className="text-xs">
-              Featured
+              {t('product.featured')}
             </Badge>
           )}
           {discountPercentage > 0 && (
@@ -385,7 +387,7 @@ export function ProductCard({ product, viewMode = 'grid', tenantSettings = {} }:
           )}
           {isOutOfStock && (
             <Badge variant="secondary" className="text-xs">
-              Out of Stock
+              {t('product.outOfStock')}
             </Badge>
           )}
           {lowStockBadge.show && (
@@ -393,7 +395,7 @@ export function ProductCard({ product, viewMode = 'grid', tenantSettings = {} }:
               variant={lowStockBadge.variant === 'destructive' ? 'destructive' : 'outline'} 
               className={`text-xs ${lowStockBadge.variant === 'warning' ? 'border-orange-500 text-orange-600' : ''}`}
             >
-              {lowStockBadge.text}
+              {lowStockBadge.translationKey ? t(lowStockBadge.translationKey, lowStockBadge.translationParams) : ''}
             </Badge>
           )}
         </div>
@@ -416,7 +418,7 @@ export function ProductCard({ product, viewMode = 'grid', tenantSettings = {} }:
             disabled={isOutOfStock}
           >
             <ShoppingCart className="h-4 w-4 mr-2" />
-            {isOutOfStock ? 'Out of Stock' : 'Add to Cart'}
+            {isOutOfStock ? t('product.outOfStock') : t('product.addToCart')}
           </Button>
         </div>
       </div>
@@ -435,7 +437,7 @@ export function ProductCard({ product, viewMode = 'grid', tenantSettings = {} }:
         <div className="space-y-1">
           {product.brand && (
             <div className="text-sm">
-              <span className="text-gray-500">by </span>
+              <span className="text-gray-500">{t('product.by')} </span>
               <Link 
                 href={`/brands/${product.brand.slug}`}
                 className="font-medium text-blue-600 hover:text-blue-800"
@@ -484,11 +486,11 @@ export function ProductCard({ product, viewMode = 'grid', tenantSettings = {} }:
         {/* Stock status */}
         <div className="mt-2 text-sm">
           {isOutOfStock ? (
-            <span className="text-red-600">Out of stock</span>
+            <span className="text-red-600">{t('product.outOfStock')}</span>
           ) : lowStockBadge.show ? (
-            <span className="text-orange-600">{lowStockBadge.text}</span>
+            <span className="text-orange-600">{lowStockBadge.translationKey ? t(lowStockBadge.translationKey, lowStockBadge.translationParams) : ''}</span>
           ) : (
-            <span className="text-green-600">In stock</span>
+            <span className="text-green-600">{t('product.inStock')}</span>
           )}
         </div>
 

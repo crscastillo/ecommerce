@@ -162,7 +162,7 @@
     "importCsv": "Import CSV",
     "productsWithCount": "Products ({count})",
     "productsListDescription": "View and manage all products in your store",
-        "brandsListDescription": "A list of all brands in your store",
+    "brandsListDescription": "A list of all brands in your store",
     "viewCategoryDetails": "View category details",
     "editCategoryDetails": "Edit category details",
     "viewInStore": "View in Store"
@@ -184,6 +184,14 @@
     "viewCategoryDetails": "View Category Details",
     "editCategoryDetails": "Edit Category Details",
     "viewInStore": "View in Store"
+  },
+  "category": {
+    "notFound": "Category Not Found",
+    "notFoundDescription": "The category you're looking for doesn't exist.",
+    "productsFound": "{count, plural, one {# product} other {# products}} found",
+    "noProducts": "No products found",
+    "noProductsDescription": "This category doesn't have any products yet.",
+    "browseOtherCategories": "Browse Other Categories"
   },
   "orders": {
     "title": "Orders",
@@ -459,6 +467,33 @@
     "clearFilters": "Clear All Filters",
     "showingResults": "Showing {count} results",
     "noResults": "No products found matching your criteria"
+  },
+  "product": {
+    "featured": "Featured",
+    "off": "OFF",
+    "outOfStock": "Out of Stock",
+    "lowStock": "Low Stock",
+    "inStock": "In Stock",
+    "by": "by",
+    "in": "in",
+    "onlyXLeftInStock": "Only {count} left in stock",
+    "total": "total",
+    "inCart": "in cart",
+    "selectVariant": "Select Variant",
+    "left": "left",
+    "quantity": "Quantity",
+    "adding": "Adding...",
+    "addToCart": "Add to Cart",
+    "addMoreToCart": "Add More to Cart",
+    "freeShippingOver": "Free shipping on orders over {amount}",
+    "warrantyIncluded": "1-year warranty included",
+    "returnPolicy": "30-day return policy",
+    "tags": "Tags",
+    "description": "Description",
+    "notFound": "Product Not Found",
+    "notFoundDescription": "The product you're looking for doesn't exist.",
+    "backToProducts": "Back to Products",
+    "returnToHome": "Return to Home"
   },
   "cart": {
     "title": "Shopping Cart",

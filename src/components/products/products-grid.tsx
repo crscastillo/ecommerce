@@ -9,9 +9,43 @@ type ViewMode = 'grid' | 'list'
 interface Product {
   id: string
   name: string
+  slug: string
+  description: string | null
+  short_description: string | null
   price: number
-  image?: string
-  [key: string]: any
+  compare_price: number | null
+  category_id: string | null
+  brand_id: string | null
+  category?: {
+    id: string
+    name: string
+    slug: string
+  }
+  brand?: {
+    id: string
+    name: string
+    slug: string
+  }
+  images: any
+  is_active: boolean
+  is_featured: boolean
+  inventory_quantity: number
+  track_inventory: boolean
+  product_type: 'single' | 'variable' | 'digital'
+  variants?: Array<{
+    id: string
+    title: string
+    option1: string | null
+    option2: string | null
+    option3: string | null
+    sku: string | null
+    price: number | null
+    compare_price: number | null
+    inventory_quantity: number
+    image_url: string | null
+    is_active: boolean
+  }>
+  tags: string[] | null
 }
 
 interface ProductsGridProps {

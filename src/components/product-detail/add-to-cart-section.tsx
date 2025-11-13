@@ -16,6 +16,7 @@ interface AddToCartSectionProps {
   isVariableProduct?: boolean
   hasSelectedVariant?: boolean
   isInCart?: boolean
+  t: any
 }
 
 export function AddToCartSection({
@@ -29,14 +30,15 @@ export function AddToCartSection({
   canIncreaseQuantity,
   isVariableProduct,
   hasSelectedVariant,
-  isInCart
+  isInCart,
+  t
 }: AddToCartSectionProps) {
   return (
     <Card>
       <CardContent className="p-6">
         <div className="space-y-4">
           <div className="flex items-center space-x-4">
-            <label htmlFor="quantity" className="font-medium">Quantity:</label>
+            <label htmlFor="quantity" className="font-medium">{t('product.quantity')}:</label>
             <div className="flex items-center space-x-2">
               <Button
                 variant="outline"
@@ -67,14 +69,14 @@ export function AddToCartSection({
             >
               <ShoppingCart className="w-5 h-5 mr-2" />
               {isAddingToCart 
-                ? 'Adding...' 
+                ? t('product.adding')
                 : isOutOfStock 
-                ? 'Out of Stock'
+                ? t('product.outOfStock')
                 : isVariableProduct && !hasSelectedVariant
-                ? 'Select Variant'
+                ? t('product.selectVariant')
                 : isInCart
-                ? 'Add More to Cart'
-                : 'Add to Cart'
+                ? t('product.addMoreToCart')
+                : t('product.addToCart')
               }
             </Button>
             <Button

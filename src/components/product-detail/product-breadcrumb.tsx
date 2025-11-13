@@ -16,14 +16,15 @@ interface ProductBreadcrumbProps {
   productName: string
   brand?: Brand
   category?: Category
+  t: any
 }
 
-export function ProductBreadcrumb({ productName, brand, category }: ProductBreadcrumbProps) {
+export function ProductBreadcrumb({ productName, brand, category, t }: ProductBreadcrumbProps) {
   return (
     <nav className="flex items-center space-x-2 text-sm text-gray-600 mb-8">
-      <Link href="/" className="hover:text-gray-900">Home</Link>
+      <Link href="/" className="hover:text-gray-900">{t('navigation.home')}</Link>
       <span>/</span>
-      <Link href="/products" className="hover:text-gray-900">Products</Link>
+      <Link href="/products" className="hover:text-gray-900">{t('navigation.products')}</Link>
       {brand && (
         <>
           <span>/</span>

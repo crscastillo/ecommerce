@@ -10,6 +10,7 @@ interface VariantSelectorProps {
   onSelectVariant: (variant: ProductVariant) => void
   formatPrice: (price: number, tenant?: any) => string
   tenant?: any
+  t: any
 }
 
 export function VariantSelector({
@@ -17,14 +18,15 @@ export function VariantSelector({
   selectedVariant,
   onSelectVariant,
   formatPrice,
-  tenant
+  tenant,
+  t
 }: VariantSelectorProps) {
   if (!variants || variants.length === 0) return null
 
   return (
     <Card>
       <CardContent className="p-6">
-        <h3 className="font-medium text-gray-900 mb-4">Select Variant:</h3>
+        <h3 className="font-medium text-gray-900 mb-4">{t('product.selectVariant')}:</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
           {variants.map((variant) => {
             const variantOutOfStock = variant.inventory_quantity <= 0
@@ -53,15 +55,15 @@ export function VariantSelector({
                     <div className="flex-shrink-0 ml-2">
                       {variantOutOfStock ? (
                         <Badge variant="destructive" className="text-xs px-1.5 py-0.5">
-                          Out of Stock
+                          {t('product.outOfStock')}
                         </Badge>
                       ) : variant.inventory_quantity <= 5 ? (
                         <Badge variant="outline" className="text-xs px-1.5 py-0.5 border-orange-500 text-orange-600">
-                          {variant.inventory_quantity} left
+                          {variant.inventory_quantity} {t('product.left')}
                         </Badge>
                       ) : (
                         <Badge variant="outline" className="text-xs px-1.5 py-0.5 border-green-500 text-green-600">
-                          In Stock
+                          {t('product.inStock')}
                         </Badge>
                       )}
                     </div>

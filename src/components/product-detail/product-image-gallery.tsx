@@ -12,6 +12,7 @@ interface ProductImageGalleryProps {
   discountPercentage?: number
   isOutOfStock?: boolean
   isLowStock?: boolean
+  t: any
 }
 
 export function ProductImageGallery({
@@ -20,7 +21,8 @@ export function ProductImageGallery({
   isFeatured,
   discountPercentage,
   isOutOfStock,
-  isLowStock
+  isLowStock,
+  t
 }: ProductImageGalleryProps) {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0)
 
@@ -44,17 +46,17 @@ export function ProductImageGallery({
         {/* Badges */}
         <div className="absolute top-4 left-4 flex flex-col gap-2">
           {isFeatured && (
-            <Badge className="bg-blue-600 hover:bg-blue-700">Featured</Badge>
+            <Badge className="bg-blue-600 hover:bg-blue-700">{t('product.featured')}</Badge>
           )}
           {discountPercentage && discountPercentage > 0 && (
-            <Badge variant="destructive">-{discountPercentage}% OFF</Badge>
+            <Badge variant="destructive">-{discountPercentage}% {t('product.off')}</Badge>
           )}
           {isOutOfStock && (
-            <Badge variant="secondary">Out of Stock</Badge>
+            <Badge variant="secondary">{t('product.outOfStock')}</Badge>
           )}
           {isLowStock && (
             <Badge variant="outline" className="border-orange-500 text-orange-600">
-              Low Stock
+              {t('product.lowStock')}
             </Badge>
           )}
         </div>

@@ -27,6 +27,7 @@ interface ProductInfoHeaderProps {
   isVariableProduct?: boolean
   isInCart?: boolean
   cartQuantity?: number
+  t: any
 }
 
 export function ProductInfoHeader({
@@ -42,7 +43,8 @@ export function ProductInfoHeader({
   totalStock,
   isVariableProduct,
   isInCart,
-  cartQuantity
+  cartQuantity,
+  t
 }: ProductInfoHeaderProps) {
   return (
     <div className="space-y-6">
@@ -51,7 +53,7 @@ export function ProductInfoHeader({
         <div className="flex items-center gap-2 text-sm">
           {brand && (
             <>
-              <span className="text-gray-600">by</span>
+              <span className="text-gray-600">{t('product.by')}</span>
               <Link 
                 href={`/brands/${brand.slug}`}
                 className="font-medium text-blue-600 hover:text-blue-800"
@@ -63,7 +65,7 @@ export function ProductInfoHeader({
           {category && (
             <>
               {brand && <span className="text-gray-400">•</span>}
-              <span className="text-gray-600">in</span>
+              <span className="text-gray-600">{t('product.in')}</span>
               <Link 
                 href={`/products/category/${category.slug}`}
                 className="font-medium text-blue-600 hover:text-blue-800"
@@ -95,16 +97,16 @@ export function ProductInfoHeader({
       {/* Stock Status */}
       <div className="flex items-center space-x-2">
         {isOutOfStock ? (
-          <Badge variant="destructive">Out of Stock</Badge>
+          <Badge variant="destructive">{t('product.outOfStock')}</Badge>
         ) : isLowStock ? (
           <Badge variant="outline" className="border-orange-500 text-orange-600">
-            Only {currentStock} left in stock
+            {t('product.onlyXLeftInStock', { count: currentStock })}
           </Badge>
         ) : (
           <Badge variant="outline" className="border-green-500 text-green-600">
-            In Stock
+            {t('product.inStock')}
             {isVariableProduct && totalStock && (
-              <span className="ml-1">({totalStock} total)</span>
+              <span className="ml-1">({totalStock} {t('product.total')})</span>
             )}
           </Badge>
         )}
@@ -112,7 +114,7 @@ export function ProductInfoHeader({
         {/* Cart Status */}
         {isInCart && cartQuantity && (
           <Badge variant="outline" className="border-blue-500 text-blue-600">
-            {cartQuantity} in cart
+            {cartQuantity} {t('product.inCart')}
           </Badge>
         )}
       </div>

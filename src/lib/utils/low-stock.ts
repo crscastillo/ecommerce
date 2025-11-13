@@ -32,33 +32,29 @@ export function isProductLowStock(
  * Get low stock badge text and styling
  */
 export function getLowStockBadge(
-  product: Product, 
+  product: Product,
   settings: LowStockSettings
-): { show: boolean; text: string; variant: 'destructive' | 'warning' | null } {
+): { show: boolean; translationKey: string; translationParams: Record<string, any>; variant: 'destructive' | 'warning' | null } {
   if (!isProductLowStock(product, settings)) {
-    return { show: false, text: '', variant: null }
+    return { show: false, translationKey: '', translationParams: {}, variant: null }
   }
   
   const threshold = settings.low_stock_threshold || 5
   const quantity = product.inventory_quantity
   
   if (quantity === 0) {
-    return { 
-      show: true, 
-      text: 'Out of Stock', 
-      variant: 'destructive' 
-    }
-  } else if (quantity === 1) {
-    return { 
-      show: true, 
-      text: 'Only 1 left', 
-      variant: 'warning' 
+    return {
+      show: true,
+      translationKey: 'product.outOfStock',
+      translationParams: {},
+      variant: 'destructive'
     }
   } else {
-    return { 
-      show: true, 
-      text: `Only ${quantity} left`, 
-      variant: 'warning' 
+    return {
+      show: true,
+      translationKey: 'product.onlyXLeftInStock',
+      translationParams: { count: quantity },
+      variant: 'warning'
     }
   }
 }

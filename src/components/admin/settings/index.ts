@@ -58,4 +58,9 @@ export interface PaymentSettings {
     account_holder?: string
     instructions?: string
   }
+  mobile_bank_transfer: {
+    enabled: boolean
+    phone_number?: string
+    instructions?: string
+  }
 }

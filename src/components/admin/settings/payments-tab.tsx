@@ -160,7 +160,7 @@ export function PaymentsTab({
         </div>
 
         {/* Bank Transfer */}
-        <div className="border rounded-lg">
+        <div className="border rounded-lg mb-6">
           <div className="flex items-center justify-between p-4">
             <div className="flex items-center space-x-4">
               <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">🏦</div>
@@ -227,6 +227,58 @@ export function PaymentsTab({
                     onChange={(e) => onPaymentMethodsChange({
                       ...paymentMethods,
                       bank_transfer: { ...paymentMethods.bank_transfer, instructions: e.target.value }
+                    })}
+                    placeholder="Please transfer the total amount and include your order number."
+                    className="text-sm"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Mobile Bank Transfer (SINPE Movil) */}
+        <div className="border rounded-lg mb-6">
+          <div className="flex items-center justify-between p-4">
+            <div className="flex items-center space-x-4">
+              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">📱</div>
+              <div>
+                <h3 className="font-medium">Mobile Bank Transfer</h3>
+                <p className="text-sm text-gray-500">Enable customers to pay via mobile bank transfer (e.g., SINPE Movil in Costa Rica). Specify your phone number and instructions below.</p>
+              </div>
+            </div>
+            <Switch
+              checked={paymentMethods.mobile_bank_transfer.enabled}
+              onCheckedChange={(checked) => onPaymentMethodsChange({
+                ...paymentMethods,
+                mobile_bank_transfer: { ...paymentMethods.mobile_bank_transfer, enabled: checked }
+              })}
+            />
+          </div>
+          {paymentMethods.mobile_bank_transfer.enabled && (
+            <div className="px-4 pb-4 space-y-4 border-t bg-orange-50">
+              <div className="space-y-3 pt-4">
+                <div>
+                  <Label htmlFor="mobile-phone-number" className="text-sm">Phone Number</Label>
+                  <Input
+                    id="mobile-phone-number"
+                    value={paymentMethods.mobile_bank_transfer.phone_number || ''}
+                    onChange={(e) => onPaymentMethodsChange({
+                      ...paymentMethods,
+                      mobile_bank_transfer: { ...paymentMethods.mobile_bank_transfer, phone_number: e.target.value }
+                    })}
+                    placeholder="+506XXXXXXXX"
+                    className="text-sm"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="mobile-instructions" className="text-sm">Instructions</Label>
+                  <Input
+                    id="mobile-instructions"
+                    value={paymentMethods.mobile_bank_transfer.instructions || ''}
+                    onChange={(e) => onPaymentMethodsChange({
+                      ...paymentMethods,
+                      mobile_bank_transfer: { ...paymentMethods.mobile_bank_transfer, instructions: e.target.value }
                     })}
                     placeholder="Please transfer the total amount and include your order number."
                     className="text-sm"

@@ -111,6 +111,11 @@ export default function SettingsPage() {
       account_number: '',
       account_holder: '',
       instructions: ''
+    },
+    mobile_bank_transfer: {
+      enabled: false,
+      phone_number: '',
+      instructions: ''
     }
   })
   const [showStripeKeys, setShowStripeKeys] = useState(false)
@@ -281,6 +286,11 @@ export default function SettingsPage() {
           bank_name: '',
           account_number: '',
           account_holder: '',
+          instructions: ''
+        },
+        mobile_bank_transfer: {
+          enabled: false,
+          phone_number: '',
           instructions: ''
         }
       })

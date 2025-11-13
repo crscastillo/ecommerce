@@ -27,6 +27,21 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
+
+// Import refactored components
+import { 
+  StoreInformationTab, 
+  ConfigurationTab, 
+  ThemeTab,
+  PaymentsTab,
+  PluginsTab,
+  UsersTab,
+  SecurityTab,
+  type StoreSettings as StoreSettingsType,
+  type ThemeSettings as ThemeSettingsType,
+  type PaymentSettings
+} from '@/components/admin/settings'
+
 import { 
   Settings, 
   Store, 
@@ -62,46 +77,9 @@ type TenantUser = {
   }
 }
 
-interface StoreSettings {
-  name: string
-  description: string
-  contact_email: string
-  contact_phone: string
-  country: string
-  admin_language: string
-  store_language: string
-  address: {
-    street?: string
-    city?: string
-    state?: string
-    zip?: string
-    country?: string
-  }
-  settings: {
-    currency?: string
-    timezone?: string
-    tax_rate?: number
-    shipping_enabled?: boolean
-    inventory_tracking?: boolean
-    allow_backorders?: boolean
-    auto_fulfill_orders?: boolean
-    email_notifications?: boolean
-    sms_notifications?: boolean
-    low_stock_threshold?: number
-  }
-}
-
-interface ThemeSettings {
-  primary_color: string
-  secondary_color: string
-  accent_color: string
-  background_color: string
-  text_color: string
-  font_family: string
-  logo_url: string
-  favicon_url: string
-  custom_css: string
-}
+// Use imported types from components
+type StoreSettings = StoreSettingsType
+type ThemeSettings = ThemeSettingsType
 
 interface PaymentMethodConfig {
   enabled: boolean
@@ -111,11 +89,7 @@ interface PaymentMethodConfig {
   tilopay_secret_key?: string
 }
 
-interface PaymentSettings {
-  cash_on_delivery: PaymentMethodConfig
-  stripe: PaymentMethodConfig
-  tilopay: PaymentMethodConfig
-}
+// Note: PaymentSettings is imported from components/admin/settings
 
 export default function SettingsPage() {
   const { tenant, isLoading: tenantLoading, error, refreshTenant } = useTenant()
@@ -641,1383 +615,121 @@ export default function SettingsPage() {
         </TabsList>
 
         {/* Store Settings */}
+        {/* Store Settings - Using Refactored Component */}
         <TabsContent value="store" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>{t('sections.storeInformation')}</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <Label htmlFor="store-name">{t('labels.storeName')}</Label>
-                  <Input
-                    id="store-name"
-                    value={storeSettings.name}
-                    onChange={(e) => setStoreSettings(prev => ({ ...prev, name: e.target.value }))}
-                    placeholder="My Awesome Store"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="subdomain">{t('labels.subdomain')}</Label>
-                  <Input
-                    id="subdomain"
-                    value={tenant.subdomain}
-                    disabled
-                    placeholder="mystore"
-                  />
-                  <p className="text-xs text-gray-500 mt-1">Subdomain cannot be changed after creation</p>
-                </div>
-                <div>
-                  <Label htmlFor="country">{t('labels.country')}</Label>
-                  <Select 
-                    value={storeSettings.country} 
-                    onValueChange={(value) => setStoreSettings(prev => ({ ...prev, country: value }))}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select country" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="US">🇺🇸 United States</SelectItem>
-                      <SelectItem value="CA">🇨🇦 Canada</SelectItem>
-                      <SelectItem value="GB">🇬🇧 United Kingdom</SelectItem>
-                      <SelectItem value="AU">🇦🇺 Australia</SelectItem>
-                      <SelectItem value="CR">🇨🇷 Costa Rica</SelectItem>
-                      <SelectItem value="MX">🇲🇽 Mexico</SelectItem>
-                      <SelectItem value="ES">🇪🇸 Spain</SelectItem>
-                      <SelectItem value="FR">🇫🇷 France</SelectItem>
-                      <SelectItem value="DE">🇩🇪 Germany</SelectItem>
-                      <SelectItem value="IT">🇮🇹 Italy</SelectItem>
-                      <SelectItem value="BR">🇧🇷 Brazil</SelectItem>
-                      <SelectItem value="AR">🇦🇷 Argentina</SelectItem>
-                      <SelectItem value="CL">🇨🇱 Chile</SelectItem>
-                      <SelectItem value="CO">🇨🇴 Colombia</SelectItem>
-                      <SelectItem value="PE">🇵🇪 Peru</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="admin-language">{t('adminLanguage')}</Label>
-                  <Select 
-                    value={storeSettings.admin_language || 'en'} 
-                    onValueChange={(value) => setStoreSettings(prev => ({ ...prev, admin_language: value }))}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select admin language" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="en">{t('languageOptions.en')}</SelectItem>
-                      <SelectItem value="es">{t('languageOptions.es')}</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <p className="text-xs text-gray-500 mt-1">Language for admin interface</p>
-                </div>
-                <div>
-                  <Label htmlFor="store-language">{t('storeLanguage')}</Label>
-                  <Select 
-                    value={storeSettings.store_language || 'en'} 
-                    onValueChange={(value) => setStoreSettings(prev => ({ ...prev, store_language: value }))}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select store language" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="en">{t('languageOptions.en')}</SelectItem>
-                      <SelectItem value="es">{t('languageOptions.es')}</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <p className="text-xs text-gray-500 mt-1">Language for public store</p>
-                </div>
-                <div>
-                  <Label htmlFor="timezone">{t('labels.timezone')}</Label>
-                  <Select 
-                    value={storeSettings.settings.timezone} 
-                    onValueChange={(value) => setStoreSettings(prev => ({ 
-                      ...prev, 
-                      settings: { ...prev.settings, timezone: value }
-                    }))}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="America/New_York">Eastern Time</SelectItem>
-                      <SelectItem value="America/Chicago">Central Time</SelectItem>
-                      <SelectItem value="America/Denver">Mountain Time</SelectItem>
-                      <SelectItem value="America/Los_Angeles">Pacific Time</SelectItem>
-                      <SelectItem value="America/Costa_Rica">Costa Rica Time</SelectItem>
-                      <SelectItem value="UTC">UTC</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              
-              <div>
-                <Label htmlFor="description">{t('labels.description')}</Label>
-                <Textarea
-                  id="description"
-                  value={storeSettings.description}
-                  onChange={(e) => setStoreSettings(prev => ({ ...prev, description: e.target.value }))}
-                  placeholder="Brief description of your store..."
-                  rows={3}
-                />
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="contact-email">{t('labels.contactEmail')}</Label>
-                  <Input
-                    id="contact-email"
-                    type="email"
-                    value={storeSettings.contact_email}
-                    onChange={(e) => setStoreSettings(prev => ({ ...prev, contact_email: e.target.value }))}
-                    placeholder="contact@mystore.com"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="contact-phone">{t('labels.contactPhone')}</Label>
-                  <Input
-                    id="contact-phone"
-                    value={storeSettings.contact_phone}
-                    onChange={(e) => setStoreSettings(prev => ({ ...prev, contact_phone: e.target.value }))}
-                    placeholder="+1 (555) 123-4567"
-                  />
-                </div>
-              </div>
-
-              <Separator />
-
-              <div>
-                <h3 className="text-lg font-medium mb-3">{t('labels.address')}</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="md:col-span-2">
-                    <Label htmlFor="street">{t('labels.streetAddress')}</Label>
-                    <Input
-                      id="street"
-                      value={storeSettings.address.street || ''}
-                      onChange={(e) => setStoreSettings(prev => ({ 
-                        ...prev, 
-                        address: { ...prev.address, street: e.target.value }
-                      }))}
-                      placeholder="123 Main Street"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="city">{t('labels.city')}</Label>
-                    <Input
-                      id="city"
-                      value={storeSettings.address.city || ''}
-                      onChange={(e) => setStoreSettings(prev => ({ 
-                        ...prev, 
-                        address: { ...prev.address, city: e.target.value }
-                      }))}
-                      placeholder="New York"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="state">{t('labels.state')}</Label>
-                    <Input
-                      id="state"
-                      value={storeSettings.address.state || ''}
-                      onChange={(e) => setStoreSettings(prev => ({ 
-                        ...prev, 
-                        address: { ...prev.address, state: e.target.value }
-                      }))}
-                      placeholder="NY"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="zip">{t('labels.zipCode')}</Label>
-                    <Input
-                      id="zip"
-                      value={storeSettings.address.zip || ''}
-                      onChange={(e) => setStoreSettings(prev => ({ 
-                        ...prev, 
-                        address: { ...prev.address, zip: e.target.value }
-                      }))}
-                      placeholder="10001"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="country">{t('labels.country')}</Label>
-                    <Input
-                      id="country"
-                      value={storeSettings.address.country || ''}
-                      onChange={(e) => setStoreSettings(prev => ({ 
-                        ...prev, 
-                        address: { ...prev.address, country: e.target.value }
-                      }))}
-                      placeholder="United States"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <Button onClick={saveStoreSettings} disabled={saving} className="w-full md:w-auto">
-                <Save className="h-4 w-4 mr-2" />
-                {saving ? tCommon('saving') : tCommon('saveStoreInformation')}
-              </Button>
-            </CardContent>
-          </Card>
+          <StoreInformationTab
+            tenant={tenant}
+            settings={storeSettings}
+            onSettingsChange={setStoreSettings}
+            onSave={saveStoreSettings}
+            saving={saving}
+          />
         </TabsContent>
 
-        {/* Configuration Settings */}
+        {/* Configuration Settings - Using Refactored Component */}
         <TabsContent value="config" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>{t('sections.storeConfiguration')}</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="currency">{t('labels.defaultCurrency')}</Label>
-                  <Select 
-                    value={storeSettings.settings.currency} 
-                    onValueChange={(value) => setStoreSettings(prev => ({ 
-                      ...prev, 
-                      settings: { ...prev.settings, currency: value }
-                    }))}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="USD">💵 USD - US Dollar</SelectItem>
-                      <SelectItem value="EUR">💶 EUR - Euro</SelectItem>
-                      <SelectItem value="GBP">💷 GBP - British Pound</SelectItem>
-                      <SelectItem value="CAD">🇨🇦 CAD - Canadian Dollar</SelectItem>
-                      <SelectItem value="CRC">🇨🇷 CRC - Costa Rican Colón</SelectItem>
-                      <SelectItem value="MXN">🇲🇽 MXN - Mexican Peso</SelectItem>
-                      <SelectItem value="AUD">🇦🇺 AUD - Australian Dollar</SelectItem>
-                      <SelectItem value="JPY">🇯🇵 JPY - Japanese Yen</SelectItem>
-                      <SelectItem value="CHF">🇨🇭 CHF - Swiss Franc</SelectItem>
-                      <SelectItem value="SEK">🇸🇪 SEK - Swedish Krona</SelectItem>
-                      <SelectItem value="NOK">🇳🇴 NOK - Norwegian Krone</SelectItem>
-                      <SelectItem value="DKK">🇩🇰 DKK - Danish Krone</SelectItem>
-                      <SelectItem value="BRL">🇧🇷 BRL - Brazilian Real</SelectItem>
-                      <SelectItem value="ARS">🇦🇷 ARS - Argentine Peso</SelectItem>
-                      <SelectItem value="CLP">🇨🇱 CLP - Chilean Peso</SelectItem>
-                      <SelectItem value="COP">🇨🇴 COP - Colombian Peso</SelectItem>
-                      <SelectItem value="PEN">🇵🇪 PEN - Peruvian Sol</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label htmlFor="timezone">{t('labels.timezone')}</Label>
-                  <Select 
-                    value={storeSettings.settings.timezone} 
-                    onValueChange={(value) => setStoreSettings(prev => ({ 
-                      ...prev, 
-                      settings: { ...prev.settings, timezone: value }
-                    }))}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="America/New_York">Eastern Time</SelectItem>
-                      <SelectItem value="America/Chicago">Central Time</SelectItem>
-                      <SelectItem value="America/Denver">Mountain Time</SelectItem>
-                      <SelectItem value="America/Los_Angeles">Pacific Time</SelectItem>
-                      <SelectItem value="UTC">UTC</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <div>
-                <Label htmlFor="tax-rate">{t('labels.taxRate')}</Label>
-                <Input
-                  id="tax-rate"
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  max="100"
-                  value={storeSettings.settings.tax_rate || 0}
-                  onChange={(e) => setStoreSettings(prev => ({ 
-                    ...prev, 
-                    settings: { ...prev.settings, tax_rate: parseFloat(e.target.value) || 0 }
-                  }))}
-                  placeholder="8.25"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="low-stock-threshold">{t('labels.lowStockThreshold')}</Label>
-                <Input
-                  id="low-stock-threshold"
-                  type="number"
-                  min="0"
-                  value={storeSettings.settings.low_stock_threshold || 5}
-                  onChange={(e) => setStoreSettings(prev => ({ 
-                    ...prev, 
-                    settings: { ...prev.settings, low_stock_threshold: parseInt(e.target.value) || 0 }
-                  }))}
-                  placeholder="5"
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                  Show low stock warnings when product quantity is below this number
-                </p>
-              </div>
-
-              <Separator />
-
-              <div className="space-y-4">
-                <h3 className="text-lg font-medium">Store Features</h3>
-                
-                <div className="flex items-center justify-between">
-                  <div>
-                    <Label>{t('labels.inventoryTracking')}</Label>
-                    <p className="text-sm text-gray-500">Track product quantities and stock levels</p>
-                  </div>
-                  <Switch
-                    checked={storeSettings.settings.inventory_tracking || false}
-                    onCheckedChange={(checked) => setStoreSettings(prev => ({ 
-                      ...prev, 
-                      settings: { ...prev.settings, inventory_tracking: checked }
-                    }))}
-                  />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div>
-                    <Label>{t('labels.allowBackorders')}</Label>
-                    <p className="text-sm text-gray-500">Allow customers to order out-of-stock items</p>
-                  </div>
-                  <Switch
-                    checked={storeSettings.settings.allow_backorders || false}
-                    onCheckedChange={(checked) => setStoreSettings(prev => ({ 
-                      ...prev, 
-                      settings: { ...prev.settings, allow_backorders: checked }
-                    }))}
-                  />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div>
-                    <Label>{t('labels.autoFulfillOrders')}</Label>
-                    <p className="text-sm text-gray-500">Automatically mark orders as fulfilled</p>
-                  </div>
-                  <Switch
-                    checked={storeSettings.settings.auto_fulfill_orders || false}
-                    onCheckedChange={(checked) => setStoreSettings(prev => ({ 
-                      ...prev, 
-                      settings: { ...prev.settings, auto_fulfill_orders: checked }
-                    }))}
-                  />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div>
-                    <Label>{t('labels.emailNotifications')}</Label>
-                    <p className="text-sm text-gray-500">Send email notifications for order updates</p>
-                  </div>
-                  <Switch
-                    checked={storeSettings.settings.email_notifications !== false}
-                    onCheckedChange={(checked) => setStoreSettings(prev => ({ 
-                      ...prev, 
-                      settings: { ...prev.settings, email_notifications: checked }
-                    }))}
-                  />
-                </div>
-              </div>
-
-              <Button onClick={saveStoreSettings} disabled={saving} className="w-full md:w-auto">
-                <Save className="h-4 w-4 mr-2" />
-                {saving ? tCommon('saving') : tCommon('saveConfiguration')}
-              </Button>
-            </CardContent>
-          </Card>
+          <ConfigurationTab
+            settings={storeSettings}
+            onSettingsChange={setStoreSettings}
+            onSave={saveStoreSettings}
+            saving={saving}
+          />
         </TabsContent>
 
-        {/* Theme Settings */}
+        {/* Theme Settings - Using Refactored Component */}
         <TabsContent value="theme" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>{t('sections.brandAssets')}</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label htmlFor="logo-url">{t('labels.logoUrl')}</Label>
-                <Input
-                  id="logo-url"
-                  value={themeSettings.logo_url}
-                  onChange={(e) => setThemeSettings(prev => ({ ...prev, logo_url: e.target.value }))}
-                  placeholder="https://example.com/logo.png"
-                />
-              </div>
-              <div>
-                <Label htmlFor="favicon-url">{t('labels.faviconUrl')}</Label>
-                <Input
-                  id="favicon-url"
-                  value={themeSettings.favicon_url}
-                  onChange={(e) => setThemeSettings(prev => ({ ...prev, favicon_url: e.target.value }))}
-                  placeholder="https://example.com/favicon.ico"
-                />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>{t('sections.colorScheme')}</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                <div>
-                  <Label htmlFor="primary-color">{t('labels.primaryColor')}</Label>
-                  <div className="flex space-x-2">
-                    <Input
-                      id="primary-color"
-                      type="color"
-                      value={themeSettings.primary_color}
-                      onChange={(e) => setThemeSettings(prev => ({ ...prev, primary_color: e.target.value }))}
-                      className="w-20"
-                    />
-                    <Input
-                      value={themeSettings.primary_color}
-                      onChange={(e) => setThemeSettings(prev => ({ ...prev, primary_color: e.target.value }))}
-                      placeholder="#3B82F6"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <Label htmlFor="secondary-color">{t('labels.secondaryColor')}</Label>
-                  <div className="flex space-x-2">
-                    <Input
-                      id="secondary-color"
-                      type="color"
-                      value={themeSettings.secondary_color}
-                      onChange={(e) => setThemeSettings(prev => ({ ...prev, secondary_color: e.target.value }))}
-                      className="w-20"
-                    />
-                    <Input
-                      value={themeSettings.secondary_color}
-                      onChange={(e) => setThemeSettings(prev => ({ ...prev, secondary_color: e.target.value }))}
-                      placeholder="#6B7280"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <Label htmlFor="accent-color">{t('labels.accentColor')}</Label>
-                  <div className="flex space-x-2">
-                    <Input
-                      id="accent-color"
-                      type="color"
-                      value={themeSettings.accent_color}
-                      onChange={(e) => setThemeSettings(prev => ({ ...prev, accent_color: e.target.value }))}
-                      className="w-20"
-                    />
-                    <Input
-                      value={themeSettings.accent_color}
-                      onChange={(e) => setThemeSettings(prev => ({ ...prev, accent_color: e.target.value }))}
-                      placeholder="#10B981"
-                    />
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>{t('sections.typography')}</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label htmlFor="font-family">{t('labels.fontFamily')}</Label>
-                <Select 
-                  value={themeSettings.font_family} 
-                  onValueChange={(value) => setThemeSettings(prev => ({ ...prev, font_family: value }))}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Inter">Inter</SelectItem>
-                    <SelectItem value="Roboto">Roboto</SelectItem>
-                    <SelectItem value="Open Sans">Open Sans</SelectItem>
-                    <SelectItem value="Poppins">Poppins</SelectItem>
-                    <SelectItem value="Lato">Lato</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>{t('sections.customCss')}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div>
-                <Label htmlFor="custom-css">{t('labels.customCss')}</Label>
-                <Textarea
-                  id="custom-css"
-                  value={themeSettings.custom_css}
-                  onChange={(e) => setThemeSettings(prev => ({ ...prev, custom_css: e.target.value }))}
-                  placeholder="/* Add your custom CSS here */&#10;.custom-class {&#10;  color: #333;&#10;}"
-                  rows={8}
-                  className="font-mono text-sm"
-                />
-              </div>
-              <Button onClick={saveThemeSettings} disabled={saving} className="mt-4">
-                <Save className="h-4 w-4 mr-2" />
-                {saving ? tCommon('saving') : tCommon('saveThemeSettings')}
-              </Button>
-            </CardContent>
-          </Card>
+          <ThemeTab
+            settings={themeSettings}
+            onSettingsChange={setThemeSettings}
+            onSave={saveThemeSettings}
+            saving={saving}
+          />
         </TabsContent>
 
         {/* Payment Methods Settings */}
         <TabsContent value="payments" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>{t('sections.paymentMethods')}</CardTitle>
-              <p className="text-sm text-muted-foreground">
-                {t('descriptions.paymentMethods')}
-              </p>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              {/* Cash on Delivery */}
-              <div className="flex items-center justify-between p-4 border rounded-lg">
-                <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
-                    💵
-                  </div>
-                  <div>
-                    <h3 className="font-medium">{t('paymentMethods.cashOnDelivery.name')}</h3>
-                    <p className="text-sm text-gray-500">
-                      {t('paymentMethods.cashOnDelivery.description')}
-                    </p>
-                  </div>
-                </div>
-                <Switch
-                  checked={paymentMethods.cash_on_delivery.enabled}
-                  onCheckedChange={(checked) => setPaymentMethods(prev => ({
-                    ...prev,
-                    cash_on_delivery: { ...prev.cash_on_delivery, enabled: checked }
-                  }))}
-                />
-              </div>
-
-              {/* Stripe */}
-              <div className="border rounded-lg">
-                <div className="flex items-center justify-between p-4">
-                  <div className="flex items-center space-x-4">
-                    <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                      <CreditCard className="h-6 w-6 text-blue-600" />
-                    </div>
-                    <div>
-                      <h3 className="font-medium">{t('paymentMethods.stripe.name')}</h3>
-                      <p className="text-sm text-gray-500">
-                        {t('paymentMethods.stripe.description')}
-                      </p>
-                    </div>
-                  </div>
-                  <Switch
-                    checked={paymentMethods.stripe.enabled}
-                    onCheckedChange={(checked) => setPaymentMethods(prev => ({
-                      ...prev,
-                      stripe: { ...prev.stripe, enabled: checked }
-                    }))}
-                  />
-                </div>
-
-                {paymentMethods.stripe.enabled && (
-                  <div className="px-4 pb-4 space-y-4 border-t bg-gray-50">
-                    <div className="flex items-center justify-between pt-4">
-                      <Label className="text-sm font-medium">API Keys</Label>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setShowStripeKeys(!showStripeKeys)}
-                      >
-                        {showStripeKeys ? (
-                          <>
-                            <EyeOff className="h-4 w-4 mr-2" />
-                            {t('paymentMethods.hideKeys')}
-                          </>
-                        ) : (
-                          <>
-                            <Eye className="h-4 w-4 mr-2" />
-                            {t('paymentMethods.showKeys')}
-                          </>
-                        )}
-                      </Button>
-                    </div>
-
-                    <div className="space-y-3">
-                      <div>
-                        <Label htmlFor="stripe-publishable-key" className="text-sm">
-                          {t('paymentMethods.publishableKey')}
-                        </Label>
-                        <Input
-                          id="stripe-publishable-key"
-                          type={showStripeKeys ? "text" : "password"}
-                          value={paymentMethods.stripe.stripe_publishable_key || ''}
-                          onChange={(e) => setPaymentMethods(prev => ({
-                            ...prev,
-                            stripe: { ...prev.stripe, stripe_publishable_key: e.target.value }
-                          }))}
-                          placeholder="pk_test_..."
-                          className="font-mono text-sm"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="stripe-secret-key" className="text-sm">
-                          {t('paymentMethods.secretKey')}
-                        </Label>
-                        <Input
-                          id="stripe-secret-key"
-                          type={showStripeKeys ? "text" : "password"}
-                          value={paymentMethods.stripe.stripe_secret_key || ''}
-                          onChange={(e) => setPaymentMethods(prev => ({
-                            ...prev,
-                            stripe: { ...prev.stripe, stripe_secret_key: e.target.value }
-                          }))}
-                          placeholder="sk_test_..."
-                          className="font-mono text-sm"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="bg-blue-50 p-3 rounded-lg">
-                      <div className="flex items-start space-x-2">
-                        <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                          <span className="text-white text-xs font-bold">i</span>
-                        </div>
-                        <div className="text-sm">
-                          <p className="font-medium text-blue-900">Stripe API Keys</p>
-                          <p className="text-blue-700">
-                            Get your API keys from the{' '}
-                            <a 
-                              href="https://dashboard.stripe.com/apikeys" 
-                              target="_blank" 
-                              rel="noopener noreferrer"
-                              className="underline"
-                            >
-                              Stripe Dashboard
-                            </a>
-                            . Use test keys for testing and live keys for production.
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* TiloPay */}
-              <div className="border rounded-lg">
-                <div className="flex items-center justify-between p-4">
-                  <div className="flex items-center space-x-4">
-                    <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                      🏦
-                    </div>
-                    <div>
-                      <h3 className="font-medium">{t('paymentMethods.tilopay.name')}</h3>
-                      <p className="text-sm text-gray-500">
-                        {t('paymentMethods.tilopay.description')}
-                      </p>
-                    </div>
-                  </div>
-                  <Switch
-                    checked={paymentMethods.tilopay.enabled}
-                    onCheckedChange={(checked) => setPaymentMethods(prev => ({
-                      ...prev,
-                      tilopay: { ...prev.tilopay, enabled: checked }
-                    }))}
-                  />
-                </div>
-
-                {paymentMethods.tilopay.enabled && (
-                  <div className="px-4 pb-4 space-y-4 border-t bg-gray-50">
-                    <div className="flex items-center justify-between pt-4">
-                      <Label className="text-sm font-medium">API Keys</Label>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setShowTiloPayKeys(!showTiloPayKeys)}
-                      >
-                        {showTiloPayKeys ? (
-                          <>
-                            <EyeOff className="h-4 w-4 mr-2" />
-                            {t('paymentMethods.hideKeys')}
-                          </>
-                        ) : (
-                          <>
-                            <Eye className="h-4 w-4 mr-2" />
-                            {t('paymentMethods.showKeys')}
-                          </>
-                        )}
-                      </Button>
-                    </div>
-
-                    <div className="space-y-3">
-                      <div>
-                        <Label htmlFor="tilopay-api-key" className="text-sm">
-                          {t('paymentMethods.apiKey')}
-                        </Label>
-                        <Input
-                          id="tilopay-api-key"
-                          type={showTiloPayKeys ? "text" : "password"}
-                          value={paymentMethods.tilopay.tilopay_api_key || ''}
-                          onChange={(e) => setPaymentMethods(prev => ({
-                            ...prev,
-                            tilopay: { ...prev.tilopay, tilopay_api_key: e.target.value }
-                          }))}
-                          placeholder="Your TiloPay API key"
-                          className="font-mono text-sm"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="tilopay-secret-key" className="text-sm">
-                          {t('paymentMethods.secretKey')}
-                        </Label>
-                        <Input
-                          id="tilopay-secret-key"
-                          type={showTiloPayKeys ? "text" : "password"}
-                          value={paymentMethods.tilopay.tilopay_secret_key || ''}
-                          onChange={(e) => setPaymentMethods(prev => ({
-                            ...prev,
-                            tilopay: { ...prev.tilopay, tilopay_secret_key: e.target.value }
-                          }))}
-                          placeholder="Your TiloPay secret key"
-                          className="font-mono text-sm"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="bg-green-50 p-3 rounded-lg">
-                      <div className="flex items-start space-x-2">
-                        <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                          <span className="text-white text-xs font-bold">i</span>
-                        </div>
-                        <div className="text-sm">
-                          <p className="font-medium text-green-900">TiloPay API Keys</p>
-                          <p className="text-green-700">
-                            Get your API keys from the{' '}
-                            <a 
-                              href="https://portal.tilopay.com" 
-                              target="_blank" 
-                              rel="noopener noreferrer"
-                              className="underline"
-                            >
-                              TiloPay Portal
-                            </a>
-                            . {t('paymentMethods.tilopaySupports')}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              <div className="flex justify-end">
-                <Button onClick={savePaymentSettings} disabled={saving}>
-                  <Save className="h-4 w-4 mr-2" />
-                  {saving ? tCommon('saving') : tCommon('savePaymentSettings')}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+          <PaymentsTab
+            paymentMethods={paymentMethods}
+            onPaymentMethodsChange={setPaymentMethods}
+            onSave={savePaymentSettings}
+            saving={saving}
+          />
         </TabsContent>
 
         {/* Plugins Management */}
         <TabsContent value="plugins" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <Puzzle className="h-5 w-5 mr-2" />
-                {t('sections.availablePlugins')}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                
-                {/* Analytics Plugin */}
-                <Card className="border-2">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center">
-                        <div className="p-2 bg-blue-100 rounded-lg mr-3">
-                          <Globe className="h-5 w-5 text-blue-600" />
-                        </div>
-                        <div>
-                          <h3 className="font-medium">{t('plugins.googleAnalytics.name')}</h3>
-                          <p className="text-sm text-gray-600">{t('plugins.googleAnalytics.description')}</p>
-                        </div>
-                      </div>
-                      <Switch 
-                        checked={false}
-                        onCheckedChange={(checked) => {
-                          // TODO: Handle plugin toggle
-                        }}
-                      />
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      <div>
-                        <Label htmlFor="ga-tracking-id">Tracking ID</Label>
-                        <Input
-                          id="ga-tracking-id"
-                          placeholder="G-XXXXXXXXXX"
-                          disabled
-                        />
-                      </div>
-                      <Badge variant="outline">{t('plugins.proFeature')}</Badge>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Facebook Pixel Plugin */}
-                <Card className="border-2">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center">
-                        <div className="p-2 bg-blue-100 rounded-lg mr-3">
-                          <Globe className="h-5 w-5 text-blue-600" />
-                        </div>
-                        <div>
-                          <h3 className="font-medium">{t('plugins.facebookPixel.name')}</h3>
-                          <p className="text-sm text-gray-600">{t('plugins.facebookPixel.description')}</p>
-                        </div>
-                      </div>
-                      <Switch 
-                        checked={false}
-                        onCheckedChange={(checked) => {
-                          // TODO: Handle plugin toggle
-                        }}
-                      />
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      <div>
-                        <Label htmlFor="fb-pixel-id">Pixel ID</Label>
-                        <Input
-                          id="fb-pixel-id"
-                          placeholder="1234567890123456"
-                          disabled
-                        />
-                      </div>
-                      <Badge variant="outline">{t('plugins.proFeature')}</Badge>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Email Marketing Plugin */}
-                <Card className="border-2">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center">
-                        <div className="p-2 bg-green-100 rounded-lg mr-3">
-                          <Mail className="h-5 w-5 text-green-600" />
-                        </div>
-                        <div>
-                          <h3 className="font-medium">{t('plugins.mailchimp.name')}</h3>
-                          <p className="text-sm text-gray-600">{t('plugins.mailchimp.description')}</p>
-                        </div>
-                      </div>
-                      <Switch 
-                        checked={false}
-                        onCheckedChange={(checked) => {
-                          // TODO: Handle plugin toggle
-                        }}
-                      />
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      <div>
-                        <Label htmlFor="mailchimp-api-key">API Key</Label>
-                        <Input
-                          id="mailchimp-api-key"
-                          placeholder="API Key"
-                          type="password"
-                          disabled
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="mailchimp-list-id">List ID</Label>
-                        <Input
-                          id="mailchimp-list-id"
-                          placeholder="List ID"
-                          disabled
-                        />
-                      </div>
-                      <Badge variant="outline">{t('plugins.proFeature')}</Badge>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* WhatsApp Plugin */}
-                <Card className="border-2">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center">
-                        <div className="p-2 bg-green-100 rounded-lg mr-3">
-                          <Mail className="h-5 w-5 text-green-600" />
-                        </div>
-                        <div>
-                          <h3 className="font-medium">{t('plugins.whatsapp.name')}</h3>
-                          <p className="text-sm text-gray-600">{t('plugins.whatsapp.description')}</p>
-                        </div>
-                      </div>
-                      <Switch 
-                        checked={true}
-                        onCheckedChange={(checked) => {
-                          // TODO: Handle plugin toggle
-                        }}
-                      />
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      <div>
-                        <Label htmlFor="whatsapp-number">WhatsApp Number</Label>
-                        <Input
-                          id="whatsapp-number"
-                          placeholder="+506 1234 5678"
-                          defaultValue="+506 8888 8888"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="whatsapp-message">Default Message</Label>
-                        <Textarea
-                          id="whatsapp-message"
-                          placeholder="Hi! I'm interested in..."
-                          defaultValue="Hola! Me interesa obtener información sobre sus productos."
-                        />
-                      </div>
-                      <Badge variant="default" className="bg-green-100 text-green-800">Active</Badge>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Live Chat Plugin */}
-                <Card className="border-2">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center">
-                        <div className="p-2 bg-purple-100 rounded-lg mr-3">
-                          <Mail className="h-5 w-5 text-purple-600" />
-                        </div>
-                        <div>
-                          <h3 className="font-medium">Live Chat Widget</h3>
-                          <p className="text-sm text-gray-600">Real-time customer support</p>
-                        </div>
-                      </div>
-                      <Switch 
-                        checked={false}
-                        onCheckedChange={(checked) => {
-                          // TODO: Handle plugin toggle
-                        }}
-                      />
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      <div>
-                        <Label htmlFor="chat-position">Widget Position</Label>
-                        <Select defaultValue="bottom-right">
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="bottom-right">Bottom Right</SelectItem>
-                            <SelectItem value="bottom-left">Bottom Left</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <Badge variant="outline">Pro Feature</Badge>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Inventory Management Plugin */}
-                <Card className="border-2">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center">
-                        <div className="p-2 bg-orange-100 rounded-lg mr-3">
-                          <AlertCircle className="h-5 w-5 text-orange-600" />
-                        </div>
-                        <div>
-                          <h3 className="font-medium">Low Stock Alerts</h3>
-                          <p className="text-sm text-gray-600">Get notified when inventory is low</p>
-                        </div>
-                      </div>
-                      <Switch 
-                        checked={true}
-                        onCheckedChange={(checked) => {
-                          // TODO: Handle plugin toggle
-                        }}
-                      />
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      <div>
-                        <Label htmlFor="low-stock-threshold">Alert Threshold</Label>
-                        <Input
-                          id="low-stock-threshold"
-                          type="number"
-                          placeholder="5"
-                          defaultValue="5"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="alert-email">Alert Email</Label>
-                        <Input
-                          id="alert-email"
-                          type="email"
-                          placeholder="alerts@yourdomain.com"
-                          defaultValue="admin@yourdomain.com"
-                        />
-                      </div>
-                      <Badge variant="default" className="bg-green-100 text-green-800">Active</Badge>
-                    </div>
-                  </CardContent>
-                </Card>
-
-              </div>
-
-              <Separator />
-
-              <div className="bg-blue-50 p-4 rounded-lg">
-                <div className="flex items-start space-x-3">
-                  <Puzzle className="h-5 w-5 text-blue-600 mt-0.5" />
-                  <div>
-                    <h3 className="font-medium text-blue-900">Need a Custom Plugin?</h3>
-                    <p className="text-sm text-blue-800 mt-1">
-                      Contact our development team to create custom integrations for your specific business needs.
-                    </p>
-                    <Button variant="outline" size="sm" className="mt-3 border-blue-200">
-                      Request Custom Plugin
-                    </Button>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex justify-end">
-                <Button onClick={() => {}} disabled={saving}>
-                  <Save className="h-4 w-4 mr-2" />
-                  {saving ? tCommon('saving') : tCommon('savePluginSettings')}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+          <PluginsTab />
         </TabsContent>
 
         {/* Users Management */}
         <TabsContent value="users" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>{t('sections.inviteNewUser')}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex space-x-4">
-                <div className="flex-1">
-                  <Input
-                    placeholder={t('users.inviteEmail')}
-                    value={inviteEmail}
-                    onChange={(e) => setInviteEmail(e.target.value)}
-                  />
-                </div>
-                <Select value={inviteRole} onValueChange={setInviteRole}>
-                  <SelectTrigger className="w-32">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="admin">{t('users.roles.admin')}</SelectItem>
-                    <SelectItem value="staff">{t('users.roles.staff')}</SelectItem>
-                    <SelectItem value="viewer">{t('users.roles.viewer')}</SelectItem>
-                  </SelectContent>
-                </Select>
-                <Button onClick={inviteUser} disabled={saving || !inviteEmail.trim()}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  {t('users.inviteButton')}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>{t('sections.teamMembers')}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {tenantUsers.length === 0 ? (
-                <div className="text-center py-8">
-                  <Users className="mx-auto h-12 w-12 text-gray-400" />
-                  <h3 className="mt-2 text-sm font-medium text-gray-900">{t('users.noTeamMembers')}</h3>
-                  <p className="mt-1 text-sm text-gray-500">
-                    {t('users.inviteUsersHelp')}
-                  </p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {tenantUsers.map((user) => (
-                    <div key={user.id} className="flex items-center justify-between p-4 border rounded-lg">
-                      <div>
-                        <div className="flex items-center space-x-2">
-                          <span className="font-medium">
-                            {user.user?.email || `${t('users.pendingInvitation')} (${user.user_id})`}
-                          </span>
-                          <Badge variant={getRoleBadgeVariant(user.role)}>
-                            {user.role}
-                          </Badge>
-                          {!user.is_active && (
-                            <Badge variant="secondary">{t('users.status.pending')}</Badge>
-                          )}
-                        </div>
-                        <p className="text-sm text-gray-500">
-                          {t('users.invited')} {new Date(user.invited_at).toLocaleDateString()}
-                        </p>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Select 
-                          value={user.role} 
-                          onValueChange={(value) => updateUserRole(user.id, value)}
-                        >
-                          <SelectTrigger className="w-28">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="admin">{t('users.roles.admin')}</SelectItem>
-                            <SelectItem value="staff">{t('users.roles.staff')}</SelectItem>
-                            <SelectItem value="viewer">{t('users.roles.viewer')}</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button variant="outline" size="sm">
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>{t('users.removeTeamMember')}</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                {t('users.removeConfirmation')}
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>{tCommon('cancel')}</AlertDialogCancel>
-                              <AlertDialogAction onClick={() => removeUser(user.id)}>
-                                {tCommon('remove')}
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
+          <UsersTab
+            tenantUsers={tenantUsers}
+            inviteEmail={inviteEmail}
+            inviteRole={inviteRole}
+            saving={saving}
+            onInviteEmailChange={setInviteEmail}
+            onInviteRoleChange={setInviteRole}
+            onInviteUser={inviteUser}
+            onUpdateUserRole={updateUserRole}
+            onRemoveUser={removeUser}
+            getRoleBadgeVariant={getRoleBadgeVariant}
+          />
         </TabsContent>
 
         {/* Security Settings */}
         <TabsContent value="security" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>{t('sections.accountInformation')}</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label>{t('security.subscriptionTier')}</Label>
-                <div className="flex items-center space-x-2 mt-1">
-                  <Badge variant="outline" className="capitalize">
-                    {tenant.subscription_tier}
-                  </Badge>
-                  <span className="text-sm text-gray-500">{t('security.plan')}</span>
-                </div>
-              </div>
-              <div>
-                <Label>{t('security.storeStatus')}</Label>
-                <div className="flex items-center space-x-2 mt-1">
-                  <Badge variant={tenant.is_active ? "default" : "secondary"}>
-                    {tenant.is_active ? t('security.active') : t('security.inactive')}
-                  </Badge>
-                </div>
-              </div>
-              <div>
-                <Label>{t('security.created')}</Label>
-                <p className="text-sm text-gray-600 mt-1">
-                  {new Date(tenant.created_at).toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                  })}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+          <SecurityTab
+            tenant={tenant}
+            saving={saving}
+            onPasswordReset={async () => {
+              try {
+                setSaving(true)
+                
+                const { error } = await supabase.auth.resetPasswordForEmail(
+                  tenant.contact_email || '',
+                  {
+                    redirectTo: `${window.location.origin}/admin/reset-password`
+                  }
+                )
 
-          <Card>
-            <CardHeader>
-              <CardTitle>{t('sections.passwordSecurity')}</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div>
-                <h3 className="font-medium mb-3">{t('security.changePassword')}</h3>
-                <p className="text-sm text-gray-600 mb-4">
-                  {t('security.changePasswordDescription')}
-                </p>
-                <Button 
-                  onClick={async () => {
-                    try {
-                      setSaving(true)
-                      
-                      const { error } = await supabase.auth.resetPasswordForEmail(
-                        tenant.contact_email || '',
-                        {
-                          redirectTo: `${window.location.origin}/admin/reset-password`
-                        }
-                      )
+                if (error) {
+                  throw error
+                }
 
-                      if (error) {
-                        throw error
-                      }
-
-                      setMessage({ 
-                        type: 'success', 
-                        text: t('security.passwordResetSent')
-                      })
-                    } catch (error) {
-                      console.error('Error sending password reset:', error)
-                      setMessage({ 
-                        type: 'error', 
-                        text: t('security.failedToSendPasswordReset')
-                      })
-                    } finally {
-                      setSaving(false)
-                    }
-                  }}
-                  disabled={saving || !tenant.contact_email}
-                  variant="outline"
-                >
-                  <Shield className="h-4 w-4 mr-2" />
-                  {saving ? t('security.sending') : t('security.sendPasswordResetEmail')}
-                </Button>
-                {!tenant.contact_email && (
-                  <p className="text-xs text-orange-600 mt-2">
-                    {t('security.addContactEmailFirst')}
-                  </p>
-                )}
-              </div>
-
-              <Separator />
-
-              <div>
-                <h3 className="font-medium mb-3">{t('security.twoFactorAuth')}</h3>
-                <p className="text-sm text-gray-600 mb-4">
-                  {t('security.twoFactorDescription')}
-                </p>
-                <div className="flex items-center justify-between p-4 border rounded-lg">
-                  <div>
-                    <div className="font-medium">{t('security.smsAuth')}</div>
-                    <div className="text-sm text-gray-500">{t('security.smsDescription')}</div>
-                  </div>
-                  <Badge variant="outline">{t('security.comingSoon')}</Badge>
-                </div>
-                <div className="flex items-center justify-between p-4 border rounded-lg mt-2">
-                  <div>
-                    <div className="font-medium">{t('security.authenticatorApp')}</div>
-                    <div className="text-sm text-gray-500">{t('security.authenticatorDescription')}</div>
-                  </div>
-                  <Badge variant="outline">{t('security.comingSoon')}</Badge>
-                </div>
-              </div>
-
-              <Separator />
-
-              <div>
-                <h3 className="font-medium mb-3">{t('security.loginSessions')}</h3>
-                <p className="text-sm text-gray-600 mb-4">
-                  {t('security.loginSessionsDescription')}
-                </p>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between p-4 border rounded-lg">
-                    <div>
-                      <div className="font-medium">{t('security.currentSession')}</div>
-                      <div className="text-sm text-gray-500">
-                        {t('security.lastActive')}: {new Date().toLocaleString()}
-                      </div>
-                    </div>
-                    <Badge variant="default">{t('security.active')}</Badge>
-                  </div>
-                  <Button 
-                    variant="outline" 
-                    onClick={async () => {
-                      try {
-                        setSaving(true)
-                        await supabase.auth.signOut()
-                        window.location.href = '/login'
-                      } catch (error) {
-                        console.error('Error signing out:', error)
-                        setMessage({ 
-                          type: 'error', 
-                          text: t('security.failedToSignOut')
-                        })
-                      } finally {
-                        setSaving(false)
-                      }
-                    }}
-                    disabled={saving}
-                  >
-                    {saving ? t('security.signingOut') : t('security.logoutAllDevices')}
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-red-600">{t('sections.dangerZone')}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div>
-                  <h3 className="font-medium text-red-600">{tCommon('deleteStore')}</h3>
-                  <p className="text-sm text-gray-600 mb-4">
-                    {tCommon('deleteStorePermanently')}
-                  </p>
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button variant="destructive">
-                        <Trash2 className="h-4 w-4 mr-2" />
-                        {tCommon('deleteStore')}
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>{tCommon('deleteStore')}</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          {tCommon('deleteStoreConfirm', { storeName: tenant.name })}
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>{tCommon('cancel')}</AlertDialogCancel>
-                        <AlertDialogAction className="bg-red-600 hover:bg-red-700">
-                          {tCommon('deleteStore')}
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+                setMessage({ 
+                  type: 'success', 
+                  text: t('security.passwordResetSent')
+                })
+              } catch (error) {
+                console.error('Error sending password reset:', error)
+                setMessage({ 
+                  type: 'error', 
+                  text: t('security.failedToSendPasswordReset')
+                })
+              } finally {
+                setSaving(false)
+              }
+            }}
+            onSignOut={async () => {
+              try {
+                setSaving(true)
+                await supabase.auth.signOut()
+                window.location.href = '/login'
+              } catch (error) {
+                console.error('Error signing out:', error)
+                setMessage({ 
+                  type: 'error', 
+                  text: t('security.failedToSignOut')
+                })
+              } finally {
+                setSaving(false)
+              }
+            }}
+            onDeleteStore={async () => {
+              // TODO: Implement delete store functionality
+            }}
+          />
         </TabsContent>
       </Tabs>
     </div>

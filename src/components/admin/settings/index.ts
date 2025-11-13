@@ -51,4 +51,11 @@ export interface PaymentSettings {
     tilopay_api_key?: string
     tilopay_secret_key?: string
   }
+  bank_transfer: {
+    enabled: boolean
+    bank_name?: string
+    account_number?: string
+    account_holder?: string
+    instructions?: string
+  }
 }

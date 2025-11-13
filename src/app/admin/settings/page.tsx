@@ -104,7 +104,14 @@ export default function SettingsPage() {
   const [paymentMethods, setPaymentMethods] = useState<PaymentSettings>({
     cash_on_delivery: { enabled: true },
     stripe: { enabled: false },
-    tilopay: { enabled: false }
+    tilopay: { enabled: false },
+    bank_transfer: {
+      enabled: false,
+      bank_name: '',
+      account_number: '',
+      account_holder: '',
+      instructions: ''
+    }
   })
   const [showStripeKeys, setShowStripeKeys] = useState(false)
   const [showTiloPayKeys, setShowTiloPayKeys] = useState(false)
@@ -268,6 +275,13 @@ export default function SettingsPage() {
           enabled: tilopayMethod?.enabled || false,
           tilopay_api_key: tilopayMethod?.keys?.publishableKey || '',
           tilopay_secret_key: tilopayMethod?.keys?.secretKey || ''
+        },
+        bank_transfer: {
+          enabled: false,
+          bank_name: '',
+          account_number: '',
+          account_holder: '',
+          instructions: ''
         }
       })
     } catch (error) {

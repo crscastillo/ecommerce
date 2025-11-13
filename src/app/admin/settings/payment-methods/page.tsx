@@ -35,6 +35,12 @@ interface PaymentMethodConfig {
   icon: React.ComponentType<{ className?: string }>
   fees?: string
   testMode?: boolean
+  bankDetails?: {
+    bankName?: string
+    accountNumber?: string
+    accountHolder?: string
+    instructions?: string
+  }
 }
 
 export default function PaymentMethodsPage() {
@@ -58,6 +64,20 @@ export default function PaymentMethodsPage() {
       icon: CreditCard,
       fees: '2.9% + 30¢ per transaction',
       testMode: true
+    },
+    {
+      id: 'bank_transfer',
+      name: 'Bank Transfer',
+      enabled: false,
+      requiresKeys: false,
+      description: 'Allow customers to pay via direct bank transfer. Provide bank account details and instructions.',
+      icon: Shield,
+      bankDetails: {
+        bankName: '',
+        accountNumber: '',
+        accountHolder: '',
+        instructions: ''
+      }
     },
     {
       id: 'traditional',
@@ -265,168 +285,53 @@ export default function PaymentMethodsPage() {
                 </div>
               </CardHeader>
 
-              {method.enabled && method.requiresKeys && (
+              {/* Bank Transfer Details */}
+              {method.id === 'bank_transfer' && method.enabled && (
                 <CardContent className="border-t bg-gray-50">
                   <div className="space-y-4">
-                    <div className="flex items-center space-x-2 mb-4">
-                      <Settings className="w-4 h-4 text-gray-600" />
-                      <h3 className="font-medium">Configuration</h3>
+                    <div>
+                      <Label htmlFor="bank-name">Bank Name</Label>
+                      <Input
+                        id="bank-name"
+                        type="text"
+                        placeholder="Your Bank Name"
+                        value={method.bankDetails?.bankName || ''}
+                        onChange={e => setPaymentMethods(prev => prev.map(m => m.id === 'bank_transfer' ? { ...m, bankDetails: { ...m.bankDetails, bankName: e.target.value } } : m))}
+                        className="text-sm"
+                      />
                     </div>
-
-                    {method.id === 'stripe' && (
-                      <>
-                        {/* Test Mode Toggle */}
-                        <div className="flex items-center justify-between p-3 bg-white rounded-lg border">
-                          <div>
-                            <Label className="font-medium">Test Mode</Label>
-                            <p className="text-sm text-gray-600">Use test keys for development and testing</p>
-                          </div>
-                          <Switch
-                            checked={method.testMode || false}
-                            onCheckedChange={() => toggleTestMode(method.id)}
-                          />
-                        </div>
-
-                        {/* API Keys */}
-                        <div className="space-y-3">
-                          <div>
-                            <Label htmlFor={`${method.id}-publishable`}>
-                              Publishable Key *
-                              <span className="text-xs text-gray-500 ml-1">
-                                (Safe to use in frontend code)
-                              </span>
-                            </Label>
-                            <Input
-                              id={`${method.id}-publishable`}
-                              type="text"
-                              placeholder={method.testMode ? 'pk_test_...' : 'pk_live_...'}
-                              value={method.keys?.publishableKey || ''}
-                              onChange={(e) => updatePaymentMethodKeys(method.id, 'publishableKey', e.target.value)}
-                              className="font-mono text-sm"
-                            />
-                          </div>
-
-                          <div>
-                            <div className="flex items-center justify-between">
-                              <Label htmlFor={`${method.id}-secret`}>
-                                Secret Key *
-                                <span className="text-xs text-gray-500 ml-1">
-                                  (Keep this secure and private)
-                                </span>
-                              </Label>
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => toggleSecretVisibility(`${method.id}-secret`)}
-                              >
-                                {showSecrets[`${method.id}-secret`] ? (
-                                  <EyeOff className="w-4 h-4" />
-                                ) : (
-                                  <Eye className="w-4 h-4" />
-                                )}
-                              </Button>
-                            </div>
-                            <Input
-                              id={`${method.id}-secret`}
-                              type={showSecrets[`${method.id}-secret`] ? 'text' : 'password'}
-                              placeholder={method.testMode ? 'sk_test_...' : 'sk_live_...'}
-                              value={method.keys?.secretKey || ''}
-                              onChange={(e) => updatePaymentMethodKeys(method.id, 'secretKey', e.target.value)}
-                              className="font-mono text-sm"
-                            />
-                          </div>
-
-                          <div>
-                            <div className="flex items-center justify-between">
-                              <Label htmlFor={`${method.id}-webhook`}>
-                                Webhook Secret
-                                <span className="text-xs text-gray-500 ml-1">
-                                  (Optional, for webhook verification)
-                                </span>
-                              </Label>
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => toggleSecretVisibility(`${method.id}-webhook`)}
-                              >
-                                {showSecrets[`${method.id}-webhook`] ? (
-                                  <EyeOff className="w-4 h-4" />
-                                ) : (
-                                  <Eye className="w-4 h-4" />
-                                )}
-                              </Button>
-                            </div>
-                            <Input
-                              id={`${method.id}-webhook`}
-                              type={showSecrets[`${method.id}-webhook`] ? 'text' : 'password'}
-                              placeholder="whsec_..."
-                              value={method.keys?.webhookSecret || ''}
-                              onChange={(e) => updatePaymentMethodKeys(method.id, 'webhookSecret', e.target.value)}
-                              className="font-mono text-sm"
-                            />
-                          </div>
-                        </div>
-
-                        {/* Validation Status */}
-                        {stripeValidation && method.keys?.publishableKey && method.keys?.secretKey && (
-                          <div className={`flex items-center space-x-2 p-3 rounded-lg ${
-                            stripeValidation.valid ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
-                          }`}>
-                            {stripeValidation.valid ? (
-                              <CheckCircle className="w-4 h-4" />
-                            ) : (
-                              <AlertTriangle className="w-4 h-4" />
-                            )}
-                            <span className="text-sm font-medium">{stripeValidation.message}</span>
-                          </div>
-                        )}
-
-                        {/* Stripe Setup Instructions */}
-                        <div className="bg-blue-50 p-4 rounded-lg">
-                          <div className="flex items-start space-x-2">
-                            <Info className="w-4 h-4 text-blue-600 mt-0.5" />
-                            <div className="text-sm">
-                              <p className="font-medium text-blue-900 mb-2">How to get your Stripe keys:</p>
-                              <ol className="list-decimal list-inside space-y-1 text-blue-800">
-                                <li>Go to your <a href="https://dashboard.stripe.com/apikeys" target="_blank" rel="noopener noreferrer" className="underline">Stripe Dashboard</a></li>
-                                <li>Navigate to "Developers" → "API keys"</li>
-                                <li>Copy your publishable and secret keys</li>
-                                <li>Use test keys for development, live keys for production</li>
-                              </ol>
-                            </div>
-                          </div>
-                        </div>
-                      </>
-                    )}
-
-                    {method.id === 'paypal' && (
-                      <div className="space-y-3">
-                        <div>
-                          <Label htmlFor={`${method.id}-client-id`}>PayPal Client ID *</Label>
-                          <Input
-                            id={`${method.id}-client-id`}
-                            type="text"
-                            placeholder="Your PayPal Client ID"
-                            value={method.keys?.publishableKey || ''}
-                            onChange={(e) => updatePaymentMethodKeys(method.id, 'publishableKey', e.target.value)}
-                            className="font-mono text-sm"
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor={`${method.id}-client-secret`}>PayPal Client Secret *</Label>
-                          <Input
-                            id={`${method.id}-client-secret`}
-                            type={showSecrets[`${method.id}-secret`] ? 'text' : 'password'}
-                            placeholder="Your PayPal Client Secret"
-                            value={method.keys?.secretKey || ''}
-                            onChange={(e) => updatePaymentMethodKeys(method.id, 'secretKey', e.target.value)}
-                            className="font-mono text-sm"
-                          />
-                        </div>
-                      </div>
-                    )}
+                    <div>
+                      <Label htmlFor="account-number">Account Number</Label>
+                      <Input
+                        id="account-number"
+                        type="text"
+                        placeholder="1234567890"
+                        value={method.bankDetails?.accountNumber || ''}
+                        onChange={e => setPaymentMethods(prev => prev.map(m => m.id === 'bank_transfer' ? { ...m, bankDetails: { ...m.bankDetails, accountNumber: e.target.value } } : m))}
+                        className="text-sm"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="account-holder">Account Holder</Label>
+                      <Input
+                        id="account-holder"
+                        type="text"
+                        placeholder="John Doe"
+                        value={method.bankDetails?.accountHolder || ''}
+                        onChange={e => setPaymentMethods(prev => prev.map(m => m.id === 'bank_transfer' ? { ...m, bankDetails: { ...m.bankDetails, accountHolder: e.target.value } } : m))}
+                        className="text-sm"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="bank-instructions">Instructions</Label>
+                      <Textarea
+                        id="bank-instructions"
+                        placeholder="Please transfer the total amount and include your order number."
+                        value={method.bankDetails?.instructions || ''}
+                        onChange={e => setPaymentMethods(prev => prev.map(m => m.id === 'bank_transfer' ? { ...m, bankDetails: { ...m.bankDetails, instructions: e.target.value } } : m))}
+                        className="text-sm"
+                      />
+                    </div>
                   </div>
                 </CardContent>
               )}

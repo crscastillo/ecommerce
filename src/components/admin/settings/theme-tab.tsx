@@ -1,4 +1,5 @@
-'use client'
+
+import React from 'react';
 
 import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
@@ -42,6 +43,37 @@ export function ThemeTab({ settings, onSettingsChange, onSave, saving }: ThemeTa
   const heroType = settings.hero_background_type || 'color';
   const heroValue = settings.hero_background_value || '';
 
+  // Supabase client for upload
+  // Use dynamic import to avoid SSR issues
+  const [uploading, setUploading] = React.useState(false);
+
+  async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const { createClient } = await import('@/lib/supabase/client');
+      const supabase = createClient();
+      // Use tenant id from settings or fallback to 'public'
+      const tenantId = (settings as any).tenant_id || 'public';
+      const filePath = `hero-background/${tenantId}/${Date.now()}_${file.name}`;
+      const { data, error } = await supabase.storage.from('public').upload(filePath, file, {
+        cacheControl: '3600',
+        upsert: true,
+      });
+      if (error) throw error;
+      // Get public URL
+      const { data: urlData } = supabase.storage.from('public').getPublicUrl(filePath);
+      if (urlData?.publicUrl) {
+        updateSettings({ hero_background_value: urlData.publicUrl });
+      }
+    } catch (err) {
+      alert('Image upload failed: ' + (err as Error).message);
+    } finally {
+      setUploading(false);
+    }
+  }
+
   return (
     <div className="space-y-6">
       <Card>
@@ -83,14 +115,25 @@ export function ThemeTab({ settings, onSettingsChange, onSave, saving }: ThemeTa
               </div>
             </div>
           ) : (
-            <div>
-              <Label htmlFor="hero-background-image">Hero Background Image URL</Label>
+            <div className="space-y-2">
+              <Label htmlFor="hero-background-image">Hero Background Image</Label>
               <Input
-                id="hero-background-image"
+                id="hero-background-image-url"
                 value={heroValue}
                 onChange={(e) => updateSettings({ hero_background_value: e.target.value })}
                 placeholder="https://example.com/hero.jpg"
+                disabled={uploading}
               />
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                disabled={uploading}
+              />
+              {uploading && <div className="text-sm text-gray-500">Uploading...</div>}
+              {heroValue && (
+                <img src={heroValue} alt="Hero preview" className="mt-2 rounded shadow max-h-40" />
+              )}
             </div>
           )}
         </CardContent>

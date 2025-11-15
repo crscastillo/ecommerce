@@ -42,8 +42,18 @@ export function ThemeTab({ settings, onSettingsChange, onSave, saving, tenantId 
       const { createClient } = await import('@/lib/supabase/client');
       const supabase = createClient();
       const user = await supabase.auth.getUser();
-      const filePath = `${tenantId}/${field}/${Date.now()}_${file.name}`;
-      console.log('[DEBUG] Asset Upload:', { tenantId, userId: user.data?.user?.id, filePath });
+      // Generate a UUID v4 for the filename
+      function uuidv4() {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+          const r = crypto.getRandomValues(new Uint8Array(1))[0] % 16;
+          const v = c === 'x' ? r : (r & 0x3 | 0x8);
+          return v.toString(16);
+        });
+      }
+      const guid = uuidv4();
+      const extension = file.name.split('.').pop();
+      const filePath = `${field}/${guid}.${extension}`;
+      console.log('[DEBUG] Asset Upload:', { userId: user.data?.user?.id, filePath });
       const { data, error } = await supabase.storage.from('public-assets').upload(filePath, file, {
         cacheControl: '3600',
         upsert: true,
@@ -82,8 +92,18 @@ export function ThemeTab({ settings, onSettingsChange, onSave, saving, tenantId 
       const { createClient } = await import('@/lib/supabase/client');
       const supabase = createClient();
       const user = await supabase.auth.getUser();
-      const filePath = `${tenantId}/hero-background/${Date.now()}_${file.name}`;
-      console.log('[DEBUG] Hero Image Upload:', { tenantId, userId: user.data?.user?.id, filePath });
+      // Generate a UUID v4 for the filename
+      function uuidv4() {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+          const r = crypto.getRandomValues(new Uint8Array(1))[0] % 16;
+          const v = c === 'x' ? r : (r & 0x3 | 0x8);
+          return v.toString(16);
+        });
+      }
+      const guid = uuidv4();
+      const extension = file.name.split('.').pop();
+      const filePath = `hero-background/${guid}.${extension}`;
+      console.log('[DEBUG] Hero Image Upload:', { userId: user.data?.user?.id, filePath });
       const { data, error } = await supabase.storage.from('public-assets').upload(filePath, file, {
         cacheControl: '3600',
         upsert: true,

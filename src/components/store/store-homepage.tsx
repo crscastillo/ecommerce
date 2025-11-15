@@ -21,9 +21,13 @@ export default function StoreHomepage({ tenant }: StoreHomepageProps) {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const t = useTranslations();
-  
+
   const storeName = tenant?.name || t('store.defaultStoreName');
   const storeDescription = tenant?.description || t('store.defaultDescription');
+
+  // Hero background config
+  const heroType = tenant?.theme_config?.hero_background_type || 'color';
+  const heroValue = tenant?.theme_config?.hero_background_value || '';
 
   useEffect(() => {
     async function fetchCategories() {
@@ -71,7 +75,21 @@ export default function StoreHomepage({ tenant }: StoreHomepageProps) {
   return (
     <div className="container mx-auto px-4 py-8">
       {/* Hero Section */}
-      <section className="text-center py-20 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg mb-12">
+      <section
+        className={`text-center py-20 rounded-lg mb-12 ${heroType === 'color' ? 'text-white' : ''}`}
+        style={
+          heroType === 'image'
+            ? {
+                backgroundImage: heroValue ? `url(${heroValue})` : undefined,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                color: '#fff',
+              }
+            : heroValue
+              ? { background: heroValue, color: '#fff' }
+              : { background: 'linear-gradient(to right, #2563eb, #9333ea)', color: '#fff' }
+        }
+      >
         <h1 className="text-4xl md:text-6xl font-bold mb-4">
           {t('store.welcomeTo', { storeName })}
         </h1>

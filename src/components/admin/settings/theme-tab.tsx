@@ -19,6 +19,8 @@ interface ThemeSettings {
   logo_url: string
   favicon_url: string
   custom_css: string
+  hero_background_type?: 'color' | 'image'
+  hero_background_value?: string
 }
 
 interface ThemeTabProps {
@@ -36,8 +38,63 @@ export function ThemeTab({ settings, onSettingsChange, onSave, saving }: ThemeTa
     onSettingsChange({ ...settings, ...updates })
   }
 
+  // Default to color if not set
+  const heroType = settings.hero_background_type || 'color';
+  const heroValue = settings.hero_background_value || '';
+
   return (
     <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>Hero Section Background</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div>
+            <Label htmlFor="hero-background-type">Background Type</Label>
+            <Select
+              value={heroType}
+              onValueChange={(value) => updateSettings({ hero_background_type: value as 'color' | 'image', hero_background_value: '' })}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="color">Color</SelectItem>
+                <SelectItem value="image">Image</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          {heroType === 'color' ? (
+            <div>
+              <Label htmlFor="hero-background-color">Hero Background Color</Label>
+              <div className="flex space-x-2">
+                <Input
+                  id="hero-background-color"
+                  type="color"
+                  value={heroValue}
+                  onChange={(e) => updateSettings({ hero_background_value: e.target.value })}
+                  className="w-20"
+                />
+                <Input
+                  value={heroValue}
+                  onChange={(e) => updateSettings({ hero_background_value: e.target.value })}
+                  placeholder="#3B82F6"
+                />
+              </div>
+            </div>
+          ) : (
+            <div>
+              <Label htmlFor="hero-background-image">Hero Background Image URL</Label>
+              <Input
+                id="hero-background-image"
+                value={heroValue}
+                onChange={(e) => updateSettings({ hero_background_value: e.target.value })}
+                placeholder="https://example.com/hero.jpg"
+              />
+            </div>
+          )}
+        </CardContent>
+      </Card>
       <Card>
         <CardHeader>
           <CardTitle>{t('sections.brandAssets')}</CardTitle>

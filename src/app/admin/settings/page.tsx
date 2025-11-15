@@ -355,7 +355,9 @@ export default function SettingsPage() {
             text_color: themeSettings.text_color,
             font_family: themeSettings.font_family,
             favicon_url: themeSettings.favicon_url,
-            custom_css: themeSettings.custom_css
+            custom_css: themeSettings.custom_css,
+            hero_background_type: themeSettings.hero_background_type,
+            hero_background_value: themeSettings.hero_background_value
           },
           updated_at: new Date().toISOString()
         })

@@ -35,6 +35,8 @@ export interface ThemeSettings {
   logo_url: string
   favicon_url: string
   custom_css: string
+  hero_background_type?: 'color' | 'image'
+  hero_background_value?: string
 }
 
 export interface PaymentSettings {

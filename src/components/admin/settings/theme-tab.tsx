@@ -32,6 +32,30 @@ interface ThemeTabProps {
 }
 
 export function ThemeTab({ settings, onSettingsChange, onSave, saving }: ThemeTabProps) {
+  async function handleAssetUpload(e: React.ChangeEvent<HTMLInputElement>, field: 'logo_url' | 'favicon_url') {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const { createClient } = await import('@/lib/supabase/client');
+      const supabase = createClient();
+      const tenantId = (settings as any).tenant_id || 'public';
+      const filePath = `${field}/${tenantId}/${Date.now()}_${file.name}`;
+      const { data, error } = await supabase.storage.from('public').upload(filePath, file, {
+        cacheControl: '3600',
+        upsert: true,
+      });
+      if (error) throw error;
+      const { data: urlData } = supabase.storage.from('public').getPublicUrl(filePath);
+      if (urlData?.publicUrl) {
+        updateSettings({ [field]: urlData.publicUrl });
+      }
+    } catch (err) {
+      alert('File upload failed: ' + (err as Error).message);
+    } finally {
+      setUploading(false);
+    }
+  }
   const t = useTranslations('settings')
   const tCommon = useTranslations('common')
 
@@ -143,23 +167,45 @@ export function ThemeTab({ settings, onSettingsChange, onSave, saving }: ThemeTa
           <CardTitle>{t('sections.brandAssets')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div>
+          <div className="space-y-2">
             <Label htmlFor="logo-url">{t('labels.logoUrl')}</Label>
             <Input
               id="logo-url"
               value={settings.logo_url}
               onChange={(e) => updateSettings({ logo_url: e.target.value })}
               placeholder="https://example.com/logo.png"
+              disabled={uploading}
             />
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => handleAssetUpload(e, 'logo_url')}
+              disabled={uploading}
+            />
+            {uploading && <div className="text-sm text-gray-500">Uploading...</div>}
+            {settings.logo_url && (
+              <img src={settings.logo_url} alt="Logo preview" className="mt-2 rounded shadow max-h-20" />
+            )}
           </div>
-          <div>
+          <div className="space-y-2">
             <Label htmlFor="favicon-url">{t('labels.faviconUrl')}</Label>
             <Input
               id="favicon-url"
               value={settings.favicon_url}
               onChange={(e) => updateSettings({ favicon_url: e.target.value })}
               placeholder="https://example.com/favicon.ico"
+              disabled={uploading}
             />
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => handleAssetUpload(e, 'favicon_url')}
+              disabled={uploading}
+            />
+            {uploading && <div className="text-sm text-gray-500">Uploading...</div>}
+            {settings.favicon_url && (
+              <img src={settings.favicon_url} alt="Favicon preview" className="mt-2 rounded shadow max-h-10" />
+            )}
           </div>
         </CardContent>
       </Card>

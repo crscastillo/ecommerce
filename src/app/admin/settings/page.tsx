@@ -216,7 +216,9 @@ export default function SettingsPage() {
         font_family: themeConfig.font_family || 'Inter',
         logo_url: tenant.logo_url || '',
         favicon_url: themeConfig.favicon_url || '',
-        custom_css: themeConfig.custom_css || ''
+        custom_css: themeConfig.custom_css || '',
+        hero_background_type: themeConfig.hero_background_type || 'color',
+        hero_background_value: themeConfig.hero_background_value || ''
       })
     } catch (error) {
       console.error('Error loading settings:', error)

@@ -671,6 +671,7 @@ export default function SettingsPage() {
             onSettingsChange={setThemeSettings}
             onSave={saveThemeSettings}
             saving={saving}
+            tenantId={tenant.id}
           />
         </TabsContent>
 

@@ -29,9 +29,11 @@ interface ThemeTabProps {
   onSettingsChange: (settings: ThemeSettings) => void
   onSave: () => Promise<void>
   saving: boolean
+  tenantId: string
 }
 
-export function ThemeTab({ settings, onSettingsChange, onSave, saving }: ThemeTabProps) {
+// Duplicate removed. Only the correct ThemeTab function remains below.
+export function ThemeTab({ settings, onSettingsChange, onSave, saving, tenantId }: ThemeTabProps) {
   async function handleAssetUpload(e: React.ChangeEvent<HTMLInputElement>, field: 'logo_url' | 'favicon_url') {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -39,14 +41,15 @@ export function ThemeTab({ settings, onSettingsChange, onSave, saving }: ThemeTa
     try {
       const { createClient } = await import('@/lib/supabase/client');
       const supabase = createClient();
-      const tenantId = (settings as any).tenant_id || 'public';
-      const filePath = `${field}/${tenantId}/${Date.now()}_${file.name}`;
-      const { data, error } = await supabase.storage.from('public').upload(filePath, file, {
+      const user = await supabase.auth.getUser();
+      const filePath = `${tenantId}/${field}/${Date.now()}_${file.name}`;
+      console.log('[DEBUG] Asset Upload:', { tenantId, userId: user.data?.user?.id, filePath });
+      const { data, error } = await supabase.storage.from('public-assets').upload(filePath, file, {
         cacheControl: '3600',
         upsert: true,
       });
       if (error) throw error;
-      const { data: urlData } = supabase.storage.from('public').getPublicUrl(filePath);
+      const { data: urlData } = supabase.storage.from('public-assets').getPublicUrl(filePath);
       if (urlData?.publicUrl) {
         updateSettings({ [field]: urlData.publicUrl });
       }
@@ -78,16 +81,15 @@ export function ThemeTab({ settings, onSettingsChange, onSave, saving }: ThemeTa
     try {
       const { createClient } = await import('@/lib/supabase/client');
       const supabase = createClient();
-      // Use tenant id from settings or fallback to 'public'
-      const tenantId = (settings as any).tenant_id || 'public';
-      const filePath = `hero-background/${tenantId}/${Date.now()}_${file.name}`;
-      const { data, error } = await supabase.storage.from('public').upload(filePath, file, {
+      const user = await supabase.auth.getUser();
+      const filePath = `${tenantId}/hero-background/${Date.now()}_${file.name}`;
+      console.log('[DEBUG] Hero Image Upload:', { tenantId, userId: user.data?.user?.id, filePath });
+      const { data, error } = await supabase.storage.from('public-assets').upload(filePath, file, {
         cacheControl: '3600',
         upsert: true,
       });
       if (error) throw error;
-      // Get public URL
-      const { data: urlData } = supabase.storage.from('public').getPublicUrl(filePath);
+      const { data: urlData } = supabase.storage.from('public-assets').getPublicUrl(filePath);
       if (urlData?.publicUrl) {
         updateSettings({ hero_background_value: urlData.publicUrl });
       }
@@ -141,23 +143,32 @@ export function ThemeTab({ settings, onSettingsChange, onSave, saving }: ThemeTa
           ) : (
             <div className="space-y-2">
               <Label htmlFor="hero-background-image">Hero Background Image</Label>
-              <Input
-                id="hero-background-image-url"
-                value={heroValue}
-                onChange={(e) => updateSettings({ hero_background_value: e.target.value })}
-                placeholder="https://example.com/hero.jpg"
-                disabled={uploading}
-              />
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageUpload}
-                disabled={uploading}
-              />
-              {uploading && <div className="text-sm text-gray-500">Uploading...</div>}
-              {heroValue && (
-                <img src={heroValue} alt="Hero preview" className="mt-2 rounded shadow max-h-40" />
-              )}
+              <div className="flex items-center space-x-4">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  disabled={uploading}
+                  onClick={() => document.getElementById('hero-bg-file')?.click()}
+                >
+                  {uploading ? (
+                    <span className="flex items-center"><span className="animate-spin mr-2 h-4 w-4 border-b-2 border-white rounded-full"></span>Uploading...</span>
+                  ) : (
+                    'Choose Image'
+                  )}
+                </Button>
+                <input
+                  id="hero-bg-file"
+                  type="file"
+                  accept="image/*"
+                  style={{ display: 'none' }}
+                  onChange={handleImageUpload}
+                  disabled={uploading}
+                />
+                {heroValue && (
+                  <img src={heroValue} alt="Hero preview" className="rounded shadow max-h-20 border" />
+                )}
+              </div>
+              {uploading && <div className="text-sm text-gray-500 mt-2">Uploading image, please wait...</div>}
             </div>
           )}
         </CardContent>
@@ -168,17 +179,24 @@ export function ThemeTab({ settings, onSettingsChange, onSave, saving }: ThemeTa
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="logo-url">{t('labels.logoUrl')}</Label>
-            <Input
-              id="logo-url"
-              value={settings.logo_url}
-              onChange={(e) => updateSettings({ logo_url: e.target.value })}
-              placeholder="https://example.com/logo.png"
+            <Label htmlFor="logo-upload">{t('labels.logoUrl')}</Label>
+            <Button
+              type="button"
+              variant="secondary"
               disabled={uploading}
-            />
+              onClick={() => document.getElementById('logo-file')?.click()}
+            >
+              {uploading ? (
+                <span className="flex items-center"><span className="animate-spin mr-2 h-4 w-4 border-b-2 border-white rounded-full"></span>Uploading...</span>
+              ) : (
+                'Upload Logo'
+              )}
+            </Button>
             <input
+              id="logo-file"
               type="file"
               accept="image/*"
+              style={{ display: 'none' }}
               onChange={(e) => handleAssetUpload(e, 'logo_url')}
               disabled={uploading}
             />
@@ -188,17 +206,24 @@ export function ThemeTab({ settings, onSettingsChange, onSave, saving }: ThemeTa
             )}
           </div>
           <div className="space-y-2">
-            <Label htmlFor="favicon-url">{t('labels.faviconUrl')}</Label>
-            <Input
-              id="favicon-url"
-              value={settings.favicon_url}
-              onChange={(e) => updateSettings({ favicon_url: e.target.value })}
-              placeholder="https://example.com/favicon.ico"
+            <Label htmlFor="favicon-upload">{t('labels.faviconUrl')}</Label>
+            <Button
+              type="button"
+              variant="secondary"
               disabled={uploading}
-            />
+              onClick={() => document.getElementById('favicon-file')?.click()}
+            >
+              {uploading ? (
+                <span className="flex items-center"><span className="animate-spin mr-2 h-4 w-4 border-b-2 border-white rounded-full"></span>Uploading...</span>
+              ) : (
+                'Upload Favicon'
+              )}
+            </Button>
             <input
+              id="favicon-file"
               type="file"
               accept="image/*"
+              style={{ display: 'none' }}
               onChange={(e) => handleAssetUpload(e, 'favicon_url')}
               disabled={uploading}
             />

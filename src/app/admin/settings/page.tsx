@@ -152,7 +152,6 @@ export default function SettingsPage() {
     accent_color: '#10B981',
     background_color: '#FFFFFF',
     text_color: '#111827',
-    font_family: 'Inter',
     logo_url: '',
     favicon_url: '',
     custom_css: ''
@@ -217,7 +216,6 @@ export default function SettingsPage() {
         accent_color: themeConfig.accent_color || '#10B981',
         background_color: themeConfig.background_color || '#FFFFFF',
         text_color: themeConfig.text_color || '#111827',
-        font_family: themeConfig.font_family || 'Inter',
         logo_url: tenant.logo_url || '',
         favicon_url: themeConfig.favicon_url || '',
         custom_css: themeConfig.custom_css || '',
@@ -361,7 +359,6 @@ export default function SettingsPage() {
             accent_color: themeSettings.accent_color,
             background_color: themeSettings.background_color,
             text_color: themeSettings.text_color,
-            font_family: themeSettings.font_family,
             favicon_url: themeSettings.favicon_url,
             custom_css: themeSettings.custom_css,
             hero_background_type: themeSettings.hero_background_type,

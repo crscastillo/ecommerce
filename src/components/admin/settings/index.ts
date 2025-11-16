@@ -31,7 +31,6 @@ export interface ThemeSettings {
   accent_color: string
   background_color: string
   text_color: string
-  font_family: string
   logo_url: string
   favicon_url: string
   custom_css: string

@@ -15,7 +15,6 @@ interface ThemeSettings {
   accent_color: string
   background_color: string
   text_color: string
-  font_family: string
   logo_url: string
   favicon_url: string
   custom_css: string
@@ -320,24 +319,6 @@ export function ThemeTab({ settings, onSettingsChange, onSave, saving }: ThemeTa
             </Button>
             <input id="favicon-file" type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => handleAssetUpload(e, 'favicon_url')} disabled={uploadingFavicon} />
             {settings.favicon_url && <img src={settings.favicon_url} alt="Favicon preview" className="mt-2 rounded shadow max-h-10" />}
-          </div>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader><CardTitle>{t('sections.typography')}</CardTitle></CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <Label htmlFor="font-family">{t('labels.fontFamily')}</Label>
-            <Select value={settings.font_family} onValueChange={(value) => updateSettings({ font_family: value })}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Inter">Inter</SelectItem>
-                <SelectItem value="Roboto">Roboto</SelectItem>
-                <SelectItem value="Open Sans">Open Sans</SelectItem>
-                <SelectItem value="Poppins">Poppins</SelectItem>
-                <SelectItem value="Lato">Lato</SelectItem>
-              </SelectContent>
-            </Select>
           </div>
         </CardContent>
       </Card>

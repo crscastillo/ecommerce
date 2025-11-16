@@ -102,7 +102,12 @@ export default function ProductsPage() {
         }
 
         if (productsResult.data) {
-          setProducts(productsResult.data)
+          // Featured products first
+          const sorted = [...productsResult.data].sort((a, b) => {
+            if (a.is_featured === b.is_featured) return 0
+            return a.is_featured ? -1 : 1
+          })
+          setProducts(sorted)
         } else {
           console.error('Error loading products:', productsResult.error)
         }

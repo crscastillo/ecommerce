@@ -220,19 +220,6 @@ export function ProductCard({ product, viewMode = 'grid', tenantSettings = {} }:
                   -{discountPercentage}%
                 </Badge>
               )}
-              {isOutOfStock && (
-                <Badge variant="secondary" className="text-xs">
-                  {t('product.outOfStock')}
-                </Badge>
-              )}
-              {lowStockBadge.show && lowStockBadge.translationKey && (
-                <Badge 
-                  variant={lowStockBadge.variant === 'destructive' ? 'destructive' : 'outline'} 
-                  className={`text-xs ${lowStockBadge.variant === 'warning' ? 'border-orange-500 text-orange-600' : ''}`}
-                >
-                  {t(lowStockBadge.translationKey, lowStockBadge.translationParams)}
-                </Badge>
-              )}
             </div>
 
             {/* Wishlist */}
@@ -356,9 +343,9 @@ export function ProductCard({ product, viewMode = 'grid', tenantSettings = {} }:
 
   // Grid view
   return (
-    <Card className="group overflow-hidden hover:shadow-lg transition-all duration-300">
+    <Card className="group overflow-hidden hover:shadow-lg transition-all duration-300 flex flex-col h-full">
       {/* Image */}
-      <div className="aspect-square relative bg-gray-100 overflow-hidden">
+      <div className="aspect-square relative bg-gray-100 overflow-hidden flex-shrink-0">
         {!imageError ? (
           <Image
             src={getImageUrl()}
@@ -383,19 +370,6 @@ export function ProductCard({ product, viewMode = 'grid', tenantSettings = {} }:
           {discountPercentage > 0 && (
             <Badge variant="destructive" className="text-xs">
               -{discountPercentage}%
-            </Badge>
-          )}
-          {isOutOfStock && (
-            <Badge variant="secondary" className="text-xs">
-              {t('product.outOfStock')}
-            </Badge>
-          )}
-          {lowStockBadge.show && (
-            <Badge 
-              variant={lowStockBadge.variant === 'destructive' ? 'destructive' : 'outline'} 
-              className={`text-xs ${lowStockBadge.variant === 'warning' ? 'border-orange-500 text-orange-600' : ''}`}
-            >
-              {lowStockBadge.translationKey ? t(lowStockBadge.translationKey, lowStockBadge.translationParams) : ''}
             </Badge>
           )}
         </div>
@@ -424,91 +398,96 @@ export function ProductCard({ product, viewMode = 'grid', tenantSettings = {} }:
       </div>
 
       {/* Content */}
-      <CardContent className="p-4">
-        <Link 
-          href={`/products/${product.slug}`}
-          className="hover:underline"
-        >
-          <h3 className="font-semibold text-gray-900 mb-1 line-clamp-2">
-            {product.name}
-          </h3>
-        </Link>
-        
-        <div className="space-y-1">
-          {product.brand && (
-            <div className="text-sm">
-              <span className="text-gray-500">{t('product.by')} </span>
+      <CardContent className="p-4 flex flex-col h-full">
+        <div className="flex-1">
+          <Link 
+            href={`/products/${product.slug}`}
+            className="hover:underline"
+          >
+            <h3 className="font-semibold text-gray-900 mb-1 line-clamp-2">
+              {product.name}
+            </h3>
+          </Link>
+          
+          <div className="space-y-1">
+            {product.brand && (
+              <div className="text-sm">
+                <span className="text-gray-500">{t('product.by')} </span>
+                <Link 
+                  href={`/brands/${product.brand.slug}`}
+                  className="font-medium text-blue-600 hover:text-blue-800"
+                >
+                  {product.brand.name}
+                </Link>
+              </div>
+            )}
+            
+            {product.category && (
               <Link 
-                href={`/brands/${product.brand.slug}`}
-                className="font-medium text-blue-600 hover:text-blue-800"
+                href={`/products/category/${product.category.slug}`}
+                className="text-sm text-gray-600 hover:text-gray-900 block"
               >
-                {product.brand.name}
+                {product.category.name}
               </Link>
+            )}
+          </div>
+
+          {product.short_description && (
+            <p className="text-gray-600 text-sm mt-2 line-clamp-2">
+              {product.short_description}
+            </p>
+          )}
+
+          {/* Tags */}
+          {product.tags && product.tags.length > 0 && (
+            <div className="flex flex-wrap gap-1 mt-2">
+              {product.tags.slice(0, 2).map((tag) => (
+                <Badge key={tag} variant="outline" className="text-xs">
+                  {tag}
+                </Badge>
+              ))}
+              {product.tags.length > 2 && (
+                <Badge variant="outline" className="text-xs">
+                  +{product.tags.length - 2}
+                </Badge>
+              )}
             </div>
           )}
-          
-          {product.category && (
-            <Link 
-              href={`/products/category/${product.category.slug}`}
-              className="text-sm text-gray-600 hover:text-gray-900 block"
-            >
-              {product.category.name}
-            </Link>
-          )}
         </div>
 
-        {product.short_description && (
-          <p className="text-gray-600 text-sm mt-2 line-clamp-2">
-            {product.short_description}
-          </p>
-        )}
+        {/* Price and Stock - Always at bottom */}
+        <div className="mt-auto pt-3 space-y-2">
+          {/* Price */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              {priceRange && priceRange.hasRange ? (
+                <span className="text-lg font-bold text-gray-900">
+                  {formatPrice(priceRange.minPrice, tenant)} - {formatPrice(priceRange.maxPrice, tenant)}
+                </span>
+              ) : (
+                <span className="text-lg font-bold text-gray-900">
+                  {formatPrice(currentPrice, tenant)}
+                </span>
+              )}
+              {currentComparePrice && currentComparePrice > currentPrice && (
+                <span className="text-sm text-gray-500 line-through">
+                  {formatPrice(currentComparePrice, tenant)}
+                </span>
+              )}
+            </div>
+          </div>
 
-        {/* Price */}
-        <div className="flex items-center justify-between mt-3">
-          <div className="flex items-center gap-2">
-            {priceRange && priceRange.hasRange ? (
-              <span className="text-lg font-bold text-gray-900">
-                {formatPrice(priceRange.minPrice, tenant)} - {formatPrice(priceRange.maxPrice, tenant)}
-              </span>
+          {/* Stock status */}
+          <div className="text-sm">
+            {isOutOfStock ? (
+              <span className="text-red-600">{t('product.outOfStock')}</span>
+            ) : lowStockBadge.show ? (
+              <span className="text-orange-600">{lowStockBadge.translationKey ? t(lowStockBadge.translationKey, lowStockBadge.translationParams) : ''}</span>
             ) : (
-              <span className="text-lg font-bold text-gray-900">
-                {formatPrice(currentPrice, tenant)}
-              </span>
-            )}
-            {currentComparePrice && currentComparePrice > currentPrice && (
-              <span className="text-sm text-gray-500 line-through">
-                {formatPrice(currentComparePrice, tenant)}
-              </span>
+              <span className="text-green-600">{t('product.inStock')}</span>
             )}
           </div>
         </div>
-
-        {/* Stock status */}
-        <div className="mt-2 text-sm">
-          {isOutOfStock ? (
-            <span className="text-red-600">{t('product.outOfStock')}</span>
-          ) : lowStockBadge.show ? (
-            <span className="text-orange-600">{lowStockBadge.translationKey ? t(lowStockBadge.translationKey, lowStockBadge.translationParams) : ''}</span>
-          ) : (
-            <span className="text-green-600">{t('product.inStock')}</span>
-          )}
-        </div>
-
-        {/* Tags */}
-        {product.tags && product.tags.length > 0 && (
-          <div className="flex flex-wrap gap-1 mt-2">
-            {product.tags.slice(0, 2).map((tag) => (
-              <Badge key={tag} variant="outline" className="text-xs">
-                {tag}
-              </Badge>
-            ))}
-            {product.tags.length > 2 && (
-              <Badge variant="outline" className="text-xs">
-                +{product.tags.length - 2}
-              </Badge>
-            )}
-          </div>
-        )}
       </CardContent>
     </Card>
   )

@@ -102,9 +102,6 @@ export default function ProductViewPage() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
-  const [mode, setMode] = useState<'view' | 'edit'>(
-    searchParams.get('mode') === 'edit' ? 'edit' : 'view'
-  )
 
   // Form state for editing
   const [formData, setFormData] = useState({
@@ -321,8 +318,8 @@ export default function ProductViewPage() {
       [field]: value
     }))
 
-    // Auto-generate slug when name changes (only in edit mode and if slug hasn't been manually edited)
-    if (field === 'name' && mode === 'edit' && !slugManuallyEdited) {
+    // Auto-generate slug when name changes (only if slug hasn't been manually edited)
+    if (field === 'name' && !slugManuallyEdited) {
       setFormData(prev => ({
         ...prev,
         slug: generateSlug(value)
@@ -611,7 +608,6 @@ export default function ProductViewPage() {
       }
 
       setSuccess(true)
-      setMode('view')
       
       // Reload product data
       const { data: updatedProduct } = await tenantDb.getProduct(productId)
@@ -707,63 +703,31 @@ export default function ProductViewPage() {
           <div>
             <h1 className="text-3xl font-bold tracking-tight">{product.name}</h1>
             <p className="text-muted-foreground">
-              {mode === 'view' ? 'View product details' : 'Edit product details'}
+              Edit product details
             </p>
           </div>
         </div>
         
         <div className="flex items-center gap-2">
-          {mode === 'view' ? (
-            <>
-              <Button 
-                variant="outline" 
-                asChild
-              >
-                <Link href={`/products/${product.slug}`} target="_blank">
-                  <Eye className="mr-2 h-4 w-4" />
-                  View in Store
-                </Link>
-              </Button>
-              <Button 
-                variant="outline" 
-                onClick={() => setMode('edit')}
-              >
-                <Edit className="mr-2 h-4 w-4" />
-                Edit
-              </Button>
-              <Button 
-                variant="outline"
-                onClick={handleDeleteClick}
-                disabled={saving}
-              >
-                <Trash2 className="mr-2 h-4 w-4" />
-                Delete
-              </Button>
-            </>
-          ) : (
-            <>
-              <Button 
-                variant="outline" 
-                onClick={() => {
-                  setMode('view')
-                  setError('')
-                }}
-              >
-                Cancel
-              </Button>
-              <Button 
-                onClick={handleSave}
-                disabled={saving}
-              >
-                {saving ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <Save className="mr-2 h-4 w-4" />
-                )}
-                Save Changes
-              </Button>
-            </>
-          )}
+          <Button 
+            onClick={handleSave}
+            disabled={saving}
+          >
+            {saving ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Save className="mr-2 h-4 w-4" />
+            )}
+            Save Changes
+          </Button>
+          <Button 
+            variant="outline"
+            onClick={handleDeleteClick}
+            disabled={saving}
+          >
+            <Trash2 className="mr-2 h-4 w-4" />
+            Delete
+          </Button>
         </div>
       </div>
 
@@ -804,34 +768,21 @@ export default function ProductViewPage() {
             <CardContent className="space-y-4">
               <div>
                 <Label htmlFor="product_type">Product Type *</Label>
-                {mode === 'view' ? (
-                  <div className="mt-1">
-                    <Badge variant={
-                      product.product_type === 'single' ? 'default' : 
-                      product.product_type === 'variable' ? 'secondary' : 
-                      'outline'
-                    }>
-                      {product.product_type === 'single' && '📦 Single Product'}
-                      {product.product_type === 'variable' && '🔀 Variable Product'}
-                      {product.product_type === 'digital' && '💾 Digital Product'}
-                    </Badge>
-                  </div>
-                ) : (
-                  <Select
-                    value={formData.product_type}
-                    onValueChange={(value) => handleInputChange('product_type', value)}
-                  >
-                    <SelectTrigger id="product_type">
-                      <SelectValue placeholder="Select product type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="single">
-                        <div className="flex items-center gap-2">
-                          <span>📦</span>
-                          <div>
-                            <div className="font-medium">Single Product</div>
-                            <div className="text-xs text-gray-500">Standard product with one variant</div>
-                          </div>
+                <Select
+                  value={formData.product_type}
+                  onValueChange={(value) => handleInputChange('product_type', value)}
+                >
+                  <SelectTrigger id="product_type">
+                    <SelectValue placeholder="Select product type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="single">
+                      <div className="flex items-center gap-2">
+                        <span>📦</span>
+                        <div>
+                          <div className="font-medium">Single Product</div>
+                          <div className="text-xs text-gray-500">Standard product with one variant</div>
+                        </div>
                         </div>
                       </SelectItem>
                       <SelectItem value="variable">
@@ -854,66 +805,49 @@ export default function ProductViewPage() {
                       </SelectItem>
                     </SelectContent>
                   </Select>
-                )}
               </div>
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
                   <Label htmlFor="name">Product Name *</Label>
-                  {mode === 'view' ? (
-                    <p className="mt-1 text-sm">{product.name}</p>
-                  ) : (
-                    <Input
-                      id="name"
-                      value={formData.name}
-                      onChange={(e) => handleInputChange('name', e.target.value)}
+                  <Input
+                    id="name"
+                    value={formData.name}
+                    onChange={(e) => handleInputChange('name', e.target.value)}
                       placeholder="Enter product name"
                     />
-                  )}
                 </div>
                 <div>
                   <Label htmlFor="slug">URL Slug *</Label>
-                  {mode === 'view' ? (
-                    <p className="mt-1 text-sm font-mono">{product.slug}</p>
-                  ) : (
-                    <Input
-                      id="slug"
-                      value={formData.slug}
-                      onChange={(e) => handleInputChange('slug', e.target.value)}
-                      placeholder="product-url-slug"
-                    />
-                  )}
+                  <Input
+                    id="slug"
+                    value={formData.slug}
+                    onChange={(e) => handleInputChange('slug', e.target.value)}
+                    placeholder="product-url-slug"
+                  />
                 </div>
               </div>
 
               <div>
                 <Label htmlFor="description">Description</Label>
-                {mode === 'view' ? (
-                  <p className="mt-1 text-sm whitespace-pre-wrap">{product.description || 'No description'}</p>
-                ) : (
-                  <Textarea
-                    id="description"
-                    value={formData.description}
-                    onChange={(e) => handleInputChange('description', e.target.value)}
-                    placeholder="Enter product description"
+                <Textarea
+                  id="description"
+                  value={formData.description}
+                  onChange={(e) => handleInputChange('description', e.target.value)}
+                  placeholder="Enter product description"
                     rows={4}
                   />
-                )}
               </div>
 
               <div>
                 <Label htmlFor="short_description">Short Description</Label>
-                {mode === 'view' ? (
-                  <p className="mt-1 text-sm">{product.short_description || 'No short description'}</p>
-                ) : (
-                  <Textarea
-                    id="short_description"
-                    value={formData.short_description}
-                    onChange={(e) => handleInputChange('short_description', e.target.value)}
-                    placeholder="Brief product summary"
-                    rows={2}
-                  />
-                )}
+                <Textarea
+                  id="short_description"
+                  value={formData.short_description}
+                  onChange={(e) => handleInputChange('short_description', e.target.value)}
+                  placeholder="Brief product summary"
+                  rows={2}
+                />
               </div>
             </CardContent>
           </Card>
@@ -931,51 +865,39 @@ export default function ProductViewPage() {
               <div className="grid gap-4 sm:grid-cols-3">
                 <div>
                   <Label htmlFor="price">Price *</Label>
-                  {mode === 'view' ? (
-                    <p className="mt-1 text-sm font-semibold">{formatPrice(product.price, tenant)}</p>
-                  ) : (
-                    <Input
-                      id="price"
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      value={formData.price}
-                      onChange={(e) => handleInputChange('price', e.target.value)}
-                      placeholder="0.00"
-                    />
-                  )}
+                  <Input
+                    id="price"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={formData.price}
+                    onChange={(e) => handleInputChange('price', e.target.value)}
+                    placeholder="0.00"
+                  />
                 </div>
                 <div>
                   <Label htmlFor="compare_price">Compare Price</Label>
-                  {mode === 'view' ? (
-                    <p className="mt-1 text-sm">{product.compare_price ? formatPrice(product.compare_price, tenant) : 'Not set'}</p>
-                  ) : (
-                    <Input
-                      id="compare_price"
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      value={formData.compare_price}
-                      onChange={(e) => handleInputChange('compare_price', e.target.value)}
-                      placeholder="0.00"
-                    />
-                  )}
+                  <Input
+                    id="compare_price"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={formData.compare_price}
+                    onChange={(e) => handleInputChange('compare_price', e.target.value)}
+                    placeholder="0.00"
+                  />
                 </div>
                 <div>
                   <Label htmlFor="cost_price">Cost per Item</Label>
-                  {mode === 'view' ? (
-                    <p className="mt-1 text-sm">{product.cost_price ? formatPrice(product.cost_price, tenant) : 'Not set'}</p>
-                  ) : (
-                    <Input
-                      id="cost_price"
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      value={formData.cost_price}
-                      onChange={(e) => handleInputChange('cost_price', e.target.value)}
-                      placeholder="0.00"
-                    />
-                  )}
+                  <Input
+                    id="cost_price"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={formData.cost_price}
+                    onChange={(e) => handleInputChange('cost_price', e.target.value)}
+                    placeholder="0.00"
+                  />
                 </div>
               </div>
             </CardContent>
@@ -983,7 +905,7 @@ export default function ProductViewPage() {
           )}
 
           {/* Variations Display (for variable products in view mode) */}
-          {formData.product_type === 'variable' && mode === 'view' && variations.length > 0 && (
+          {formData.product_type === 'variable' && false && variations.length > 0 && (
             <Card>
               <CardHeader>
                 <CardTitle>Product Variations</CardTitle>
@@ -1032,7 +954,7 @@ export default function ProductViewPage() {
           )}
 
           {/* Variations (for variable products) */}
-          {formData.product_type === 'variable' && mode === 'edit' && (
+          {formData.product_type === 'variable' && true && (
             <Card>
               <CardHeader>
                 <CardTitle>Product Variations</CardTitle>
@@ -1307,55 +1229,22 @@ export default function ProductViewPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                {mode === 'view' ? (
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">Track quantity:</span>
-                      <Badge variant={product.track_inventory ? "default" : "secondary"}>
-                        {product.track_inventory ? "Yes" : "No"}
-                      </Badge>
-                    </div>
-                    {product.track_inventory && (
-                      <>
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm">Quantity:</span>
-                          <span className="text-sm font-medium">{product.inventory_quantity}</span>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm">Allow backorder:</span>
-                          <Badge variant={product.allow_backorder ? "default" : "secondary"}>
-                            {product.allow_backorder ? "Yes" : "No"}
-                          </Badge>
-                        </div>
-                      </>
-                    )}
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">SKU:</span>
-                      <span className="text-sm font-mono">{product.sku || 'Not set'}</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">Weight:</span>
-                      <span className="text-sm">{product.weight ? `${product.weight} lbs` : 'Not set'}</span>
-                    </div>
-                  </div>
-                ) : (
-                  <>
-                    <div className="flex items-center space-x-2">
-                      <Switch
-                        id="track_inventory"
-                        checked={formData.track_inventory}
-                        onCheckedChange={(checked: any) => handleInputChange('track_inventory', checked)}
-                      />
-                      <Label htmlFor="track_inventory">Track quantity</Label>
-                    </div>
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="track_inventory"
+                    checked={formData.track_inventory}
+                    onCheckedChange={(checked: any) => handleInputChange('track_inventory', checked)}
+                  />
+                  <Label htmlFor="track_inventory">Track quantity</Label>
+                </div>
 
-                    {formData.track_inventory && (
-                      <div className="grid gap-4 sm:grid-cols-2">
-                        <div>
-                          <Label htmlFor="inventory_quantity">Quantity</Label>
-                          <Input
-                            id="inventory_quantity"
-                            type="number"
+                {formData.track_inventory && (
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div>
+                      <Label htmlFor="inventory_quantity">Quantity</Label>
+                      <Input
+                        id="inventory_quantity"
+                        type="number"
                             min="0"
                             value={formData.inventory_quantity}
                             onChange={(e) => handleInputChange('inventory_quantity', e.target.value)}
@@ -1396,8 +1285,6 @@ export default function ProductViewPage() {
                         />
                       </div>
                     </div>
-                  </>
-                )}
               </CardContent>
             </Card>
           )}
@@ -1407,95 +1294,55 @@ export default function ProductViewPage() {
             <CardHeader>
               <CardTitle>Product Images</CardTitle>
               <CardDescription>
-                {mode === 'view' ? 'Product image gallery' : 'Upload and manage product images'}
+                Upload and manage product images
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {mode === 'view' ? (
-                productImages.length > 0 ? (
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    {productImages.map((imageUrl, index) => (
-                      <div key={imageUrl || index} className="relative">
-                        <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden">
-                          {imageUrl ? (
-                            <Image
-                              src={imageUrl}
-                              alt={`${product.name} image ${index + 1}`}
-                              fill
-                              className="object-cover"
-                              unoptimized={isSupabaseStorageUrl(imageUrl)}
-                              onError={(e) => {
-                                console.error('Failed to load image:', imageUrl)
-                                const target = e.currentTarget as HTMLImageElement
-                                target.src = createImagePlaceholder(`${index + 1}`)
-                              }}
-                            />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center text-gray-400">
-                              <Package className="w-6 h-6" />
-                            </div>
-                          )}
-                          {index === 0 && (
-                            <Badge className="absolute top-2 left-2 text-xs">
-                              Main
-                            </Badge>
-                          )}
-                        </div>
-                        <p className="text-xs text-gray-500 mt-1 text-center">
-                          Image {index + 1}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-gray-500 text-sm">No images uploaded</p>
-                )
-              ) : (
-                <div className="space-y-4">
-                  {/* Upload Area */}
-                  <div 
-                    className="border-2 border-dashed border-gray-300 hover:border-gray-400 rounded-lg p-6 text-center transition-colors"
-                    onDrop={(e) => {
-                      e.preventDefault()
-                      const files = e.dataTransfer.files
-                      if (files && files.length > 0) {
-                        const fileInput = document.createElement('input')
-                        fileInput.type = 'file'
-                        fileInput.multiple = true
-                        fileInput.accept = 'image/*'
-                        fileInput.files = files
-                        fileInput.dispatchEvent(new Event('change'))
-                      }
-                    }}
-                    onDragOver={(e) => e.preventDefault()}
-                  >
-                    <Package className="h-12 w-12 mx-auto text-gray-400 mb-4" />
-                    <p className="text-lg font-medium text-gray-600 mb-2">Drop images here</p>
-                    <p className="text-sm text-gray-500 mb-4">or click to browse files</p>
-                    <Button 
-                      type="button" 
-                      variant="outline"
-                      disabled={saving}
-                      onClick={() => {
-                        const input = document.createElement('input')
-                        input.type = 'file'
-                        input.multiple = true
-                        input.accept = 'image/*'
-                        input.onchange = (e) => {
-                          const target = e.target as HTMLInputElement
-                          if (target.files) {
-                            // Process files similar to ImageUpload component
-                            Array.from(target.files).forEach(async (file) => {
-                              const reader = new FileReader()
-                              reader.onload = (e) => {
-                                if (e.target?.result) {
-                                  setProductImages(prev => [...prev, e.target!.result as string])
-                                }
+              <div className="space-y-4">
+                {/* Upload Area */}
+                <div 
+                  className="border-2 border-dashed border-gray-300 hover:border-gray-400 rounded-lg p-6 text-center transition-colors"
+                  onDrop={(e) => {
+                    e.preventDefault()
+                    const files = e.dataTransfer.files
+                    if (files && files.length > 0) {
+                      const fileInput = document.createElement('input')
+                      fileInput.type = 'file'
+                      fileInput.multiple = true
+                      fileInput.accept = 'image/*'
+                      fileInput.files = files
+                      fileInput.dispatchEvent(new Event('change'))
+                    }
+                  }}
+                  onDragOver={(e) => e.preventDefault()}
+                >
+                  <Package className="h-12 w-12 mx-auto text-gray-400 mb-4" />
+                  <p className="text-lg font-medium text-gray-600 mb-2">Drop images here</p>
+                  <p className="text-sm text-gray-500 mb-4">or click to browse files</p>
+                  <Button 
+                    type="button" 
+                    variant="outline"
+                    disabled={saving}
+                    onClick={() => {
+                      const input = document.createElement('input')
+                      input.type = 'file'
+                      input.multiple = true
+                      input.accept = 'image/*'
+                      input.onchange = (e) => {
+                        const target = e.target as HTMLInputElement
+                        if (target.files) {
+                          // Process files similar to ImageUpload component
+                          Array.from(target.files).forEach(async (file) => {
+                            const reader = new FileReader()
+                            reader.onload = (e) => {
+                              if (e.target?.result) {
+                                setProductImages(prev => [...prev, e.target!.result as string])
                               }
-                              reader.readAsDataURL(file)
-                            })
-                          }
+                            }
+                            reader.readAsDataURL(file)
+                          })
                         }
+                      }
                         input.click()
                       }}
                     >
@@ -1566,7 +1413,6 @@ export default function ProductViewPage() {
                     {productImages.length} of 10 images uploaded
                   </div>
                 </div>
-              )}
             </CardContent>
           </Card>
 
@@ -1580,41 +1426,22 @@ export default function ProductViewPage() {
               <CardTitle>Status</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {mode === 'view' ? (
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm">Status:</span>
-                    <Badge variant={product.is_active ? "default" : "secondary"}>
-                      {product.is_active ? "Active" : "Inactive"}
-                    </Badge>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm">Featured:</span>
-                    <Badge variant={product.is_featured ? "default" : "secondary"}>
-                      {product.is_featured ? "Yes" : "No"}
-                    </Badge>
-                  </div>
-                </div>
-              ) : (
-                <>
-                  <div className="flex items-center space-x-2">
-                    <Switch
-                      id="is_active"
-                      checked={formData.is_active}
-                      onCheckedChange={(checked: any) => handleInputChange('is_active', checked)}
-                    />
-                    <Label htmlFor="is_active">Product is active</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Switch
-                      id="is_featured"
-                      checked={formData.is_featured}
-                      onCheckedChange={(checked: any) => handleInputChange('is_featured', checked)}
-                    />
-                    <Label htmlFor="is_featured">Featured product</Label>
-                  </div>
-                </>
-              )}
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="is_active"
+                  checked={formData.is_active}
+                  onCheckedChange={(checked: any) => handleInputChange('is_active', checked)}
+                />
+                <Label htmlFor="is_active">Product is active</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="is_featured"
+                  checked={formData.is_featured}
+                  onCheckedChange={(checked: any) => handleInputChange('is_featured', checked)}
+                />
+                <Label htmlFor="is_featured">Featured product</Label>
+              </div>
             </CardContent>
           </Card>
 
@@ -1627,43 +1454,32 @@ export default function ProductViewPage() {
               {/* Category */}
               <div>
                 <Label className="text-sm font-medium">Category</Label>
-                {mode === 'view' ? (
-                  <p className="text-sm mt-1">
-                    {categories.find(c => c.id === product.category_id)?.name || 'No category assigned'}
-                  </p>
-                ) : (
-                  <Select
-                    value={formData.category_id}
-                    onValueChange={(value) => handleInputChange('category_id', value)}
-                  >
-                    <SelectTrigger className="mt-1">
-                      <SelectValue placeholder="Select category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="none">No category</SelectItem>
-                      {categories.map((category) => (
-                        <SelectItem key={category.id} value={category.id}>
-                          {category.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
+                <Select
+                  value={formData.category_id}
+                  onValueChange={(value) => handleInputChange('category_id', value)}
+                >
+                  <SelectTrigger className="mt-1">
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">No category</SelectItem>
+                    {categories.map((category) => (
+                      <SelectItem key={category.id} value={category.id}>
+                        {category.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               {/* Brand */}
               <div>
                 <Label className="text-sm font-medium">Brand</Label>
-                {mode === 'view' ? (
-                  <p className="text-sm mt-1">
-                    {brands.find(b => b.id === product.brand_id)?.name || 'No brand assigned'}
-                  </p>
-                ) : (
-                  <Select
-                    value={formData.brand_id}
-                    onValueChange={(value) => handleInputChange('brand_id', value)}
-                  >
-                    <SelectTrigger className="mt-1">
+                <Select
+                  value={formData.brand_id}
+                  onValueChange={(value) => handleInputChange('brand_id', value)}
+                >
+                  <SelectTrigger className="mt-1">
                       <SelectValue placeholder="Select brand" />
                     </SelectTrigger>
                     <SelectContent>
@@ -1675,7 +1491,6 @@ export default function ProductViewPage() {
                       ))}
                     </SelectContent>
                   </Select>
-                )}
               </div>
             </CardContent>
           </Card>
@@ -1712,32 +1527,24 @@ export default function ProductViewPage() {
             <CardContent className="space-y-4">
               <div>
                 <Label htmlFor="seo_title" className="text-sm">SEO Title</Label>
-                {mode === 'view' ? (
-                  <p className="mt-1 text-sm text-muted-foreground">{product.seo_title || 'Not set'}</p>
-                ) : (
-                  <Input
-                    id="seo_title"
-                    value={formData.seo_title}
-                    onChange={(e) => handleInputChange('seo_title', e.target.value)}
-                    placeholder="SEO optimized title"
-                    className="mt-1"
-                  />
-                )}
+                <Input
+                  id="seo_title"
+                  value={formData.seo_title}
+                  onChange={(e) => handleInputChange('seo_title', e.target.value)}
+                  placeholder="SEO optimized title"
+                  className="mt-1"
+                />
               </div>
               <div>
                 <Label htmlFor="seo_description" className="text-sm">SEO Description</Label>
-                {mode === 'view' ? (
-                  <p className="mt-1 text-sm text-muted-foreground">{product.seo_description || 'Not set'}</p>
-                ) : (
-                  <Textarea
-                    id="seo_description"
-                    value={formData.seo_description}
-                    onChange={(e) => handleInputChange('seo_description', e.target.value)}
-                    placeholder="SEO meta description"
-                    rows={3}
-                    className="mt-1"
-                  />
-                )}
+                <Textarea
+                  id="seo_description"
+                  value={formData.seo_description}
+                  onChange={(e) => handleInputChange('seo_description', e.target.value)}
+                  placeholder="SEO meta description"
+                  rows={3}
+                  className="mt-1"
+                />
               </div>
             </CardContent>
           </Card>

@@ -122,12 +122,6 @@ export function ProductMobileCard({
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-[140px]">
                       <DropdownMenuItem asChild>
-                        <Link href={`/admin/products/${product.id}`} className="text-xs">
-                          <Eye className="mr-2 h-3 w-3" />
-                          View
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
                         <Link href={`/products/${product.slug}`} target="_blank" className="text-xs">
                           <Eye className="mr-2 h-3 w-3" />
                           Preview

@@ -185,12 +185,6 @@ export function ProductTable({
                           View in Store
                         </Link>
                       </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link href={`/admin/products/${product.id}`}>
-                          <Eye className="mr-2 h-4 w-4" />
-                          View
-                        </Link>
-                      </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => onEdit(product.id)}>
                         <Edit className="mr-2 h-4 w-4" />
                         Edit

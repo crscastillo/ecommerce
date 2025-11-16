@@ -41,7 +41,7 @@ export default function ProductsPage() {
 
   // Event handlers
   const handleEdit = (productId: string) => {
-    router.push(`/admin/products/${productId}?mode=edit`)
+    router.push(`/admin/products/${productId}`)
   }
 
   const handleDelete = async (product: ProductWithVariants) => {

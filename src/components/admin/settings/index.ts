@@ -37,6 +37,8 @@ export interface ThemeSettings {
   custom_css: string
   hero_background_type?: 'color' | 'image'
   hero_background_value?: string
+  admin_theme?: string
+  store_theme?: string
 }
 
 export interface PaymentSettings {

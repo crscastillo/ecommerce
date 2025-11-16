@@ -145,6 +145,8 @@ export default function SettingsPage() {
   })
 
   const [themeSettings, setThemeSettings] = useState<ThemeSettings>({
+    admin_theme: 'default',
+    store_theme: 'default',
     primary_color: '#3B82F6',
     secondary_color: '#6B7280',
     accent_color: '#10B981',
@@ -208,6 +210,8 @@ export default function SettingsPage() {
       // Load theme settings from tenant.theme_config
       const themeConfig = (tenant.theme_config as any) || {}
       setThemeSettings({
+        admin_theme: themeConfig.admin_theme || 'default',
+        store_theme: themeConfig.store_theme || 'default',
         primary_color: themeConfig.primary_color || '#3B82F6',
         secondary_color: themeConfig.secondary_color || '#6B7280',
         accent_color: themeConfig.accent_color || '#10B981',
@@ -350,6 +354,8 @@ export default function SettingsPage() {
         .update({
           logo_url: themeSettings.logo_url,
           theme_config: {
+            admin_theme: themeSettings.admin_theme,
+            store_theme: themeSettings.store_theme,
             primary_color: themeSettings.primary_color,
             secondary_color: themeSettings.secondary_color,
             accent_color: themeSettings.accent_color,

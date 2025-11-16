@@ -8,6 +8,7 @@ import { ToastProvider } from "@/lib/contexts/toast-context";
 import { IntlProvider } from "@/lib/providers/intl-provider";
 import { PublicLanguageProvider } from "@/lib/contexts/public-language-context";
 import { PublicIntlProvider } from "@/lib/providers/public-intl-provider";
+import { ThemeProvider } from "@/lib/providers/theme-provider";
 import { platformConfig } from "@/lib/config/platform";
 
 const geistSans = Geist({
@@ -42,19 +43,21 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <TenantProvider>
-          <PublicLanguageProvider>
-            <PublicIntlProvider>
-              <IntlProvider>
-                <ToastProvider>
-                  <CartProvider>
-                    <ConditionalLayout>
-                      {children}
-                    </ConditionalLayout>
-                  </CartProvider>
-                </ToastProvider>
-              </IntlProvider>
-            </PublicIntlProvider>
-          </PublicLanguageProvider>
+          <ThemeProvider>
+            <PublicLanguageProvider>
+              <PublicIntlProvider>
+                <IntlProvider>
+                  <ToastProvider>
+                    <CartProvider>
+                      <ConditionalLayout>
+                        {children}
+                      </ConditionalLayout>
+                    </CartProvider>
+                  </ToastProvider>
+                </IntlProvider>
+              </PublicIntlProvider>
+            </PublicLanguageProvider>
+          </ThemeProvider>
         </TenantProvider>
       </body>
     </html>

@@ -34,15 +34,19 @@ interface ThemeTabProps {
 
 // Duplicate removed. Only the correct ThemeTab function remains below.
 export function ThemeTab({ settings, onSettingsChange, onSave, saving, tenantId }: ThemeTabProps) {
+  const [uploadingLogo, setUploadingLogo] = React.useState(false);
+  const [uploadingFavicon, setUploadingFavicon] = React.useState(false);
+  const [uploadingHero, setUploadingHero] = React.useState(false);
+
   async function handleAssetUpload(e: React.ChangeEvent<HTMLInputElement>, field: 'logo_url' | 'favicon_url') {
     const file = e.target.files?.[0];
     if (!file) return;
+    const setUploading = field === 'logo_url' ? setUploadingLogo : setUploadingFavicon;
     setUploading(true);
     try {
       const { createClient } = await import('@/lib/supabase/client');
       const supabase = createClient();
       const user = await supabase.auth.getUser();
-      // Generate a UUID v4 for the filename
       function uuidv4() {
         return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
           const r = crypto.getRandomValues(new Uint8Array(1))[0] % 16;
@@ -80,19 +84,14 @@ export function ThemeTab({ settings, onSettingsChange, onSave, saving, tenantId 
   const heroType = settings.hero_background_type || 'color';
   const heroValue = settings.hero_background_value || '';
 
-  // Supabase client for upload
-  // Use dynamic import to avoid SSR issues
-  const [uploading, setUploading] = React.useState(false);
-
   async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-    setUploading(true);
+    setUploadingHero(true);
     try {
       const { createClient } = await import('@/lib/supabase/client');
       const supabase = createClient();
       const user = await supabase.auth.getUser();
-      // Generate a UUID v4 for the filename
       function uuidv4() {
         return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
           const r = crypto.getRandomValues(new Uint8Array(1))[0] % 16;
@@ -116,7 +115,7 @@ export function ThemeTab({ settings, onSettingsChange, onSave, saving, tenantId 
     } catch (err) {
       alert('Image upload failed: ' + (err as Error).message);
     } finally {
-      setUploading(false);
+      setUploadingHero(false);
     }
   }
 
@@ -167,10 +166,10 @@ export function ThemeTab({ settings, onSettingsChange, onSave, saving, tenantId 
                 <Button
                   type="button"
                   variant="secondary"
-                  disabled={uploading}
+                  disabled={uploadingHero}
                   onClick={() => document.getElementById('hero-bg-file')?.click()}
                 >
-                  {uploading ? (
+                  {uploadingHero ? (
                     <span className="flex items-center"><span className="animate-spin mr-2 h-4 w-4 border-b-2 border-white rounded-full"></span>Uploading...</span>
                   ) : (
                     'Choose Image'
@@ -182,13 +181,13 @@ export function ThemeTab({ settings, onSettingsChange, onSave, saving, tenantId 
                   accept="image/*"
                   style={{ display: 'none' }}
                   onChange={handleImageUpload}
-                  disabled={uploading}
+                  disabled={uploadingHero}
                 />
                 {heroValue && (
                   <img src={heroValue} alt="Hero preview" className="rounded shadow max-h-20 border" />
                 )}
               </div>
-              {uploading && <div className="text-sm text-gray-500 mt-2">Uploading image, please wait...</div>}
+              {uploadingHero && <div className="text-sm text-gray-500 mt-2">Uploading image, please wait...</div>}
             </div>
           )}
         </CardContent>
@@ -203,10 +202,10 @@ export function ThemeTab({ settings, onSettingsChange, onSave, saving, tenantId 
             <Button
               type="button"
               variant="secondary"
-              disabled={uploading}
+              disabled={uploadingLogo}
               onClick={() => document.getElementById('logo-file')?.click()}
             >
-              {uploading ? (
+              {uploadingLogo ? (
                 <span className="flex items-center"><span className="animate-spin mr-2 h-4 w-4 border-b-2 border-white rounded-full"></span>Uploading...</span>
               ) : (
                 'Upload Logo'
@@ -218,9 +217,9 @@ export function ThemeTab({ settings, onSettingsChange, onSave, saving, tenantId 
               accept="image/*"
               style={{ display: 'none' }}
               onChange={(e) => handleAssetUpload(e, 'logo_url')}
-              disabled={uploading}
+              disabled={uploadingLogo}
             />
-            {uploading && <div className="text-sm text-gray-500">Uploading...</div>}
+            {uploadingLogo && <div className="text-sm text-gray-500">Uploading...</div>}
             {settings.logo_url && (
               <img src={settings.logo_url} alt="Logo preview" className="mt-2 rounded shadow max-h-20" />
             )}
@@ -230,10 +229,10 @@ export function ThemeTab({ settings, onSettingsChange, onSave, saving, tenantId 
             <Button
               type="button"
               variant="secondary"
-              disabled={uploading}
+              disabled={uploadingFavicon}
               onClick={() => document.getElementById('favicon-file')?.click()}
             >
-              {uploading ? (
+              {uploadingFavicon ? (
                 <span className="flex items-center"><span className="animate-spin mr-2 h-4 w-4 border-b-2 border-white rounded-full"></span>Uploading...</span>
               ) : (
                 'Upload Favicon'
@@ -245,9 +244,9 @@ export function ThemeTab({ settings, onSettingsChange, onSave, saving, tenantId 
               accept="image/*"
               style={{ display: 'none' }}
               onChange={(e) => handleAssetUpload(e, 'favicon_url')}
-              disabled={uploading}
+              disabled={uploadingFavicon}
             />
-            {uploading && <div className="text-sm text-gray-500">Uploading...</div>}
+            {uploadingFavicon && <div className="text-sm text-gray-500">Uploading...</div>}
             {settings.favicon_url && (
               <img src={settings.favicon_url} alt="Favicon preview" className="mt-2 rounded shadow max-h-10" />
             )}

@@ -25,7 +25,7 @@ export function BrandList({
   const router = useRouter()
 
   const handleEdit = (id: string) => {
-    router.push(`/admin/brands/${id}/edit`)
+    router.push(`/admin/brands/${id}`)
   }
 
   const handleDelete = async (id: string) => {

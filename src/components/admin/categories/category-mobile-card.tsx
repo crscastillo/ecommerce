@@ -103,7 +103,7 @@ export function CategoryMobileCard({
                       <DropdownMenuItem asChild>
                         <Link href={`/admin/categories/${category.id}`} className="text-xs">
                           <Package className="mr-2 h-3 w-3" />
-                          View
+                          Edit
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>

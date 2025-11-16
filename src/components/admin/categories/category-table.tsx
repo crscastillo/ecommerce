@@ -168,21 +168,15 @@ export function CategoryTable({
                     <DropdownMenuContent align="end">
                       <DropdownMenuLabel>Actions</DropdownMenuLabel>
                       <DropdownMenuItem asChild>
-                        <Link href={`/products/category/${category.slug}`} target="_blank">
-                          <Eye className="mr-2 h-4 w-4" />
-                          View in Store
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
                         <Link href={`/admin/categories/${category.id}`}>
-                          <Package className="mr-2 h-4 w-4" />
-                          View Category
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link href={`/admin/categories/${category.id}/edit`}>
                           <Edit className="mr-2 h-4 w-4" />
                           Edit
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link href={`/products/category/${category.slug}`} target="_blank">
+                          <Eye className="mr-2 h-4 w-4" />
+                          Preview (Store)
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />

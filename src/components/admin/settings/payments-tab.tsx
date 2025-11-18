@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Save, Eye, EyeOff, CreditCard } from 'lucide-react'
 import { PaymentSettings } from './index'
+import { FeatureFlagsService, PaymentMethodFlags } from '@/lib/services/feature-flags'
 
 interface PaymentsTabProps {
   paymentMethods: PaymentSettings
@@ -26,6 +27,44 @@ export function PaymentsTab({
 }: PaymentsTabProps) {
   const t = useTranslations('settings')
   const tCommon = useTranslations('common')
+  const [enabledFlags, setEnabledFlags] = useState<PaymentMethodFlags>({
+    cash_on_delivery: true,
+    stripe: true,
+    tilopay: true,
+    bank_transfer: true,
+    mobile_bank_transfer: true
+  })
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    loadFeatureFlags()
+  }, [])
+
+  const loadFeatureFlags = async () => {
+    try {
+      setLoading(true)
+      const flags = await FeatureFlagsService.getEnabledPaymentMethods()
+      setEnabledFlags(flags)
+    } catch (error) {
+      console.error('Error loading feature flags:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  if (loading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>{t('sections.paymentMethods')}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center py-8 text-gray-500">Loading payment methods...</div>
+        </CardContent>
+      </Card>
+    )
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -36,6 +75,7 @@ export function PaymentsTab({
       </CardHeader>
       <CardContent>
         {/* Cash on Delivery */}
+        {enabledFlags.cash_on_delivery && (
         <div className="border rounded-lg mb-6">
           <div className="flex items-center justify-between p-4">
             <div className="flex items-center space-x-4">
@@ -54,8 +94,10 @@ export function PaymentsTab({
             />
           </div>
         </div>
+        )}
 
         {/* Stripe */}
+        {enabledFlags.stripe && (
         <div className="border rounded-lg mb-6">
           <div className="flex items-center justify-between p-4">
             <div className="flex items-center space-x-4">
@@ -106,8 +148,10 @@ export function PaymentsTab({
             </div>
           )}
         </div>
+        )}
 
         {/* TiloPay */}
+        {enabledFlags.tilopay && (
         <div className="border rounded-lg mb-6">
           <div className="flex items-center justify-between p-4">
             <div className="flex items-center space-x-4">
@@ -158,8 +202,10 @@ export function PaymentsTab({
             </div>
           )}
         </div>
+        )}
 
         {/* Bank Transfer */}
+        {enabledFlags.bank_transfer && (
         <div className="border rounded-lg mb-6">
           <div className="flex items-center justify-between p-4">
             <div className="flex items-center space-x-4">
@@ -236,8 +282,10 @@ export function PaymentsTab({
             </div>
           )}
         </div>
+        )}
 
         {/* Mobile Bank Transfer (SINPE Movil) */}
+        {enabledFlags.mobile_bank_transfer && (
         <div className="border rounded-lg mb-6">
           <div className="flex items-center justify-between p-4">
             <div className="flex items-center space-x-4">
@@ -288,6 +336,7 @@ export function PaymentsTab({
             </div>
           )}
         </div>
+        )}
 
         <div className="flex justify-end mt-6">
           <Button onClick={onSave} disabled={saving}>

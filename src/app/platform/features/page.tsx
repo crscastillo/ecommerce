@@ -35,16 +35,18 @@ import {
   Users,
   Globe,
   Zap,
-  Shield
+  Shield,
+  CreditCard
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import { FeatureFlagsService, FeatureFlag as DBFeatureFlag } from '@/lib/services/feature-flags'
 
 interface FeatureFlag {
   id: string
   name: string
   key: string
   description: string
-  category: 'platform' | 'tenant' | 'user' | 'experimental'
+  category: 'platform' | 'tenant' | 'user' | 'experimental' | 'payment_methods'
   is_enabled: boolean
   rollout_percentage: number
   target_tiers: string[]
@@ -104,9 +106,9 @@ const defaultFeatureFlags: FeatureFlag[] = [
 ]
 
 export default function FeatureFlagsPage() {
-  const [featureFlags, setFeatureFlags] = useState<FeatureFlag[]>(defaultFeatureFlags)
-  const [filteredFlags, setFilteredFlags] = useState<FeatureFlag[]>(defaultFeatureFlags)
-  const [loading, setLoading] = useState(false)
+  const [featureFlags, setFeatureFlags] = useState<FeatureFlag[]>([])
+  const [filteredFlags, setFilteredFlags] = useState<FeatureFlag[]>([])
+  const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
   const [searchTerm, setSearchTerm] = useState('')
@@ -128,8 +130,47 @@ export default function FeatureFlagsPage() {
   const supabase = createClient()
 
   useEffect(() => {
+    loadFeatureFlags()
+  }, [])
+
+  useEffect(() => {
     filterFlags()
   }, [featureFlags, searchTerm, categoryFilter])
+
+  const loadFeatureFlags = async () => {
+    try {
+      setLoading(true)
+      const dbFlags = await FeatureFlagsService.getAllFeatureFlags()
+      
+      // Convert DB format to UI format
+      const uiFlags: FeatureFlag[] = [
+        // Add existing default flags
+        ...defaultFeatureFlags,
+        // Add payment method flags from database
+        ...dbFlags.map(flag => ({
+          id: flag.id,
+          name: flag.feature_name,
+          key: flag.feature_key,
+          description: flag.feature_description || '',
+          category: 'payment_methods' as const,
+          is_enabled: flag.enabled,
+          rollout_percentage: 100,
+          target_tiers: ['basic', 'pro', 'enterprise'],
+          created_at: flag.created_at,
+          updated_at: flag.updated_at
+        }))
+      ]
+      
+      setFeatureFlags(uiFlags)
+    } catch (err) {
+      console.error('Error loading feature flags:', err)
+      setError('Failed to load feature flags')
+      // Fallback to default flags
+      setFeatureFlags(defaultFeatureFlags)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const filterFlags = () => {
     let filtered = [...featureFlags]
@@ -156,10 +197,14 @@ export default function FeatureFlagsPage() {
       const flag = featureFlags.find(f => f.id === flagId)
       if (!flag) return
 
+      // Update in database if it's a payment method flag
+      if (flag.category === 'payment_methods') {
+        await FeatureFlagsService.updateFeatureFlag(flagId, !flag.is_enabled)
+      }
+
       const updatedFlag = { ...flag, is_enabled: !flag.is_enabled, updated_at: new Date().toISOString() }
       setFeatureFlags(flags => flags.map(f => f.id === flagId ? updatedFlag : f))
 
-      // In a real implementation, you'd update the database here
       setMessage(`Feature flag "${flag.name}" ${updatedFlag.is_enabled ? 'enabled' : 'disabled'}`)
       setTimeout(() => setMessage(''), 3000)
     } catch (err: any) {
@@ -267,6 +312,7 @@ export default function FeatureFlagsPage() {
 
   const getCategoryIcon = (category: FeatureFlag['category']) => {
     switch (category) {
+      case 'payment_methods': return <CreditCard className="h-4 w-4" />
       case 'platform': return <Globe className="h-4 w-4" />
       case 'tenant': return <Users className="h-4 w-4" />
       case 'user': return <Shield className="h-4 w-4" />
@@ -277,8 +323,9 @@ export default function FeatureFlagsPage() {
 
   const getCategoryColor = (category: FeatureFlag['category']) => {
     switch (category) {
+      case 'payment_methods': return 'bg-green-100 text-green-800'
       case 'platform': return 'bg-blue-100 text-blue-800'
-      case 'tenant': return 'bg-green-100 text-green-800'
+      case 'tenant': return 'bg-indigo-100 text-indigo-800'
       case 'user': return 'bg-purple-100 text-purple-800'
       case 'experimental': return 'bg-orange-100 text-orange-800'
       default: return 'bg-gray-100 text-gray-800'
@@ -336,6 +383,7 @@ export default function FeatureFlagsPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Categories</SelectItem>
+                <SelectItem value="payment_methods">Payment Methods</SelectItem>
                 <SelectItem value="platform">Platform</SelectItem>
                 <SelectItem value="tenant">Tenant</SelectItem>
                 <SelectItem value="user">User</SelectItem>
@@ -347,6 +395,13 @@ export default function FeatureFlagsPage() {
       </Card>
 
       {/* Feature Flags Grid */}
+      {loading ? (
+        <Card>
+          <CardContent className="text-center py-12">
+            <div className="text-gray-500">Loading feature flags...</div>
+          </CardContent>
+        </Card>
+      ) : (
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {filteredFlags.map((flag) => (
           <Card key={flag.id} className="relative">
@@ -424,8 +479,9 @@ export default function FeatureFlagsPage() {
           </Card>
         ))}
       </div>
+      )}
 
-      {filteredFlags.length === 0 && (
+      {!loading && filteredFlags.length === 0 && (
         <Card>
           <CardContent className="text-center py-12">
             <Flag className="h-12 w-12 text-gray-400 mx-auto mb-4" />
@@ -502,6 +558,7 @@ export default function FeatureFlagsPage() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="payment_methods">Payment Methods</SelectItem>
                   <SelectItem value="platform">Platform</SelectItem>
                   <SelectItem value="tenant">Tenant</SelectItem>
                   <SelectItem value="user">User</SelectItem>

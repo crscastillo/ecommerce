@@ -7,6 +7,7 @@ export interface FeatureFlag {
   feature_description: string | null
   enabled: boolean
   category: string
+  target_tiers: string[]
   created_at: string
   updated_at: string
 }
@@ -37,7 +38,10 @@ export class FeatureFlagsService {
       throw error
     }
     
-    return data || []
+    return (data || []).map(flag => ({
+      ...flag,
+      target_tiers: flag.target_tiers || ['basic', 'pro', 'enterprise']
+    }))
   }
 
   /**
@@ -57,11 +61,72 @@ export class FeatureFlagsService {
       throw error
     }
     
-    return data || []
+    return (data || []).map(flag => ({
+      ...flag,
+      target_tiers: flag.target_tiers || ['basic', 'pro', 'enterprise']
+    }))
   }
 
   /**
-   * Get enabled payment methods
+   * Get enabled payment methods for a specific tier
+   */
+  static async getEnabledPaymentMethodsForTier(tier: 'basic' | 'pro' | 'enterprise'): Promise<PaymentMethodFlags> {
+    const supabase = createClient()
+    
+    const { data, error } = await supabase
+      .from('platform_feature_flags')
+      .select('feature_key, enabled, target_tiers')
+      .eq('category', 'payment_methods')
+    
+    if (error) {
+      console.error('Error fetching payment method flags:', error)
+      // Return all disabled as fallback for tier-specific
+      return {
+        cash_on_delivery: false,
+        stripe: false,
+        tilopay: false,
+        bank_transfer: false,
+        mobile_bank_transfer: false
+      }
+    }
+    
+    const flags: PaymentMethodFlags = {
+      cash_on_delivery: false,
+      stripe: false,
+      tilopay: false,
+      bank_transfer: false,
+      mobile_bank_transfer: false
+    }
+    
+    data?.forEach(flag => {
+      // Check if the flag is enabled AND the tier has access
+      const tierHasAccess = flag.target_tiers ? flag.target_tiers.includes(tier) : true
+      const isEnabled = flag.enabled && tierHasAccess
+      
+      switch (flag.feature_key) {
+        case 'payment_method_cash_on_delivery':
+          flags.cash_on_delivery = isEnabled
+          break
+        case 'payment_method_stripe':
+          flags.stripe = isEnabled
+          break
+        case 'payment_method_tilopay':
+          flags.tilopay = isEnabled
+          break
+        case 'payment_method_bank_transfer':
+          flags.bank_transfer = isEnabled
+          break
+        case 'payment_method_mobile_bank_transfer':
+          flags.mobile_bank_transfer = isEnabled
+          break
+      }
+    })
+    
+    return flags
+  }
+
+  /**
+   * Get enabled payment methods (for all tiers - backward compatibility)
    */
   static async getEnabledPaymentMethods(): Promise<PaymentMethodFlags> {
     const supabase = createClient()
@@ -115,7 +180,31 @@ export class FeatureFlagsService {
   }
 
   /**
-   * Check if a specific feature is enabled
+   * Check if a specific feature is enabled for a specific tier
+   */
+  static async isFeatureEnabledForTier(featureKey: string, tier: 'basic' | 'pro' | 'enterprise'): Promise<boolean> {
+    const supabase = createClient()
+    
+    const { data, error } = await supabase
+      .from('platform_feature_flags')
+      .select('enabled, target_tiers')
+      .eq('feature_key', featureKey)
+      .single()
+    
+    if (error) {
+      console.error(`Error checking feature flag ${featureKey}:`, error)
+      return false
+    }
+    
+    if (!data?.enabled) return false
+    
+    // Check if tier has access
+    const tierHasAccess = data.target_tiers ? data.target_tiers.includes(tier) : true
+    return tierHasAccess
+  }
+
+  /**
+   * Check if a specific feature is enabled (for any tier - backward compatibility)
    */
   static async isFeatureEnabled(featureKey: string): Promise<boolean> {
     const supabase = createClient()
@@ -147,6 +236,28 @@ export class FeatureFlagsService {
     
     if (error) {
       console.error('Error updating feature flag:', error)
+      throw error
+    }
+  }
+
+  /**
+   * Update feature flag with full details including tiers
+   */
+  static async updateFeatureFlagDetails(id: string, updates: {
+    feature_name?: string
+    feature_description?: string
+    enabled?: boolean
+    target_tiers?: string[]
+  }): Promise<void> {
+    const supabase = createClient()
+    
+    const { error } = await supabase
+      .from('platform_feature_flags')
+      .update(updates)
+      .eq('id', id)
+    
+    if (error) {
+      console.error('Error updating feature flag details:', error)
       throw error
     }
   }

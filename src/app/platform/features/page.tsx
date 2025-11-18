@@ -54,57 +54,6 @@ interface FeatureFlag {
   updated_at: string
 }
 
-const defaultFeatureFlags: FeatureFlag[] = [
-  {
-    id: '1',
-    name: 'Advanced Analytics',
-    key: 'advanced_analytics',
-    description: 'Enable advanced analytics and reporting features for tenants',
-    category: 'tenant',
-    is_enabled: true,
-    rollout_percentage: 100,
-    target_tiers: ['pro', 'enterprise'],
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString()
-  },
-  {
-    id: '2',
-    name: 'Multi-Currency Support',
-    key: 'multi_currency',
-    description: 'Allow tenants to accept payments in multiple currencies',
-    category: 'tenant',
-    is_enabled: false,
-    rollout_percentage: 0,
-    target_tiers: ['enterprise'],
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString()
-  },
-  {
-    id: '3',
-    name: 'API Rate Limiting',
-    key: 'api_rate_limiting',
-    description: 'Enhanced API rate limiting and throttling',
-    category: 'platform',
-    is_enabled: true,
-    rollout_percentage: 100,
-    target_tiers: ['basic', 'pro', 'enterprise'],
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString()
-  },
-  {
-    id: '4',
-    name: 'AI Product Recommendations',
-    key: 'ai_recommendations',
-    description: 'AI-powered product recommendations for customers',
-    category: 'experimental',
-    is_enabled: false,
-    rollout_percentage: 25,
-    target_tiers: ['pro', 'enterprise'],
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString()
-  }
-]
-
 export default function FeatureFlagsPage() {
   const [featureFlags, setFeatureFlags] = useState<FeatureFlag[]>([])
   const [filteredFlags, setFilteredFlags] = useState<FeatureFlag[]>([])
@@ -124,7 +73,7 @@ export default function FeatureFlagsPage() {
     category: 'tenant' as FeatureFlag['category'],
     is_enabled: false,
     rollout_percentage: 100,
-    target_tiers: [] as string[]
+    target_tiers: ['basic', 'pro', 'enterprise'] as string[]
   })
 
   const supabase = createClient()
@@ -143,30 +92,25 @@ export default function FeatureFlagsPage() {
       const dbFlags = await FeatureFlagsService.getAllFeatureFlags()
       
       // Convert DB format to UI format
-      const uiFlags: FeatureFlag[] = [
-        // Add existing default flags
-        ...defaultFeatureFlags,
-        // Add payment method flags from database
-        ...dbFlags.map(flag => ({
-          id: flag.id,
-          name: flag.feature_name,
-          key: flag.feature_key,
-          description: flag.feature_description || '',
-          category: 'payment_methods' as const,
-          is_enabled: flag.enabled,
-          rollout_percentage: 100,
-          target_tiers: ['basic', 'pro', 'enterprise'],
-          created_at: flag.created_at,
-          updated_at: flag.updated_at
-        }))
-      ]
+      const uiFlags: FeatureFlag[] = dbFlags.map(flag => ({
+        id: flag.id,
+        name: flag.feature_name,
+        key: flag.feature_key,
+        description: flag.feature_description || '',
+        category: 'payment_methods' as const,
+        is_enabled: flag.enabled,
+        rollout_percentage: 100,
+        target_tiers: flag.target_tiers || ['basic', 'pro', 'enterprise'],
+        created_at: flag.created_at,
+        updated_at: flag.updated_at
+      }))
       
       setFeatureFlags(uiFlags)
     } catch (err) {
       console.error('Error loading feature flags:', err)
       setError('Failed to load feature flags')
-      // Fallback to default flags
-      setFeatureFlags(defaultFeatureFlags)
+      // Fallback to empty array if database fails
+      setFeatureFlags([])
     } finally {
       setLoading(false)
     }
@@ -239,7 +183,7 @@ export default function FeatureFlagsPage() {
       category: 'tenant',
       is_enabled: false,
       rollout_percentage: 100,
-      target_tiers: []
+      target_tiers: ['basic', 'pro', 'enterprise']
     })
     setIsDialogOpen(true)
   }
@@ -258,7 +202,16 @@ export default function FeatureFlagsPage() {
     setIsDialogOpen(true)
   }
 
-  const handleSaveFlag = () => {
+  const handleTierToggle = (tier: string) => {
+    setFormData(prev => ({
+      ...prev,
+      target_tiers: prev.target_tiers.includes(tier)
+        ? prev.target_tiers.filter(t => t !== tier)
+        : [...prev.target_tiers, tier]
+    }))
+  }
+
+  const handleSaveFlag = async () => {
     try {
       if (!formData.name || !formData.key) {
         setError('Name and key are required')
@@ -269,6 +222,16 @@ export default function FeatureFlagsPage() {
       
       if (editingFlag) {
         // Update existing flag
+        if (editingFlag.category === 'payment_methods') {
+          // Update in database for payment method flags
+          await FeatureFlagsService.updateFeatureFlagDetails(editingFlag.id, {
+            feature_name: formData.name,
+            feature_description: formData.description,
+            enabled: formData.is_enabled,
+            target_tiers: formData.target_tiers
+          })
+        }
+        
         const updatedFlag: FeatureFlag = {
           ...editingFlag,
           ...formData,
@@ -277,7 +240,7 @@ export default function FeatureFlagsPage() {
         setFeatureFlags(flags => flags.map(f => f.id === editingFlag.id ? updatedFlag : f))
         setMessage(`Feature flag "${formData.name}" updated`)
       } else {
-        // Create new flag
+        // Create new flag (UI only for now - you could extend this to create DB flags)
         const newFlag: FeatureFlag = {
           id: Math.random().toString(36).substr(2, 9),
           ...formData,
@@ -292,7 +255,7 @@ export default function FeatureFlagsPage() {
       setTimeout(() => setMessage(''), 3000)
     } catch (err: any) {
       console.error('Error saving feature flag:', err)
-      setError('Failed to save feature flag')
+      setError('Failed to save feature flag: ' + (err.message || 'Unknown error'))
     }
   }
 
@@ -461,11 +424,18 @@ export default function FeatureFlagsPage() {
               <div>
                 <span className="text-sm font-medium block mb-2">Target Tiers</span>
                 <div className="flex flex-wrap gap-1">
-                  {flag.target_tiers.map(tier => (
-                    <Badge key={tier} variant="outline" className="text-xs">
-                      {tier}
-                    </Badge>
-                  ))}
+                  {flag.target_tiers.map(tier => {
+                    const tierColors = {
+                      basic: 'bg-gray-100 text-gray-800',
+                      pro: 'bg-blue-100 text-blue-800',
+                      enterprise: 'bg-purple-100 text-purple-800'
+                    }
+                    return (
+                      <Badge key={tier} variant="outline" className={`text-xs ${tierColors[tier as keyof typeof tierColors] || 'bg-gray-100 text-gray-800'}`}>
+                        {tier}
+                      </Badge>
+                    )
+                  })}
                 </div>
               </div>
 
@@ -565,6 +535,42 @@ export default function FeatureFlagsPage() {
                   <SelectItem value="experimental">Experimental</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+
+            <div>
+              <Label className="text-sm font-medium mb-3 block">Target Tiers</Label>
+              <div className="space-y-2">
+                {['basic', 'pro', 'enterprise'].map(tier => {
+                  const tierColors = {
+                    basic: 'bg-gray-100 text-gray-800 border-gray-300',
+                    pro: 'bg-blue-100 text-blue-800 border-blue-300',
+                    enterprise: 'bg-purple-100 text-purple-800 border-purple-300'
+                  }
+                  const isSelected = formData.target_tiers.includes(tier)
+                  return (
+                    <div key={tier} className="flex items-center space-x-3">
+                      <Switch
+                        id={`tier-${tier}`}
+                        checked={isSelected}
+                        onCheckedChange={() => handleTierToggle(tier)}
+                      />
+                      <Badge 
+                        className={`text-xs cursor-pointer transition-opacity ${
+                          isSelected 
+                            ? tierColors[tier as keyof typeof tierColors] 
+                            : 'bg-gray-50 text-gray-400 border-gray-200 opacity-60'
+                        }`}
+                        onClick={() => handleTierToggle(tier)}
+                      >
+                        {tier.charAt(0).toUpperCase() + tier.slice(1)}
+                      </Badge>
+                    </div>
+                  )
+                })}
+              </div>
+              <p className="text-xs text-gray-500 mt-2">
+                Select which subscription tiers can access this feature
+              </p>
             </div>
 
             <div className="flex items-center justify-between">

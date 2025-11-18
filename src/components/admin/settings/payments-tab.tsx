@@ -43,7 +43,10 @@ export function PaymentsTab({
   const loadFeatureFlags = async () => {
     try {
       setLoading(true)
-      const flags = await FeatureFlagsService.getEnabledPaymentMethods()
+      // TODO: Get actual tenant tier from user subscription/profile
+      // For now, defaulting to 'basic' tier - you should replace this with actual tier logic
+      const tenantTier: 'basic' | 'pro' | 'enterprise' = 'pro' // Change this based on tenant's actual tier
+      const flags = await FeatureFlagsService.getEnabledPaymentMethodsForTier(tenantTier)
       setEnabledFlags(flags)
     } catch (error) {
       console.error('Error loading feature flags:', error)
@@ -103,7 +106,10 @@ export function PaymentsTab({
             <div className="flex items-center space-x-4">
               <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center"><CreditCard /></div>
               <div>
-                <h3 className="font-medium">Stripe</h3>
+                <h3 className="font-medium flex items-center gap-2">
+                  Stripe
+                  <Badge className="bg-blue-100 text-blue-800 text-xs">Pro+</Badge>
+                </h3>
                 <p className="text-sm text-gray-500">Accept credit cards and digital wallets via Stripe.</p>
               </div>
             </div>
@@ -157,7 +163,10 @@ export function PaymentsTab({
             <div className="flex items-center space-x-4">
               <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">🏦</div>
               <div>
-                <h3 className="font-medium">TiloPay</h3>
+                <h3 className="font-medium flex items-center gap-2">
+                  TiloPay
+                  <Badge className="bg-blue-100 text-blue-800 text-xs">Pro+</Badge>
+                </h3>
                 <p className="text-sm text-gray-500">Accept payments via TiloPay.</p>
               </div>
             </div>

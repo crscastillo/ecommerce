@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { 
@@ -54,6 +55,7 @@ export function CategoryTable({
   onDelete, 
   onToggleStatus
 }: CategoryTableProps) {
+  const t = useTranslations('categories')
   const [deleteCategory, setDeleteCategory] = useState<CategoryWithProductCount | null>(null)
   const [deleting, setDeleting] = useState(false)
 
@@ -83,14 +85,14 @@ export function CategoryTable({
     return (
       <div className="text-center py-8">
         <FolderOpen className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-        <h3 className="text-lg font-semibold mb-2">No categories found</h3>
+        <h3 className="text-lg font-semibold mb-2">{t('noCategoriesFound')}</h3>
         <p className="text-muted-foreground mb-4">
-          Get started by creating your first category.
+          {t('getStartedMessage')}
         </p>
         <Button asChild>
           <Link href="/admin/categories/new">
             <Plus className="mr-2 h-4 w-4" />
-            Add Category
+            {t('addCategory')}
           </Link>
         </Button>
       </div>
@@ -103,13 +105,13 @@ export function CategoryTable({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Category</TableHead>
-              <TableHead>Slug</TableHead>
-              <TableHead>Products</TableHead>
-              <TableHead>Sort Order</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Created</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead>{t('category')}</TableHead>
+              <TableHead>{t('slug')}</TableHead>
+              <TableHead>{t('products')}</TableHead>
+              <TableHead>{t('sortOrder')}</TableHead>
+              <TableHead>{t('status')}</TableHead>
+              <TableHead>{t('created')}</TableHead>
+              <TableHead className="text-right">{t('actions')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -132,7 +134,7 @@ export function CategoryTable({
                 </TableCell>
                 <TableCell>
                   <span className="text-sm">
-                    {category.product_count || 0} products
+                    {t('productsCount', { count: category.product_count || 0 })}
                   </span>
                 </TableCell>
                 <TableCell>
@@ -145,7 +147,7 @@ export function CategoryTable({
                     variant={category.is_active ? 'default' : 'secondary'}
                     className={category.is_active ? 'bg-green-100 text-green-800' : ''}
                   >
-                    {category.is_active ? 'Active' : 'Inactive'}
+                    {category.is_active ? t('active') : t('inactive')}
                   </Badge>
                 </TableCell>
                 <TableCell>
@@ -161,29 +163,29 @@ export function CategoryTable({
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" className="h-8 w-8 p-0">
-                        <span className="sr-only">Open menu</span>
+                        <span className="sr-only">{t('openMenu')}</span>
                         <MoreHorizontal className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                      <DropdownMenuLabel>{t('actions')}</DropdownMenuLabel>
                       <DropdownMenuItem asChild>
                         <Link href={`/admin/categories/${category.id}`}>
                           <Edit className="mr-2 h-4 w-4" />
-                          Edit
+                          {t('edit')}
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
                         <Link href={`/products/category/${category.slug}`} target="_blank">
                           <Eye className="mr-2 h-4 w-4" />
-                          Preview (Store)
+                          {t('previewStore')}
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem
                         onClick={() => onToggleStatus(category.id, category.is_active)}
                       >
-                        {category.is_active ? 'Deactivate' : 'Activate'}
+                        {category.is_active ? t('deactivate') : t('activate')}
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem
@@ -191,7 +193,7 @@ export function CategoryTable({
                         className="text-red-600 focus:text-red-600"
                       >
                         <Trash2 className="mr-2 h-4 w-4" />
-                        Delete
+                        {t('delete')}
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -206,19 +208,19 @@ export function CategoryTable({
       <AlertDialog open={!!deleteCategory} onOpenChange={() => setDeleteCategory(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Category</AlertDialogTitle>
+            <AlertDialogTitle>{t('deleteCategory')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete "{deleteCategory?.name}"? This action cannot be undone and will remove the category from all products.
+              {t('deleteConfirmation', { name: deleteCategory?.name || '' })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={deleting}>{t('cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               disabled={deleting}
               className="bg-red-600 hover:bg-red-700"
             >
-              {deleting ? 'Deleting...' : 'Delete Category'}
+              {deleting ? t('deleting') : t('deleteCategory')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

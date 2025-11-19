@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { useTenant } from '@/lib/contexts/tenant-context'
 import { TenantDatabase } from '@/lib/supabase/tenant-database'
 import { createClient } from '@/lib/supabase/client'
@@ -32,6 +33,7 @@ import {
 } from '@/lib/types/category'
 
 export default function NewCategoryPage() {
+  const t = useTranslations('categories')
   const router = useRouter()
   const { tenant, isLoading: tenantLoading } = useTenant()
   
@@ -81,7 +83,7 @@ export default function NewCategoryPage() {
         setSlugValidation({
           isValidating: false,
           isValid: false,
-          message: 'Error checking slug availability'
+          message: t('errorCheckingSlugAvailability')
         })
         return
       }
@@ -92,13 +94,13 @@ export default function NewCategoryPage() {
       setSlugValidation({
         isValidating: false,
         isValid: !isDuplicate,
-        message: isDuplicate ? 'A category with this slug already exists' : ''
+        message: isDuplicate ? t('slugAlreadyExists') : ''
       })
     } catch (err) {
       setSlugValidation({
         isValidating: false,
         isValid: false,
-        message: 'Error checking slug availability'
+        message: t('errorCheckingSlugAvailability')
       })
     }
   }
@@ -147,16 +149,16 @@ export default function NewCategoryPage() {
 
   const validateForm = (): string | null => {
     if (!formData.name.trim()) {
-      return 'Category name is required'
+      return t('categoryNameIsRequired')
     }
     if (!formData.slug.trim()) {
-      return 'Category slug is required'
+      return t('categorySlugIsRequired')
     }
     if (formData.slug.trim() !== formData.slug.trim().toLowerCase()) {
-      return 'Slug must be lowercase'
+      return t('slugMustBeLowercase')
     }
     if (!/^[a-z0-9-]+$/.test(formData.slug.trim())) {
-      return 'Slug can only contain lowercase letters, numbers, and hyphens'
+      return t('slugInvalidCharacters')
     }
     return null
   }
@@ -172,12 +174,10 @@ export default function NewCategoryPage() {
       return
     }
 
-    if (!slugValidation.isValid) {
-      setError('Please fix the slug validation errors before saving')
-      return
-    }
-
-    setSaving(true)
+      if (!slugValidation.isValid) {
+        setError(t('fixSlugValidationErrors'))
+        return
+      }    setSaving(true)
 
     try {
       const categoryData: CategoryCreateData = {
@@ -220,10 +220,10 @@ export default function NewCategoryPage() {
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold">Create Category</h1>
+          <h1 className="text-3xl font-bold">{t('createCategory')}</h1>
         </div>
         <div className="text-center py-8">
-          <p>Loading...</p>
+          <p>{t('loading')}</p>
         </div>
       </div>
     )
@@ -234,17 +234,17 @@ export default function NewCategoryPage() {
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold">Create Category</h1>
+          <h1 className="text-3xl font-bold">{t('createCategory')}</h1>
         </div>
         <Card>
           <CardContent className="p-8 text-center">
             <AlertCircle className="mx-auto h-12 w-12 text-orange-500 mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">Tenant Access Required</h3>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">{t('tenantAccessRequired')}</h3>
             <p className="text-gray-600 mb-4">
-              Category creation requires access via your store subdomain.
+              {t('categoryCreationRequiresAccess')}
             </p>
             <Button onClick={() => window.location.href = '/'}>
-              Go to Main Site
+              {t('goToMainSite')}
             </Button>
           </CardContent>
         </Card>
@@ -265,13 +265,13 @@ export default function NewCategoryPage() {
           <Button variant="ghost" size="sm" asChild>
             <Link href="/admin/categories">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Categories
+              {t('backToCategories')}
             </Link>
           </Button>
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Create Category</h1>
+            <h1 className="text-3xl font-bold tracking-tight">{t('createCategory')}</h1>
             <p className="text-muted-foreground">
-              Add a new category to organize your products
+              {t('addNewCategory')}
             </p>
           </div>
         </div>
@@ -283,12 +283,12 @@ export default function NewCategoryPage() {
           {saving ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Creating...
+              {t('creating')}
             </>
           ) : (
             <>
               <Save className="mr-2 h-4 w-4" />
-              Create Category
+              {t('createCategory')}
             </>
           )}
         </Button>
@@ -313,30 +313,30 @@ export default function NewCategoryPage() {
           {/* Basic Information */}
           <Card>
             <CardHeader>
-              <CardTitle>Basic Information</CardTitle>
+              <CardTitle>{t('basicInformation')}</CardTitle>
               <CardDescription>
-                Essential category details
+                {t('essentialCategoryDetails')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <Label htmlFor="name">Category Name *</Label>
+                  <Label htmlFor="name">{t('categoryNameRequired')}</Label>
                   <Input
                     id="name"
                     value={formData.name}
                     onChange={(e) => handleNameChange(e.target.value)}
-                    placeholder="Enter category name"
+                    placeholder={t('enterCategoryName')}
                     disabled={saving}
                   />
                 </div>
                 <div>
-                  <Label htmlFor="slug">URL Slug *</Label>
+                  <Label htmlFor="slug">{t('urlSlugRequired')}</Label>
                   <Input
                     id="slug"
                     value={formData.slug}
                     onChange={(e) => handleSlugChange(e.target.value)}
-                    placeholder="category-url-slug"
+                    placeholder={t('categoryUrlSlug')}
                     disabled={saving}
                     className={!slugValidation.isValid ? 'border-red-500' : ''}
                   />
@@ -348,19 +348,19 @@ export default function NewCategoryPage() {
                       <AlertCircle className="h-3 w-3 text-red-500" />
                     )}
                     <p className={`text-xs ${slugValidation.isValid ? 'text-muted-foreground' : 'text-red-500'}`}>
-                      {slugValidation.message || 'Only lowercase letters, numbers, and hyphens allowed'}
+                      {slugValidation.message || t('onlyLowercaseAllowed')}
                     </p>
                   </div>
                 </div>
               </div>
 
               <div>
-                <Label htmlFor="description">Description</Label>
+                <Label htmlFor="description">{t('description')}</Label>
                 <Textarea
                   id="description"
                   value={formData.description}
                   onChange={(e) => handleInputChange('description', e.target.value)}
-                  placeholder="Category description"
+                  placeholder={t('categoryDescription')}
                   rows={3}
                   disabled={saving}
                 />
@@ -368,18 +368,18 @@ export default function NewCategoryPage() {
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <Label htmlFor="image_url">Image URL</Label>
+                  <Label htmlFor="image_url">{t('imageUrl')}</Label>
                   <Input
                     id="image_url"
                     type="url"
                     value={formData.image_url}
                     onChange={(e) => handleInputChange('image_url', e.target.value)}
-                    placeholder="https://example.com/image.jpg"
+                    placeholder={t('imageUrlPlaceholder')}
                     disabled={saving}
                   />
                 </div>
                 <div>
-                  <Label htmlFor="sort_order">Sort Order</Label>
+                  <Label htmlFor="sort_order">{t('sortOrder')}</Label>
                   <Input
                     id="sort_order"
                     type="number"
@@ -397,38 +397,38 @@ export default function NewCategoryPage() {
           {/* SEO Settings */}
           <Card>
             <CardHeader>
-              <CardTitle>SEO Settings</CardTitle>
+              <CardTitle>{t('seoSettings')}</CardTitle>
               <CardDescription>
-                Optimize your category for search engines
+                {t('optimizeCategoryForSEO')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <Label htmlFor="seo_title">SEO Title</Label>
+                <Label htmlFor="seo_title">{t('seoTitle')}</Label>
                 <Input
                   id="seo_title"
                   value={formData.seo_title}
                   onChange={(e) => handleInputChange('seo_title', e.target.value)}
-                  placeholder="SEO optimized title"
+                  placeholder={t('seoOptimizedTitle')}
                   disabled={saving}
                 />
                 <p className="text-xs text-muted-foreground mt-1">
-                  Recommended: 50-60 characters
+                  {t('recommended50to60Characters')}
                 </p>
               </div>
 
               <div>
-                <Label htmlFor="seo_description">SEO Description</Label>
+                <Label htmlFor="seo_description">{t('seoDescription')}</Label>
                 <Textarea
                   id="seo_description"
                   value={formData.seo_description}
                   onChange={(e) => handleInputChange('seo_description', e.target.value)}
-                  placeholder="SEO meta description"
+                  placeholder={t('seoMetaDescription')}
                   rows={2}
                   disabled={saving}
                 />
                 <p className="text-xs text-muted-foreground mt-1">
-                  Recommended: 150-160 characters
+                  {t('recommended150to160Characters')}
                 </p>
               </div>
             </CardContent>
@@ -440,7 +440,7 @@ export default function NewCategoryPage() {
           {/* Category Status */}
           <Card>
             <CardHeader>
-              <CardTitle>Category Status</CardTitle>
+              <CardTitle>{t('categoryStatus')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center space-x-2">
@@ -450,10 +450,10 @@ export default function NewCategoryPage() {
                   onCheckedChange={(checked) => handleInputChange('is_active', checked)}
                   disabled={saving}
                 />
-                <Label htmlFor="is_active">Category is active</Label>
+                <Label htmlFor="is_active">{t('categoryIsActive')}</Label>
               </div>
               <p className="text-xs text-muted-foreground">
-                Active categories will be visible to customers in your store
+                {t('activeCategoriesVisible')}
               </p>
             </CardContent>
           </Card>
@@ -461,25 +461,25 @@ export default function NewCategoryPage() {
           {/* Category Guidelines */}
           <Card>
             <CardHeader>
-              <CardTitle>Guidelines</CardTitle>
+              <CardTitle>{t('guidelines')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-sm">
               <div>
-                <h4 className="font-medium">Category Name</h4>
+                <h4 className="font-medium">{t('categoryNameRequired')}</h4>
                 <p className="text-muted-foreground">
-                  Use clear, descriptive names that customers will easily understand
+                  {t('categoryNameGuideline')}
                 </p>
               </div>
               <div>
-                <h4 className="font-medium">URL Slug</h4>
+                <h4 className="font-medium">{t('urlSlugRequired')}</h4>
                 <p className="text-muted-foreground">
-                  Keep it short and relevant for better SEO. Auto-generated from name.
+                  {t('urlSlugGuideline')}
                 </p>
               </div>
               <div>
-                <h4 className="font-medium">Description</h4>
+                <h4 className="font-medium">{t('description')}</h4>
                 <p className="text-muted-foreground">
-                  Help customers understand what products they'll find in this category
+                  {t('descriptionGuideline')}
                 </p>
               </div>
             </CardContent>
@@ -494,9 +494,9 @@ export default function NewCategoryPage() {
             <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100 mb-4">
               <FolderOpen className="h-6 w-6 text-green-600" />
             </div>
-            <AlertDialogTitle className="text-center">Category Created!</AlertDialogTitle>
+            <AlertDialogTitle className="text-center">{t('categoryCreated')}</AlertDialogTitle>
             <AlertDialogDescription className="text-center">
-              Your category has been created successfully. Redirecting to categories list...
+              {t('categoryCreatedSuccess')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="flex justify-center py-4">

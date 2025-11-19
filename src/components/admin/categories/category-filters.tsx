@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -18,6 +19,8 @@ export function CategoryFiltersComponent({
   onFiltersChange, 
   totalCount 
 }: CategoryFiltersProps) {
+  const t = useTranslations('categories')
+  const tCommon = useTranslations('common')
   const [isExpanded, setIsExpanded] = useState(false)
 
   const handleSearchChange = (search: string) => {
@@ -42,7 +45,7 @@ export function CategoryFiltersComponent({
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-2 text-base">
               <Filter className="h-4 w-4" />
-              Filters
+              {t('filters')}
               {totalCount > 0 && (
                 <span className="text-sm font-normal text-muted-foreground">
                   ({totalCount})
@@ -69,7 +72,7 @@ export function CategoryFiltersComponent({
           <div className="relative mb-3">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search..."
+              placeholder={t('search')}
               value={filters.search}
               onChange={(e) => handleSearchChange(e.target.value)}
               className="pl-9 h-9"
@@ -81,7 +84,7 @@ export function CategoryFiltersComponent({
             <div className="space-y-3">
               {/* Status Filter */}
               <div>
-                <div className="text-xs font-medium text-muted-foreground mb-2">Status</div>
+                <div className="text-xs font-medium text-muted-foreground mb-2">{t('status')}</div>
                 <div className="flex gap-1">
                   <Button
                     variant={filters.status === 'all' ? 'default' : 'outline'}
@@ -89,7 +92,7 @@ export function CategoryFiltersComponent({
                     onClick={() => handleStatusChange('all')}
                     className="h-7 text-xs flex-1"
                   >
-                    All
+                    {t('all')}
                   </Button>
                   <Button
                     variant={filters.status === 'active' ? 'default' : 'outline'}
@@ -97,7 +100,7 @@ export function CategoryFiltersComponent({
                     onClick={() => handleStatusChange('active')}
                     className="h-7 text-xs flex-1"
                   >
-                    Active
+                    {t('active')}
                   </Button>
                   <Button
                     variant={filters.status === 'inactive' ? 'default' : 'outline'}
@@ -105,7 +108,7 @@ export function CategoryFiltersComponent({
                     onClick={() => handleStatusChange('inactive')}
                     className="h-7 text-xs flex-1"
                   >
-                    Inactive
+                    {t('inactive')}
                   </Button>
                 </div>
               </div>
@@ -118,7 +121,7 @@ export function CategoryFiltersComponent({
                   onClick={() => onFiltersChange({ status: 'all', search: '' })}
                   className="h-7 text-xs w-full"
                 >
-                  Clear all filters
+                  {t('clearAllFilters')}
                 </Button>
               )}
             </div>
@@ -131,10 +134,10 @@ export function CategoryFiltersComponent({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Filter className="h-5 w-5" />
-            Filters
+            {t('filters')}
             {totalCount > 0 && (
               <span className="text-sm font-normal text-muted-foreground">
-                ({totalCount} categories)
+                ({t('categoriesWithCount', { count: totalCount })})
               </span>
             )}
           </CardTitle>
@@ -147,7 +150,7 @@ export function CategoryFiltersComponent({
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                 <Input
                   type="text"
-                  placeholder="Search categories..."
+                  placeholder={t('searchCategories')}
                   value={filters.search}
                   onChange={(e) => handleSearchChange(e.target.value)}
                   className="pl-10"
@@ -163,7 +166,7 @@ export function CategoryFiltersComponent({
                 onClick={() => handleStatusChange('all')}
                 className="min-w-16"
               >
-                All
+                {t('all')}
               </Button>
               <Button
                 variant={filters.status === 'active' ? 'default' : 'outline'}
@@ -171,7 +174,7 @@ export function CategoryFiltersComponent({
                 onClick={() => handleStatusChange('active')}
                 className="min-w-16"
               >
-                Active
+                {t('active')}
               </Button>
               <Button
                 variant={filters.status === 'inactive' ? 'default' : 'outline'}
@@ -179,7 +182,7 @@ export function CategoryFiltersComponent({
                 onClick={() => handleStatusChange('inactive')}
                 className="min-w-16"
               >
-                Inactive
+                {t('inactive')}
               </Button>
             </div>
           </div>
@@ -187,16 +190,16 @@ export function CategoryFiltersComponent({
           {/* Active Filters Display */}
           {hasActiveFilters && (
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <span>Active filters:</span>
+              <span>{t('activeFilters')}</span>
               <div className="flex gap-2">
                 {filters.search && (
                   <span className="bg-muted px-2 py-1 rounded text-xs">
-                    Search: "{filters.search}"
+                    {tCommon('search')}: "{filters.search}"
                   </span>
                 )}
                 {filters.status !== 'all' && (
                   <span className="bg-muted px-2 py-1 rounded text-xs">
-                    Status: {filters.status}
+                    {t('status')}: {t(filters.status)}
                   </span>
                 )}
               </div>
@@ -206,7 +209,7 @@ export function CategoryFiltersComponent({
                 onClick={() => onFiltersChange({ status: 'all', search: '' })}
                 className="h-6 px-2 text-xs"
               >
-                Clear all
+                {t('clearAll')}
               </Button>
             </div>
           )}

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { useTenant } from '@/lib/contexts/tenant-context'
 import { TenantDatabase } from '@/lib/supabase/tenant-database'
 import { Button } from '@/components/ui/button'
@@ -43,6 +44,7 @@ interface CategoryWithProductCount extends Category {
 }
 
 export default function CategoryPage() {
+  const t = useTranslations('categories')
   const params = useParams()
   const router = useRouter()
   const { tenant } = useTenant()
@@ -242,7 +244,7 @@ export default function CategoryPage() {
             <Button asChild>
               <Link href="/admin/categories">
                 <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to Categories
+                {t('backToCategories')}
               </Link>
             </Button>
           </CardContent>
@@ -261,12 +263,12 @@ export default function CategoryPage() {
           <Button variant="ghost" size="sm" asChild>
             <Link href="/admin/categories">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Categories
+              {t('backToCategories')}
             </Link>
           </Button>
           <div>
             <h1 className="text-3xl font-bold tracking-tight">{category.name}</h1>
-            <p className="text-muted-foreground">Edit category details</p>
+            <p className="text-muted-foreground">{t('editCategoryDetails')}</p>
           </div>
         </div>
         
@@ -278,12 +280,12 @@ export default function CategoryPage() {
             {saving ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Saving...
+                {t('saving')}
               </>
             ) : (
               <>
                 <Save className="mr-2 h-4 w-4" />
-                Save Changes
+                {t('saveChanges')}
               </>
             )}
           </Button>
@@ -294,7 +296,7 @@ export default function CategoryPage() {
             className="text-red-600 hover:text-red-700"
           >
             <Trash2 className="mr-2 h-4 w-4" />
-            Delete
+            {t('deleteCategory')}
           </Button>
         </div>
       </div>
@@ -316,7 +318,7 @@ export default function CategoryPage() {
           <CardContent className="pt-6">
             <div className="flex items-center gap-2 text-green-600">
               <FolderOpen className="w-4 h-4" />
-              Category updated successfully!
+              {t('categoryUpdatedSuccessfully')}
             </div>
           </CardContent>
         </Card>
@@ -329,45 +331,45 @@ export default function CategoryPage() {
           {/* Basic Information */}
           <Card>
             <CardHeader>
-              <CardTitle>Basic Information</CardTitle>
+              <CardTitle>{t('basicInformation')}</CardTitle>
               <CardDescription>
-                Essential category details
+                {t('essentialCategoryDetails')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <Label htmlFor="name">Category Name *</Label>
+                  <Label htmlFor="name">{t('categoryNameRequired')}</Label>
                   <Input
                     id="name"
                     value={formData.name}
                     onChange={(e) => handleInputChange('name', e.target.value)}
-                    placeholder="Enter category name"
+                    placeholder={t('enterCategoryName')}
                     disabled={saving}
                   />
                 </div>
                 <div>
-                  <Label htmlFor="slug">URL Slug *</Label>
+                  <Label htmlFor="slug">{t('urlSlugRequired')}</Label>
                   <Input
                     id="slug"
                     value={formData.slug}
                     onChange={(e) => handleInputChange('slug', e.target.value)}
-                    placeholder="category-url-slug"
+                    placeholder={t('categoryUrlSlug')}
                     disabled={saving}
                   />
                   <p className="text-xs text-muted-foreground mt-1">
-                    Only lowercase letters, numbers, and hyphens allowed
+                    {t('onlyLowercaseAllowed')}
                   </p>
                 </div>
               </div>
 
               <div>
-                <Label htmlFor="description">Description</Label>
+                <Label htmlFor="description">{t('description')}</Label>
                 <Textarea
                   id="description"
                   value={formData.description}
                   onChange={(e) => handleInputChange('description', e.target.value)}
-                  placeholder="Category description"
+                  placeholder={t('categoryDescription')}
                   rows={3}
                   disabled={saving}
                 />
@@ -375,18 +377,18 @@ export default function CategoryPage() {
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <Label htmlFor="image_url">Image URL</Label>
+                  <Label htmlFor="image_url">{t('imageUrl')}</Label>
                   <Input
                     id="image_url"
                     type="url"
                     value={formData.image_url}
                     onChange={(e) => handleInputChange('image_url', e.target.value)}
-                    placeholder="https://example.com/image.jpg"
+                    placeholder={t('imageUrlPlaceholder')}
                     disabled={saving}
                   />
                 </div>
                 <div>
-                  <Label htmlFor="sort_order">Sort Order</Label>
+                  <Label htmlFor="sort_order">{t('sortOrder')}</Label>
                   <Input
                     id="sort_order"
                     type="number"
@@ -404,38 +406,38 @@ export default function CategoryPage() {
           {/* SEO Settings */}
           <Card>
             <CardHeader>
-              <CardTitle>SEO Settings</CardTitle>
+              <CardTitle>{t('seoSettings')}</CardTitle>
               <CardDescription>
-                Optimize your category for search engines
+                {t('seoOptimizeDescription')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <Label htmlFor="seo_title">SEO Title</Label>
+                <Label htmlFor="seo_title">{t('seoTitle')}</Label>
                 <Input
                   id="seo_title"
                   value={formData.seo_title}
                   onChange={(e) => handleInputChange('seo_title', e.target.value)}
-                  placeholder="SEO optimized title"
+                  placeholder={t('seoTitlePlaceholder')}
                   disabled={saving}
                 />
                 <p className="text-xs text-muted-foreground mt-1">
-                  Recommended: 50-60 characters
+                  {t('seoTitleGuideline')}
                 </p>
               </div>
 
               <div>
-                <Label htmlFor="seo_description">SEO Description</Label>
+                <Label htmlFor="seo_description">{t('seoDescription')}</Label>
                 <Textarea
                   id="seo_description"
                   value={formData.seo_description}
                   onChange={(e) => handleInputChange('seo_description', e.target.value)}
-                  placeholder="SEO meta description"
+                  placeholder={t('seoDescriptionPlaceholder')}
                   rows={2}
                   disabled={saving}
                 />
                 <p className="text-xs text-muted-foreground mt-1">
-                  Recommended: 150-160 characters
+                  {t('seoDescriptionGuideline')}
                 </p>
               </div>
             </CardContent>
@@ -447,7 +449,7 @@ export default function CategoryPage() {
           {/* Category Status */}
           <Card>
             <CardHeader>
-              <CardTitle>Category Status</CardTitle>
+              <CardTitle>{t('categoryStatus')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center space-x-2">
@@ -457,7 +459,7 @@ export default function CategoryPage() {
                   onCheckedChange={(checked) => handleInputChange('is_active', checked)}
                   disabled={saving}
                 />
-                <Label htmlFor="is_active">Category is active</Label>
+                <Label htmlFor="is_active">{t('categoryIsActive')}</Label>
               </div>
             </CardContent>
           </Card>
@@ -465,11 +467,11 @@ export default function CategoryPage() {
           {/* Category Information */}
           <Card>
             <CardHeader>
-              <CardTitle>Category Information</CardTitle>
+              <CardTitle>{t('categoryInformation')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-sm">
               <div>
-                <span className="text-muted-foreground">Created:</span>
+                <span className="text-muted-foreground">{t('created')}</span>
                 <p className="font-medium">
                   {new Date(category.created_at).toLocaleDateString('en-US', {
                     year: 'numeric',
@@ -479,7 +481,7 @@ export default function CategoryPage() {
                 </p>
               </div>
               <div>
-                <span className="text-muted-foreground">Last Updated:</span>
+                <span className="text-muted-foreground">{t('lastUpdated')}</span>
                 <p className="font-medium">
                   {new Date(category.updated_at).toLocaleDateString('en-US', {
                     year: 'numeric',
@@ -489,7 +491,7 @@ export default function CategoryPage() {
                 </p>
               </div>
               <div>
-                <span className="text-muted-foreground">Category ID:</span>
+                <span className="text-muted-foreground">{t('categoryId')}</span>
                 <p className="font-mono text-xs">{category.id}</p>
               </div>
             </CardContent>
@@ -501,13 +503,13 @@ export default function CategoryPage() {
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Category</AlertDialogTitle>
+            <AlertDialogTitle>{t('deleteCategory')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete "{category?.name}"? This action cannot be undone and will remove the category from all products.
+              {t('deleteCategoryConfirmation', { name: category?.name })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={deleting}>{t('cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               disabled={deleting}
@@ -516,10 +518,10 @@ export default function CategoryPage() {
               {deleting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Deleting...
+                  {t('deleting')}
                 </>
               ) : (
-                'Delete Category'
+                t('deleteCategory')
               )}
             </AlertDialogAction>
           </AlertDialogFooter>

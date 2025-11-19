@@ -23,7 +23,7 @@ interface CustomerDetailsModalProps {
 }
 
 export function CustomerDetailsModal({ customer, open, onOpenChange }: CustomerDetailsModalProps) {
-  const t = useTranslations('clients')
+  const t = useTranslations('customers')
   const tCommon = useTranslations('common')
 
   const formatCurrency = (amount: number) => {
@@ -141,12 +141,12 @@ export function CustomerDetailsModal({ customer, open, onOpenChange }: CustomerD
           {/* Actions */}
           <div className="flex justify-end gap-2 pt-4 border-t">
             <Button variant="outline" asChild>
-              <Link href={`/admin/clients/${customer.id}`}>
+              <Link href={`/admin/customers/${customer.id}`}>
                 {t('viewFullProfile')}
               </Link>
             </Button>
             <Button asChild>
-              <Link href={`/admin/clients/${customer.id}/edit`}>
+              <Link href={`/admin/customers/${customer.id}/edit`}>
                 {t('editCustomer')}
               </Link>
             </Button>

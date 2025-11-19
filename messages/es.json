@@ -181,7 +181,8 @@
       "digital": "Digital"
     },
     "noProductsFoundFiltered": "No se encontraron productos que coincidan con sus filtros.",
-    "noProductsFoundEmpty": "No hay productos disponibles. ¡Comience agregando algunos!"
+    "noProductsFoundEmpty": "No hay productos disponibles. ¡Comience agregando algunos!",
+    "backToProducts": "Volver a Productos"
   },
   "categories": {
     "title": "Categorías",
@@ -1010,7 +1011,7 @@
       "copyright": "© 2025 {platformName}. Todos los derechos reservados."
     }
   },
-  "clients": {
+  "customers": {
     "title": "Clientes",
     "description": "Gestiona tu base de clientes y visualiza información de clientes",
     "addCustomer": "Agregar Cliente",
@@ -1073,6 +1074,14 @@
     "phone": "Teléfono",
     "notProvided": "No proporcionado",
     "accountType": "Tipo de Cuenta",
+    "addressLine1": "Línea de Dirección 1",
+    "addressLine2": "Línea de Dirección 2",
+    "city": "Ciudad",
+    "state": "Estado/Provincia",
+    "postalCode": "Código Postal",
+    "country": "País",
+    "notes": "Notas",
+    "acceptsMarketing": "Acepta Marketing",
     "marketingEmails": "Correos de Marketing",
     "tags": "Etiquetas",
     "lastUpdate": "Última Actualización",
@@ -1095,6 +1104,68 @@
     "customerTags": "Etiquetas del Cliente",
     "enterTags": "Ingresa etiquetas separadas por comas",
     "tagsDescription": "Usa etiquetas para organizar y categorizar clientes",
-    "enterNotes": "Ingresa notas internas sobre este cliente..."
+    "enterNotes": "Ingresa notas internas sobre este cliente...",
+    "new": {
+      "description": "Agregar un nuevo cliente a tu tienda"
+    },
+    "fields": {
+      "firstName": "Nombre",
+      "lastName": "Apellido",
+      "email": "Correo Electrónico",
+      "phone": "Teléfono",
+      "addressLine1": "Línea de Dirección 1",
+      "addressLine2": "Línea de Dirección 2",
+      "city": "Ciudad",
+      "state": "Estado/Provincia",
+      "postalCode": "Código Postal",
+      "country": "País",
+      "notes": "Notas",
+      "acceptsMarketing": "Acepta Marketing",
+      "status": "Estado"
+    },
+    "placeholders": {
+      "firstName": "Ingrese el nombre",
+      "lastName": "Ingrese el apellido",
+      "email": "Ingrese el correo electrónico",
+      "phone": "Ingrese el número de teléfono",
+      "addressLine1": "Ingrese la dirección",
+      "addressLine2": "Apartamento, suite, etc. (opcional)",
+      "city": "Ingrese la ciudad",
+      "state": "Ingrese el estado/provincia",
+      "postalCode": "Ingrese el código postal",
+      "notes": "Agregar notas sobre este cliente..."
+    },
+    "descriptions": {
+      "acceptsMarketing": "El cliente acepta recibir correos de marketing y contenido promocional"
+    },
+    "actions": {
+      "back": "Volver",
+      "create": "Crear Cliente",
+      "save": "Guardar Cliente",
+      "saving": "Guardando...",
+      "cancel": "Cancelar"
+    },
+    "details": {
+      "personalInfo": "Información Personal",
+      "addressInfo": "Información de Dirección",
+      "accountSettings": "Configuración de Cuenta"
+    },
+    "status": {
+      "active": "Activo",
+      "inactive": "Inactivo",
+      "suspended": "Suspendido"
+    },
+    "countries": {
+      "US": "Estados Unidos",
+      "CA": "Canadá",
+      "MX": "México",
+      "GB": "Reino Unido",
+      "DE": "Alemania",
+      "FR": "Francia",
+      "ES": "España",
+      "IT": "Italia",
+      "AU": "Australia",
+      "JP": "Japón"
+    }
   }
 }

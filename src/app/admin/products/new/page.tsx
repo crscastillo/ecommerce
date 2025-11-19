@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useTranslations } from 'next-intl'
 import { useTenant } from '@/lib/contexts/tenant-context'
 import { TenantDatabase } from '@/lib/supabase/tenant-database'
 import { Button } from '@/components/ui/button'
@@ -45,6 +46,7 @@ interface Brand {
 }
 
 export default function NewProductPage() {
+  const t = useTranslations('products')
   const [loading, setLoading] = useState(false)
   const [categories, setCategories] = useState<Category[]>([])
   const [brands, setBrands] = useState<Brand[]>([])
@@ -539,7 +541,7 @@ export default function NewProductPage() {
         <Button variant="ghost" size="sm" asChild>
           <Link href="/admin/products">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Products
+            {t('backToProducts')}
           </Link>
         </Button>
         <div>

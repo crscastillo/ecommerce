@@ -23,7 +23,7 @@ export function CustomerFilters({
   onStatusFilterChange,
   onMarketingFilterChange
 }: CustomerFiltersProps) {
-  const t = useTranslations('clients')
+  const t = useTranslations('customers')
   const tCommon = useTranslations('common')
 
   return (

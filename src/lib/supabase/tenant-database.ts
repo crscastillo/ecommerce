@@ -389,14 +389,29 @@ export class TenantDatabase {
   }
 
   async createCustomer(customerData: any) {
-    return this.supabase
-      .from('customers')
-      .insert({
-        ...customerData,
-        tenant_id: this.tenantId
+    // Use API route to bypass RLS issues with tenant owners
+    try {
+      const response = await fetch('/api/customers', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          tenant_id: this.tenantId,
+          ...customerData
+        })
       })
-      .select()
-      .single()
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Failed to create customer')
+      }
+
+      const result = await response.json()
+      return { data: result.data, error: null }
+    } catch (error: any) {
+      return { data: null, error: { message: error.message } }
+    }
   }
 
   async updateCustomer(id: string, customerData: any) {

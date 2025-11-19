@@ -24,7 +24,7 @@ interface CustomersTableProps {
 }
 
 export function CustomersTable({ customers, loading, onViewCustomer }: CustomersTableProps) {
-  const t = useTranslations('clients')
+  const t = useTranslations('customers')
   const tCommon = useTranslations('common')
 
   const formatCurrency = (amount: number) => {
@@ -68,7 +68,7 @@ export function CustomersTable({ customers, loading, onViewCustomer }: Customers
       <TableHeader>
         <TableRow>
           <TableHead>{t('customer')}</TableHead>
-          <TableHead>{t('status')}</TableHead>
+          <TableHead>{tCommon('status')}</TableHead>
           <TableHead>{t('orders')}</TableHead>
           <TableHead>{t('totalSpent')}</TableHead>
           <TableHead>{t('lastOrder')}</TableHead>
@@ -94,9 +94,21 @@ export function CustomersTable({ customers, loading, onViewCustomer }: Customers
               </div>
             </TableCell>
             <TableCell>
-              <Badge variant={customer.user_id ? "default" : "secondary"}>
-                {customer.user_id ? t('registered') : t('guest')}
-              </Badge>
+              <div className="space-y-1">
+                <Badge 
+                  variant={
+                    (customer as any).status === 'active' ? 'default' : 
+                    (customer as any).status === 'inactive' ? 'secondary' : 
+                    (customer as any).status === 'suspended' ? 'destructive' :
+                    'default'
+                  }
+                >
+                  {(customer as any).status ? t(`status.${(customer as any).status}`) : t('status.active')}
+                </Badge>
+                <div className="text-xs text-muted-foreground">
+                  {customer.user_id ? t('registered') : t('guest')}
+                </div>
+              </div>
             </TableCell>
             <TableCell>
               {customer.orders_count || 0}
@@ -132,7 +144,7 @@ export function CustomersTable({ customers, loading, onViewCustomer }: Customers
                   size="sm"
                   asChild
                 >
-                  <Link href={`/admin/clients/${customer.id}/edit`}>
+                  <Link href={`/admin/customers/${customer.id}/edit`}>
                     <Edit className="h-4 w-4" />
                   </Link>
                 </Button>

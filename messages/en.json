@@ -185,7 +185,8 @@
       "single": "Single",
       "variable": "Variable",
       "digital": "Digital"
-    }
+    },
+    "backToProducts": "Back to Products"
   },
   "categories": {
     "title": "Categories",
@@ -999,7 +1000,7 @@
       "copyright": "© 2025 {platformName}. All rights reserved."
     }
   },
-  "clients": {
+  "customers": {
     "title": "Customers",
     "description": "Manage your customer base and view customer information",
     "addCustomer": "Add Customer",
@@ -1062,6 +1063,14 @@
     "phone": "Phone",
     "notProvided": "Not provided",
     "accountType": "Account Type",
+    "addressLine1": "Address Line 1",
+    "addressLine2": "Address Line 2",
+    "city": "City",
+    "state": "State/Province",
+    "postalCode": "Postal Code",
+    "country": "Country",
+    "notes": "Notes",
+    "acceptsMarketing": "Accepts Marketing",
     "marketingEmails": "Marketing Emails",
     "tags": "Tags",
     "lastUpdate": "Last Update",
@@ -1084,6 +1093,68 @@
     "customerTags": "Customer Tags",
     "enterTags": "Enter tags separated by commas",
     "tagsDescription": "Use tags to organize and categorize customers",
-    "enterNotes": "Enter internal notes about this customer..."
+    "enterNotes": "Enter internal notes about this customer...",
+    "new": {
+      "description": "Add a new customer to your store"
+    },
+    "fields": {
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email",
+      "phone": "Phone",
+      "addressLine1": "Address Line 1",
+      "addressLine2": "Address Line 2",
+      "city": "City",
+      "state": "State/Province",
+      "postalCode": "Postal Code",
+      "country": "Country",
+      "notes": "Notes",
+      "acceptsMarketing": "Accepts Marketing",
+      "status": "Status"
+    },
+    "placeholders": {
+      "firstName": "Enter first name",
+      "lastName": "Enter last name",
+      "email": "Enter email address",
+      "phone": "Enter phone number",
+      "addressLine1": "Enter street address",
+      "addressLine2": "Apartment, suite, etc. (optional)",
+      "city": "Enter city",
+      "state": "Enter state/province",
+      "postalCode": "Enter postal code",
+      "notes": "Add notes about this customer..."
+    },
+    "descriptions": {
+      "acceptsMarketing": "Customer agrees to receive marketing emails and promotional content"
+    },
+    "actions": {
+      "back": "Back",
+      "create": "Create Customer",
+      "save": "Save Customer",
+      "saving": "Saving...",
+      "cancel": "Cancel"
+    },
+    "details": {
+      "personalInfo": "Personal Information",
+      "addressInfo": "Address Information",
+      "accountSettings": "Account Settings"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "suspended": "Suspended"
+    },
+    "countries": {
+      "US": "United States",
+      "CA": "Canada",
+      "MX": "Mexico",
+      "GB": "United Kingdom",
+      "DE": "Germany",
+      "FR": "France",
+      "ES": "Spain",
+      "IT": "Italy",
+      "AU": "Australia",
+      "JP": "Japan"
+    }
   }
 }

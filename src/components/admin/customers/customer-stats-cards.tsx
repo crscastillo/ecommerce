@@ -17,7 +17,7 @@ interface CustomerStatsCardsProps {
 }
 
 export function CustomerStatsCards({ stats, loading }: CustomerStatsCardsProps) {
-  const t = useTranslations('clients')
+  const t = useTranslations('customers')
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {

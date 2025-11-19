@@ -21,7 +21,7 @@ type Customer = Database['public']['Tables']['customers']['Row']
 
 export default function CustomersPage() {
   const { tenant } = useTenant()
-  const t = useTranslations('clients')
+  const t = useTranslations('customers')
   const tCommon = useTranslations('common')
   
   const [customers, setCustomers] = useState<Customer[]>([])

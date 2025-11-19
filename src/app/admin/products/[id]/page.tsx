@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { useTenant } from '@/lib/contexts/tenant-context'
 import { TenantDatabase } from '@/lib/supabase/tenant-database'
 import { formatPrice } from '@/lib/utils/currency'
@@ -93,6 +94,7 @@ export default function ProductViewPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { tenant } = useTenant()
+  const t = useTranslations('products')
   const productId = params.id as string
 
   const [loading, setLoading] = useState(true)
@@ -679,7 +681,7 @@ export default function ProductViewPage() {
             <Button asChild>
               <Link href="/admin/products">
                 <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to Products
+                {t('backToProducts')}
               </Link>
             </Button>
           </CardContent>
@@ -698,7 +700,7 @@ export default function ProductViewPage() {
           <Button variant="ghost" size="sm" asChild>
             <Link href="/admin/products">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Products
+              {t('backToProducts')}
             </Link>
           </Button>
           <div>

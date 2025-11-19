@@ -15,6 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { DetailedSelect } from '@/components/ui/detailed-select'
 import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
 import { ImageUpload } from '@/components/admin/image-upload'
@@ -565,43 +566,29 @@ export default function NewProductPage() {
                 {/* Product Type Selection */}
                 <div>
                   <Label htmlFor="product_type">Product Type *</Label>
-                  <Select 
-                    value={formData.product_type} 
-                    onValueChange={(value: 'single' | 'variable' | 'digital') => handleInputChange('product_type', value)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select product type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="single">
-                        <div className="flex items-center gap-2">
-                          <span>📦</span>
-                          <div>
-                            <div className="font-medium">Single Product</div>
-                            <div className="text-xs text-gray-500">Simple product with one variant</div>
-                          </div>
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="variable">
-                        <div className="flex items-center gap-2">
-                          <span>🔧</span>
-                          <div>
-                            <div className="font-medium">Variable Product</div>
-                            <div className="text-xs text-gray-500">Product with multiple variants (size, color, etc.)</div>
-                          </div>
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="digital">
-                        <div className="flex items-center gap-2">
-                          <span>💾</span>
-                          <div>
-                            <div className="font-medium">Digital Product</div>
-                            <div className="text-xs text-gray-500">Downloadable digital content</div>
-                          </div>
-                        </div>
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <DetailedSelect
+                    id="product_type"
+                    value={formData.product_type}
+                    onValueChange={(value) => handleInputChange('product_type', value as 'single' | 'variable' | 'digital')}
+                    placeholder="Select product type"
+                    options={[
+                      {
+                        value: 'single',
+                        label: 'Single Product',
+                        description: 'Simple product with one variant'
+                      },
+                      {
+                        value: 'variable',
+                        label: 'Variable Product',
+                        description: 'Product with multiple variants (size, color, etc.)'
+                      },
+                      {
+                        value: 'digital',
+                        label: 'Digital Product',
+                        description: 'Downloadable digital content'
+                      }
+                    ]}
+                  />
                 </div>
 
                 <div className="grid gap-4 sm:grid-cols-2">

@@ -26,6 +26,13 @@ export interface SecurityFeatureFlags {
   advanced_session_management: boolean
 }
 
+export interface PluginFeatureFlags {
+  plugin_google_analytics: boolean
+  plugin_facebook_pixel: boolean
+  plugin_mailchimp: boolean
+  plugin_whatsapp: boolean
+}
+
 export class FeatureFlagsService {
   /**
    * Get all feature flags
@@ -309,6 +316,59 @@ export class FeatureFlagsService {
           break
         case 'advanced_session_management':
           flags.advanced_session_management = isEnabled
+          break
+      }
+    })
+    
+    return flags
+  }
+
+  /**
+   * Get enabled plugin features for a specific tier
+   */
+  static async getEnabledPluginFeaturesForTier(tier: 'basic' | 'pro' | 'enterprise'): Promise<PluginFeatureFlags> {
+    const supabase = createClient()
+    
+    const { data, error } = await supabase
+      .from('platform_feature_flags')
+      .select('feature_key, enabled, target_tiers')
+      .eq('category', 'plugins')
+    
+    if (error) {
+      console.error('Error fetching plugin feature flags:', error)
+      // Return all disabled as fallback
+      return {
+        plugin_google_analytics: false,
+        plugin_facebook_pixel: false,
+        plugin_mailchimp: false,
+        plugin_whatsapp: false
+      }
+    }
+    
+    const flags: PluginFeatureFlags = {
+      plugin_google_analytics: false,
+      plugin_facebook_pixel: false,
+      plugin_mailchimp: false,
+      plugin_whatsapp: false
+    }
+    
+    data?.forEach(flag => {
+      // Check if the flag is enabled AND the tier has access
+      const tierHasAccess = flag.target_tiers ? flag.target_tiers.includes(tier) : true
+      const isEnabled = flag.enabled && tierHasAccess
+      
+      switch (flag.feature_key) {
+        case 'plugin_google_analytics':
+          flags.plugin_google_analytics = isEnabled
+          break
+        case 'plugin_facebook_pixel':
+          flags.plugin_facebook_pixel = isEnabled
+          break
+        case 'plugin_mailchimp':
+          flags.plugin_mailchimp = isEnabled
+          break
+        case 'plugin_whatsapp':
+          flags.plugin_whatsapp = isEnabled
           break
       }
     })

@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useTranslations } from 'next-intl'
 import { Database } from '@/lib/types/database'
 import { PaymentMethodsService } from '@/lib/services/payment-methods'
+import { FeatureFlagsService, PluginFeatureFlags } from '@/lib/services/feature-flags'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -160,6 +161,13 @@ export default function SettingsPage() {
 
   const [inviteEmail, setInviteEmail] = useState('')
   const [inviteRole, setInviteRole] = useState('staff')
+  const [pluginFeatures, setPluginFeatures] = useState<PluginFeatureFlags>({
+    plugin_google_analytics: false,
+    plugin_facebook_pixel: false,
+    plugin_mailchimp: false,
+    plugin_whatsapp: false
+  })
+  const [pluginFeaturesLoaded, setPluginFeaturesLoaded] = useState(false)
 
   const supabase = createClient()
 
@@ -173,6 +181,7 @@ export default function SettingsPage() {
       loadSettings()
       loadTenantUsers()
       loadPaymentMethods()
+      loadPluginFeatures()
     }
   }, [tenant?.id])
 
@@ -301,6 +310,22 @@ export default function SettingsPage() {
       })
     } catch (error) {
       console.error('Error loading payment methods:', error)
+    }
+  }
+
+  const loadPluginFeatures = async () => {
+    if (!tenant?.subscription_tier) return
+
+    try {
+      const features = await FeatureFlagsService.getEnabledPluginFeaturesForTier(
+        tenant.subscription_tier as 'basic' | 'pro' | 'enterprise'
+      )
+      setPluginFeatures(features)
+    } catch (error) {
+      console.error('Failed to load plugin features:', error)
+      // Keep default disabled state on error
+    } finally {
+      setPluginFeaturesLoaded(true)
     }
   }
 
@@ -615,7 +640,16 @@ export default function SettingsPage() {
 
       {/* Settings Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-7">
+        {(() => {
+          const hasAnyPlugins = pluginFeaturesLoaded && (
+            pluginFeatures.plugin_google_analytics ||
+            pluginFeatures.plugin_facebook_pixel ||
+            pluginFeatures.plugin_mailchimp ||
+            pluginFeatures.plugin_whatsapp
+          )
+          
+          return (
+            <TabsList className={hasAnyPlugins ? "grid w-full grid-cols-7" : "grid w-full grid-cols-6"}>
           <TabsTrigger value="store" className="flex items-center space-x-2">
             <Store className="h-4 w-4" />
             <span>{t('tabs.store')}</span>
@@ -632,10 +666,12 @@ export default function SettingsPage() {
             <CreditCard className="h-4 w-4" />
             <span>{t('tabs.payments')}</span>
           </TabsTrigger>
-          <TabsTrigger value="plugins" className="flex items-center space-x-2">
-            <Puzzle className="h-4 w-4" />
-            <span>{t('tabs.plugins')}</span>
-          </TabsTrigger>
+          {hasAnyPlugins && (
+            <TabsTrigger value="plugins" className="flex items-center space-x-2">
+              <Puzzle className="h-4 w-4" />
+              <span>{t('tabs.plugins')}</span>
+            </TabsTrigger>
+          )}
           <TabsTrigger value="users" className="flex items-center space-x-2">
             <Users className="h-4 w-4" />
             <span>{t('tabs.users')}</span>
@@ -644,7 +680,9 @@ export default function SettingsPage() {
             <Shield className="h-4 w-4" />
             <span>{t('tabs.security')}</span>
           </TabsTrigger>
-        </TabsList>
+            </TabsList>
+          )
+        })()}
 
         {/* Store Settings - Using Refactored Component */}
         <TabsContent value="store" className="space-y-6">
@@ -689,9 +727,16 @@ export default function SettingsPage() {
         </TabsContent>
 
         {/* Plugins Management */}
-        <TabsContent value="plugins" className="space-y-6">
-          <PluginsTab />
-        </TabsContent>
+        {pluginFeaturesLoaded && (
+          pluginFeatures.plugin_google_analytics ||
+          pluginFeatures.plugin_facebook_pixel ||
+          pluginFeatures.plugin_mailchimp ||
+          pluginFeatures.plugin_whatsapp
+        ) && (
+          <TabsContent value="plugins" className="space-y-6">
+            <PluginsTab tenant={tenant} />
+          </TabsContent>
+        )}
 
         {/* Users Management */}
         <TabsContent value="users" className="space-y-6">

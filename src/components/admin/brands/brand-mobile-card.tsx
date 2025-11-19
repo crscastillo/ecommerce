@@ -158,7 +158,7 @@ export function BrandMobileCard({ brand, onEdit, onDelete }: BrandMobileCardProp
           <AlertDialogHeader>
             <AlertDialogTitle>{t('deleteBrand')}</AlertDialogTitle>
             <AlertDialogDescription>
-              {t('deleteBrandConfirmation', { name: deleteBrand?.name })}
+              {t('deleteBrandConfirmation', { name: deleteBrand?.name || '' })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

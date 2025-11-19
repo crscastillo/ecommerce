@@ -23,7 +23,7 @@ import {
 } from '@/lib/types/category'
 
 export default function CategoriesPage() {
-  const { tenant, isLoading: tenantLoading } = useTenant()
+  const { tenant } = useTenant()
   const t = useTranslations()
   
   // State for filters
@@ -48,48 +48,6 @@ export default function CategoriesPage() {
 
   const handleToggleStatus = async (categoryId: string, currentStatus: boolean) => {
     await toggleCategoryStatus(categoryId, currentStatus)
-  }
-
-  // Show loading state while tenant is loading
-  if (tenantLoading) {
-    return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold">{t('navigation.categories')}</h1>
-        </div>
-        <div className="text-center py-8">
-          <p>Loading...</p>
-        </div>
-      </div>
-    )
-  }
-
-  // Show tenant access required message if no tenant after loading
-  if (!tenantLoading && !tenant) {
-    return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold">{t('navigation.categories')}</h1>
-        </div>
-        <Card>
-          <CardContent className="p-8 text-center">
-            <AlertCircle className="mx-auto h-12 w-12 text-orange-500 mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">{t('errors.tenantAccessRequired')}</h3>
-            <p className="text-gray-600 mb-4">
-              {t('categories.managementRequiresAccess')}
-            </p>
-            <Button onClick={() => window.location.href = '/'}>
-              {t('common.goToMainSite')}
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    )
-  }
-
-  // Don't render until we have a tenant
-  if (!tenant) {
-    return null
   }
 
   // Check if filters are active

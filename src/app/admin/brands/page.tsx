@@ -20,7 +20,7 @@ import { BrandFilters } from '@/lib/types/brand'
 import { useToast } from '@/lib/contexts/toast-context'
 
 export default function BrandsPage() {
-  const { tenant, isLoading: tenantLoading } = useTenant()
+  const { tenant } = useTenant()
   const { success, error: showError } = useToast()
   const t = useTranslations('brands')
   const tCommon = useTranslations('common')
@@ -52,49 +52,7 @@ export default function BrandsPage() {
     }
   }
 
-  // Show loading state while tenant is loading
-  if (tenantLoading) {
-    return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold">{t('navigation.brands')}</h1>
-        </div>
-        <div className="text-center py-8">
-          <p>{tCommon('loading')}</p>
-        </div>
-      </div>
-    )
-  }
-
-  // Show tenant access required message if no tenant after loading
-  if (!tenantLoading && !tenant) {
-    return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold">{t('navigation.brands')}</h1>
-        </div>
-        <Card>
-          <CardContent className="p-8 text-center">
-            <AlertCircle className="mx-auto h-12 w-12 text-orange-500 mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">{tErrors('tenantAccessRequired')}</h3>
-            <p className="text-gray-600 mb-4">
-              {t('managementRequiresAccess')}
-            </p>
-            <Button onClick={() => window.location.href = '/'}>
-              {tCommon('goToMainSite')}
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    )
-  }
-
-  // Don't render until we have a tenant
-  if (!tenant) {
-    return null
-  }
-
-  // Check if filters are active
+    // Check if filters are active
   const hasFilters = Boolean(filters.search || filters.status !== 'all')
 
   return (

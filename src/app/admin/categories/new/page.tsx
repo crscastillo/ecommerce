@@ -35,7 +35,7 @@ import {
 export default function NewCategoryPage() {
   const t = useTranslations('categories')
   const router = useRouter()
-  const { tenant, isLoading: tenantLoading } = useTenant()
+  const { tenant } = useTenant()
   
   // State
   const [formData, setFormData] = useState(defaultCategoryFormData)
@@ -213,48 +213,6 @@ export default function NewCategoryPage() {
     } finally {
       setSaving(false)
     }
-  }
-
-  // Show loading state while tenant is loading
-  if (tenantLoading) {
-    return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold">{t('createCategory')}</h1>
-        </div>
-        <div className="text-center py-8">
-          <p>{t('loading')}</p>
-        </div>
-      </div>
-    )
-  }
-
-  // Show tenant access required message if no tenant after loading
-  if (!tenantLoading && !tenant) {
-    return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold">{t('createCategory')}</h1>
-        </div>
-        <Card>
-          <CardContent className="p-8 text-center">
-            <AlertCircle className="mx-auto h-12 w-12 text-orange-500 mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">{t('tenantAccessRequired')}</h3>
-            <p className="text-gray-600 mb-4">
-              {t('categoryCreationRequiresAccess')}
-            </p>
-            <Button onClick={() => window.location.href = '/'}>
-              {t('goToMainSite')}
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    )
-  }
-
-  // Don't render until we have a tenant
-  if (!tenant) {
-    return null
   }
 
   return (

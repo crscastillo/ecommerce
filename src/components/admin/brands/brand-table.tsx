@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import {
@@ -49,6 +50,7 @@ type SortField = 'name' | 'created_at' | 'updated_at' | 'sort_order' | 'product_
 type SortDirection = 'asc' | 'desc'
 
 export function BrandTable({ brands, onEdit, onDelete }: BrandTableProps) {
+  const t = useTranslations('brands')
   const [sortField, setSortField] = useState<SortField>('sort_order')
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc')
   const [deleteBrand, setDeleteBrand] = useState<BrandWithProductCount | null>(null)
@@ -100,8 +102,8 @@ export function BrandTable({ brands, onEdit, onDelete }: BrandTableProps) {
     return (
       <div className="text-center py-12">
         <Package className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-        <h3 className="text-lg font-medium text-gray-900 mb-2">No brands found</h3>
-        <p className="text-gray-500">Get started by creating your first brand.</p>
+        <h3 className="text-lg font-medium text-gray-900 mb-2">{t('noBrandsFound')}</h3>
+        <p className="text-gray-500">{t('getBrandsStarted')}</p>
       </div>
     )
   }
@@ -111,25 +113,25 @@ export function BrandTable({ brands, onEdit, onDelete }: BrandTableProps) {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-[50px]">Logo</TableHead>
+            <TableHead className="w-[50px]">{t('logo')}</TableHead>
             <TableHead>
               <Button
                 variant="ghost"
                 onClick={() => handleSort('name')}
                 className="h-auto p-0 font-semibold hover:bg-transparent"
               >
-                Name
+                {t('name')}
                 <SortIcon field="name" />
               </Button>
             </TableHead>
-            <TableHead>Status</TableHead>
+            <TableHead>{t('status')}</TableHead>
             <TableHead>
               <Button
                 variant="ghost"
                 onClick={() => handleSort('product_count')}
                 className="h-auto p-0 font-semibold hover:bg-transparent"
               >
-                Products
+                {t('products')}
                 <SortIcon field="product_count" />
               </Button>
             </TableHead>
@@ -139,7 +141,7 @@ export function BrandTable({ brands, onEdit, onDelete }: BrandTableProps) {
                 onClick={() => handleSort('sort_order')}
                 className="h-auto p-0 font-semibold hover:bg-transparent"
               >
-                Sort
+                {t('sort')}
                 <SortIcon field="sort_order" />
               </Button>
             </TableHead>
@@ -149,11 +151,11 @@ export function BrandTable({ brands, onEdit, onDelete }: BrandTableProps) {
                 onClick={() => handleSort('created_at')}
                 className="h-auto p-0 font-semibold hover:bg-transparent"
               >
-                Created
+                {t('created')}
                 <SortIcon field="created_at" />
               </Button>
             </TableHead>
-            <TableHead className="w-[50px]">Actions</TableHead>
+            <TableHead className="w-[50px]">{t('actions')}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -200,7 +202,7 @@ export function BrandTable({ brands, onEdit, onDelete }: BrandTableProps) {
                           className="flex items-center gap-1"
                         >
                           <ExternalLink className="h-3 w-3" />
-                          Website
+                          {t('website')}
                         </a>
                       </Button>
                     )}
@@ -209,7 +211,7 @@ export function BrandTable({ brands, onEdit, onDelete }: BrandTableProps) {
               </TableCell>
               <TableCell>
                 <Badge variant={brand.is_active ? 'default' : 'secondary'}>
-                  {brand.is_active ? 'Active' : 'Inactive'}
+                  {brand.is_active ? t('active') : t('inactive')}
                 </Badge>
               </TableCell>
               <TableCell>
@@ -237,14 +239,14 @@ export function BrandTable({ brands, onEdit, onDelete }: BrandTableProps) {
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem onClick={() => onEdit(brand.id)}>
                       <Edit2 className="mr-2 h-4 w-4" />
-                      Edit
+                      {t('edit')}
                     </DropdownMenuItem>
                     <DropdownMenuItem 
                       onClick={() => setDeleteBrand(brand)}
                       className="text-red-600"
                     >
                       <Trash2 className="mr-2 h-4 w-4" />
-                      Delete
+                      {t('delete')}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -258,13 +260,13 @@ export function BrandTable({ brands, onEdit, onDelete }: BrandTableProps) {
       <AlertDialog open={!!deleteBrand} onOpenChange={() => setDeleteBrand(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Brand</AlertDialogTitle>
+            <AlertDialogTitle>{t('deleteBrand')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete "{deleteBrand?.name}"? This action cannot be undone and will remove the brand association from all products.
+              {t('deleteBrandConfirmation', { name: deleteBrand?.name })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={async () => {
                 if (!deleteBrand) return
@@ -281,7 +283,7 @@ export function BrandTable({ brands, onEdit, onDelete }: BrandTableProps) {
               disabled={deleting}
               className="bg-red-600 hover:bg-red-700"
             >
-              {deleting ? 'Deleting...' : 'Delete Brand'}
+              {deleting ? t('deleting') : t('deleteBrand')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

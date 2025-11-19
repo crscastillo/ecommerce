@@ -16,6 +16,7 @@ import { BrandFormData, defaultBrandFormData, Brand } from '@/lib/types/brand'
 import { TenantDatabase } from '@/lib/supabase/tenant-database'
 import { useTenant } from '@/lib/contexts/tenant-context'
 import { createClient } from '@/lib/supabase/client'
+import { useTranslations } from 'next-intl'
 
 interface BrandFormProps {
   initialData?: Brand
@@ -26,6 +27,7 @@ export function BrandForm({ initialData, mode }: BrandFormProps) {
   const router = useRouter()
   const { tenant } = useTenant()
   const { createBrand, updateBrand, loading } = useBrandActions()
+  const t = useTranslations('brands')
 
   const [formData, setFormData] = useState<BrandFormData>(() => {
     if (initialData) {
@@ -112,7 +114,7 @@ export function BrandForm({ initialData, mode }: BrandFormProps) {
         
         setErrors(prev => ({
           ...prev,
-          slug: isDuplicate ? 'This slug is already in use by another brand' : undefined
+          slug: isDuplicate ? t('slugAlreadyInUse') : undefined
         }))
       } catch (error) {
         console.error('Error validating slug:', error)
@@ -128,22 +130,22 @@ export function BrandForm({ initialData, mode }: BrandFormProps) {
     const newErrors: Partial<BrandFormData> = {}
 
     if (!formData.name.trim()) {
-      newErrors.name = 'Name is required'
+      newErrors.name = t('nameIsRequired')
     }
 
     if (!formData.slug.trim()) {
-      newErrors.slug = 'Slug is required'
+      newErrors.slug = t('slugIsRequired')
     } else if (!/^[a-z0-9-]+$/.test(formData.slug)) {
-      newErrors.slug = 'Slug can only contain lowercase letters, numbers, and hyphens'
+      newErrors.slug = t('slugInvalidFormat')
     }
 
     const sortOrder = parseInt(formData.sort_order)
     if (isNaN(sortOrder) || sortOrder < 0) {
-      newErrors.sort_order = 'Sort order must be a valid number'
+      newErrors.sort_order = t('sortOrderMustBeValid')
     }
 
     if (formData.website_url && !formData.website_url.match(/^https?:\/\/.+/)) {
-      newErrors.website_url = 'Website URL must start with http:// or https://'
+      newErrors.website_url = t('websiteUrlMustBeValid')
     }
 
     setErrors(newErrors)
@@ -191,22 +193,22 @@ export function BrandForm({ initialData, mode }: BrandFormProps) {
             onClick={() => router.back()}
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back
+            {t('back')}
           </Button>
           <div>
             <h1 className="text-2xl font-bold">
-              {mode === 'create' ? 'Create Brand' : 'Edit Brand'}
+              {mode === 'create' ? t('createBrand') : t('editBrand')}
             </h1>
             {initialData && (
               <p className="text-muted-foreground">
-                Editing {initialData.name}
+                {t('editingBrand', { name: initialData.name })}
               </p>
             )}
           </div>
         </div>
         <Button type="submit" disabled={loading}>
           <Save className="w-4 h-4 mr-2" />
-          {loading ? 'Saving...' : 'Save Brand'}
+          {loading ? t('savingBrand') : t('saveBrand')}
         </Button>
       </div>
 
@@ -215,17 +217,17 @@ export function BrandForm({ initialData, mode }: BrandFormProps) {
           {/* Basic Information */}
           <Card>
             <CardHeader>
-              <CardTitle>Basic Information</CardTitle>
+              <CardTitle>{t('basicInformation')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="name">Name *</Label>
+                  <Label htmlFor="name">{t('nameRequired')}</Label>
                   <Input
                     id="name"
                     value={formData.name}
                     onChange={(e) => handleNameChange(e.target.value)}
-                    placeholder="Enter brand name"
+                    placeholder={t('enterBrandName')}
                   />
                   {errors.name && (
                     <Alert variant="destructive">
@@ -236,13 +238,13 @@ export function BrandForm({ initialData, mode }: BrandFormProps) {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="slug">Slug *</Label>
+                  <Label htmlFor="slug">{t('slugRequired')}</Label>
                   <div className="relative">
                     <Input
                       id="slug"
                       value={formData.slug}
                       onChange={(e) => handleSlugChange(e.target.value)}
-                      placeholder="brand-slug"
+                      placeholder={t('brandSlugPlaceholder')}
                       className={errors.slug ? 'border-red-500' : ''}
                     />
                     {slugValidating && (
@@ -258,42 +260,42 @@ export function BrandForm({ initialData, mode }: BrandFormProps) {
                     </Alert>
                   )}
                   {!errors.slug && formData.slug && !slugValidating && (
-                    <p className="text-sm text-green-600">✓ Slug is available</p>
+                    <p className="text-sm text-green-600">{t('slugIsAvailable')}</p>
                   )}
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
+                <Label htmlFor="description">{t('description')}</Label>
                 <Textarea
                   id="description"
                   value={formData.description}
                   onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                  placeholder="Enter brand description"
+                  placeholder={t('enterBrandDescription')}
                   rows={3}
                 />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="logo_url">Logo URL</Label>
+                  <Label htmlFor="logo_url">{t('logoUrl')}</Label>
                   <Input
                     id="logo_url"
                     type="url"
                     value={formData.logo_url}
                     onChange={(e) => setFormData(prev => ({ ...prev, logo_url: e.target.value }))}
-                    placeholder="https://example.com/logo.png"
+                    placeholder={t('logoUrlPlaceholder')}
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="website_url">Website URL</Label>
+                  <Label htmlFor="website_url">{t('websiteUrl')}</Label>
                   <Input
                     id="website_url"
                     type="url"
                     value={formData.website_url}
                     onChange={(e) => setFormData(prev => ({ ...prev, website_url: e.target.value }))}
-                    placeholder="https://example.com"
+                    placeholder={t('websiteUrlPlaceholder')}
                   />
                   {errors.website_url && (
                     <Alert variant="destructive">
@@ -309,26 +311,26 @@ export function BrandForm({ initialData, mode }: BrandFormProps) {
           {/* SEO Information */}
           <Card>
             <CardHeader>
-              <CardTitle>SEO Information</CardTitle>
+              <CardTitle>{t('seoInformation')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="seo_title">SEO Title</Label>
+                <Label htmlFor="seo_title">{t('seoTitle')}</Label>
                 <Input
                   id="seo_title"
                   value={formData.seo_title}
                   onChange={(e) => setFormData(prev => ({ ...prev, seo_title: e.target.value }))}
-                  placeholder="SEO optimized title"
+                  placeholder={t('seoTitlePlaceholder')}
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="seo_description">SEO Description</Label>
+                <Label htmlFor="seo_description">{t('seoDescription')}</Label>
                 <Textarea
                   id="seo_description"
                   value={formData.seo_description}
                   onChange={(e) => setFormData(prev => ({ ...prev, seo_description: e.target.value }))}
-                  placeholder="SEO meta description"
+                  placeholder={t('seoDescriptionPlaceholder')}
                   rows={3}
                 />
               </div>
@@ -340,7 +342,7 @@ export function BrandForm({ initialData, mode }: BrandFormProps) {
           {/* Preview */}
           <Card>
             <CardHeader>
-              <CardTitle>Preview</CardTitle>
+              <CardTitle>{t('preview')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -361,7 +363,7 @@ export function BrandForm({ initialData, mode }: BrandFormProps) {
                     </div>
                   )}
                   <div>
-                    <h3 className="font-semibold">{formData.name || 'Brand Name'}</h3>
+                    <h3 className="font-semibold">{formData.name || t('brandNamePlaceholder')}</h3>
                     {formData.description && (
                       <p className="text-sm text-muted-foreground line-clamp-2">
                         {formData.description}
@@ -389,14 +391,14 @@ export function BrandForm({ initialData, mode }: BrandFormProps) {
           {/* Settings */}
           <Card>
             <CardHeader>
-              <CardTitle>Settings</CardTitle>
+              <CardTitle>{t('settings')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <Label>Status</Label>
+                  <Label>{t('brandStatus')}</Label>
                   <p className="text-sm text-muted-foreground">
-                    Make this brand {formData.is_active ? 'visible' : 'hidden'} on the website
+                    {t('brandStatusDescription', { status: formData.is_active ? t('visible') : t('hidden') })}
                   </p>
                 </div>
                 <Switch
@@ -408,14 +410,14 @@ export function BrandForm({ initialData, mode }: BrandFormProps) {
               <Separator />
 
               <div className="space-y-2">
-                <Label htmlFor="sort_order">Sort Order</Label>
+                <Label htmlFor="sort_order">{t('sortOrder')}</Label>
                 <Input
                   id="sort_order"
                   type="number"
                   min="0"
                   value={formData.sort_order}
                   onChange={(e) => setFormData(prev => ({ ...prev, sort_order: e.target.value }))}
-                  placeholder="0"
+                  placeholder={t('sortOrderPlaceholder')}
                 />
                 {errors.sort_order && (
                   <Alert variant="destructive">
@@ -424,7 +426,7 @@ export function BrandForm({ initialData, mode }: BrandFormProps) {
                   </Alert>
                 )}
                 <p className="text-sm text-muted-foreground">
-                  Lower numbers appear first
+                  {t('sortOrderDescription')}
                 </p>
               </div>
             </CardContent>

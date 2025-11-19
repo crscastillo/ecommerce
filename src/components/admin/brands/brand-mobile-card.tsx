@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -30,6 +31,7 @@ interface BrandMobileCardProps {
 }
 
 export function BrandMobileCard({ brand, onEdit, onDelete }: BrandMobileCardProps) {
+  const t = useTranslations('brands')
   const [deleteBrand, setDeleteBrand] = useState<BrandWithProductCount | null>(null)
   const [deleting, setDeleting] = useState(false)
 
@@ -85,14 +87,14 @@ export function BrandMobileCard({ brand, onEdit, onDelete }: BrandMobileCardProp
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={() => onEdit(brand.id)}>
                 <Edit2 className="h-4 w-4 mr-2" />
-                Edit
+                {t('edit')}
               </DropdownMenuItem>
               <DropdownMenuItem 
                 onClick={() => setDeleteBrand(brand)}
                 className="text-red-600"
               >
                 <Trash2 className="h-4 w-4 mr-2" />
-                Delete
+                {t('delete')}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -103,12 +105,12 @@ export function BrandMobileCard({ brand, onEdit, onDelete }: BrandMobileCardProp
         {/* Status and Product Count */}
         <div className="flex items-center justify-between">
           <Badge variant={brand.is_active ? 'default' : 'secondary'}>
-            {brand.is_active ? 'Active' : 'Inactive'}
+            {brand.is_active ? t('active') : t('inactive')}
           </Badge>
           {typeof brand.product_count === 'number' && (
             <div className="flex items-center gap-1 text-sm text-muted-foreground">
               <Package className="h-3 w-3" />
-              <span>{brand.product_count} products</span>
+              <span>{brand.product_count} {t('products').toLowerCase()}</span>
             </div>
           )}
         </div>
@@ -129,7 +131,7 @@ export function BrandMobileCard({ brand, onEdit, onDelete }: BrandMobileCardProp
                 className="flex items-center gap-1"
               >
                 <ExternalLink className="h-3 w-3" />
-                Visit Website
+                {t('website')}
               </a>
             </Button>
           </div>
@@ -137,9 +139,9 @@ export function BrandMobileCard({ brand, onEdit, onDelete }: BrandMobileCardProp
 
         {/* Metadata */}
         <div className="text-xs text-muted-foreground space-y-1">
-          <div>Created: {new Date(brand.created_at).toLocaleDateString()}</div>
+          <div>{t('created')}: {new Date(brand.created_at).toLocaleDateString()}</div>
           {brand.updated_at && brand.updated_at !== brand.created_at && (
-            <div>Updated: {new Date(brand.updated_at).toLocaleDateString()}</div>
+            <div>{t('updated')}: {new Date(brand.updated_at).toLocaleDateString()}</div>
           )}
           {brand.slug && (
             <div className="font-mono bg-muted px-1.5 py-0.5 rounded text-xs inline-block">
@@ -154,19 +156,19 @@ export function BrandMobileCard({ brand, onEdit, onDelete }: BrandMobileCardProp
       <AlertDialog open={!!deleteBrand} onOpenChange={() => setDeleteBrand(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Brand</AlertDialogTitle>
+            <AlertDialogTitle>{t('deleteBrand')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete "{deleteBrand?.name}"? This action cannot be undone and will remove the brand association from all products.
+              {t('deleteBrandConfirmation', { name: deleteBrand?.name })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               disabled={deleting}
               className="bg-red-600 hover:bg-red-700"
             >
-              {deleting ? 'Deleting...' : 'Delete Brand'}
+              {deleting ? t('deleting') : t('deleteBrand')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

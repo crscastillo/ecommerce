@@ -22,7 +22,10 @@ import { useToast } from '@/lib/contexts/toast-context'
 export default function BrandsPage() {
   const { tenant, isLoading: tenantLoading } = useTenant()
   const { success, error: showError } = useToast()
-  const t = useTranslations()
+  const t = useTranslations('brands')
+  const tCommon = useTranslations('common')
+  const tErrors = useTranslations('errors')
+  const tNavigation = useTranslations('navigation')
   
   // State for filters
   const [filters, setFilters] = useState<BrandFilters>({
@@ -57,7 +60,7 @@ export default function BrandsPage() {
           <h1 className="text-3xl font-bold">{t('navigation.brands')}</h1>
         </div>
         <div className="text-center py-8">
-          <p>Loading...</p>
+          <p>{tCommon('loading')}</p>
         </div>
       </div>
     )
@@ -73,12 +76,12 @@ export default function BrandsPage() {
         <Card>
           <CardContent className="p-8 text-center">
             <AlertCircle className="mx-auto h-12 w-12 text-orange-500 mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">{t('errors.tenantAccessRequired')}</h3>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">{tErrors('tenantAccessRequired')}</h3>
             <p className="text-gray-600 mb-4">
-              {t('brands.managementRequiresAccess')}
+              {t('managementRequiresAccess')}
             </p>
             <Button onClick={() => window.location.href = '/'}>
-              {t('common.goToMainSite')}
+              {tCommon('goToMainSite')}
             </Button>
           </CardContent>
         </Card>
@@ -104,10 +107,10 @@ export default function BrandsPage() {
             <div className="flex items-center gap-2">
               <Package className="h-5 w-5 text-gray-600" />
               <div>
-                <h1 className="text-xl font-bold tracking-tight">{t('navigation.brands')}</h1>
+                <h1 className="text-xl font-bold tracking-tight">{tNavigation('brands')}</h1>
                 {brands.length > 0 && (
                   <p className="text-muted-foreground text-xs">
-                    {t('brands.brandCount', { count: brands.length })}
+                    {t('brandCount', { count: brands.length })}
                   </p>
                 )}
               </div>
@@ -115,7 +118,7 @@ export default function BrandsPage() {
             <Button asChild size="sm" className="h-8 px-3">
               <Link href="/admin/brands/new">
                 <Plus className="mr-1 h-3 w-3" />
-                {t('common.add')}
+                {tCommon('add')}
               </Link>
             </Button>
           </div>
@@ -125,12 +128,12 @@ export default function BrandsPage() {
         <div className="hidden md:flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <Package className="h-8 w-8 text-gray-600" />
-            <h1 className="text-3xl font-bold">{t('navigation.brands')}</h1>
+            <h1 className="text-3xl font-bold">{tNavigation('brands')}</h1>
           </div>
           <Button asChild>
             <Link href="/admin/brands/new">
               <Plus className="mr-2 h-4 w-4" />
-              {t('brands.addBrand')}
+              {t('addBrand')}
             </Link>
           </Button>
         </div>
@@ -169,10 +172,10 @@ export default function BrandsPage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Package className="h-5 w-5" />
-            {t('brands.brandsWithCount', { count: brands.length })}
+            {t('brandsWithCount', { count: brands.length })}
           </CardTitle>
           <CardDescription>
-            {t('brands.manageBrandPortfolio')}
+            {t('manageBrandPortfolio')}
           </CardDescription>
         </CardHeader>
         <CardContent>

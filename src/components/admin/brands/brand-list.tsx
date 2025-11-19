@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Plus, Grid, List, Package } from 'lucide-react'
 import Link from 'next/link'
@@ -23,6 +24,8 @@ export function BrandList({
   onDelete
 }: BrandListProps) {
   const router = useRouter()
+  const t = useTranslations('brands')
+  const tCommon = useTranslations('common')
 
   const handleEdit = (id: string) => {
     router.push(`/admin/brands/${id}`)
@@ -37,7 +40,7 @@ export function BrandList({
       <div className="flex items-center justify-center py-6 md:py-8">
         <div className="text-center">
           <div className="animate-spin rounded-full h-6 w-6 md:h-8 md:w-8 border-b-2 border-blue-600 mx-auto mb-2 md:mb-3"></div>
-          <p className="text-xs md:text-sm text-muted-foreground">Loading brands...</p>
+          <p className="text-xs md:text-sm text-muted-foreground">{tCommon('loading')}</p>
         </div>
       </div>
     )
@@ -47,17 +50,17 @@ export function BrandList({
     return (
       <div className="text-center py-6 md:py-8 px-4">
         <Package className="mx-auto h-8 w-8 md:h-12 md:w-12 text-muted-foreground mb-3 md:mb-4" />
-        <h3 className="text-base md:text-lg font-semibold mb-2">No brands found</h3>
+        <h3 className="text-base md:text-lg font-semibold mb-2">{t('noBrandsFound')}</h3>
         <p className="text-muted-foreground mb-4 text-xs md:text-sm max-w-md mx-auto">
           {hasFilters 
-            ? 'No brands match your current filters. Try adjusting your search criteria.' 
-            : 'Get started by creating your first brand to organize your products.'
+            ? t('noBrandsMatchFilters') 
+            : t('getBrandsStarted')
           }
         </p>
         <Button asChild size="sm" className="h-8 md:h-auto">
           <Link href="/admin/brands/new">
             <Plus className="mr-2 h-4 w-4" />
-            Add Brand
+            {t('addBrand')}
           </Link>
         </Button>
       </div>

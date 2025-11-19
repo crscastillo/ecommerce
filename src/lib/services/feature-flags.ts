@@ -20,6 +20,12 @@ export interface PaymentMethodFlags {
   mobile_bank_transfer: boolean
 }
 
+export interface SecurityFeatureFlags {
+  mfa_sms_enabled: boolean
+  mfa_authenticator_enabled: boolean
+  advanced_session_management: boolean
+}
+
 export class FeatureFlagsService {
   /**
    * Get all feature flags
@@ -260,6 +266,54 @@ export class FeatureFlagsService {
       console.error('Error updating feature flag details:', error)
       throw error
     }
+  }
+
+  /**
+   * Get enabled security features for a specific tier
+   */
+  static async getEnabledSecurityFeaturesForTier(tier: 'basic' | 'pro' | 'enterprise'): Promise<SecurityFeatureFlags> {
+    const supabase = createClient()
+    
+    const { data, error } = await supabase
+      .from('platform_feature_flags')
+      .select('feature_key, enabled, target_tiers')
+      .eq('category', 'security')
+    
+    if (error) {
+      console.error('Error fetching security feature flags:', error)
+      // Return all disabled as fallback
+      return {
+        mfa_sms_enabled: false,
+        mfa_authenticator_enabled: false,
+        advanced_session_management: false
+      }
+    }
+    
+    const flags: SecurityFeatureFlags = {
+      mfa_sms_enabled: false,
+      mfa_authenticator_enabled: false,
+      advanced_session_management: false
+    }
+    
+    data?.forEach(flag => {
+      // Check if the flag is enabled AND the tier has access
+      const tierHasAccess = flag.target_tiers ? flag.target_tiers.includes(tier) : true
+      const isEnabled = flag.enabled && tierHasAccess
+      
+      switch (flag.feature_key) {
+        case 'mfa_sms_enabled':
+          flags.mfa_sms_enabled = isEnabled
+          break
+        case 'mfa_authenticator_enabled':
+          flags.mfa_authenticator_enabled = isEnabled
+          break
+        case 'advanced_session_management':
+          flags.advanced_session_management = isEnabled
+          break
+      }
+    })
+    
+    return flags
   }
 
   /**

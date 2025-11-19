@@ -46,7 +46,7 @@ interface FeatureFlag {
   name: string
   key: string
   description: string
-  category: 'platform' | 'tenant' | 'user' | 'experimental' | 'payment_methods'
+  category: 'platform' | 'tenant' | 'user' | 'experimental' | 'payment_methods' | 'security'
   is_enabled: boolean
   rollout_percentage: number
   target_tiers: string[]
@@ -76,6 +76,8 @@ export default function FeatureFlagsPage() {
     target_tiers: ['basic', 'pro', 'enterprise'] as string[]
   })
 
+
+
   const supabase = createClient()
 
   useEffect(() => {
@@ -92,18 +94,28 @@ export default function FeatureFlagsPage() {
       const dbFlags = await FeatureFlagsService.getAllFeatureFlags()
       
       // Convert DB format to UI format
-      const uiFlags: FeatureFlag[] = dbFlags.map(flag => ({
-        id: flag.id,
-        name: flag.feature_name,
-        key: flag.feature_key,
-        description: flag.feature_description || '',
-        category: 'payment_methods' as const,
-        is_enabled: flag.enabled,
-        rollout_percentage: 100,
-        target_tiers: flag.target_tiers || ['basic', 'pro', 'enterprise'],
-        created_at: flag.created_at,
-        updated_at: flag.updated_at
-      }))
+      const uiFlags: FeatureFlag[] = dbFlags.map(flag => {
+        // Map database category to UI category
+        let category: FeatureFlag['category'] = 'platform'
+        if (flag.category === 'payment_methods') category = 'payment_methods'
+        else if (flag.category === 'security') category = 'security'
+        else if (flag.category === 'tenant') category = 'tenant'
+        else if (flag.category === 'user') category = 'user'
+        else if (flag.category === 'experimental') category = 'experimental'
+        
+        return {
+          id: flag.id,
+          name: flag.feature_name,
+          key: flag.feature_key,
+          description: flag.feature_description || '',
+          category,
+          is_enabled: flag.enabled,
+          rollout_percentage: 100,
+          target_tiers: flag.target_tiers || ['basic', 'pro', 'enterprise'],
+          created_at: flag.created_at,
+          updated_at: flag.updated_at
+        }
+      })
       
       setFeatureFlags(uiFlags)
     } catch (err) {
@@ -141,10 +153,8 @@ export default function FeatureFlagsPage() {
       const flag = featureFlags.find(f => f.id === flagId)
       if (!flag) return
 
-      // Update in database if it's a payment method flag
-      if (flag.category === 'payment_methods') {
-        await FeatureFlagsService.updateFeatureFlag(flagId, !flag.is_enabled)
-      }
+      // Update in database for all feature flags
+      await FeatureFlagsService.updateFeatureFlag(flagId, !flag.is_enabled)
 
       const updatedFlag = { ...flag, is_enabled: !flag.is_enabled, updated_at: new Date().toISOString() }
       setFeatureFlags(flags => flags.map(f => f.id === flagId ? updatedFlag : f))
@@ -222,15 +232,13 @@ export default function FeatureFlagsPage() {
       
       if (editingFlag) {
         // Update existing flag
-        if (editingFlag.category === 'payment_methods') {
-          // Update in database for payment method flags
-          await FeatureFlagsService.updateFeatureFlagDetails(editingFlag.id, {
-            feature_name: formData.name,
-            feature_description: formData.description,
-            enabled: formData.is_enabled,
-            target_tiers: formData.target_tiers
-          })
-        }
+        // Update in database for all feature flags
+        await FeatureFlagsService.updateFeatureFlagDetails(editingFlag.id, {
+          feature_name: formData.name,
+          feature_description: formData.description,
+          enabled: formData.is_enabled,
+          target_tiers: formData.target_tiers
+        })
         
         const updatedFlag: FeatureFlag = {
           ...editingFlag,
@@ -279,6 +287,7 @@ export default function FeatureFlagsPage() {
       case 'platform': return <Globe className="h-4 w-4" />
       case 'tenant': return <Users className="h-4 w-4" />
       case 'user': return <Shield className="h-4 w-4" />
+      case 'security': return <Shield className="h-4 w-4" />
       case 'experimental': return <Zap className="h-4 w-4" />
       default: return <Flag className="h-4 w-4" />
     }
@@ -290,6 +299,7 @@ export default function FeatureFlagsPage() {
       case 'platform': return 'bg-blue-100 text-blue-800'
       case 'tenant': return 'bg-indigo-100 text-indigo-800'
       case 'user': return 'bg-purple-100 text-purple-800'
+      case 'security': return 'bg-red-100 text-red-800'
       case 'experimental': return 'bg-orange-100 text-orange-800'
       default: return 'bg-gray-100 text-gray-800'
     }
@@ -350,6 +360,7 @@ export default function FeatureFlagsPage() {
                 <SelectItem value="platform">Platform</SelectItem>
                 <SelectItem value="tenant">Tenant</SelectItem>
                 <SelectItem value="user">User</SelectItem>
+                <SelectItem value="security">Security</SelectItem>
                 <SelectItem value="experimental">Experimental</SelectItem>
               </SelectContent>
             </Select>
@@ -532,6 +543,7 @@ export default function FeatureFlagsPage() {
                   <SelectItem value="platform">Platform</SelectItem>
                   <SelectItem value="tenant">Tenant</SelectItem>
                   <SelectItem value="user">User</SelectItem>
+                  <SelectItem value="security">Security</SelectItem>
                   <SelectItem value="experimental">Experimental</SelectItem>
                 </SelectContent>
               </Select>

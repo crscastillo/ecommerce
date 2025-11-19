@@ -32,6 +32,7 @@ import {
 import { 
   StoreInformationTab, 
   ConfigurationTab, 
+  StoreConfigTab,
   ThemeTab,
   PaymentsTab,
   PluginsTab,
@@ -645,7 +646,6 @@ export default function SettingsPage() {
           </TabsTrigger>
         </TabsList>
 
-        {/* Store Settings */}
         {/* Store Settings - Using Refactored Component */}
         <TabsContent value="store" className="space-y-6">
           <StoreInformationTab

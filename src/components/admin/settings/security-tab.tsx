@@ -1,7 +1,9 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { useTranslations } from 'next-intl'
 import { createClient } from '@/lib/supabase/client'
+import { FeatureFlagsService, SecurityFeatureFlags } from '@/lib/services/feature-flags'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -47,6 +49,30 @@ export function SecurityTab({
 }: SecurityTabProps) {
   const t = useTranslations('settings')
   const tCommon = useTranslations('common')
+  const [securityFeatures, setSecurityFeatures] = useState<SecurityFeatureFlags>({
+    mfa_sms_enabled: false,
+    mfa_authenticator_enabled: false,
+    advanced_session_management: false
+  })
+  const [featuresLoading, setFeaturesLoading] = useState(true)
+
+  useEffect(() => {
+    const loadSecurityFeatures = async () => {
+      try {
+        const features = await FeatureFlagsService.getEnabledSecurityFeaturesForTier(
+          tenant.subscription_tier as 'basic' | 'pro' | 'enterprise'
+        )
+        setSecurityFeatures(features)
+      } catch (error) {
+        console.error('Failed to load security features:', error)
+        // Keep default disabled state on error
+      } finally {
+        setFeaturesLoading(false)
+      }
+    }
+
+    loadSecurityFeatures()
+  }, [tenant.subscription_tier])
 
   return (
     <>
@@ -110,30 +136,42 @@ export function SecurityTab({
             )}
           </div>
 
-          <Separator />
+          {!featuresLoading && (securityFeatures.mfa_sms_enabled || securityFeatures.mfa_authenticator_enabled) && (
+            <>
+              <Separator />
 
-          <div>
-            <h3 className="font-medium mb-3">{t('security.twoFactorAuth')}</h3>
-            <p className="text-sm text-gray-600 mb-4">
-              {t('security.twoFactorDescription')}
-            </p>
-            <div className="flex items-center justify-between p-4 border rounded-lg">
               <div>
-                <div className="font-medium">{t('security.smsAuth')}</div>
-                <div className="text-sm text-gray-500">{t('security.smsDescription')}</div>
+                <h3 className="font-medium mb-3">{t('security.twoFactorAuth')}</h3>
+                <p className="text-sm text-gray-600 mb-4">
+                  {t('security.twoFactorDescription')}
+                </p>
+                
+                <div className="space-y-3">
+                  {securityFeatures.mfa_sms_enabled && (
+                    <div className="flex items-center justify-between p-4 border rounded-lg">
+                      <div>
+                        <div className="font-medium">{t('security.smsAuth')}</div>
+                        <div className="text-sm text-gray-500">{t('security.smsDescription')}</div>
+                      </div>
+                      <Badge variant="outline">{t('security.comingSoon')}</Badge>
+                    </div>
+                  )}
+                  
+                  {securityFeatures.mfa_authenticator_enabled && (
+                    <div className="flex items-center justify-between p-4 border rounded-lg">
+                      <div>
+                        <div className="font-medium">{t('security.authenticatorApp')}</div>
+                        <div className="text-sm text-gray-500">{t('security.authenticatorDescription')}</div>
+                      </div>
+                      <Badge variant="outline">{t('security.comingSoon')}</Badge>
+                    </div>
+                  )}
+                </div>
               </div>
-              <Badge variant="outline">{t('security.comingSoon')}</Badge>
-            </div>
-            <div className="flex items-center justify-between p-4 border rounded-lg mt-2">
-              <div>
-                <div className="font-medium">{t('security.authenticatorApp')}</div>
-                <div className="text-sm text-gray-500">{t('security.authenticatorDescription')}</div>
-              </div>
-              <Badge variant="outline">{t('security.comingSoon')}</Badge>
-            </div>
-          </div>
 
-          <Separator />
+              <Separator />
+            </>
+          )}
 
           <div>
             <h3 className="font-medium mb-3">{t('security.loginSessions')}</h3>
@@ -150,13 +188,20 @@ export function SecurityTab({
                 </div>
                 <Badge variant="default">{t('security.active')}</Badge>
               </div>
-              <Button 
-                variant="outline" 
-                onClick={onSignOut}
-                disabled={saving}
-              >
-                {saving ? t('security.signingOut') : t('security.logoutAllDevices')}
-              </Button>
+              
+              {securityFeatures.advanced_session_management ? (
+                <Button 
+                  variant="outline" 
+                  onClick={onSignOut}
+                  disabled={saving}
+                >
+                  {saving ? t('security.signingOut') : t('security.logoutAllDevices')}
+                </Button>
+              ) : (
+                <div className="text-xs text-gray-500 p-2 bg-gray-50 rounded">
+                  Advanced session management not available for your plan
+                </div>
+              )}
             </div>
           </div>
         </CardContent>

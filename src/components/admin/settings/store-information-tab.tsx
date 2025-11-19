@@ -66,108 +66,14 @@ export function StoreInformationTab({
         <CardTitle>{t('sections.storeInformation')}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <Label htmlFor="store-name">{t('labels.storeName')}</Label>
-            <Input
-              id="store-name"
-              value={settings.name}
-              onChange={(e) => updateSettings({ name: e.target.value })}
-              placeholder="My Awesome Store"
-            />
-          </div>
-          <div>
-            <Label htmlFor="subdomain">{t('labels.subdomain')}</Label>
-            <Input
-              id="subdomain"
-              value={tenant.subdomain}
-              disabled
-              placeholder="mystore"
-            />
-            <p className="text-xs text-gray-500 mt-1">Subdomain cannot be changed after creation</p>
-          </div>
-          <div>
-            <Label htmlFor="country">{t('labels.country')}</Label>
-            <Select 
-              value={settings.country} 
-              onValueChange={(value) => updateSettings({ country: value })}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select country" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="US">🇺🇸 United States</SelectItem>
-                <SelectItem value="CA">🇨🇦 Canada</SelectItem>
-                <SelectItem value="GB">🇬🇧 United Kingdom</SelectItem>
-                <SelectItem value="AU">🇦🇺 Australia</SelectItem>
-                <SelectItem value="CR">🇨🇷 Costa Rica</SelectItem>
-                <SelectItem value="MX">🇲🇽 Mexico</SelectItem>
-                <SelectItem value="ES">🇪🇸 Spain</SelectItem>
-                <SelectItem value="FR">🇫🇷 France</SelectItem>
-                <SelectItem value="DE">🇩🇪 Germany</SelectItem>
-                <SelectItem value="IT">🇮🇹 Italy</SelectItem>
-                <SelectItem value="BR">🇧🇷 Brazil</SelectItem>
-                <SelectItem value="AR">🇦🇷 Argentina</SelectItem>
-                <SelectItem value="CL">🇨🇱 Chile</SelectItem>
-                <SelectItem value="CO">🇨🇴 Colombia</SelectItem>
-                <SelectItem value="PE">🇵🇪 Peru</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <Label htmlFor="admin-language">{t('adminLanguage')}</Label>
-            <Select 
-              value={settings.admin_language || 'en'} 
-              onValueChange={(value) => updateSettings({ admin_language: value })}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select admin language" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="en">{t('languageOptions.en')}</SelectItem>
-                <SelectItem value="es">{t('languageOptions.es')}</SelectItem>
-              </SelectContent>
-            </Select>
-            <p className="text-xs text-gray-500 mt-1">Language for admin interface</p>
-          </div>
-          <div>
-            <Label htmlFor="store-language">{t('storeLanguage')}</Label>
-            <Select 
-              value={settings.store_language || 'en'} 
-              onValueChange={(value) => updateSettings({ store_language: value })}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select store language" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="en">{t('languageOptions.en')}</SelectItem>
-                <SelectItem value="es">{t('languageOptions.es')}</SelectItem>
-              </SelectContent>
-            </Select>
-            <p className="text-xs text-gray-500 mt-1">Language for public store</p>
-          </div>
-          <div>
-            <Label htmlFor="timezone">{t('labels.timezone')}</Label>
-            <Select 
-              value={settings.settings.timezone} 
-              onValueChange={(value) => updateSetting('timezone', value)}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="America/New_York">Eastern Time</SelectItem>
-                <SelectItem value="America/Chicago">Central Time</SelectItem>
-                <SelectItem value="America/Denver">Mountain Time</SelectItem>
-                <SelectItem value="America/Los_Angeles">Pacific Time</SelectItem>
-                <SelectItem value="America/Costa_Rica">Costa Rica Time</SelectItem>
-                <SelectItem value="UTC">UTC</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+        <div>
+          <Label htmlFor="store-name">{t('labels.storeName')}</Label>
+          <Input
+            id="store-name"
+            value={settings.name}
+            onChange={(e) => updateSettings({ name: e.target.value })}
+            placeholder="My Awesome Store"
+          />
         </div>
         
         <div>
@@ -179,6 +85,29 @@ export function StoreInformationTab({
             placeholder="Brief description of your store..."
             rows={3}
           />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <Label htmlFor="subdomain">{t('labels.subdomain')}</Label>
+            <Input
+              id="subdomain"
+              value={tenant.subdomain}
+              disabled
+              placeholder="mystore"
+            />
+            <p className="text-xs text-gray-500 mt-1">Subdomain cannot be changed after creation</p>
+          </div>
+          <div>
+            <Label htmlFor="custom-domain">Custom Domain</Label>
+            <Input
+              id="custom-domain"
+              value={settings.settings.custom_domain || ''}
+              onChange={(e) => updateSetting('custom_domain', e.target.value)}
+              placeholder="www.mystore.com"
+            />
+            <p className="text-xs text-gray-500 mt-1">Your custom domain (optional)</p>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -207,8 +136,8 @@ export function StoreInformationTab({
 
         <div>
           <h3 className="text-lg font-medium mb-3">{t('labels.address')}</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="md:col-span-2">
+          <div className="space-y-4">
+            <div>
               <Label htmlFor="street">{t('labels.streetAddress')}</Label>
               <Input
                 id="street"
@@ -217,41 +146,66 @@ export function StoreInformationTab({
                 placeholder="123 Main Street"
               />
             </div>
-            <div>
-              <Label htmlFor="city">{t('labels.city')}</Label>
-              <Input
-                id="city"
-                value={settings.address.city || ''}
-                onChange={(e) => updateAddress('city', e.target.value)}
-                placeholder="New York"
-              />
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="city">{t('labels.city')}</Label>
+                <Input
+                  id="city"
+                  value={settings.address.city || ''}
+                  onChange={(e) => updateAddress('city', e.target.value)}
+                  placeholder="New York"
+                />
+              </div>
+              <div>
+                <Label htmlFor="state">{t('labels.state')}</Label>
+                <Input
+                  id="state"
+                  value={settings.address.state || ''}
+                  onChange={(e) => updateAddress('state', e.target.value)}
+                  placeholder="NY"
+                />
+              </div>
             </div>
-            <div>
-              <Label htmlFor="state">{t('labels.state')}</Label>
-              <Input
-                id="state"
-                value={settings.address.state || ''}
-                onChange={(e) => updateAddress('state', e.target.value)}
-                placeholder="NY"
-              />
-            </div>
-            <div>
-              <Label htmlFor="zip">{t('labels.zipCode')}</Label>
-              <Input
-                id="zip"
-                value={settings.address.zip || ''}
-                onChange={(e) => updateAddress('zip', e.target.value)}
-                placeholder="10001"
-              />
-            </div>
-            <div>
-              <Label htmlFor="country-addr">{t('labels.country')}</Label>
-              <Input
-                id="country-addr"
-                value={settings.address.country || ''}
-                onChange={(e) => updateAddress('country', e.target.value)}
-                placeholder="United States"
-              />
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="zip">{t('labels.zipCode')}</Label>
+                <Input
+                  id="zip"
+                  value={settings.address.zip || ''}
+                  onChange={(e) => updateAddress('zip', e.target.value)}
+                  placeholder="10001"
+                />
+              </div>
+              <div>
+                <Label htmlFor="country">{t('labels.country')}</Label>
+                <Select 
+                  value={settings.country} 
+                  onValueChange={(value) => updateSettings({ country: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select country" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="US">🇺🇸 United States</SelectItem>
+                    <SelectItem value="CA">🇨🇦 Canada</SelectItem>
+                    <SelectItem value="GB">🇬🇧 United Kingdom</SelectItem>
+                    <SelectItem value="AU">🇦🇺 Australia</SelectItem>
+                    <SelectItem value="CR">🇨🇷 Costa Rica</SelectItem>
+                    <SelectItem value="MX">🇲🇽 Mexico</SelectItem>
+                    <SelectItem value="ES">🇪🇸 Spain</SelectItem>
+                    <SelectItem value="FR">🇫🇷 France</SelectItem>
+                    <SelectItem value="DE">🇩🇪 Germany</SelectItem>
+                    <SelectItem value="IT">🇮🇹 Italy</SelectItem>
+                    <SelectItem value="BR">🇧🇷 Brazil</SelectItem>
+                    <SelectItem value="AR">🇦🇷 Argentina</SelectItem>
+                    <SelectItem value="CL">🇨🇱 Chile</SelectItem>
+                    <SelectItem value="CO">🇨🇴 Colombia</SelectItem>
+                    <SelectItem value="PE">🇵🇪 Peru</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </div>
         </div>

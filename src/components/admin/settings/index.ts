@@ -1,6 +1,7 @@
 // Settings Page Components
 export { StoreInformationTab } from './store-information-tab'
 export { ConfigurationTab } from './configuration-tab'
+export { StoreConfigTab } from './store-config-tab'
 export { ThemeTab } from './theme-tab'
 export { PaymentsTab } from './payments-tab'
 export { PluginsTab } from './plugins-tab'

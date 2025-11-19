@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -19,6 +20,8 @@ export function ProductFiltersComponent({
   totalCount 
 }: ProductFiltersProps) {
   const [isExpanded, setIsExpanded] = useState(false)
+  const t = useTranslations('products')
+  const tCommon = useTranslations('common')
 
   const handleSearchChange = (search: string) => {
     onFiltersChange({ ...filters, search })
@@ -50,6 +53,17 @@ export function ProductFiltersComponent({
 
   const hasActiveFilters = filters.search || filters.status !== 'all' || filters.productType !== 'all'
 
+  // Create translated options
+  const translatedStatusOptions = statusOptions.map(option => ({
+    ...option,
+    label: tCommon(option.value as any)
+  }))
+
+  const translatedProductTypeOptions = productTypeOptions.map(option => ({
+    ...option,
+    label: t(`typeOptions.${option.value}`)
+  }))
+
   return (
     <Card>
       {/* Mobile Compact Header */}
@@ -58,7 +72,7 @@ export function ProductFiltersComponent({
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-2 text-base">
               <Filter className="h-4 w-4" />
-              Filters
+              {tCommon('filter')}
               {totalCount > 0 && (
                 <span className="text-sm font-normal text-muted-foreground">
                   ({totalCount})
@@ -85,7 +99,7 @@ export function ProductFiltersComponent({
           <div className="relative mb-3">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search..."
+              placeholder={t('searchProductsPlaceholder')}
               value={filters.search}
               onChange={(e) => handleSearchChange(e.target.value)}
               className="pl-9 h-9"
@@ -97,9 +111,9 @@ export function ProductFiltersComponent({
             <div className="space-y-3">
               {/* Status Filter */}
               <div>
-                <div className="text-xs font-medium text-muted-foreground mb-2">Status</div>
+                <div className="text-xs font-medium text-muted-foreground mb-2">{tCommon('status')}</div>
                 <div className="flex gap-1">
-                  {statusOptions.map((option) => (
+                  {translatedStatusOptions.map((option) => (
                     <Button
                       key={option.value}
                       variant={filters.status === option.value ? 'default' : 'outline'}
@@ -115,9 +129,9 @@ export function ProductFiltersComponent({
 
               {/* Product Type Filter */}
               <div>
-                <div className="text-xs font-medium text-muted-foreground mb-2">Type</div>
+                <div className="text-xs font-medium text-muted-foreground mb-2">{t('productType')}</div>
                 <div className="grid grid-cols-2 gap-1">
-                  {productTypeOptions.map((option) => (
+                  {translatedProductTypeOptions.map((option) => (
                     <Button
                       key={option.value}
                       variant={filters.productType === option.value ? 'default' : 'outline'}
@@ -140,7 +154,7 @@ export function ProductFiltersComponent({
                   onClick={clearAllFilters}
                   className="h-7 text-xs w-full"
                 >
-                  Clear all filters
+                  {tCommon('clearAllFilters')}
                 </Button>
               )}
             </div>
@@ -153,7 +167,7 @@ export function ProductFiltersComponent({
         <CardHeader className="pb-4">
           <CardTitle className="flex items-center gap-2 text-lg">
             <Filter className="h-5 w-5" />
-            Filter Products
+            {t('filterProducts')}
             {totalCount > 0 && (
               <span className="text-sm font-normal text-muted-foreground">
                 ({totalCount})
@@ -168,7 +182,7 @@ export function ProductFiltersComponent({
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Search products..."
+                  placeholder={t('searchProductsPlaceholder')}
                   value={filters.search}
                   onChange={(e) => handleSearchChange(e.target.value)}
                   className="pl-9 h-10"
@@ -181,9 +195,9 @@ export function ProductFiltersComponent({
               {/* Status Filter */}
               <div className="flex gap-2 items-center flex-wrap">
                 <div className="text-sm font-medium text-muted-foreground mr-2 whitespace-nowrap">
-                  Status:
+                  {t('statusLabel')}
                 </div>
-                {statusOptions.map((option) => (
+                {translatedStatusOptions.map((option) => (
                   <Button
                     key={option.value}
                     variant={filters.status === option.value ? 'default' : 'outline'}
@@ -199,9 +213,9 @@ export function ProductFiltersComponent({
               {/* Product Type Filter */}
               <div className="flex gap-2 items-center flex-wrap">
                 <div className="text-sm font-medium text-muted-foreground mr-2 whitespace-nowrap">
-                  Type:
+                  {t('typeLabel')}
                 </div>
-                {productTypeOptions.map((option) => (
+                {translatedProductTypeOptions.map((option) => (
                   <Button
                     key={option.value}
                     variant={filters.productType === option.value ? 'default' : 'outline'}
@@ -219,21 +233,21 @@ export function ProductFiltersComponent({
             {/* Active Filters Display */}
             {hasActiveFilters && (
               <div className="flex items-start gap-2 text-sm text-muted-foreground border-t pt-4">
-                <span className="flex-shrink-0 mt-1">Active filters:</span>
+                <span className="flex-shrink-0 mt-1">{tCommon('activeFiltersLabel')}</span>
                 <div className="flex gap-2 flex-wrap flex-1">
                   {filters.search && (
                     <span className="bg-muted px-2 py-1 rounded text-xs">
-                      Search: "{filters.search.length > 15 ? filters.search.substring(0, 15) + '...' : filters.search}"
+                      {tCommon('searchLabel')} "{filters.search.length > 15 ? filters.search.substring(0, 15) + '...' : filters.search}"
                     </span>
                   )}
                   {filters.status !== 'all' && (
                     <span className="bg-muted px-2 py-1 rounded text-xs">
-                      Status: {filters.status}
+                      {tCommon('status')}: {filters.status}
                     </span>
                   )}
                   {filters.productType !== 'all' && (
                     <span className="bg-muted px-2 py-1 rounded text-xs">
-                      Type: {productTypeOptions.find(opt => opt.value === filters.productType)?.label}
+                      {t('productType')}: {translatedProductTypeOptions.find(opt => opt.value === filters.productType)?.label}
                     </span>
                   )}
                 </div>
@@ -243,7 +257,7 @@ export function ProductFiltersComponent({
                   onClick={clearAllFilters}
                   className="h-7 px-2 text-xs flex-shrink-0"
                 >
-                  Clear all
+{tCommon('clear')}
                 </Button>
               </div>
             )}

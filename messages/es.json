@@ -46,7 +46,15 @@
     "deleteStore": "Eliminar Tienda",
     "deleteStoreConfirm": "Esto eliminará permanentemente su tienda \"{storeName}\" y todos los datos asociados, incluidos productos, pedidos y clientes. Esta acción no se puede deshacer.",
     "deleteStorePermanently": "Eliminar permanentemente su tienda y todos los datos asociados. Esta acción no se puede deshacer.",
-    "remove": "Eliminar"
+        "remove": "Remover",
+    "loadingProducts": "Cargando productos...",
+    "noProductsFound": "No se encontraron productos",
+    "clearAllFilters": "Limpiar todos los filtros",
+    "activeFiltersLabel": "Filtros activos:",
+    "searchLabel": "Buscar:",
+    "all": "Todos",
+    "active": "Activo",
+    "inactive": "Inactivo"
   },
   "navigation": {
     "dashboard": "Panel de Control",
@@ -161,7 +169,19 @@
     "manageProductCatalog": "Administre el catálogo de productos de su tienda",
     "importCsv": "Importar CSV",
     "productsWithCount": "Productos ({count})",
-    "productsListDescription": "Vea y administre todos los productos en su tienda"
+    "productsListDescription": "Vea y administre todos los productos en su tienda",
+    "filterProducts": "Filtrar Productos",
+    "searchProductsPlaceholder": "Buscar productos...",
+    "statusLabel": "Estado",
+    "typeLabel": "Tipo",
+    "typeOptions": {
+      "all": "Todos",
+      "single": "Simple",
+      "variable": "Variable",
+      "digital": "Digital"
+    },
+    "noProductsFoundFiltered": "No se encontraron productos que coincidan con sus filtros.",
+    "noProductsFoundEmpty": "No hay productos disponibles. ¡Comience agregando algunos!"
   },
   "categories": {
     "title": "Categorías",
@@ -209,10 +229,22 @@
     "noBrandsFound": "No se encontraron marcas",
     "manageBrandCatalog": "Administre las marcas disponibles en su tienda",
     "brandsWithCount": "Marcas ({count})",
-    "brandsListDescription": "Una lista de todas las marcas en su tienda",
-    "viewCategoryDetails": "Ver detalles de la categoría",
-    "editCategoryDetails": "Editar detalles de la categoría",
-    "viewInStore": "Ver en la Tienda"
+    "brandsListDescription": "Una lista de todas las marcas en su tienda"
+  },
+  "settings": {
+    "viewInStore": "Ver en Tienda",
+    "filterProducts": "Filtrar Productos",
+    "searchProductsPlaceholder": "Buscar productos...",
+    "noProductsFoundFiltered": "Ningún producto coincide con los filtros actuales. Intenta ajustar tus criterios de búsqueda.",
+    "noProductsFoundEmpty": "Comienza agregando tu primer producto a la tienda.",
+    "statusLabel": "Estado:",
+    "typeLabel": "Tipo:",
+    "typeOptions": {
+      "all": "Todos",
+      "single": "Simple",
+      "variable": "Variable",
+      "digital": "Digital"
+    }
   },
   "settings": {
     "title": "Configuración",

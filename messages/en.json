@@ -46,7 +46,15 @@
     "deleteStore": "Delete Store",
     "deleteStoreConfirm": "This will permanently delete your store \"{storeName}\" and all associated data including products, orders, and customers. This action cannot be undone.",
     "deleteStorePermanently": "Permanently delete your store and all associated data. This action cannot be undone.",
-    "remove": "Remove"
+    "remove": "Remove",
+    "loadingProducts": "Loading products...",
+    "noProductsFound": "No products found",
+    "clearAllFilters": "Clear all filters",
+    "activeFiltersLabel": "Active filters:",
+    "searchLabel": "Search:",
+    "all": "All",
+    "active": "Active",
+    "inactive": "Inactive"
   },
   "navigation": {
     "dashboard": "Dashboard",
@@ -165,7 +173,19 @@
     "brandsListDescription": "A list of all brands in your store",
     "viewCategoryDetails": "View category details",
     "editCategoryDetails": "Edit category details",
-    "viewInStore": "View in Store"
+    "viewInStore": "View in Store",
+    "filterProducts": "Filter Products",
+    "searchProductsPlaceholder": "Search products...",
+    "noProductsFoundFiltered": "No products match your current filters. Try adjusting your search criteria.",
+    "noProductsFoundEmpty": "Get started by adding your first product to your store.",
+    "statusLabel": "Status:",
+    "typeLabel": "Type:",
+    "typeOptions": {
+      "all": "All",
+      "single": "Single",
+      "variable": "Variable",
+      "digital": "Digital"
+    }
   },
   "categories": {
     "title": "Categories",

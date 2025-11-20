@@ -377,6 +377,137 @@ export class FeatureFlagsService {
   }
 
   /**
+   * Get available payment method configurations from feature flags
+   */
+  static async getPaymentMethodConfigurations(tier: 'basic' | 'pro' | 'enterprise'): Promise<Array<{
+    id: string
+    name: string
+    enabled: boolean
+    requiresKeys: boolean
+    keys?: {
+      publishableKey?: string
+      secretKey?: string
+      webhookSecret?: string
+    }
+    testMode?: boolean
+    metadata?: Record<string, any>
+    bankDetails?: {
+      bankName?: string
+      accountNumber?: string
+      accountHolder?: string
+      instructions?: string
+    }
+  }>> {
+    const supabase = createClient()
+    
+    const { data, error } = await supabase
+      .from('platform_feature_flags')
+      .select('feature_key, feature_name, feature_description, enabled, target_tiers')
+      .eq('category', 'payment_methods')
+      .order('feature_name', { ascending: true })
+    
+    if (error) {
+      console.error('Error fetching payment method configurations:', error)
+      return []
+    }
+    
+    const configurations = data?.map(flag => {
+      // Check if the flag is available for this tier
+      const tierHasAccess = flag.target_tiers ? flag.target_tiers.includes(tier) : true
+      
+      // Don't include payment methods that aren't available for this tier
+      if (!tierHasAccess) return null
+      
+      // Map feature keys to payment method configurations
+      const baseConfig = {
+        enabled: false, // User hasn't configured it yet
+        testMode: true
+      }
+      
+      switch (flag.feature_key) {
+        case 'payment_method_traditional':
+          return {
+            id: 'traditional',
+            name: flag.feature_name,
+            ...baseConfig,
+            requiresKeys: false
+          }
+        case 'payment_method_stripe':
+          return {
+            id: 'stripe',
+            name: flag.feature_name,
+            ...baseConfig,
+            requiresKeys: true,
+            keys: {
+              publishableKey: '',
+              secretKey: '',
+              webhookSecret: ''
+            }
+          }
+        case 'payment_method_tilopay':
+          return {
+            id: 'tilopay',
+            name: flag.feature_name,
+            ...baseConfig,
+            requiresKeys: true,
+            keys: {
+              publishableKey: '',
+              secretKey: '',
+              webhookSecret: ''
+            },
+            metadata: {
+              description: 'TiloPay payment gateway for Costa Rica',
+              supportedCountries: ['CR'],
+              supportedCurrencies: ['CRC', 'USD']
+            }
+          }
+        case 'payment_method_paypal':
+          return {
+            id: 'paypal',
+            name: flag.feature_name,
+            ...baseConfig,
+            requiresKeys: true,
+            keys: {
+              publishableKey: '',
+              secretKey: ''
+            }
+          }
+        case 'payment_method_applepay':
+          return {
+            id: 'apple_pay',
+            name: flag.feature_name,
+            ...baseConfig,
+            requiresKeys: false
+          }
+        case 'payment_method_googlepay':
+          return {
+            id: 'google_pay',
+            name: flag.feature_name,
+            ...baseConfig,
+            requiresKeys: false
+          }
+        case 'payment_method_bank_transfer':
+          return {
+            id: 'bank_transfer',
+            name: flag.feature_name,
+            ...baseConfig,
+            requiresKeys: false,
+            bankDetails: {
+              bankName: '',
+              accountNumber: '',
+              accountHolder: '',
+              instructions: ''
+            }
+          }
+        default:
+          return null
+      }
+    }).filter(Boolean) || []
+    
+    return configurations as any[]
+  }
+
+  /**
    * Bulk update feature flags
    */
   static async bulkUpdateFeatureFlags(updates: { id: string; enabled: boolean }[]): Promise<void> {

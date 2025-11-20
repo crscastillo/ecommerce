@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -9,8 +9,7 @@ import { Switch } from '@/components/ui/switch'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Save, Eye, EyeOff, CreditCard } from 'lucide-react'
-import { PaymentSettings } from './index'
-import { FeatureFlagsService, PaymentMethodFlags } from '@/lib/services/feature-flags'
+import { PaymentSettings, PaymentMethodConfig } from './index'
 
 interface PaymentsTabProps {
   paymentMethods: PaymentSettings
@@ -27,45 +26,29 @@ export function PaymentsTab({
 }: PaymentsTabProps) {
   const t = useTranslations('settings')
   const tCommon = useTranslations('common')
-  const [enabledFlags, setEnabledFlags] = useState<PaymentMethodFlags>({
-    cash_on_delivery: true,
-    stripe: true,
-    tilopay: true,
-    bank_transfer: true,
-    mobile_bank_transfer: true
-  })
-  const [loading, setLoading] = useState(true)
+  const [showSecrets, setShowSecrets] = useState<Record<string, boolean>>({})
 
-  useEffect(() => {
-    loadFeatureFlags()
-  }, [])
-
-  const loadFeatureFlags = async () => {
-    try {
-      setLoading(true)
-      // TODO: Get actual tenant tier from user subscription/profile
-      // For now, defaulting to 'basic' tier - you should replace this with actual tier logic
-      const tenantTier: 'basic' | 'pro' | 'enterprise' = 'pro' // Change this based on tenant's actual tier
-      const flags = await FeatureFlagsService.getEnabledPaymentMethodsForTier(tenantTier)
-      setEnabledFlags(flags)
-    } catch (error) {
-      console.error('Error loading feature flags:', error)
-    } finally {
-      setLoading(false)
-    }
+  const getPaymentMethod = (id: string) => {
+    return paymentMethods.find(method => method.id === id)
   }
 
-  if (loading) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('sections.paymentMethods')}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center py-8 text-gray-500">Loading payment methods...</div>
-        </CardContent>
-      </Card>
+  const updatePaymentMethod = (id: string, updates: Partial<PaymentMethodConfig>) => {
+    const updatedMethods = paymentMethods.map(method => 
+      method.id === id ? { ...method, ...updates } : method
     )
+    onPaymentMethodsChange(updatedMethods)
+  }
+
+  const updatePaymentMethodKey = (id: string, keyName: string, value: string) => {
+    const method = getPaymentMethod(id)
+    if (!method) return
+
+    const updatedKeys = { ...method.keys, [keyName]: value }
+    updatePaymentMethod(id, { keys: updatedKeys })
+  }
+
+  const toggleSecretVisibility = (key: string) => {
+    setShowSecrets(prev => ({ ...prev, [key]: !prev[key] }))
   }
 
   return (
@@ -77,275 +60,261 @@ export function PaymentsTab({
         </p>
       </CardHeader>
       <CardContent>
-        {/* Cash on Delivery */}
-        {enabledFlags.cash_on_delivery && (
-        <div className="border rounded-lg mb-6">
-          <div className="flex items-center justify-between p-4">
-            <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">💵</div>
-              <div>
-                <h3 className="font-medium">Cash on Delivery</h3>
-                <p className="text-sm text-gray-500">Allow customers to pay with cash upon delivery.</p>
-              </div>
-            </div>
-            <Switch
-              checked={paymentMethods.cash_on_delivery.enabled}
-              onCheckedChange={(checked) => onPaymentMethodsChange({
-                ...paymentMethods,
-                cash_on_delivery: { ...paymentMethods.cash_on_delivery, enabled: checked }
-              })}
-            />
-          </div>
-        </div>
-        )}
+        <div className="space-y-4">
+          {paymentMethods.map((method) => {
+            const getIcon = (methodId: string) => {
+              switch (methodId) {
+                case 'stripe': return <CreditCard className="h-6 w-6" />
+                case 'traditional': return <div className="text-xl">💰</div>
+                case 'tilopay': return <div className="text-xl">🇨🇷</div>
+                case 'paypal': return <CreditCard className="h-6 w-6" />
+                case 'apple_pay': return <div className="text-xl">🍎</div>
+                case 'google_pay': return <div className="text-xl">🎯</div>
+                case 'bank_transfer': return <div className="text-xl">🏦</div>
+                default: return <CreditCard className="h-6 w-6" />
+              }
+            }
 
-        {/* Stripe */}
-        {enabledFlags.stripe && (
-        <div className="border rounded-lg mb-6">
-          <div className="flex items-center justify-between p-4">
-            <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center"><CreditCard /></div>
-              <div>
-                <h3 className="font-medium flex items-center gap-2">
-                  Stripe
-                  <Badge className="bg-blue-100 text-blue-800 text-xs">Pro+</Badge>
-                </h3>
-                <p className="text-sm text-gray-500">Accept credit cards and digital wallets via Stripe.</p>
-              </div>
-            </div>
-            <Switch
-              checked={paymentMethods.stripe.enabled}
-              onCheckedChange={(checked) => onPaymentMethodsChange({
-                ...paymentMethods,
-                stripe: { ...paymentMethods.stripe, enabled: checked }
-              })}
-            />
-          </div>
-          {paymentMethods.stripe.enabled && (
-            <div className="px-4 pb-4 space-y-4 border-t bg-gray-50">
-              <div className="space-y-3 pt-4">
-                <div>
-                  <Label htmlFor="stripe-publishable-key" className="text-sm">Publishable Key</Label>
-                  <Input
-                    id="stripe-publishable-key"
-                    value={paymentMethods.stripe.stripe_publishable_key || ''}
-                    onChange={(e) => onPaymentMethodsChange({
-                      ...paymentMethods,
-                      stripe: { ...paymentMethods.stripe, stripe_publishable_key: e.target.value }
-                    })}
-                    placeholder="pk_test_..."
-                    className="font-mono text-sm"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="stripe-secret-key" className="text-sm">Secret Key</Label>
-                  <Input
-                    id="stripe-secret-key"
-                    value={paymentMethods.stripe.stripe_secret_key || ''}
-                    onChange={(e) => onPaymentMethodsChange({
-                      ...paymentMethods,
-                      stripe: { ...paymentMethods.stripe, stripe_secret_key: e.target.value }
-                    })}
-                    placeholder="sk_test_..."
-                    className="font-mono text-sm"
-                  />
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-        )}
+            const getBadgeColor = (methodId: string) => {
+              switch (methodId) {
+                case 'stripe': return 'bg-blue-100 text-blue-800'
+                case 'tilopay': return 'bg-orange-100 text-orange-800'
+                case 'paypal': return 'bg-purple-100 text-purple-800'
+                default: return 'bg-gray-100 text-gray-800'
+              }
+            }
 
-        {/* TiloPay */}
-        {enabledFlags.tilopay && (
-        <div className="border rounded-lg mb-6">
-          <div className="flex items-center justify-between p-4">
-            <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">🏦</div>
-              <div>
-                <h3 className="font-medium flex items-center gap-2">
-                  TiloPay
-                  <Badge className="bg-blue-100 text-blue-800 text-xs">Pro+</Badge>
-                </h3>
-                <p className="text-sm text-gray-500">Accept payments via TiloPay.</p>
-              </div>
-            </div>
-            <Switch
-              checked={paymentMethods.tilopay.enabled}
-              onCheckedChange={(checked) => onPaymentMethodsChange({
-                ...paymentMethods,
-                tilopay: { ...paymentMethods.tilopay, enabled: checked }
-              })}
-            />
-          </div>
-          {paymentMethods.tilopay.enabled && (
-            <div className="px-4 pb-4 space-y-4 border-t bg-gray-50">
-              <div className="space-y-3 pt-4">
-                <div>
-                  <Label htmlFor="tilopay-api-key" className="text-sm">API Key</Label>
-                  <Input
-                    id="tilopay-api-key"
-                    value={paymentMethods.tilopay.tilopay_api_key || ''}
-                    onChange={(e) => onPaymentMethodsChange({
-                      ...paymentMethods,
-                      tilopay: { ...paymentMethods.tilopay, tilopay_api_key: e.target.value }
-                    })}
-                    placeholder="Your TiloPay API key"
-                    className="font-mono text-sm"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="tilopay-secret-key" className="text-sm">Secret Key</Label>
-                  <Input
-                    id="tilopay-secret-key"
-                    value={paymentMethods.tilopay.tilopay_secret_key || ''}
-                    onChange={(e) => onPaymentMethodsChange({
-                      ...paymentMethods,
-                      tilopay: { ...paymentMethods.tilopay, tilopay_secret_key: e.target.value }
-                    })}
-                    placeholder="Your TiloPay secret key"
-                    className="font-mono text-sm"
-                  />
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-        )}
+            const getDescription = (methodId: string) => {
+              switch (methodId) {
+                case 'traditional': return 'Accept traditional card payments and cash on delivery'
+                case 'stripe': return 'Accept credit cards and digital wallets via Stripe'
+                case 'tilopay': return 'Accept payments via TiloPay gateway (Costa Rica)'
+                case 'paypal': return 'Accept PayPal payments and credit cards'
+                case 'apple_pay': return 'Accept Apple Pay payments on Safari and iOS devices'
+                case 'google_pay': return 'Accept Google Pay payments on supported browsers'
+                case 'bank_transfer': return 'Allow customers to pay via direct bank transfer'
+                default: return 'Payment method configuration'
+              }
+            }
 
-        {/* Bank Transfer */}
-        {enabledFlags.bank_transfer && (
-        <div className="border rounded-lg mb-6">
-          <div className="flex items-center justify-between p-4">
-            <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">🏦</div>
-              <div>
-                <h3 className="font-medium">Bank Transfer</h3>
-                <p className="text-sm text-gray-500">Enable customers to pay via direct bank transfer. Provide bank details and instructions below.</p>
-              </div>
-            </div>
-            <Switch
-              checked={paymentMethods.bank_transfer.enabled}
-              onCheckedChange={(checked) => onPaymentMethodsChange({
-                ...paymentMethods,
-                bank_transfer: { ...paymentMethods.bank_transfer, enabled: checked }
-              })}
-            />
-          </div>
-          {paymentMethods.bank_transfer.enabled && (
-            <div className="px-4 pb-4 space-y-4 border-t bg-gray-50">
-              <div className="space-y-3 pt-4">
-                <div>
-                  <Label htmlFor="bank-name" className="text-sm">Bank Name</Label>
-                  <Input
-                    id="bank-name"
-                    value={paymentMethods.bank_transfer.bank_name || ''}
-                    onChange={(e) => onPaymentMethodsChange({
-                      ...paymentMethods,
-                      bank_transfer: { ...paymentMethods.bank_transfer, bank_name: e.target.value }
-                    })}
-                    placeholder="Your Bank Name"
-                    className="text-sm"
+            return (
+              <div key={method.id} className={`border rounded-lg transition-all ${method.enabled ? 'ring-2 ring-blue-200' : ''}`}>
+                <div className="flex items-center justify-between p-4">
+                  <div className="flex items-center space-x-4">
+                    <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${
+                      method.enabled ? 'bg-blue-100' : 'bg-gray-100'
+                    }`}>
+                      {getIcon(method.id)}
+                    </div>
+                    <div>
+                      <h3 className="font-medium flex items-center gap-2">
+                        {method.name}
+                        {method.enabled && <Badge variant="default">Enabled</Badge>}
+                        {method.testMode && <Badge variant="outline">Test Mode</Badge>}
+                        {(method.id === 'stripe' || method.id === 'tilopay') && (
+                          <Badge className={`text-xs ${getBadgeColor(method.id)}`}>Pro+</Badge>
+                        )}
+                      </h3>
+                      <p className="text-sm text-gray-500">
+                        {getDescription(method.id)}
+                      </p>
+                    </div>
+                  </div>
+                  <Switch
+                    checked={method.enabled}
+                    onCheckedChange={(checked) => updatePaymentMethod(method.id, { enabled: checked })}
                   />
                 </div>
-                <div>
-                  <Label htmlFor="account-number" className="text-sm">Account Number</Label>
-                  <Input
-                    id="account-number"
-                    value={paymentMethods.bank_transfer.account_number || ''}
-                    onChange={(e) => onPaymentMethodsChange({
-                      ...paymentMethods,
-                      bank_transfer: { ...paymentMethods.bank_transfer, account_number: e.target.value }
-                    })}
-                    placeholder="1234567890"
-                    className="text-sm"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="account-holder" className="text-sm">Account Holder</Label>
-                  <Input
-                    id="account-holder"
-                    value={paymentMethods.bank_transfer.account_holder || ''}
-                    onChange={(e) => onPaymentMethodsChange({
-                      ...paymentMethods,
-                      bank_transfer: { ...paymentMethods.bank_transfer, account_holder: e.target.value }
-                    })}
-                    placeholder="John Doe"
-                    className="text-sm"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="bank-instructions" className="text-sm">Instructions</Label>
-                  <Input
-                    id="bank-instructions"
-                    value={paymentMethods.bank_transfer.instructions || ''}
-                    onChange={(e) => onPaymentMethodsChange({
-                      ...paymentMethods,
-                      bank_transfer: { ...paymentMethods.bank_transfer, instructions: e.target.value }
-                    })}
-                    placeholder="Please transfer the total amount and include your order number."
-                    className="text-sm"
-                  />
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-        )}
 
-        {/* Mobile Bank Transfer (SINPE Movil) */}
-        {enabledFlags.mobile_bank_transfer && (
-        <div className="border rounded-lg mb-6">
-          <div className="flex items-center justify-between p-4">
-            <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">📱</div>
-              <div>
-                <h3 className="font-medium">Mobile Bank Transfer</h3>
-                <p className="text-sm text-gray-500">Enable customers to pay via mobile bank transfer (e.g., SINPE Movil in Costa Rica). Specify your phone number and instructions below.</p>
+                {/* Payment Method Configuration */}
+                {method.enabled && method.requiresKeys && (
+                  <div className="px-4 pb-4 space-y-4 border-t bg-gray-50">
+                    <div className="space-y-3 pt-4">
+                      {method.id === 'stripe' && (
+                        <>
+                          <div>
+                            <Label htmlFor={`${method.id}-pk`} className="text-sm">Publishable Key</Label>
+                            <Input
+                              id={`${method.id}-pk`}
+                              value={method.keys?.publishableKey || ''}
+                              onChange={(e) => updatePaymentMethodKey(method.id, 'publishableKey', e.target.value)}
+                              placeholder="pk_test_..."
+                              className="font-mono text-sm"
+                            />
+                          </div>
+                          <div>
+                            <Label htmlFor={`${method.id}-sk`} className="text-sm">Secret Key</Label>
+                            <div className="relative">
+                              <Input
+                                id={`${method.id}-sk`}
+                                type={showSecrets[`${method.id}-sk`] ? 'text' : 'password'}
+                                value={method.keys?.secretKey || ''}
+                                onChange={(e) => updatePaymentMethodKey(method.id, 'secretKey', e.target.value)}
+                                placeholder="sk_test_..."
+                                className="font-mono text-sm pr-10"
+                              />
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                                onClick={() => toggleSecretVisibility(`${method.id}-sk`)}
+                              >
+                                {showSecrets[`${method.id}-sk`] ? (
+                                  <EyeOff className="h-4 w-4" />
+                                ) : (
+                                  <Eye className="h-4 w-4" />
+                                )}
+                              </Button>
+                            </div>
+                          </div>
+                        </>
+                      )}
+
+                      {method.id === 'tilopay' && (
+                        <>
+                          <div>
+                            <Label htmlFor={`${method.id}-api`} className="text-sm">API Key</Label>
+                            <Input
+                              id={`${method.id}-api`}
+                              value={method.keys?.publishableKey || ''}
+                              onChange={(e) => updatePaymentMethodKey(method.id, 'publishableKey', e.target.value)}
+                              placeholder="TiloPay API Key"
+                              className="font-mono text-sm"
+                            />
+                          </div>
+                          <div>
+                            <Label htmlFor={`${method.id}-secret`} className="text-sm">Secret Key</Label>
+                            <div className="relative">
+                              <Input
+                                id={`${method.id}-secret`}
+                                type={showSecrets[`${method.id}-secret`] ? 'text' : 'password'}
+                                value={method.keys?.secretKey || ''}
+                                onChange={(e) => updatePaymentMethodKey(method.id, 'secretKey', e.target.value)}
+                                placeholder="TiloPay Secret Key"
+                                className="font-mono text-sm pr-10"
+                              />
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                                onClick={() => toggleSecretVisibility(`${method.id}-secret`)}
+                              >
+                                {showSecrets[`${method.id}-secret`] ? (
+                                  <EyeOff className="h-4 w-4" />
+                                ) : (
+                                  <Eye className="h-4 w-4" />
+                                )}
+                              </Button>
+                            </div>
+                          </div>
+                        </>
+                      )}
+
+                      {method.id === 'paypal' && (
+                        <>
+                          <div>
+                            <Label htmlFor={`${method.id}-client`} className="text-sm">Client ID</Label>
+                            <Input
+                              id={`${method.id}-client`}
+                              value={method.keys?.publishableKey || ''}
+                              onChange={(e) => updatePaymentMethodKey(method.id, 'publishableKey', e.target.value)}
+                              placeholder="PayPal Client ID"
+                              className="font-mono text-sm"
+                            />
+                          </div>
+                          <div>
+                            <Label htmlFor={`${method.id}-secret`} className="text-sm">Client Secret</Label>
+                            <div className="relative">
+                              <Input
+                                id={`${method.id}-secret`}
+                                type={showSecrets[`${method.id}-secret`] ? 'text' : 'password'}
+                                value={method.keys?.secretKey || ''}
+                                onChange={(e) => updatePaymentMethodKey(method.id, 'secretKey', e.target.value)}
+                                placeholder="PayPal Client Secret"
+                                className="font-mono text-sm pr-10"
+                              />
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                                onClick={() => toggleSecretVisibility(`${method.id}-secret`)}
+                              >
+                                {showSecrets[`${method.id}-secret`] ? (
+                                  <EyeOff className="h-4 w-4" />
+                                ) : (
+                                  <Eye className="h-4 w-4" />
+                                )}
+                              </Button>
+                            </div>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Bank Transfer Details */}
+                {method.enabled && method.id === 'bank_transfer' && (
+                  <div className="px-4 pb-4 space-y-4 border-t bg-gray-50">
+                    <div className="space-y-3 pt-4">
+                      <div>
+                        <Label htmlFor="bank-name" className="text-sm">Bank Name</Label>
+                        <Input
+                          id="bank-name"
+                          value={method.bankDetails?.bankName || ''}
+                          onChange={(e) => updatePaymentMethod(method.id, {
+                            bankDetails: { ...method.bankDetails, bankName: e.target.value }
+                          })}
+                          placeholder="Your Bank Name"
+                          className="text-sm"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="account-number" className="text-sm">Account Number</Label>
+                        <Input
+                          id="account-number"
+                          value={method.bankDetails?.accountNumber || ''}
+                          onChange={(e) => updatePaymentMethod(method.id, {
+                            bankDetails: { ...method.bankDetails, accountNumber: e.target.value }
+                          })}
+                          placeholder="1234567890"
+                          className="text-sm"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="account-holder" className="text-sm">Account Holder</Label>
+                        <Input
+                          id="account-holder"
+                          value={method.bankDetails?.accountHolder || ''}
+                          onChange={(e) => updatePaymentMethod(method.id, {
+                            bankDetails: { ...method.bankDetails, accountHolder: e.target.value }
+                          })}
+                          placeholder="Account Holder Name"
+                          className="text-sm"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="bank-instructions" className="text-sm">Instructions</Label>
+                        <Input
+                          id="bank-instructions"
+                          value={method.bankDetails?.instructions || ''}
+                          onChange={(e) => updatePaymentMethod(method.id, {
+                            bankDetails: { ...method.bankDetails, instructions: e.target.value }
+                          })}
+                          placeholder="Please transfer the total amount and include your order number."
+                          className="text-sm"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
-            </div>
-            <Switch
-              checked={paymentMethods.mobile_bank_transfer.enabled}
-              onCheckedChange={(checked) => onPaymentMethodsChange({
-                ...paymentMethods,
-                mobile_bank_transfer: { ...paymentMethods.mobile_bank_transfer, enabled: checked }
-              })}
-            />
-          </div>
-          {paymentMethods.mobile_bank_transfer.enabled && (
-            <div className="px-4 pb-4 space-y-4 border-t bg-orange-50">
-              <div className="space-y-3 pt-4">
-                <div>
-                  <Label htmlFor="mobile-phone-number" className="text-sm">Phone Number</Label>
-                  <Input
-                    id="mobile-phone-number"
-                    value={paymentMethods.mobile_bank_transfer.phone_number || ''}
-                    onChange={(e) => onPaymentMethodsChange({
-                      ...paymentMethods,
-                      mobile_bank_transfer: { ...paymentMethods.mobile_bank_transfer, phone_number: e.target.value }
-                    })}
-                    placeholder="+506XXXXXXXX"
-                    className="text-sm"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="mobile-instructions" className="text-sm">Instructions</Label>
-                  <Input
-                    id="mobile-instructions"
-                    value={paymentMethods.mobile_bank_transfer.instructions || ''}
-                    onChange={(e) => onPaymentMethodsChange({
-                      ...paymentMethods,
-                      mobile_bank_transfer: { ...paymentMethods.mobile_bank_transfer, instructions: e.target.value }
-                    })}
-                    placeholder="Please transfer the total amount and include your order number."
-                    className="text-sm"
-                  />
-                </div>
-              </div>
-            </div>
-          )}
+            )
+          })}
         </div>
-        )}
 
         <div className="flex justify-end mt-6">
           <Button onClick={onSave} disabled={saving}>

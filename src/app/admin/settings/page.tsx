@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useTenant } from '@/lib/contexts/tenant-context'
 import { createClient } from '@/lib/supabase/client'
 import { useTranslations } from 'next-intl'
@@ -97,29 +98,15 @@ export default function SettingsPage() {
   const { tenant, isLoading: tenantLoading, error, refreshTenant } = useTenant()
   const t = useTranslations('settings')
   const tCommon = useTranslations('common')
+  const router = useRouter()
+  const searchParams = useSearchParams()
   const [mounted, setMounted] = useState(false)
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
   const [tenantUsers, setTenantUsers] = useState<TenantUser[]>([])
-  const [activeTab, setActiveTab] = useState('store')
-  const [paymentMethods, setPaymentMethods] = useState<PaymentSettings>({
-    cash_on_delivery: { enabled: true },
-    stripe: { enabled: false },
-    tilopay: { enabled: false },
-    bank_transfer: {
-      enabled: false,
-      bank_name: '',
-      account_number: '',
-      account_holder: '',
-      instructions: ''
-    },
-    mobile_bank_transfer: {
-      enabled: false,
-      phone_number: '',
-      instructions: ''
-    }
-  })
+  const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'store')
+  const [paymentMethods, setPaymentMethods] = useState<PaymentSettings>([])
   const [showStripeKeys, setShowStripeKeys] = useState(false)
   const [showTiloPayKeys, setShowTiloPayKeys] = useState(false)
   
@@ -184,6 +171,29 @@ export default function SettingsPage() {
       loadPluginFeatures()
     }
   }, [tenant?.id])
+
+  // Update URL when tab changes
+  useEffect(() => {
+    const currentTab = searchParams.get('tab')
+    if (currentTab !== activeTab) {
+      const newParams = new URLSearchParams(searchParams.toString())
+      if (activeTab === 'store') {
+        newParams.delete('tab')
+      } else {
+        newParams.set('tab', activeTab)
+      }
+      const newUrl = newParams.toString() ? `?${newParams.toString()}` : '/admin/settings'
+      router.replace(newUrl, { scroll: false })
+    }
+  }, [activeTab, searchParams, router])
+
+  // Update activeTab when URL changes
+  useEffect(() => {
+    const tabFromUrl = searchParams.get('tab') || 'store'
+    if (tabFromUrl !== activeTab) {
+      setActiveTab(tabFromUrl)
+    }
+  }, [searchParams])
 
   const loadSettings = async () => {
     if (!tenant) return
@@ -274,40 +284,9 @@ export default function SettingsPage() {
     if (!tenant?.id) return
 
     try {
-      const methods = await PaymentMethodsService.getPaymentMethodsConfig(tenant.id)
-      
-      // Convert to our local state format
-      const stripeMethod = methods.find(m => m.id === 'stripe')
-      const traditionalMethod = methods.find(m => m.id === 'traditional')
-      const tilopayMethod = methods.find(m => m.id === 'tilopay')
-      
-      setPaymentMethods({
-        cash_on_delivery: {
-          enabled: traditionalMethod?.enabled || true
-        },
-        stripe: {
-          enabled: stripeMethod?.enabled || false,
-          stripe_publishable_key: stripeMethod?.keys?.publishableKey || '',
-          stripe_secret_key: stripeMethod?.keys?.secretKey || ''
-        },
-        tilopay: {
-          enabled: tilopayMethod?.enabled || false,
-          tilopay_api_key: tilopayMethod?.keys?.publishableKey || '',
-          tilopay_secret_key: tilopayMethod?.keys?.secretKey || ''
-        },
-        bank_transfer: {
-          enabled: false,
-          bank_name: '',
-          account_number: '',
-          account_holder: '',
-          instructions: ''
-        },
-        mobile_bank_transfer: {
-          enabled: false,
-          phone_number: '',
-          instructions: ''
-        }
-      })
+      const tier = (tenant.subscription_tier as 'basic' | 'pro' | 'enterprise') || 'pro'
+      const methods = await PaymentMethodsService.getPaymentMethodsConfig(tenant.id, tier)
+      setPaymentMethods(methods)
     } catch (error) {
       console.error('Error loading payment methods:', error)
     }
@@ -413,67 +392,36 @@ export default function SettingsPage() {
     try {
       setSaving(true)
       
-      // Validate Stripe keys if Stripe is enabled
-      if (paymentMethods.stripe.enabled) {
-        const validation = PaymentMethodsService.validateStripeKeys({
-          publishableKey: paymentMethods.stripe.stripe_publishable_key,
-          secretKey: paymentMethods.stripe.stripe_secret_key
-        })
+      // Validate enabled payment methods with keys
+      for (const method of paymentMethods) {
+        if (!method.enabled || !method.requiresKeys) continue
         
-        if (!validation.valid) {
-          setMessage({ type: 'error', text: `Stripe validation error: ${validation.message}` })
-          return
-        }
-      }
-
-      // Validate TiloPay keys if TiloPay is enabled
-      if (paymentMethods.tilopay.enabled) {
-        const validation = PaymentMethodsService.validateTiloPayKeys({
-          publishableKey: paymentMethods.tilopay.tilopay_api_key,
-          secretKey: paymentMethods.tilopay.tilopay_secret_key
-        })
-        
-        if (!validation.valid) {
-          setMessage({ type: 'error', text: `TiloPay validation error: ${validation.message}` })
-          return
-        }
-      }
-
-      // Convert to service format
-      const defaultMethods = PaymentMethodsService.getDefaultPaymentMethods()
-      const updatedMethods = defaultMethods.map(method => {
         if (method.id === 'stripe') {
-          return {
-            ...method,
-            enabled: paymentMethods.stripe.enabled,
-            keys: {
-              ...method.keys,
-              publishableKey: paymentMethods.stripe.stripe_publishable_key || '',
-              secretKey: paymentMethods.stripe.stripe_secret_key || ''
-            }
+          const validation = PaymentMethodsService.validateStripeKeys({
+            publishableKey: method.keys?.publishableKey || '',
+            secretKey: method.keys?.secretKey || ''
+          })
+          
+          if (!validation.valid) {
+            setMessage({ type: 'error', text: `Stripe validation error: ${validation.message}` })
+            return
           }
         }
-        if (method.id === 'traditional') {
-          return {
-            ...method,
-            enabled: paymentMethods.cash_on_delivery.enabled
-          }
-        }
+        
         if (method.id === 'tilopay') {
-          return {
-            ...method,
-            enabled: paymentMethods.tilopay.enabled,
-            keys: {
-              ...method.keys,
-              publishableKey: paymentMethods.tilopay.tilopay_api_key || '',
-              secretKey: paymentMethods.tilopay.tilopay_secret_key || ''
-            }
+          const validation = PaymentMethodsService.validateTiloPayKeys({
+            publishableKey: method.keys?.publishableKey || '',
+            secretKey: method.keys?.secretKey || ''
+          })
+          
+          if (!validation.valid) {
+            setMessage({ type: 'error', text: `TiloPay validation error: ${validation.message}` })
+            return
           }
         }
-        return method
-      })
+      }
 
-      await PaymentMethodsService.savePaymentMethodsConfig(tenant.id, updatedMethods)
+      await PaymentMethodsService.savePaymentMethodsConfig(tenant.id, paymentMethods)
       setMessage({ type: 'success', text: 'Payment settings saved successfully!' })
     } catch (error) {
       console.error('Error saving payment settings:', error)

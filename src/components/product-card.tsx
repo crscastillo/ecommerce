@@ -13,6 +13,8 @@ import {
 } from 'lucide-react'
 import { useState } from 'react'
 import { useTenant } from '@/lib/contexts/tenant-context'
+import { useCart } from '@/lib/contexts/cart-context'
+import { useToast } from '@/lib/contexts/toast-context'
 import { useTranslations } from 'next-intl'
 import { formatPrice } from '@/lib/utils/currency'
 import { isProductLowStock, getLowStockBadge } from '@/lib/utils/low-stock'
@@ -70,7 +72,10 @@ interface ProductCardProps {
 export function ProductCard({ product, viewMode = 'grid', tenantSettings = {} }: ProductCardProps) {
   const [imageError, setImageError] = useState(false)
   const [isWishlisted, setIsWishlisted] = useState(false)
+  const [addingToCart, setAddingToCart] = useState(false)
   const { tenant } = useTenant()
+  const { addToCart } = useCart()
+  const { success, error: showError } = useToast()
   const t = useTranslations()
 
   // Helper functions for variable products
@@ -187,6 +192,46 @@ export function ProductCard({ product, viewMode = 'grid', tenantSettings = {} }:
     
   const lowStockBadge = getLowStockBadge(stockForLowStockCheck, lowStockSettings)
   const isLowStockProduct = isProductLowStock(stockForLowStockCheck, lowStockSettings)
+
+  // Handle add to cart
+  const handleAddToCart = async (e: React.MouseEvent) => {
+    e.preventDefault() // Prevent navigation if card is wrapped in Link
+    e.stopPropagation()
+    
+    if (isOutOfStock || addingToCart) return
+    
+    setAddingToCart(true)
+    
+    try {
+      const productImage = product.images && product.images.length > 0 
+        ? product.images[0] 
+        : undefined
+
+      const maxQuantity = product.track_inventory ? totalStock : undefined
+
+      addToCart({
+        id: product.id,
+        name: product.name,
+        slug: product.slug,
+        price: currentPrice,
+        image: productImage,
+        maxQuantity: maxQuantity
+      }, 1)
+
+      success(
+        'Added to cart!',
+        `${product.name} has been added to your cart`
+      )
+    } catch (err) {
+      console.error('Error adding to cart:', err)
+      showError(
+        'Failed to add to cart',
+        'Please try again later'
+      )
+    } finally {
+      setAddingToCart(false)
+    }
+  }
 
   if (viewMode === 'list') {
     return (
@@ -363,11 +408,16 @@ export function ProductCard({ product, viewMode = 'grid', tenantSettings = {} }:
               {/* Add to Cart button - wider on mobile */}
               <Button 
                 size="sm" 
-                disabled={isOutOfStock}
+                disabled={isOutOfStock || addingToCart}
+                onClick={handleAddToCart}
                 className="flex items-center gap-2 ml-auto w-auto sm:w-auto min-w-[120px]"
               >
                 <ShoppingCart className="h-4 w-4" />
-                <span>{isOutOfStock ? t('product.outOfStock') : t('product.addToCart')}</span>
+                <span>
+                  {addingToCart ? t('product.adding') : 
+                   isOutOfStock ? t('product.outOfStock') : 
+                   t('product.addToCart')}
+                </span>
               </Button>
             </div>
           </CardContent>
@@ -424,10 +474,13 @@ export function ProductCard({ product, viewMode = 'grid', tenantSettings = {} }:
           <Button 
             size="sm" 
             className="w-full"
-            disabled={isOutOfStock}
+            disabled={isOutOfStock || addingToCart}
+            onClick={handleAddToCart}
           >
             <ShoppingCart className="h-4 w-4 mr-2" />
-            {isOutOfStock ? t('product.outOfStock') : t('product.addToCart')}
+            {addingToCart ? t('product.adding') : 
+             isOutOfStock ? t('product.outOfStock') : 
+             t('product.addToCart')}
           </Button>
         </div>
       </div>

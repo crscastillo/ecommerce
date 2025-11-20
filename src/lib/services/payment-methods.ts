@@ -24,27 +24,50 @@ export interface TenantPaymentSettings {
 }
 
 export class PaymentMethodsService {
-  static async getPaymentMethodsConfig(tenantId: string): Promise<PaymentMethodConfig[]> {
+  static async getPaymentMethodsConfig(tenantId: string, tier: 'basic' | 'pro' | 'enterprise' = 'pro'): Promise<PaymentMethodConfig[]> {
     try {
-      const { data, error } = await supabase
-        .from('tenant_payment_settings')
-        .select('payment_methods')
-        .eq('tenant_id', tenantId)
-        .single()
-
-      if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
-        throw error
+      // ALWAYS start with feature flag configurations - they determine what's available
+      const availableConfigs = await this.getDefaultPaymentMethods(tier)
+      
+      if (availableConfigs.length === 0) {
+        console.warn(`No payment methods available for tier: ${tier} - no feature flags found`)
+        return []
       }
 
-      if (data?.payment_methods) {
-        return data.payment_methods as PaymentMethodConfig[]
+      // Then try to get saved tenant-specific settings
+      const response = await fetch(`/api/payment-settings?tenant_id=${tenantId}`)
+      
+      if (!response.ok) {
+        console.warn('Failed to fetch saved payment settings, using feature flag defaults')
+        return availableConfigs
       }
 
-      // Return default configuration if none exists
-      return this.getDefaultPaymentMethods()
+      const result = await response.json()
+      
+      if (result.data?.payment_methods) {
+        const availableIds = availableConfigs.map(config => config.id)
+        
+        // Only include saved methods that are still available according to feature flags
+        const filteredMethods = result.data.payment_methods.filter((method: PaymentMethodConfig) => 
+          availableIds.includes(method.id)
+        )
+        
+        // Merge available configs with saved settings
+        // The feature flags determine what's available, saved settings determine configuration
+        const mergedMethods = availableConfigs.map(defaultConfig => {
+          const savedConfig = filteredMethods.find((saved: PaymentMethodConfig) => saved.id === defaultConfig.id)
+          return savedConfig ? { ...defaultConfig, ...savedConfig } : defaultConfig
+        })
+        
+        return mergedMethods
+      }
+
+      // Return feature flag configurations if no saved settings exist
+      return availableConfigs
     } catch (error) {
       console.error('Error loading payment methods config:', error)
-      return this.getDefaultPaymentMethods()
+      // Return empty array if feature flags fail - no hardcoded fallback
+      return []
     }
   }
 
@@ -53,82 +76,48 @@ export class PaymentMethodsService {
     paymentMethods: PaymentMethodConfig[]
   ): Promise<void> {
     try {
-      const { error } = await supabase
-        .from('tenant_payment_settings')
-        .upsert({
+      const response = await fetch('/api/payment-settings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
           tenant_id: tenantId,
-          payment_methods: paymentMethods,
-          updated_at: new Date().toISOString()
+          payment_methods: paymentMethods
         })
+      })
 
-      if (error) throw error
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Failed to save payment settings')
+      }
+
+      const result = await response.json()
+      console.log('Payment settings saved successfully:', result.data)
     } catch (error) {
       console.error('Error saving payment methods config:', error)
       throw error
     }
   }
 
-  static getDefaultPaymentMethods(): PaymentMethodConfig[] {
-    return [
-      {
-        id: 'stripe',
-        name: 'Stripe',
-        enabled: true,
-        requiresKeys: true,
-        keys: {
-          publishableKey: '',
-          secretKey: '',
-          webhookSecret: ''
-        },
-        testMode: true
-      },
-      {
-        id: 'traditional',
-        name: 'Traditional Card Form',
-        enabled: true,
-        requiresKeys: false
-      },
-      {
-        id: 'tilopay',
-        name: 'TiloPay',
-        enabled: false,
-        requiresKeys: true,
-        keys: {
-          publishableKey: '',
-          secretKey: '',
-          webhookSecret: ''
-        },
-        testMode: true,
-        metadata: {
-          description: 'TiloPay payment gateway for Costa Rica',
-          supportedCountries: ['CR'],
-          supportedCurrencies: ['CRC', 'USD']
-        }
-      },
-      {
-        id: 'paypal',
-        name: 'PayPal',
-        enabled: false,
-        requiresKeys: true,
-        keys: {
-          publishableKey: '',
-          secretKey: ''
-        }
-      },
-      {
-        id: 'apple_pay',
-        name: 'Apple Pay',
-        enabled: false,
-        requiresKeys: false
-      },
-      {
-        id: 'google_pay',
-        name: 'Google Pay',
-        enabled: false,
-        requiresKeys: false
+  static async getDefaultPaymentMethods(tier: 'basic' | 'pro' | 'enterprise' = 'pro'): Promise<PaymentMethodConfig[]> {
+    const { FeatureFlagsService } = await import('./feature-flags')
+    
+    try {
+      const configurations = await FeatureFlagsService.getPaymentMethodConfigurations(tier)
+      
+      if (configurations.length === 0) {
+        console.warn(`No payment method feature flags found for tier ${tier}`)
       }
-    ]
+      
+      return configurations
+    } catch (error) {
+      console.error('Error loading payment methods from feature flags:', error)
+      return []
+    }
   }
+
+
 
   static validateStripeKeys(keys: any): { valid: boolean; message: string } {
     if (!keys.publishableKey || !keys.secretKey) {

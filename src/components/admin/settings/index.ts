@@ -41,30 +41,24 @@ export interface ThemeSettings {
   store_theme?: string
 }
 
-export interface PaymentSettings {
-  cash_on_delivery: {
-    enabled: boolean
+export interface PaymentMethodConfig {
+  id: string
+  name: string
+  enabled: boolean
+  requiresKeys: boolean
+  keys?: {
+    publishableKey?: string
+    secretKey?: string
+    webhookSecret?: string
   }
-  stripe: {
-    enabled: boolean
-    stripe_publishable_key?: string
-    stripe_secret_key?: string
-  }
-  tilopay: {
-    enabled: boolean
-    tilopay_api_key?: string
-    tilopay_secret_key?: string
-  }
-  bank_transfer: {
-    enabled: boolean
-    bank_name?: string
-    account_number?: string
-    account_holder?: string
-    instructions?: string
-  }
-  mobile_bank_transfer: {
-    enabled: boolean
-    phone_number?: string
+  testMode?: boolean
+  metadata?: Record<string, any>
+  bankDetails?: {
+    bankName?: string
+    accountNumber?: string
+    accountHolder?: string
     instructions?: string
   }
 }
+
+export type PaymentSettings = PaymentMethodConfig[]

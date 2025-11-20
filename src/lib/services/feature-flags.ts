@@ -117,9 +117,6 @@ export class FeatureFlagsService {
       const isEnabled = flag.enabled && tierHasAccess
       
       switch (flag.feature_key) {
-        case 'payment_method_cash_on_delivery':
-          flags.cash_on_delivery = isEnabled
-          break
         case 'payment_method_stripe':
           flags.stripe = isEnabled
           break
@@ -171,9 +168,6 @@ export class FeatureFlagsService {
     
     data?.forEach(flag => {
       switch (flag.feature_key) {
-        case 'payment_method_cash_on_delivery':
-          flags.cash_on_delivery = flag.enabled
-          break
         case 'payment_method_stripe':
           flags.stripe = flag.enabled
           break
@@ -425,13 +419,6 @@ export class FeatureFlagsService {
       }
       
       switch (flag.feature_key) {
-        case 'payment_method_traditional':
-          return {
-            id: 'traditional',
-            name: flag.feature_name,
-            ...baseConfig,
-            requiresKeys: false
-          }
         case 'payment_method_stripe':
           return {
             id: 'stripe',
@@ -471,20 +458,6 @@ export class FeatureFlagsService {
               publishableKey: '',
               secretKey: ''
             }
-          }
-        case 'payment_method_applepay':
-          return {
-            id: 'apple_pay',
-            name: flag.feature_name,
-            ...baseConfig,
-            requiresKeys: false
-          }
-        case 'payment_method_googlepay':
-          return {
-            id: 'google_pay',
-            name: flag.feature_name,
-            ...baseConfig,
-            requiresKeys: false
           }
         case 'payment_method_bank_transfer':
           return {

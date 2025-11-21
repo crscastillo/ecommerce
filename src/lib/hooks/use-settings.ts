@@ -50,7 +50,7 @@ export function useStoreSettings() {
       contact_phone: tenant.contact_phone || '',
       country: tenant.country || 'US',
       admin_language: tenantSettings.admin_language || 'en',
-      store_language: (tenant as any).language || tenantSettings.store_language || 'en',
+      store_language: tenantSettings.store_language || 'en',
       address: (tenant.address as any) || {},
       settings: {
         currency: 'USD',
@@ -89,7 +89,7 @@ export function useStoreSettings() {
           contact_email: settings.contact_email,
           contact_phone: settings.contact_phone,
           country: settings.country,
-          language: settings.store_language, // Use the existing language column for store language
+
           address: settings.address,
           settings: updatedSettings, // Store language preferences in settings JSONB
           updated_at: new Date().toISOString()

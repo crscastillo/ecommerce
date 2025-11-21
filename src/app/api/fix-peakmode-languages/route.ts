@@ -22,12 +22,24 @@ export async function POST(request: NextRequest) {
       }
     )
 
-    // Update peakmode tenant with proper language settings
+    // Get current tenant settings
+    const { data: currentTenant } = await supabase
+      .from('tenants')
+      .select('settings')
+      .eq('subdomain', 'peakmode')
+      .single()
+
+    const currentSettings = (currentTenant?.settings as any) || {}
+
+    // Update peakmode tenant with proper language settings stored in settings JSONB
     const { data: tenant, error } = await supabase
       .from('tenants')
       .update({
-        admin_language: 'en',
-        store_language: 'es'
+        settings: {
+          ...currentSettings,
+          admin_language: 'en',
+          store_language: 'es'
+        }
       })
       .eq('subdomain', 'peakmode')
       .select()

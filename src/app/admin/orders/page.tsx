@@ -85,12 +85,7 @@ export default function OrdersPage() {
         return
       }
       
-      // If this is a demo tenant, don't make database calls
-      if (tenant.id === 'demo-tenant-id') {
-        setOrders([])
-        setLoading(false)
-        return
-      }
+
       
       const { data: orders, error } = await supabase
         .from('orders')
@@ -129,19 +124,6 @@ export default function OrdersPage() {
           totalRevenue: 0
         }
         setStats(emptyStats)
-        return
-      }
-      
-      // If this is a demo tenant, show demo stats
-      if (tenant.id === 'demo-tenant-id') {
-        const demoStats: OrderStats = {
-          total: 0,
-          pending: 0,
-          paid: 0,
-          fulfilled: 0,
-          totalRevenue: 0
-        }
-        setStats(demoStats)
         return
       }
       

@@ -144,7 +144,7 @@ export function SettingsContent({ tenant, searchParams, router }: SettingsConten
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-2">
           <Settings className="h-8 w-8 text-gray-600" />
-          <h1 className="text-3xl font-bold">Settings</h1>
+          <h1 className="text-3xl font-bold">{t('title')}</h1>
         </div>
       </div>
 

@@ -476,6 +476,7 @@
   },
   "settings": {
     "title": "Settings",
+    "loading": "Loading settings...",
     "general": "General",
     "storeSettings": "Store Settings",
     "storeName": "Store Name",

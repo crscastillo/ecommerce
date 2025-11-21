@@ -487,6 +487,7 @@
   },
   "settings": {
     "title": "Configuración",
+    "loading": "Cargando configuración...",
     "general": "General",
     "storeSettings": "Configuración de Tienda",
     "storeName": "Nombre de la Tienda",

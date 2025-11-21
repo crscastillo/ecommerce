@@ -2,11 +2,14 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { useTenant } from '@/lib/contexts/tenant-context'
 import { SettingsProvider } from '@/lib/contexts/settings-context'
 import { SettingsContent } from '@/components/admin/settings/settings-content'
 
 export default function SettingsPage() {
+  const t = useTranslations('settings')
+  const tCommon = useTranslations('common')
   const { tenant, isLoading: tenantLoading, error } = useTenant()
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -27,10 +30,10 @@ export default function SettingsPage() {
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold">Settings</h1>
+          <h1 className="text-3xl font-bold">{t('title')}</h1>
         </div>
         <div className="text-center py-8">
-          <p>Loading settings...</p>
+          <p>{t('loading')}</p>
         </div>
       </div>
     )

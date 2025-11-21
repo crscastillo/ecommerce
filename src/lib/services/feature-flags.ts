@@ -472,6 +472,17 @@ export class FeatureFlagsService {
               instructions: ''
             }
           }
+        case 'payment_method_mobile_bank_transfer':
+          return {
+            id: 'mobile_bank_transfer',
+            name: flag.feature_name,
+            ...baseConfig,
+            requiresKeys: false,
+            bankDetails: {
+              phoneNumber: '',
+              instructions: ''
+            }
+          }
         default:
           return null
       }

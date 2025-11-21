@@ -58,6 +58,7 @@ export interface PaymentMethodConfig {
     accountNumber?: string
     accountHolder?: string
     instructions?: string
+    phoneNumber?: string // For mobile bank transfer
   }
 }
 

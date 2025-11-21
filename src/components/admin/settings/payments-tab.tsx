@@ -71,6 +71,7 @@ export function PaymentsTab({
                 case 'apple_pay': return <div className="text-xl">🍎</div>
                 case 'google_pay': return <div className="text-xl">🎯</div>
                 case 'bank_transfer': return <div className="text-xl">🏦</div>
+                case 'mobile_bank_transfer': return <div className="text-xl">📱</div>
                 default: return <CreditCard className="h-6 w-6" />
               }
             }
@@ -93,6 +94,7 @@ export function PaymentsTab({
                 case 'apple_pay': return 'Accept Apple Pay payments on Safari and iOS devices'
                 case 'google_pay': return 'Accept Google Pay payments on supported browsers'
                 case 'bank_transfer': return 'Allow customers to pay via direct bank transfer'
+                case 'mobile_bank_transfer': return 'Allow customers to pay via mobile bank transfer'
                 default: return 'Payment method configuration'
               }
             }
@@ -305,6 +307,38 @@ export function PaymentsTab({
                             bankDetails: { ...method.bankDetails, instructions: e.target.value }
                           })}
                           placeholder="Please transfer the total amount and include your order number."
+                          className="text-sm"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Mobile Bank Transfer Details */}
+                {method.enabled && method.id === 'mobile_bank_transfer' && (
+                  <div className="px-4 pb-4 space-y-4 border-t bg-gray-50">
+                    <div className="space-y-3 pt-4">
+                      <div>
+                        <Label htmlFor="mobile-bank-phone" className="text-sm">Mobile Bank Phone Number</Label>
+                        <Input
+                          id="mobile-bank-phone"
+                          value={method.bankDetails?.phoneNumber || ''}
+                          onChange={(e) => updatePaymentMethod(method.id, {
+                            bankDetails: { ...method.bankDetails, phoneNumber: e.target.value }
+                          })}
+                          placeholder="+1234567890"
+                          className="text-sm"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="mobile-bank-instructions" className="text-sm">Instructions</Label>
+                        <Input
+                          id="mobile-bank-instructions"
+                          value={method.bankDetails?.instructions || ''}
+                          onChange={(e) => updatePaymentMethod(method.id, {
+                            bankDetails: { ...method.bankDetails, instructions: e.target.value }
+                          })}
+                          placeholder="Please transfer via mobile banking and include your order number."
                           className="text-sm"
                         />
                       </div>

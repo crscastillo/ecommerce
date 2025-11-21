@@ -172,9 +172,11 @@ export default function SettingsPage() {
     }
   }, [tenant?.id])
 
-  // Update URL when tab changes
+  // Update URL when tab changes (only when user changes tab, not on initial load)
   useEffect(() => {
-    const currentTab = searchParams.get('tab')
+    if (!mounted) return // Don't update URL on initial mount
+    
+    const currentTab = searchParams.get('tab') || 'store'
     if (currentTab !== activeTab) {
       const newParams = new URLSearchParams(searchParams.toString())
       if (activeTab === 'store') {
@@ -185,15 +187,15 @@ export default function SettingsPage() {
       const newUrl = newParams.toString() ? `?${newParams.toString()}` : '/admin/settings'
       router.replace(newUrl, { scroll: false })
     }
-  }, [activeTab, searchParams, router])
+  }, [activeTab, mounted])
 
-  // Update activeTab when URL changes
+  // Initialize activeTab from URL on mount only
   useEffect(() => {
-    const tabFromUrl = searchParams.get('tab') || 'store'
-    if (tabFromUrl !== activeTab) {
+    if (mounted) {
+      const tabFromUrl = searchParams.get('tab') || 'store'
       setActiveTab(tabFromUrl)
     }
-  }, [searchParams])
+  }, [mounted])
 
   const loadSettings = async () => {
     if (!tenant) return

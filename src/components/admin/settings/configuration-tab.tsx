@@ -85,6 +85,46 @@ export function ConfigurationTab({ settings, onSettingsChange, onSave, saving }:
           </div>
         </div>
 
+        <Separator />
+
+        <div className="space-y-4">
+          <h3 className="text-lg font-medium">Language Settings</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="admin-language">Admin Language</Label>
+              <Select 
+                value={settings.admin_language || 'en'} 
+                onValueChange={(value) => onSettingsChange({ ...settings, admin_language: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select admin language" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="en">🇺🇸 English</SelectItem>
+                  <SelectItem value="es">🇪🇸 Español</SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-gray-500 mt-1">Language for admin interface</p>
+            </div>
+            <div>
+              <Label htmlFor="store-language">Store Language</Label>
+              <Select 
+                value={settings.store_language || 'en'} 
+                onValueChange={(value) => onSettingsChange({ ...settings, store_language: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select store language" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="en">🇺🇸 English</SelectItem>
+                  <SelectItem value="es">🇪🇸 Español</SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-gray-500 mt-1">Language for public store</p>
+            </div>
+          </div>
+        </div>
+
         <div>
           <Label htmlFor="tax-rate">{t('labels.taxRate')}</Label>
           <Input

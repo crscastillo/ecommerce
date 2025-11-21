@@ -1,10 +1,22 @@
--- Fix Orders RLS Policies
--- Remove the problematic tenant-scoped policy and create proper admin access policies
+-- Consolidated Orders RLS Policies
+-- This migration provides comprehensive RLS policies for orders and order_line_items tables
 
--- Drop existing orders policies
+-- Drop any existing problematic policies
 DROP POLICY IF EXISTS "Tenant scoped access" ON orders;
+DROP POLICY IF EXISTS "Admin users can manage orders for their tenants" ON orders;
+DROP POLICY IF EXISTS "Public can create orders" ON orders;
+DROP POLICY IF EXISTS "Public can view orders by ID" ON orders;
 
--- Create new orders policies for admin and public access
+DROP POLICY IF EXISTS "Tenant scoped access" ON order_line_items;
+DROP POLICY IF EXISTS "Admin users can manage order line items for their tenants" ON order_line_items;
+DROP POLICY IF EXISTS "Public can create order line items" ON order_line_items;
+DROP POLICY IF EXISTS "Public can view order line items" ON order_line_items;
+
+-- ============================================================================
+-- ORDERS TABLE RLS POLICIES
+-- ============================================================================
+
+-- Admin users can manage orders for their tenants
 CREATE POLICY "Admin users can manage orders for their tenants" ON orders
   FOR ALL USING (
     auth.role() = 'authenticated' AND (
@@ -35,19 +47,21 @@ CREATE POLICY "Admin users can manage orders for their tenants" ON orders
     )
   );
 
--- Allow public access for order creation (guest checkout)
+-- Public can create orders (guest checkout)
 CREATE POLICY "Public can create orders" ON orders
   FOR INSERT 
   WITH CHECK (true);
 
--- Allow public to view their own orders (for order confirmation pages)
-CREATE POLICY "Public can view orders by ID" ON orders
+-- Public can view orders (for order confirmation pages)
+CREATE POLICY "Public can view orders" ON orders
   FOR SELECT 
   USING (true);
 
--- Fix order_line_items policies too
-DROP POLICY IF EXISTS "Tenant scoped access" ON order_line_items;
+-- ============================================================================
+-- ORDER LINE ITEMS TABLE RLS POLICIES
+-- ============================================================================
 
+-- Admin users can manage order line items for their tenants
 CREATE POLICY "Admin users can manage order line items for their tenants" ON order_line_items
   FOR ALL USING (
     auth.role() = 'authenticated' AND (
@@ -76,12 +90,12 @@ CREATE POLICY "Admin users can manage order line items for their tenants" ON ord
     )
   );
 
--- Allow public to create order line items (guest checkout)
+-- Public can create order line items (guest checkout)
 CREATE POLICY "Public can create order line items" ON order_line_items
   FOR INSERT 
   WITH CHECK (true);
 
--- Allow public to view order line items
+-- Public can view order line items
 CREATE POLICY "Public can view order line items" ON order_line_items
   FOR SELECT 
   USING (true);

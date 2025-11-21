@@ -1,10 +1,15 @@
--- Fix customers RLS policy to work with proper tenant access
--- This replaces the get_current_tenant_id() approach with proper tenant authorization
+-- Consolidated Customers RLS Policies
+-- This migration provides comprehensive RLS policies for customers table
 
--- Drop the existing policy that uses get_current_tenant_id()
-DROP POLICY "Tenant scoped access" ON customers;
+-- Drop existing policies to avoid conflicts
+DROP POLICY IF EXISTS "Tenant scoped access" ON customers;
+DROP POLICY IF EXISTS "Tenant users can manage customers" ON customers;
 
--- Create new policies that match the tenant authorization pattern
+-- ============================================================================
+-- CUSTOMERS TABLE RLS POLICIES
+-- ============================================================================
+
+-- Tenant users can manage customers for their tenant
 CREATE POLICY "Tenant users can manage customers" ON customers
   FOR ALL USING (
     auth.role() = 'authenticated' AND (
@@ -34,7 +39,3 @@ CREATE POLICY "Tenant users can manage customers" ON customers
       )
     )
   );
-
--- Also add a public read policy for customers (for storefront)
-CREATE POLICY "Public can view active customers for orders" ON customers
-  FOR SELECT USING (true);

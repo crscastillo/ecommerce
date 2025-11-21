@@ -394,6 +394,7 @@ export type Database = {
           total_discounts: number | null
           total_price: number
           total_tax: number | null
+          tracking_numbers: Json | null
           updated_at: string
         }
         Insert: {
@@ -419,6 +420,7 @@ export type Database = {
           total_discounts?: number | null
           total_price: number
           total_tax?: number | null
+          tracking_numbers?: Json | null
           updated_at?: string
         }
         Update: {
@@ -444,6 +446,7 @@ export type Database = {
           total_discounts?: number | null
           total_price?: number
           total_tax?: number | null
+          tracking_numbers?: Json | null
           updated_at?: string
         }
         Relationships: [

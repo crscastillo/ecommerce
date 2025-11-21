@@ -1,11 +1,17 @@
--- Fix tenant_payment_settings RLS policy to work with proper tenant authorization
--- This replaces the tenant_users-only approach with proper tenant owner authorization
+-- Consolidated Payment Settings RLS Policies
+-- This migration provides comprehensive RLS policies for tenant_payment_settings table
 
--- Drop the existing policies
-DROP POLICY "Users can view payment settings for their tenant" ON tenant_payment_settings;
-DROP POLICY "Users can update payment settings for their tenant" ON tenant_payment_settings;
+-- Drop existing policies to avoid conflicts
+DROP POLICY IF EXISTS "Users can view payment settings for their tenant" ON tenant_payment_settings;
+DROP POLICY IF EXISTS "Users can update payment settings for their tenant" ON tenant_payment_settings;
+DROP POLICY IF EXISTS "Tenant users can view payment settings" ON tenant_payment_settings;
+DROP POLICY IF EXISTS "Tenant users can manage payment settings" ON tenant_payment_settings;
 
--- Create new policies that match the tenant authorization pattern
+-- ============================================================================
+-- TENANT PAYMENT SETTINGS RLS POLICIES
+-- ============================================================================
+
+-- Tenant users can view payment settings
 CREATE POLICY "Tenant users can view payment settings" ON tenant_payment_settings
   FOR SELECT USING (
     auth.role() = 'authenticated' AND (
@@ -22,6 +28,7 @@ CREATE POLICY "Tenant users can view payment settings" ON tenant_payment_setting
     )
   );
 
+-- Tenant users can manage payment settings (with role restrictions for modifications)
 CREATE POLICY "Tenant users can manage payment settings" ON tenant_payment_settings
   FOR ALL USING (
     auth.role() = 'authenticated' AND (
@@ -30,7 +37,7 @@ CREATE POLICY "Tenant users can manage payment settings" ON tenant_payment_setti
         SELECT id FROM tenants 
         WHERE owner_id = auth.uid()
       ) OR
-      -- Allow tenant users (staff/collaborators) with admin/owner role
+      -- Allow tenant users (staff/collaborators) with admin/owner role for modifications
       tenant_id IN (
         SELECT tenant_id FROM tenant_users 
         WHERE user_id = auth.uid() AND is_active = true
@@ -45,7 +52,7 @@ CREATE POLICY "Tenant users can manage payment settings" ON tenant_payment_setti
         SELECT id FROM tenants 
         WHERE owner_id = auth.uid()
       ) OR
-      -- Allow tenant users (staff/collaborators) with admin/owner role
+      -- Allow tenant users (staff/collaborators) with admin/owner role for modifications
       tenant_id IN (
         SELECT tenant_id FROM tenant_users 
         WHERE user_id = auth.uid() AND is_active = true

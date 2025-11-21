@@ -24,15 +24,13 @@ type Order = Database['public']['Tables']['orders']['Row'] & {
 
 interface OrdersTableProps {
   orders: Order[]
-  onViewOrder: (order: Order) => void
-  onEditOrder: (orderId: string) => void
+  onViewOrder: (orderId: string) => void
   onUpdateStatus: (orderId: string, field: 'financial_status' | 'fulfillment_status', value: string) => void
 }
 
 export function OrdersTable({
   orders,
   onViewOrder,
-  onEditOrder,
   onUpdateStatus
 }: OrdersTableProps) {
   const t = useTranslations('orders')
@@ -157,22 +155,14 @@ export function OrdersTable({
                 </div>
               </TableCell>
               <TableCell>
-                <div className="flex space-x-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => onViewOrder(order)}
-                  >
-                    <Eye className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => onEditOrder(order.id)}
-                  >
-                    {t('editOrder')}
-                  </Button>
-                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => onViewOrder(order.id)}
+                >
+                  <Eye className="h-4 w-4 mr-2" />
+                  {t('viewOrder')}
+                </Button>
               </TableCell>
             </TableRow>
           ))}

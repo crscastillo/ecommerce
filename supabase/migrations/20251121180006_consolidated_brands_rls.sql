@@ -1,5 +1,6 @@
--- Add Row Level Security (RLS) policies to brands table
--- This migration enables RLS on the brands table and creates appropriate security policies
+-- Consolidated Brands RLS Policies
+-- This migration enables RLS on the brands table and creates comprehensive security policies
+-- Table: brands
 
 -- Enable RLS on brands table
 ALTER TABLE brands ENABLE ROW LEVEL SECURITY;

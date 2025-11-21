@@ -1,9 +1,12 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { platformConfig } from '@/lib/config/platform'
+import { useTenant } from '@/lib/contexts/tenant-context'
+import { createClient } from '@/lib/supabase/client'
 import { useTranslations } from 'next-intl'
 import { 
   DollarSign, 
@@ -16,10 +19,87 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 
+interface DashboardStats {
+  totalRevenue: number
+  productsCount: number
+  ordersCount: number
+  customersCount: number
+  revenueGrowth: number
+}
+
 export default function AdminDashboard() {
   const t = useTranslations()
-  const tenant = { name: 'My Store', subdomain: 'mystore', is_active: true, subscription_tier: 'basic' }
-  const isLoading = false
+  const { tenant } = useTenant()
+  const [stats, setStats] = useState<DashboardStats>({
+    totalRevenue: 0,
+    productsCount: 0,
+    ordersCount: 0,
+    customersCount: 0,
+    revenueGrowth: 0
+  })
+  const [isLoading, setIsLoading] = useState(true)
+  const supabase = createClient()
+
+  useEffect(() => {
+    if (tenant?.id) {
+      loadDashboardStats()
+    }
+  }, [tenant?.id])
+
+  const loadDashboardStats = async () => {
+    if (!tenant?.id) return
+
+    try {
+      setIsLoading(true)
+
+      // Fetch all stats in parallel
+      const [ordersResult, productsResult, customersResult] = await Promise.all([
+        // Orders and revenue
+        supabase
+          .from('orders')
+          .select('total_price, financial_status')
+          .eq('tenant_id', tenant.id),
+        
+        // Products count
+        supabase
+          .from('products')
+          .select('id', { count: 'exact' })
+          .eq('tenant_id', tenant.id)
+          .eq('is_active', true),
+        
+        // Customers count
+        supabase
+          .from('customers')
+          .select('id', { count: 'exact' })
+          .eq('tenant_id', tenant.id)
+      ])
+
+      // Calculate revenue from paid orders
+      const totalRevenue = ordersResult.data
+        ?.filter(order => order.financial_status === 'paid')
+        .reduce((sum, order) => sum + (order.total_price || 0), 0) || 0
+
+      setStats({
+        totalRevenue,
+        productsCount: productsResult.count || 0,
+        ordersCount: ordersResult.data?.length || 0,
+        customersCount: customersResult.count || 0,
+        revenueGrowth: 0 // TODO: Calculate month-over-month growth
+      })
+
+    } catch (error) {
+      console.error('Error loading dashboard stats:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD'
+    }).format(amount)
+  }
 
   if (isLoading) {
     return (
@@ -92,9 +172,9 @@ export default function AdminDashboard() {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">$0.00</div>
+            <div className="text-2xl font-bold">{formatCurrency(stats.totalRevenue)}</div>
             <p className="text-xs text-muted-foreground">
-              {t('dashboard.fromLastMonth', { percentage: '+0%' })}
+              {stats.revenueGrowth >= 0 ? '+' : ''}{stats.revenueGrowth.toFixed(1)}% from last month
             </p>
           </CardContent>
         </Card>
@@ -106,9 +186,9 @@ export default function AdminDashboard() {
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">0</div>
+            <div className="text-2xl font-bold">{stats.productsCount}</div>
             <p className="text-xs text-muted-foreground">
-              {t('dashboard.startAddingProducts')}
+              {stats.productsCount === 0 ? t('dashboard.startAddingProducts') : 'Active products'}
             </p>
           </CardContent>
         </Card>
@@ -120,9 +200,9 @@ export default function AdminDashboard() {
             <ShoppingCart className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">0</div>
+            <div className="text-2xl font-bold">{stats.ordersCount}</div>
             <p className="text-xs text-muted-foreground">
-              {t('dashboard.noOrdersYet')}
+              {stats.ordersCount === 0 ? t('dashboard.noOrdersYet') : 'Total orders'}
             </p>
           </CardContent>
         </Card>
@@ -134,9 +214,9 @@ export default function AdminDashboard() {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">0</div>
+            <div className="text-2xl font-bold">{stats.customersCount}</div>
             <p className="text-xs text-muted-foreground">
-              {t('dashboard.noCustomersYet')}
+              {stats.customersCount === 0 ? t('dashboard.noCustomersYet') : 'Total customers'}
             </p>
           </CardContent>
         </Card>

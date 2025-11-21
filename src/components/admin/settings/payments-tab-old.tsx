@@ -28,6 +28,24 @@ export function PaymentsTab({
   const t = useTranslations('settings')
   const tCommon = useTranslations('common')
   const [showSecrets, setShowSecrets] = useState<Record<string, boolean>>({})
+  const [enabledFlags, setEnabledFlags] = useState<PaymentMethodFlags>({
+    stripe: false,
+    tilopay: false,
+    bank_transfer: false,
+    mobile_bank_transfer: false
+  })
+
+  useEffect(() => {
+    const loadFlags = async () => {
+      try {
+        const flags = await FeatureFlagsService.getEnabledPaymentMethods()
+        setEnabledFlags(flags)
+      } catch (error) {
+        console.error('Failed to load payment method flags:', error)
+      }
+    }
+    loadFlags()
+  }, [])
 
   const getPaymentMethod = (id: string) => {
     return paymentMethods.find(method => method.id === id)
@@ -52,12 +70,10 @@ export function PaymentsTab({
     setShowSecrets(prev => ({ ...prev, [key]: !prev[key] }))
   }
 
-  const traditionalMethod = getPaymentMethod('traditional')
   const stripeMethod = getPaymentMethod('stripe')
   const tilopayMethod = getPaymentMethod('tilopay')
-  const paypalMethod = getPaymentMethod('paypal')
-  const applePayMethod = getPaymentMethod('apple_pay')
-  const googlePayMethod = getPaymentMethod('google_pay')
+  const bankTransferMethod = getPaymentMethod('bank_transfer')
+  const mobileBankTransferMethod = getPaymentMethod('mobile_bank_transfer')
 
   return (
     <Card>
@@ -68,28 +84,6 @@ export function PaymentsTab({
         </p>
       </CardHeader>
       <CardContent>
-        {/* Cash on Delivery */}
-        {enabledFlags.cash_on_delivery && (
-        <div className="border rounded-lg mb-6">
-          <div className="flex items-center justify-between p-4">
-            <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">💵</div>
-              <div>
-                <h3 className="font-medium">Cash on Delivery</h3>
-                <p className="text-sm text-gray-500">Allow customers to pay with cash upon delivery.</p>
-              </div>
-            </div>
-            <Switch
-              checked={paymentMethods.cash_on_delivery.enabled}
-              onCheckedChange={(checked) => onPaymentMethodsChange({
-                ...paymentMethods,
-                cash_on_delivery: { ...paymentMethods.cash_on_delivery, enabled: checked }
-              })}
-            />
-          </div>
-        </div>
-        )}
-
         {/* Stripe */}
         {enabledFlags.stripe && (
         <div className="border rounded-lg mb-6">
@@ -105,25 +99,24 @@ export function PaymentsTab({
               </div>
             </div>
             <Switch
-              checked={paymentMethods.stripe.enabled}
-              onCheckedChange={(checked) => onPaymentMethodsChange({
-                ...paymentMethods,
-                stripe: { ...paymentMethods.stripe, enabled: checked }
-              })}
+              checked={stripeMethod?.enabled || false}
+              onCheckedChange={(checked) => {
+                const updatedMethods = paymentMethods.map(method => 
+                  method.id === 'stripe' ? { ...method, enabled: checked } : method
+                )
+                onPaymentMethodsChange(updatedMethods)
+              }}
             />
           </div>
-          {paymentMethods.stripe.enabled && (
+          {stripeMethod?.enabled && (
             <div className="px-4 pb-4 space-y-4 border-t bg-gray-50">
               <div className="space-y-3 pt-4">
                 <div>
                   <Label htmlFor="stripe-publishable-key" className="text-sm">Publishable Key</Label>
                   <Input
                     id="stripe-publishable-key"
-                    value={paymentMethods.stripe.stripe_publishable_key || ''}
-                    onChange={(e) => onPaymentMethodsChange({
-                      ...paymentMethods,
-                      stripe: { ...paymentMethods.stripe, stripe_publishable_key: e.target.value }
-                    })}
+                    value={stripeMethod?.keys?.publishableKey || ''}
+                    onChange={(e) => updatePaymentMethodKey('stripe', 'publishableKey', e.target.value)}
                     placeholder="pk_test_..."
                     className="font-mono text-sm"
                   />
@@ -132,11 +125,8 @@ export function PaymentsTab({
                   <Label htmlFor="stripe-secret-key" className="text-sm">Secret Key</Label>
                   <Input
                     id="stripe-secret-key"
-                    value={paymentMethods.stripe.stripe_secret_key || ''}
-                    onChange={(e) => onPaymentMethodsChange({
-                      ...paymentMethods,
-                      stripe: { ...paymentMethods.stripe, stripe_secret_key: e.target.value }
-                    })}
+                    value={stripeMethod?.keys?.secretKey || ''}
+                    onChange={(e) => updatePaymentMethodKey('stripe', 'secretKey', e.target.value)}
                     placeholder="sk_test_..."
                     className="font-mono text-sm"
                   />
@@ -162,25 +152,24 @@ export function PaymentsTab({
               </div>
             </div>
             <Switch
-              checked={paymentMethods.tilopay.enabled}
-              onCheckedChange={(checked) => onPaymentMethodsChange({
-                ...paymentMethods,
-                tilopay: { ...paymentMethods.tilopay, enabled: checked }
-              })}
+              checked={tilopayMethod?.enabled || false}
+              onCheckedChange={(checked) => {
+                const updatedMethods = paymentMethods.map(method => 
+                  method.id === 'tilopay' ? { ...method, enabled: checked } : method
+                )
+                onPaymentMethodsChange(updatedMethods)
+              }}
             />
           </div>
-          {paymentMethods.tilopay.enabled && (
+          {tilopayMethod?.enabled && (
             <div className="px-4 pb-4 space-y-4 border-t bg-gray-50">
               <div className="space-y-3 pt-4">
                 <div>
                   <Label htmlFor="tilopay-api-key" className="text-sm">API Key</Label>
                   <Input
                     id="tilopay-api-key"
-                    value={paymentMethods.tilopay.tilopay_api_key || ''}
-                    onChange={(e) => onPaymentMethodsChange({
-                      ...paymentMethods,
-                      tilopay: { ...paymentMethods.tilopay, tilopay_api_key: e.target.value }
-                    })}
+                    value={tilopayMethod?.keys?.publishableKey || ''}
+                    onChange={(e) => updatePaymentMethodKey('tilopay', 'publishableKey', e.target.value)}
                     placeholder="Your TiloPay API key"
                     className="font-mono text-sm"
                   />
@@ -189,11 +178,8 @@ export function PaymentsTab({
                   <Label htmlFor="tilopay-secret-key" className="text-sm">Secret Key</Label>
                   <Input
                     id="tilopay-secret-key"
-                    value={paymentMethods.tilopay.tilopay_secret_key || ''}
-                    onChange={(e) => onPaymentMethodsChange({
-                      ...paymentMethods,
-                      tilopay: { ...paymentMethods.tilopay, tilopay_secret_key: e.target.value }
-                    })}
+                    value={tilopayMethod?.keys?.secretKey || ''}
+                    onChange={(e) => updatePaymentMethodKey('tilopay', 'secretKey', e.target.value)}
                     placeholder="Your TiloPay secret key"
                     className="font-mono text-sm"
                   />
@@ -216,25 +202,31 @@ export function PaymentsTab({
               </div>
             </div>
             <Switch
-              checked={paymentMethods.bank_transfer.enabled}
-              onCheckedChange={(checked) => onPaymentMethodsChange({
-                ...paymentMethods,
-                bank_transfer: { ...paymentMethods.bank_transfer, enabled: checked }
-              })}
+              checked={bankTransferMethod?.enabled || false}
+              onCheckedChange={(checked) => {
+                const updatedMethods = paymentMethods.map(method => 
+                  method.id === 'bank_transfer' ? { ...method, enabled: checked } : method
+                )
+                onPaymentMethodsChange(updatedMethods)
+              }}
             />
           </div>
-          {paymentMethods.bank_transfer.enabled && (
+          {bankTransferMethod?.enabled && (
             <div className="px-4 pb-4 space-y-4 border-t bg-gray-50">
               <div className="space-y-3 pt-4">
                 <div>
                   <Label htmlFor="bank-name" className="text-sm">Bank Name</Label>
                   <Input
                     id="bank-name"
-                    value={paymentMethods.bank_transfer.bank_name || ''}
-                    onChange={(e) => onPaymentMethodsChange({
-                      ...paymentMethods,
-                      bank_transfer: { ...paymentMethods.bank_transfer, bank_name: e.target.value }
-                    })}
+                    value={bankTransferMethod?.bankDetails?.bankName || ''}
+                    onChange={(e) => {
+                      const updatedMethods = paymentMethods.map(method => 
+                        method.id === 'bank_transfer' 
+                          ? { ...method, bankDetails: { ...method.bankDetails, bankName: e.target.value } }
+                          : method
+                      )
+                      onPaymentMethodsChange(updatedMethods)
+                    }}
                     placeholder="Your Bank Name"
                     className="text-sm"
                   />
@@ -243,11 +235,15 @@ export function PaymentsTab({
                   <Label htmlFor="account-number" className="text-sm">Account Number</Label>
                   <Input
                     id="account-number"
-                    value={paymentMethods.bank_transfer.account_number || ''}
-                    onChange={(e) => onPaymentMethodsChange({
-                      ...paymentMethods,
-                      bank_transfer: { ...paymentMethods.bank_transfer, account_number: e.target.value }
-                    })}
+                    value={bankTransferMethod?.bankDetails?.accountNumber || ''}
+                    onChange={(e) => {
+                      const updatedMethods = paymentMethods.map(method => 
+                        method.id === 'bank_transfer' 
+                          ? { ...method, bankDetails: { ...method.bankDetails, accountNumber: e.target.value } }
+                          : method
+                      )
+                      onPaymentMethodsChange(updatedMethods)
+                    }}
                     placeholder="1234567890"
                     className="text-sm"
                   />
@@ -256,11 +252,15 @@ export function PaymentsTab({
                   <Label htmlFor="account-holder" className="text-sm">Account Holder</Label>
                   <Input
                     id="account-holder"
-                    value={paymentMethods.bank_transfer.account_holder || ''}
-                    onChange={(e) => onPaymentMethodsChange({
-                      ...paymentMethods,
-                      bank_transfer: { ...paymentMethods.bank_transfer, account_holder: e.target.value }
-                    })}
+                    value={bankTransferMethod?.bankDetails?.accountHolder || ''}
+                    onChange={(e) => {
+                      const updatedMethods = paymentMethods.map(method => 
+                        method.id === 'bank_transfer' 
+                          ? { ...method, bankDetails: { ...method.bankDetails, accountHolder: e.target.value } }
+                          : method
+                      )
+                      onPaymentMethodsChange(updatedMethods)
+                    }}
                     placeholder="John Doe"
                     className="text-sm"
                   />
@@ -269,11 +269,15 @@ export function PaymentsTab({
                   <Label htmlFor="bank-instructions" className="text-sm">Instructions</Label>
                   <Input
                     id="bank-instructions"
-                    value={paymentMethods.bank_transfer.instructions || ''}
-                    onChange={(e) => onPaymentMethodsChange({
-                      ...paymentMethods,
-                      bank_transfer: { ...paymentMethods.bank_transfer, instructions: e.target.value }
-                    })}
+                    value={bankTransferMethod?.bankDetails?.instructions || ''}
+                    onChange={(e) => {
+                      const updatedMethods = paymentMethods.map(method => 
+                        method.id === 'bank_transfer' 
+                          ? { ...method, bankDetails: { ...method.bankDetails, instructions: e.target.value } }
+                          : method
+                      )
+                      onPaymentMethodsChange(updatedMethods)
+                    }}
                     placeholder="Please transfer the total amount and include your order number."
                     className="text-sm"
                   />
@@ -296,25 +300,31 @@ export function PaymentsTab({
               </div>
             </div>
             <Switch
-              checked={paymentMethods.mobile_bank_transfer.enabled}
-              onCheckedChange={(checked) => onPaymentMethodsChange({
-                ...paymentMethods,
-                mobile_bank_transfer: { ...paymentMethods.mobile_bank_transfer, enabled: checked }
-              })}
+              checked={mobileBankTransferMethod?.enabled || false}
+              onCheckedChange={(checked) => {
+                const updatedMethods = paymentMethods.map(method => 
+                  method.id === 'mobile_bank_transfer' ? { ...method, enabled: checked } : method
+                )
+                onPaymentMethodsChange(updatedMethods)
+              }}
             />
           </div>
-          {paymentMethods.mobile_bank_transfer.enabled && (
+          {mobileBankTransferMethod?.enabled && (
             <div className="px-4 pb-4 space-y-4 border-t bg-orange-50">
               <div className="space-y-3 pt-4">
                 <div>
                   <Label htmlFor="mobile-phone-number" className="text-sm">Phone Number</Label>
                   <Input
                     id="mobile-phone-number"
-                    value={paymentMethods.mobile_bank_transfer.phone_number || ''}
-                    onChange={(e) => onPaymentMethodsChange({
-                      ...paymentMethods,
-                      mobile_bank_transfer: { ...paymentMethods.mobile_bank_transfer, phone_number: e.target.value }
-                    })}
+                    value={mobileBankTransferMethod?.bankDetails?.phoneNumber || ''}
+                    onChange={(e) => {
+                      const updatedMethods = paymentMethods.map(method => 
+                        method.id === 'mobile_bank_transfer' 
+                          ? { ...method, bankDetails: { ...method.bankDetails, phoneNumber: e.target.value } }
+                          : method
+                      )
+                      onPaymentMethodsChange(updatedMethods)
+                    }}
                     placeholder="+506XXXXXXXX"
                     className="text-sm"
                   />
@@ -323,11 +333,15 @@ export function PaymentsTab({
                   <Label htmlFor="mobile-instructions" className="text-sm">Instructions</Label>
                   <Input
                     id="mobile-instructions"
-                    value={paymentMethods.mobile_bank_transfer.instructions || ''}
-                    onChange={(e) => onPaymentMethodsChange({
-                      ...paymentMethods,
-                      mobile_bank_transfer: { ...paymentMethods.mobile_bank_transfer, instructions: e.target.value }
-                    })}
+                    value={mobileBankTransferMethod?.bankDetails?.instructions || ''}
+                    onChange={(e) => {
+                      const updatedMethods = paymentMethods.map(method => 
+                        method.id === 'mobile_bank_transfer' 
+                          ? { ...method, bankDetails: { ...method.bankDetails, instructions: e.target.value } }
+                          : method
+                      )
+                      onPaymentMethodsChange(updatedMethods)
+                    }}
                     placeholder="Please transfer the total amount and include your order number."
                     className="text-sm"
                   />

@@ -13,7 +13,6 @@ export interface FeatureFlag {
 }
 
 export interface PaymentMethodFlags {
-  cash_on_delivery: boolean
   stripe: boolean
   tilopay: boolean
   bank_transfer: boolean
@@ -95,7 +94,6 @@ export class FeatureFlagsService {
       console.error('Error fetching payment method flags:', error)
       // Return all disabled as fallback for tier-specific
       return {
-        cash_on_delivery: false,
         stripe: false,
         tilopay: false,
         bank_transfer: false,
@@ -104,7 +102,6 @@ export class FeatureFlagsService {
     }
     
     const flags: PaymentMethodFlags = {
-      cash_on_delivery: false,
       stripe: false,
       tilopay: false,
       bank_transfer: false,
@@ -150,7 +147,6 @@ export class FeatureFlagsService {
       console.error('Error fetching payment method flags:', error)
       // Return all enabled as fallback
       return {
-        cash_on_delivery: true,
         stripe: true,
         tilopay: true,
         bank_transfer: true,
@@ -159,7 +155,6 @@ export class FeatureFlagsService {
     }
     
     const flags: PaymentMethodFlags = {
-      cash_on_delivery: false,
       stripe: false,
       tilopay: false,
       bank_transfer: false,

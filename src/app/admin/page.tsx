@@ -121,7 +121,7 @@ export default function AdminDashboard() {
         <div>
           <h1 className="text-3xl font-bold tracking-tight">{t('dashboard.title')}</h1>
           <p className="text-muted-foreground">
-            {t('dashboard.welcomeBack', { storeName: tenant?.name })}
+            {t('dashboard.welcomeBack', { storeName: tenant?.name || '' })}
           </p>
         </div>
         <div className="flex items-center space-x-2">

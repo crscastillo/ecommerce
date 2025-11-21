@@ -320,7 +320,7 @@ CREATE INDEX IF NOT EXISTS idx_order_line_items_order_id ON order_line_items(ord
 CREATE INDEX IF NOT EXISTS idx_discounts_tenant_id ON discounts(tenant_id);
 
 -- Platform feature flags indexes
-CREATE INDEX IF NOT EXISTS idx_platform_feature_flags_flag_key ON platform_feature_flags(flag_key);
+CREATE INDEX IF NOT EXISTS idx_platform_feature_flags_feature_key ON platform_feature_flags(feature_key);
 CREATE INDEX IF NOT EXISTS idx_platform_feature_flags_category ON platform_feature_flags(category);
 
 -- ============================================================================
@@ -401,8 +401,8 @@ $$;
 -- Inventory management functions
 CREATE OR REPLACE FUNCTION update_product_inventory(
   p_product_id UUID,
-  p_variant_id UUID DEFAULT NULL,
-  p_quantity_change INTEGER
+  p_quantity_change INTEGER,
+  p_variant_id UUID DEFAULT NULL
 )
 RETURNS BOOLEAN
 LANGUAGE plpgsql
@@ -435,8 +435,8 @@ $$;
 
 CREATE OR REPLACE FUNCTION check_inventory_availability(
   p_product_id UUID,
-  p_variant_id UUID DEFAULT NULL,
-  p_requested_quantity INTEGER DEFAULT 1
+  p_requested_quantity INTEGER DEFAULT 1,
+  p_variant_id UUID DEFAULT NULL
 )
 RETURNS BOOLEAN
 LANGUAGE plpgsql

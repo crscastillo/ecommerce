@@ -4,13 +4,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
-interface PaymentInfo {
-  cardNumber: string
-  expiryDate: string
-  cvv: string
-  cardholderName: string
-  paymentMethod: 'card' | 'stripe' | 'tilopay'
-}
+
+import type { PaymentInfo } from './types'
 
 interface TraditionalCardFormProps {
   paymentInfo: PaymentInfo

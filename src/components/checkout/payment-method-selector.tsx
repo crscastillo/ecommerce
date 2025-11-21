@@ -8,8 +8,8 @@ import type { PaymentMethodConfig } from '@/lib/services/payment-methods'
 
 interface PaymentMethodSelectorProps {
   availablePaymentMethods: PaymentMethodConfig[]
-  selectedPaymentMethod: 'card' | 'stripe' | 'tilopay'
-  onSelect: (method: 'card' | 'stripe' | 'tilopay') => void
+  selectedPaymentMethod: string
+  onSelect: (method: string) => void
   loading?: boolean
 }
 
@@ -67,7 +67,7 @@ export function PaymentMethodSelector({
                 ? 'border-blue-500 bg-blue-50' 
                 : 'border-gray-200 hover:border-gray-300'
             }`}
-            onClick={() => onSelect(method.id as 'card' | 'stripe' | 'tilopay')}
+            onClick={() => onSelect(method.id)}
           >
             <CardContent className="p-4 text-center">
               <div className="mb-2">
@@ -87,6 +87,8 @@ export function PaymentMethodSelector({
                  method.id === 'traditional' ? 'Enter card details manually' :
                  method.id === 'tilopay' ? 'Costa Rican payment gateway' :
                  method.id === 'paypal' ? 'Pay with PayPal' :
+                 method.id === 'bank_transfer' ? 'Pay via direct bank transfer' :
+                 method.id === 'mobile_bank_transfer' ? 'Pay via mobile bank transfer' :
                  'Secure payment processing'}
               </p>
               <div className="mt-2 flex justify-center space-x-2">

@@ -297,7 +297,7 @@ async function handlePublicStoreRoutes(request: NextRequest, supabaseResponse: N
   const { data: { user } } = await supabase.auth.getUser()
   
   // Only protect specific customer routes
-  const protectedRoutes = ['/account', '/checkout']
+  const protectedRoutes = ['/account']
   const isProtectedRoute = protectedRoutes.some(route => 
     request.nextUrl.pathname.startsWith(route)
   )

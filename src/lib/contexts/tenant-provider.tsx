@@ -255,29 +255,20 @@ export function TenantProvider({ children, initialTenant }: TenantProviderProps)
       }
 
       // Fetch tenant data
-      const { data: tenantData, error: tenantError } = await supabase
-        .from('tenants')
-        .select('*')
-        .eq('subdomain', subdomain)
-        .eq('is_active', true)
-        .maybeSingle()
-
-      if (tenantError) {
-        throw new Error(`Tenant query error: ${tenantError.message}`)
+      // Use Next.js API route for tenant fetch
+      const response = await fetch(`/api/tenant?subdomain=${subdomain}`)
+      const result = await response.json()
+      if (!response.ok || !result.data) {
+        throw new Error(result.error || `Tenant not found for subdomain: ${subdomain}`)
       }
-
-      if (!tenantData) {
-        throw new Error(`Tenant not found for subdomain: ${subdomain}`)
-      }
-
-      setTenant(tenantData)
+      setTenant(result.data)
 
       // Fetch tenant user relationship if user is logged in
-      if (user && tenantData) {
+      if (user && result.data) {
         const { data: tenantUserData } = await supabase
           .from('tenant_users')
           .select('*')
-          .eq('tenant_id', tenantData.id)
+          .eq('tenant_id', result.data.id)
           .eq('user_id', user.id)
           .eq('is_active', true)
           .maybeSingle()

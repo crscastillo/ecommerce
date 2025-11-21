@@ -74,7 +74,7 @@ export function ProductCard({ product, viewMode = 'grid', tenantSettings = {} }:
   const [isWishlisted, setIsWishlisted] = useState(false)
   const [addingToCart, setAddingToCart] = useState(false)
   const { tenant } = useTenant()
-  const { addToCart } = useCart()
+  const { addToCart, items } = useCart()
   const { success, error: showError } = useToast()
   const t = useTranslations()
 
@@ -195,6 +195,7 @@ export function ProductCard({ product, viewMode = 'grid', tenantSettings = {} }:
 
   // Handle add to cart
   const handleAddToCart = async (e: React.MouseEvent) => {
+    console.log('handleAddToCart called')
     e.preventDefault() // Prevent navigation if card is wrapped in Link
     e.stopPropagation()
     
@@ -209,6 +210,18 @@ export function ProductCard({ product, viewMode = 'grid', tenantSettings = {} }:
 
       const maxQuantity = product.track_inventory ? totalStock : undefined
 
+      // Debug log for addToCart payload
+      console.log('AddToCart payload:', {
+        id: product.id,
+        name: product.name,
+        slug: product.slug,
+        price: currentPrice,
+        image: productImage,
+        maxQuantity: maxQuantity
+      })
+      // Debug log for cart items before
+      console.log('Cart items before:', items)
+
       addToCart({
         id: product.id,
         name: product.name,
@@ -217,6 +230,11 @@ export function ProductCard({ product, viewMode = 'grid', tenantSettings = {} }:
         image: productImage,
         maxQuantity: maxQuantity
       }, 1)
+
+      // Debug log for cart items after (async, so use setTimeout)
+      setTimeout(() => {
+        console.log('Cart items after:', items)
+      }, 500)
 
       success(
         'Added to cart!',

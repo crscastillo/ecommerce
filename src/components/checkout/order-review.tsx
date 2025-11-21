@@ -27,7 +27,7 @@ interface OrderItem {
 
 interface OrderReviewProps {
   shippingInfo: ShippingInfo
-  paymentMethod: 'card' | 'stripe' | 'tilopay'
+  paymentMethod: string
   paymentDetails?: {
     card?: { last4?: string; brand?: string }
     paymentId?: string

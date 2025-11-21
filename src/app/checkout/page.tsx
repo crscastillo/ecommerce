@@ -34,13 +34,7 @@ interface ShippingInfo {
   country: string
 }
 
-interface PaymentInfo {
-  cardNumber: string
-  expiryDate: string
-  cvv: string
-  cardholderName: string
-  paymentMethod: 'card' | 'stripe' | 'tilopay'
-}
+import type { PaymentInfo } from '@/components/checkout/types'
 
 export default function CheckoutPage() {
   const router = useRouter()
@@ -72,7 +66,7 @@ export default function CheckoutPage() {
     expiryDate: '',
     cvv: '',
     cardholderName: '',
-    paymentMethod: 'stripe'
+    paymentMethod: 'stripe' // default, will be set by availablePaymentMethods
   })
 
   // Load available payment methods for this tenant
@@ -230,31 +224,38 @@ export default function CheckoutPage() {
 
   const handlePlaceOrder = async () => {
     setIsProcessing(true)
-    
     try {
-      // Simulate order processing
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      
-      // In a real app, you would:
-      // 1. Create order in database
-      // 2. Process payment (Stripe or traditional)
-      // 3. Send confirmation email
-      // 4. Update inventory
-      
-      success(
-        'Order Placed Successfully!',
-        `Your order for ${getItemCount()} items has been confirmed.`
-      )
-      
-      // Clear cart and redirect
+      // Debug log for items payload
+      console.log('Order POST items payload:', items)
+      const response = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          tenant_id: tenant?.id,
+          customer_info: {
+            email: shippingInfo.email,
+            first_name: shippingInfo.firstName,
+            last_name: shippingInfo.lastName,
+            phone: shippingInfo.phone,
+          },
+          shipping_info: shippingInfo,
+          payment_info: paymentInfo,
+          items,
+          totals: {
+            subtotal,
+            tax,
+            total,
+            currency: tenant?.settings?.currency || 'USD'
+          }
+        })
+      })
+      const result = await response.json()
+      if (!response.ok) throw new Error(result.error || 'Order failed')
+      success('Order Placed Successfully!', `Your order for ${getItemCount()} items has been confirmed.`)
       clearCart()
       router.push('/order-confirmation')
-      
     } catch (err) {
-      error(
-        'Order Failed',
-        'There was an error processing your order. Please try again.'
-      )
+      error('Order Failed', err instanceof Error ? err.message : 'There was an error processing your order. Please try again.')
     } finally {
       setIsProcessing(false)
     }
@@ -320,9 +321,44 @@ export default function CheckoutPage() {
                 <PaymentMethodSelector
                   availablePaymentMethods={availablePaymentMethods}
                   selectedPaymentMethod={paymentInfo.paymentMethod}
-                  onSelect={(method) => setPaymentInfo(prev => ({ ...prev, paymentMethod: method as 'card' | 'stripe' | 'tilopay' }))}
+                  onSelect={(method) => setPaymentInfo(prev => ({ ...prev, paymentMethod: method as any }))}
                   loading={loadingPaymentMethods}
                 />
+                {/* Mobile Bank Transfer Payment Form */}
+                {paymentInfo.paymentMethod === 'mobile_bank_transfer' && (
+                  <Card className="mt-4">
+                    <CardContent className="pt-6">
+                      <h3 className="font-medium mb-4">Mobile Bank Transfer</h3>
+                      <div className="bg-gray-100 p-4 rounded">
+                        <p>Send your payment to the following mobile bank account:</p>
+                        <p className="mt-2 font-mono">Account: 123456789<br />Bank: Example Mobile Bank<br />Phone: +1234567890</p>
+                        <p className="mt-2 text-sm text-gray-600">After payment, reply to the confirmation email with your transaction receipt.</p>
+                      </div>
+                      <div className="flex space-x-4 mt-6">
+                        <Button type="button" variant="outline" onClick={() => setCurrentStep('shipping')} className="flex-1">Back to Shipping</Button>
+                        <Button type="button" className="flex-1" onClick={() => setCurrentStep('review')}>Continue</Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Regular Bank Transfer Payment Form */}
+                {paymentInfo.paymentMethod === 'bank_transfer' && (
+                  <Card className="mt-4">
+                    <CardContent className="pt-6">
+                      <h3 className="font-medium mb-4">Bank Transfer</h3>
+                      <div className="bg-gray-100 p-4 rounded">
+                        <p>Send your payment to the following bank account:</p>
+                        <p className="mt-2 font-mono">Account: 987654321<br />Bank: Example Bank<br />SWIFT: EXAMPBANK</p>
+                        <p className="mt-2 text-sm text-gray-600">After payment, reply to the confirmation email with your transaction receipt.</p>
+                      </div>
+                      <div className="flex space-x-4 mt-6">
+                        <Button type="button" variant="outline" onClick={() => setCurrentStep('shipping')} className="flex-1">Back to Shipping</Button>
+                        <Button type="button" className="flex-1" onClick={() => setCurrentStep('review')}>Continue</Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
 
                 {/* Stripe Payment Form */}
                 {paymentInfo.paymentMethod === 'stripe' && (

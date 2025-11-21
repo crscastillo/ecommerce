@@ -67,6 +67,7 @@
     "analytics": "Analytics",
     "pages": "Pages",
     "billing": "Billing",
+    "analytics": "Analytics",
     "settings": "Settings",
     "logout": "Logout",
     "profile": "Profile",
@@ -703,6 +704,26 @@
       "postalCode": "10001",
       "selectCountry": "Select country"
     }
+  },
+  "analytics": {
+    "title": "Analytics",
+    "comingSoon": "Coming Soon",
+    "advancedAnalytics": "Advanced Analytics",
+    "description": "Get detailed insights into your store's performance with comprehensive analytics and reporting tools.",
+    "revenue": "Revenue",
+    "trackSales": "Track sales performance",
+    "customers": "Customers",
+    "userBehavior": "Analyze user behavior",
+    "orders": "Orders",
+    "conversionRates": "Monitor conversion rates",
+    "traffic": "Traffic",
+    "pageViews": "Track page views",
+    "salesOverview": "Sales Overview",
+    "salesDescription": "Track your sales performance over time",
+    "topProducts": "Top Products",
+    "productsDescription": "See which products are performing best",
+    "chartPlaceholder": "Interactive charts coming soon",
+    "reportPlaceholder": "Detailed reports coming soon"
   },
   "auth": {
     "login": "Login",

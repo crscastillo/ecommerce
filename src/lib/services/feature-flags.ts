@@ -487,6 +487,55 @@ export class FeatureFlagsService {
   }
 
   /**
+   * Get feature flags for a specific tenant based on their tier
+   */
+  static async getFeatureFlags(tenantId: string): Promise<Record<string, boolean>> {
+    const supabase = createClient()
+    
+    // Get tenant tier
+    const { data: tenant, error: tenantError } = await supabase
+      .from('tenants')
+      .select('subscription_tier')
+      .eq('id', tenantId)
+      .single()
+    
+    if (tenantError) {
+      console.error('Error fetching tenant:', tenantError)
+      return { analytics: false }
+    }
+    
+    const tier = tenant?.subscription_tier || 'basic'
+    
+    // Get all feature flags
+    const { data: flags, error } = await supabase
+      .from('platform_feature_flags')
+      .select('feature_key, enabled, target_tiers')
+    
+    if (error) {
+      console.error('Error fetching feature flags:', error)
+      return { analytics: false }
+    }
+    
+    const result: Record<string, boolean> = {}
+    
+    flags?.forEach(flag => {
+      // Check if the flag is enabled AND the tier has access
+      const tierHasAccess = flag.target_tiers ? flag.target_tiers.includes(tier) : true
+      const isEnabled = flag.enabled && tierHasAccess
+      
+      // Map feature keys to simple names
+      switch (flag.feature_key) {
+        case 'analytics_dashboard':
+          result.analytics = isEnabled
+          break
+        // Add more feature mappings as needed
+      }
+    })
+    
+    return result
+  }
+
+  /**
    * Bulk update feature flags
    */
   static async bulkUpdateFeatureFlags(updates: { id: string; enabled: boolean }[]): Promise<void> {

@@ -3,10 +3,12 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useTranslations } from 'next-intl'
+import { useState, useEffect } from 'react'
 import { useTenant } from '@/lib/contexts/tenant-context'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { platformConfig } from '@/lib/config/platform'
+import { FeatureFlagsService } from '@/lib/services/feature-flags'
 import {
   Store,
   Package,
@@ -46,6 +48,19 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
   const pathname = usePathname()
   const { tenant, isLoading } = useTenant()
   const t = useTranslations('navigation')
+  const [analyticsEnabled, setAnalyticsEnabled] = useState(false)
+
+  // Check if analytics feature is enabled
+  useEffect(() => {
+    const checkAnalyticsFeature = async () => {
+      if (tenant?.id) {
+        const featureFlags = await FeatureFlagsService.getFeatureFlags(tenant.id)
+        setAnalyticsEnabled(featureFlags.analytics || false)
+      }
+    }
+    
+    checkAnalyticsFeature()
+  }, [tenant?.id])
 
   if (isLoading) {
     return (
@@ -98,30 +113,38 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
 
           {/* Navigation */}
           <nav className="flex-1 space-y-1 px-2 py-4">
-            {navigationItems.map((item) => {
-              const isActive = pathname === item.href
-              return (
-                <Link
-                  key={item.key}
-                  href={item.href}
-                  className={cn(
-                    "group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors",
-                    isActive
-                      ? "bg-blue-100 text-blue-700"
-                      : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                  )}
-                  onClick={onClose}
-                >
-                  <item.icon
+            {navigationItems
+              .filter((item) => {
+                // Filter out analytics if feature is disabled
+                if (item.key === 'analytics' && !analyticsEnabled) {
+                  return false
+                }
+                return true
+              })
+              .map((item) => {
+                const isActive = pathname === item.href
+                return (
+                  <Link
+                    key={item.key}
+                    href={item.href}
                     className={cn(
-                      "mr-3 h-5 w-5 flex-shrink-0",
-                      isActive ? "text-blue-500" : "text-gray-400 group-hover:text-gray-500"
+                      "group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors",
+                      isActive
+                        ? "bg-blue-100 text-blue-700"
+                        : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                     )}
-                  />
-                  {t(item.key)}
-                </Link>
-              )
-            })}
+                    onClick={onClose}
+                  >
+                    <item.icon
+                      className={cn(
+                        "mr-3 h-5 w-5 flex-shrink-0",
+                        isActive ? "text-blue-500" : "text-gray-400 group-hover:text-gray-500"
+                      )}
+                    />
+                    {t(item.key)}
+                  </Link>
+                )
+              })}
           </nav>
 
           {/* Subscription info */}

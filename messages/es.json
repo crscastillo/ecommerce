@@ -67,6 +67,7 @@
     "analytics": "Analíticas",
     "pages": "Páginas",
     "billing": "Facturación",
+    "analytics": "Analíticas",
     "settings": "Configuración",
     "logout": "Cerrar Sesión",
     "profile": "Perfil",
@@ -714,6 +715,26 @@
       "postalCode": "10101",
       "selectCountry": "Seleccionar país"
     }
+  },
+  "analytics": {
+    "title": "Analíticas",
+    "comingSoon": "Próximamente",
+    "advancedAnalytics": "Analíticas Avanzadas",
+    "description": "Obtenga información detallada sobre el rendimiento de su tienda con herramientas completas de análisis e informes.",
+    "revenue": "Ingresos",
+    "trackSales": "Seguimiento del rendimiento de ventas",
+    "customers": "Clientes",
+    "userBehavior": "Analizar comportamiento del usuario",
+    "orders": "Pedidos",
+    "conversionRates": "Monitorear tasas de conversión",
+    "traffic": "Tráfico",
+    "pageViews": "Seguimiento de vistas de página",
+    "salesOverview": "Resumen de Ventas",
+    "salesDescription": "Seguimiento del rendimiento de ventas a lo largo del tiempo",
+    "topProducts": "Productos Principales",
+    "productsDescription": "Ver qué productos están funcionando mejor",
+    "chartPlaceholder": "Gráficos interactivos próximamente",
+    "reportPlaceholder": "Informes detallados próximamente"
   },
   "auth": {
     "login": "Iniciar Sesión",

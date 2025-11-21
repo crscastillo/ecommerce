@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useTranslations } from 'next-intl'
 import { createClient } from '@/lib/supabase/client'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { 
   Settings, 
   Store, 
@@ -12,7 +13,8 @@ import {
   Shield, 
   CreditCard,
   Cog,
-  Puzzle
+  Puzzle,
+  ChevronDown
 } from 'lucide-react'
 
 // Import hooks
@@ -151,38 +153,96 @@ export function SettingsContent({ tenant, searchParams, router }: SettingsConten
 
       {/* Settings Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className={pluginFeatures.hasAnyPlugins ? "grid w-full grid-cols-7" : "grid w-full grid-cols-6"}>
-          <TabsTrigger value="store" className="flex items-center space-x-2">
-            <Store className="h-4 w-4" />
-            <span>{t('tabs.store')}</span>
-          </TabsTrigger>
-          <TabsTrigger value="config" className="flex items-center space-x-2">
-            <Cog className="h-4 w-4" />
-            <span>{t('tabs.config')}</span>
-          </TabsTrigger>
-          <TabsTrigger value="theme" className="flex items-center space-x-2">
-            <Palette className="h-4 w-4" />
-            <span>{t('tabs.theme')}</span>
-          </TabsTrigger>
-          <TabsTrigger value="payments" className="flex items-center space-x-2">
-            <CreditCard className="h-4 w-4" />
-            <span>{t('tabs.payments')}</span>
-          </TabsTrigger>
-          {pluginFeatures.hasAnyPlugins && (
-            <TabsTrigger value="plugins" className="flex items-center space-x-2">
-              <Puzzle className="h-4 w-4" />
-              <span>{t('tabs.plugins')}</span>
+        {/* Mobile: Dropdown Navigation */}
+        <div className="block md:hidden">
+          <Select value={activeTab} onValueChange={setActiveTab}>
+            <SelectTrigger className="w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="store">
+                <div className="flex items-center space-x-2">
+                  <Store className="h-4 w-4" />
+                  <span>{t('tabs.store')}</span>
+                </div>
+              </SelectItem>
+              <SelectItem value="config">
+                <div className="flex items-center space-x-2">
+                  <Cog className="h-4 w-4" />
+                  <span>{t('tabs.config')}</span>
+                </div>
+              </SelectItem>
+              <SelectItem value="theme">
+                <div className="flex items-center space-x-2">
+                  <Palette className="h-4 w-4" />
+                  <span>{t('tabs.theme')}</span>
+                </div>
+              </SelectItem>
+              <SelectItem value="payments">
+                <div className="flex items-center space-x-2">
+                  <CreditCard className="h-4 w-4" />
+                  <span>{t('tabs.payments')}</span>
+                </div>
+              </SelectItem>
+              {pluginFeatures.hasAnyPlugins && (
+                <SelectItem value="plugins">
+                  <div className="flex items-center space-x-2">
+                    <Puzzle className="h-4 w-4" />
+                    <span>{t('tabs.plugins')}</span>
+                  </div>
+                </SelectItem>
+              )}
+              <SelectItem value="users">
+                <div className="flex items-center space-x-2">
+                  <Users className="h-4 w-4" />
+                  <span>{t('tabs.users')}</span>
+                </div>
+              </SelectItem>
+              <SelectItem value="security">
+                <div className="flex items-center space-x-2">
+                  <Shield className="h-4 w-4" />
+                  <span>{t('tabs.security')}</span>
+                </div>
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Desktop: Full Tab Navigation */}
+        <div className="hidden md:block">
+          <TabsList className={pluginFeatures.hasAnyPlugins ? "grid w-full grid-cols-7" : "grid w-full grid-cols-6"}>
+            <TabsTrigger value="store" className="flex items-center space-x-2">
+              <Store className="h-4 w-4" />
+              <span>{t('tabs.store')}</span>
             </TabsTrigger>
-          )}
-          <TabsTrigger value="users" className="flex items-center space-x-2">
-            <Users className="h-4 w-4" />
-            <span>{t('tabs.users')}</span>
-          </TabsTrigger>
-          <TabsTrigger value="security" className="flex items-center space-x-2">
-            <Shield className="h-4 w-4" />
-            <span>{t('tabs.security')}</span>
-          </TabsTrigger>
-        </TabsList>
+            <TabsTrigger value="config" className="flex items-center space-x-2">
+              <Cog className="h-4 w-4" />
+              <span>{t('tabs.config')}</span>
+            </TabsTrigger>
+            <TabsTrigger value="theme" className="flex items-center space-x-2">
+              <Palette className="h-4 w-4" />
+              <span>{t('tabs.theme')}</span>
+            </TabsTrigger>
+            <TabsTrigger value="payments" className="flex items-center space-x-2">
+              <CreditCard className="h-4 w-4" />
+              <span>{t('tabs.payments')}</span>
+            </TabsTrigger>
+            {pluginFeatures.hasAnyPlugins && (
+              <TabsTrigger value="plugins" className="flex items-center space-x-2">
+                <Puzzle className="h-4 w-4" />
+                <span>{t('tabs.plugins')}</span>
+              </TabsTrigger>
+            )}
+            <TabsTrigger value="users" className="flex items-center space-x-2">
+              <Users className="h-4 w-4" />
+              <span>{t('tabs.users')}</span>
+            </TabsTrigger>
+            <TabsTrigger value="security" className="flex items-center space-x-2">
+              <Shield className="h-4 w-4" />
+              <span>{t('tabs.security')}</span>
+            </TabsTrigger>
+          </TabsList>
+        </div>
 
         {/* Store Settings */}
         <TabsContent value="store" className="space-y-6">

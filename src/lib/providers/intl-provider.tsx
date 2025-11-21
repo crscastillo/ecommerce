@@ -26,9 +26,11 @@ export function IntlProvider({ children }: Props) {
   const isAdminRoute = pathname?.startsWith('/admin')
   
   // Use admin_language for admin routes, store_language for store routes
+  // Read language preferences from tenant.settings or fallback to tenant.language
+  const tenantSettings = (tenant?.settings as any) || {}
   const locale = isAdminRoute 
-    ? (tenant as any)?.admin_language || 'en'
-    : (tenant as any)?.store_language || 'en'
+    ? tenantSettings.admin_language || (tenant as any)?.language || 'en'
+    : tenantSettings.store_language || (tenant as any)?.language || 'en'
   
   // Get messages for the current locale, fallback to English
   const messages = messagesMap[locale] || messagesMap.en

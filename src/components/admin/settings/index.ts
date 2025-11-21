@@ -7,11 +7,10 @@ export { PaymentsTab } from './payments-tab'
 export { PluginsTab } from './plugins-tab'
 export { UsersTab } from './users-tab'
 export { SecurityTab } from './security-tab'
-// TODO: Create remaining components
-// export { PaymentsTab } from './payments-tab'
-// export { PluginsTab } from './plugins-tab'
-// export { UsersTab } from './users-tab'
-// export { SecurityTab } from './security-tab'
+
+// Settings Components
+export { SettingsMessage } from './settings-message'
+export { SettingsContent } from './settings-content'
 
 // Shared Settings Types
 export interface StoreSettings {

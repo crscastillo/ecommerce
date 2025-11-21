@@ -500,6 +500,39 @@
       "en": "🇺🇸 English",
       "es": "🇨🇷 Español (Costa Rica)"
     },
+    "timezoneOptions": {
+      "America/New_York": "Eastern Time (UTC-5/-4)",
+      "America/Chicago": "Central Time (UTC-6/-5)", 
+      "America/Denver": "Mountain Time (UTC-7/-6)",
+      "America/Los_Angeles": "Pacific Time (UTC-8/-7)",
+      "UTC": "UTC (Coordinated Universal Time)",
+      "America/Costa_Rica": "Costa Rica Time (UTC-6)",
+      "America/Mexico_City": "Mexico City Time (UTC-6/-5)",
+      "Europe/London": "London Time (UTC+0/+1)",
+      "Europe/Madrid": "Madrid Time (UTC+1/+2)",
+      "Asia/Tokyo": "Tokyo Time (UTC+9)"
+    },
+    "languageSettings": {
+      "title": "Language Settings",
+      "adminLanguage": "Admin Language",
+      "storeLanguage": "Store Language",
+      "adminLanguagePlaceholder": "Select admin language",
+      "storeLanguagePlaceholder": "Select store language",
+      "adminLanguageHelp": "Language for admin interface",
+      "storeLanguageHelp": "Language for public store"
+    },
+    "storeFeatures": {
+      "title": "Store Features",
+      "inventoryTracking": "Inventory Tracking",
+      "inventoryTrackingHelp": "Track product quantities and stock levels",
+      "allowBackorders": "Allow Backorders",
+      "allowBackordersHelp": "Allow customers to order out-of-stock items",
+      "autoFulfillOrders": "Auto-fulfill Orders",
+      "autoFulfillOrdersHelp": "Automatically mark orders as fulfilled",
+      "emailNotifications": "Email Notifications",
+      "emailNotificationsHelp": "Send email notifications for order updates",
+      "lowStockThresholdHelp": "Show low stock warnings when product quantity is below this number"
+    },
     "tabs": {
       "store": "Store",
       "config": "Config",
@@ -685,7 +718,18 @@
       "descriptionMaxLength": "Description must be less than 500 characters",
       "invalidDomainFormat": "Please enter a valid domain (e.g., www.mystore.com)",
       "domainTooLong": "Domain name is too long",
-      "localhostNotAllowed": "Localhost domains are not allowed"
+      "localhostNotAllowed": "Localhost domains are not allowed",
+      "currencyRequired": "Currency is required",
+      "timezoneRequired": "Timezone is required",
+      "taxRateRequired": "Tax rate is required",
+      "taxRateInvalid": "Tax rate must be a valid percentage (0-100)",
+      "taxRateNegative": "Tax rate cannot be negative",
+      "taxRateMax": "Tax rate cannot exceed 99.99%",
+      "lowStockThresholdRequired": "Low stock threshold is required",
+      "lowStockThresholdInvalid": "Low stock threshold must be a valid number",
+      "lowStockThresholdNegative": "Low stock threshold cannot be negative",
+      "lowStockThresholdMax": "Low stock threshold cannot exceed 100",
+      "fixErrorsBeforeSaving": "Please fix the validation errors before saving"
     },
     "help": {
       "subdomainImmutable": "Subdomain cannot be changed after creation",

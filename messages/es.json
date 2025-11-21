@@ -511,6 +511,39 @@
       "en": "🇺🇸 English",
       "es": "🇨🇷 Español (Costa Rica)"
     },
+    "timezoneOptions": {
+      "America/New_York": "Hora del Este (UTC-5/-4)",
+      "America/Chicago": "Hora Central (UTC-6/-5)",
+      "America/Denver": "Hora de la Montaña (UTC-7/-6)",
+      "America/Los_Angeles": "Hora del Pacífico (UTC-8/-7)",
+      "UTC": "UTC (Tiempo Universal Coordinado)",
+      "America/Costa_Rica": "Hora de Costa Rica (UTC-6)",
+      "America/Mexico_City": "Hora de Ciudad de México (UTC-6/-5)",
+      "Europe/London": "Hora de Londres (UTC+0/+1)",
+      "Europe/Madrid": "Hora de Madrid (UTC+1/+2)",
+      "Asia/Tokyo": "Hora de Tokio (UTC+9)"
+    },
+    "languageSettings": {
+      "title": "Configuración de Idioma",
+      "adminLanguage": "Idioma del Administrador",
+      "storeLanguage": "Idioma de la Tienda",
+      "adminLanguagePlaceholder": "Seleccionar idioma del administrador",
+      "storeLanguagePlaceholder": "Seleccionar idioma de la tienda",
+      "adminLanguageHelp": "Idioma para la interfaz de administración",
+      "storeLanguageHelp": "Idioma para la tienda pública"
+    },
+    "storeFeatures": {
+      "title": "Características de la Tienda",
+      "inventoryTracking": "Seguimiento de Inventario",
+      "inventoryTrackingHelp": "Rastrear cantidades de productos y niveles de stock",
+      "allowBackorders": "Permitir Pedidos Pendientes",
+      "allowBackordersHelp": "Permitir a los clientes ordenar productos fuera de stock",
+      "autoFulfillOrders": "Completar Pedidos Automáticamente",
+      "autoFulfillOrdersHelp": "Marcar automáticamente los pedidos como completados",
+      "emailNotifications": "Notificaciones por Correo",
+      "emailNotificationsHelp": "Enviar notificaciones por correo para actualizaciones de pedidos",
+      "lowStockThresholdHelp": "Mostrar advertencias de stock bajo cuando la cantidad del producto esté por debajo de este número"
+    },
     "tabs": {
       "store": "Tienda",
       "config": "Configuración",
@@ -696,7 +729,18 @@
       "descriptionMaxLength": "La descripción debe tener menos de 500 caracteres",
       "invalidDomainFormat": "Por favor ingrese un dominio válido (ej. www.mitienda.com)",
       "domainTooLong": "El nombre del dominio es demasiado largo",
-      "localhostNotAllowed": "Los dominios localhost no están permitidos"
+      "localhostNotAllowed": "Los dominios localhost no están permitidos",
+      "currencyRequired": "La moneda es requerida",
+      "timezoneRequired": "La zona horaria es requerida",
+      "taxRateRequired": "La tasa de impuesto es requerida",
+      "taxRateInvalid": "La tasa de impuesto debe ser un porcentaje válido (0-100)",
+      "taxRateNegative": "La tasa de impuesto no puede ser negativa",
+      "taxRateMax": "La tasa de impuesto no puede exceder 99.99%",
+      "lowStockThresholdRequired": "El umbral de stock bajo es requerido",
+      "lowStockThresholdInvalid": "El umbral de stock bajo debe ser un número válido",
+      "lowStockThresholdNegative": "El umbral de stock bajo no puede ser negativo",
+      "lowStockThresholdMax": "El umbral de stock bajo no puede exceder 100",
+      "fixErrorsBeforeSaving": "Por favor corrija los errores de validación antes de guardar"
     },
     "help": {
       "subdomainImmutable": "El subdominio no se puede cambiar después de la creación",

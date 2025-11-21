@@ -40,6 +40,7 @@
     "redirectingToHomepage": "Redirecting to homepage in 10 seconds...",
     "saveStoreInformation": "Save Store Information",
     "saveConfiguration": "Save Configuration",
+    "characters": "characters",
     "saveThemeSettings": "Save Theme Settings",
     "savePaymentSettings": "Save Payment Settings",
     "savePluginSettings": "Save Plugin Settings",
@@ -628,6 +629,7 @@
       "state": "State",
       "zipCode": "ZIP Code",
       "defaultCurrency": "Default Currency",
+      "customDomain": "Custom Domain",
       "taxRate": "Tax Rate (%)",
       "lowStockThreshold": "Low Stock Threshold",
       "logoUrl": "Logo URL",
@@ -667,6 +669,38 @@
       "accountSettings": "Account Settings",
       "signOut": "Sign Out",
       "searchPlaceholder": "Search products, orders..."
+    },
+    "validation": {
+      "storeNameRequired": "Store name is required",
+      "storeNameMinLength": "Store name must be at least 2 characters",
+      "storeNameMaxLength": "Store name must be less than 100 characters",
+      "contactEmailRequired": "Contact email is required",
+      "invalidEmailFormat": "Please enter a valid email address",
+      "emailTooLong": "Email address is too long",
+      "emailInvalidCharacters": "Email address contains invalid characters",
+      "emailInvalidDomain": "Email domain is invalid",
+      "invalidPhoneFormat": "Please enter a valid phone number",
+      "descriptionMaxLength": "Description must be less than 500 characters",
+      "invalidDomainFormat": "Please enter a valid domain (e.g., www.mystore.com)",
+      "domainTooLong": "Domain name is too long",
+      "localhostNotAllowed": "Localhost domains are not allowed"
+    },
+    "help": {
+      "subdomainImmutable": "Subdomain cannot be changed after creation",
+      "customDomain": "Your custom domain (optional) - e.g., www.mystore.com"
+    },
+    "placeholders": {
+      "storeName": "My Awesome Store",
+      "storeDescription": "Brief description of your store...",
+      "subdomain": "mystore",
+      "customDomain": "www.mystore.com",
+      "contactEmail": "contact@mystore.com",
+      "contactPhone": "+1 (555) 123-4567",
+      "streetAddress": "123 Main Street",
+      "city": "New York",
+      "state": "NY",
+      "postalCode": "10001",
+      "selectCountry": "Select country"
     }
   },
   "auth": {

@@ -40,6 +40,7 @@
     "redirectingToHomepage": "Redirigiendo a la página principal en 10 segundos...",
     "saveStoreInformation": "Guardar Información de la Tienda",
     "saveConfiguration": "Guardar Configuración",
+    "characters": "caracteres",
     "saveThemeSettings": "Guardar Configuración del Tema",
     "savePaymentSettings": "Guardar Configuración de Pagos",
     "savePluginSettings": "Guardar Configuración de Plugins",
@@ -639,6 +640,7 @@
       "state": "Estado",
       "zipCode": "Código Postal",
       "defaultCurrency": "Moneda Predeterminada",
+      "customDomain": "Dominio Personalizado",
       "taxRate": "Tasa de Impuesto (%)",
       "lowStockThreshold": "Umbral de Stock Bajo",
       "logoUrl": "URL del Logo",
@@ -678,6 +680,38 @@
       "accountSettings": "Configuración de Cuenta",
       "signOut": "Cerrar Sesión",
       "searchPlaceholder": "Buscar productos, pedidos..."
+    },
+    "validation": {
+      "storeNameRequired": "El nombre de la tienda es requerido",
+      "storeNameMinLength": "El nombre de la tienda debe tener al menos 2 caracteres",
+      "storeNameMaxLength": "El nombre de la tienda debe tener menos de 100 caracteres",
+      "contactEmailRequired": "El email de contacto es requerido",
+      "invalidEmailFormat": "Por favor ingrese una dirección de email válida",
+      "emailTooLong": "La dirección de email es demasiado larga",
+      "emailInvalidCharacters": "La dirección de email contiene caracteres inválidos",
+      "emailInvalidDomain": "El dominio del email es inválido",
+      "invalidPhoneFormat": "Por favor ingrese un número de teléfono válido",
+      "descriptionMaxLength": "La descripción debe tener menos de 500 caracteres",
+      "invalidDomainFormat": "Por favor ingrese un dominio válido (ej. www.mitienda.com)",
+      "domainTooLong": "El nombre del dominio es demasiado largo",
+      "localhostNotAllowed": "Los dominios localhost no están permitidos"
+    },
+    "help": {
+      "subdomainImmutable": "El subdominio no se puede cambiar después de la creación",
+      "customDomain": "Su dominio personalizado (opcional) - ej. www.mitienda.com"
+    },
+    "placeholders": {
+      "storeName": "Mi Tienda Increíble",
+      "storeDescription": "Breve descripción de su tienda...",
+      "subdomain": "mitienda",
+      "customDomain": "www.mitienda.com",
+      "contactEmail": "contacto@mitienda.com",
+      "contactPhone": "+506 1234-5678",
+      "streetAddress": "Calle Principal 123",
+      "city": "San José",
+      "state": "San José",
+      "postalCode": "10101",
+      "selectCountry": "Seleccionar país"
     }
   },
   "auth": {

@@ -99,7 +99,7 @@ export function StoreConfigTab({
                 disabled
                 placeholder="mystore"
               />
-              <p className="text-xs text-gray-500 mt-1">Subdomain cannot be changed after creation</p>
+              <p className="text-xs text-gray-500 mt-1">{t('help.subdomainImmutable')}</p>
             </div>
             <div>
               <Label htmlFor="custom-domain">Custom Domain</Label>

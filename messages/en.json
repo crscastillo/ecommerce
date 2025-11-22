@@ -232,6 +232,18 @@
       "postalCode": "10001",
       "selectCountry": "Select country",
       "colorValue": "#3B82F6"
+    },
+    "header": {
+      "searchPlaceholder": "Search products, orders...",
+      "visitStore": "Visit Store",
+      "accountSettings": "Account Settings",
+      "signOut": "Sign Out"
+    },
+    "roles": {
+      "owner": "Owner",
+      "admin": "Admin", 
+      "staff": "Staff",
+      "viewer": "Viewer"
     }
   }
 }

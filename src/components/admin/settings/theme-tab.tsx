@@ -121,7 +121,7 @@ interface ThemeTabProps {
   tenantId: string
 }
 
-export function ThemeTab({ settings, onSettingsChange, onSave, saving }: ThemeTabProps) {
+export function ThemeTab({ settings, onSettingsChange, onSave, saving, tenantId }: ThemeTabProps) {
   const [uploadingLogo, setUploadingLogo] = React.useState(false)
   const [uploadingFavicon, setUploadingFavicon] = React.useState(false)
   const [uploadingHero, setUploadingHero] = React.useState(false)
@@ -157,19 +157,38 @@ export function ThemeTab({ settings, onSettingsChange, onSave, saving }: ThemeTa
   async function handleAssetUpload(e: React.ChangeEvent<HTMLInputElement>, field: 'logo_url' | 'favicon_url') {
     const file = e.target.files?.[0]
     if (!file) return
+    
     const setUploading = field === 'logo_url' ? setUploadingLogo : setUploadingFavicon
     setUploading(true)
+    
     try {
-      const { createClient } = await import('@/lib/supabase/client')
-      const supabase = createClient()
-      const guid = crypto.randomUUID()
-      const extension = file.name.split('.').pop()
-      const filePath = `${field}/${guid}.${extension}`
-      const { error } = await supabase.storage.from('public-assets').upload(filePath, file, { cacheControl: '3600', upsert: true })
-      if (error) throw error
-      const { data: urlData } = supabase.storage.from('public-assets').getPublicUrl(filePath)
-      if (urlData?.publicUrl) updateSettings({ [field]: urlData.publicUrl })
+      if (!tenantId) {
+        throw new Error('Tenant ID not found. Please refresh the page and try again.')
+      }
+      
+      // Use API route for upload to avoid RLS issues
+      const assetType = field === 'logo_url' ? 'logo' : 'favicon'
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('tenantId', tenantId)
+      formData.append('assetType', assetType)
+      
+      const response = await fetch('/api/theme-assets', {
+        method: 'POST',
+        body: formData
+      })
+      
+      const result = await response.json()
+      
+      if (!response.ok) {
+        throw new Error(result.error || 'Upload failed')
+      }
+      
+      if (result.success && result.url) {
+        updateSettings({ [field]: result.url })
+      }
     } catch (err) {
+      console.error(`${field} upload error:`, err)
       alert('File upload failed: ' + (err as Error).message)
     } finally {
       setUploading(false)
@@ -179,18 +198,35 @@ export function ThemeTab({ settings, onSettingsChange, onSave, saving }: ThemeTa
   async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
+    
     setUploadingHero(true)
     try {
-      const { createClient } = await import('@/lib/supabase/client')
-      const supabase = createClient()
-      const guid = crypto.randomUUID()
-      const extension = file.name.split('.').pop()
-      const filePath = `hero-background/${guid}.${extension}`
-      const { error } = await supabase.storage.from('public-assets').upload(filePath, file, { cacheControl: '3600', upsert: true })
-      if (error) throw error
-      const { data: urlData } = supabase.storage.from('public-assets').getPublicUrl(filePath)
-      if (urlData?.publicUrl) updateSettings({ hero_background_value: urlData.publicUrl })
+      if (!tenantId) {
+        throw new Error('Tenant ID not found. Please refresh the page and try again.')
+      }
+      
+      // Use API route for upload to avoid RLS issues
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('tenantId', tenantId)
+      formData.append('assetType', 'hero')
+      
+      const response = await fetch('/api/theme-assets', {
+        method: 'POST',
+        body: formData
+      })
+      
+      const result = await response.json()
+      
+      if (!response.ok) {
+        throw new Error(result.error || 'Upload failed')
+      }
+      
+      if (result.success && result.url) {
+        updateSettings({ hero_background_value: result.url })
+      }
     } catch (err) {
+      console.error('Hero image upload error:', err)
       alert('Image upload failed: ' + (err as Error).message)
     } finally {
       setUploadingHero(false)

@@ -244,6 +244,15 @@
       "admin": "Admin", 
       "staff": "Staff",
       "viewer": "Viewer"
+    },
+    "messages": {
+      "storeSettingsSaved": "Store settings saved successfully!",
+      "configurationSaved": "Configuration saved successfully!",
+      "themeSettingsSaved": "Theme settings saved successfully!",
+      "paymentSettingsSaved": "Payment settings saved successfully!",
+      "failedToSaveStore": "Failed to save store settings",
+      "failedToSaveTheme": "Failed to save theme settings",
+      "failedToSavePayments": "Failed to save payment settings"
     }
   }
 }

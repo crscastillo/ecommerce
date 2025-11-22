@@ -726,6 +726,15 @@
       "admin": "Administrador",
       "staff": "Personal"
     },
+    "messages": {
+      "storeSettingsSaved": "¡Configuración de tienda guardada exitosamente!",
+      "configurationSaved": "¡Configuración guardada exitosamente!",
+      "themeSettingsSaved": "¡Configuración de tema guardada exitosamente!",
+      "paymentSettingsSaved": "¡Configuración de pagos guardada exitosamente!",
+      "failedToSaveStore": "Error al guardar configuración de tienda",
+      "failedToSaveTheme": "Error al guardar configuración de tema",
+      "failedToSavePayments": "Error al guardar configuración de pagos"
+    },
     "header": {
       "visitStore": "Visitar Tienda",
       "accountSettings": "Configuración de Cuenta",

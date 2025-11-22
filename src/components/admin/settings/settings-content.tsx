@@ -260,7 +260,7 @@ export function SettingsContent({ tenant, searchParams, router }: SettingsConten
           <ConfigurationTab
             settings={storeSettings.settings}
             onSettingsChange={storeSettings.setSettings}
-            onSave={storeSettings.saveSettings}
+            onSave={() => storeSettings.saveSettings(t('messages.configurationSaved'))}
             saving={state.saving}
           />
         </TabsContent>

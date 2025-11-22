@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useTranslations } from 'next-intl'
 import { useTenant } from '@/lib/contexts/tenant-context'
 import { useSettings } from '@/lib/contexts/settings-context'
 import { createClient } from '@/lib/supabase/client'
@@ -10,6 +11,7 @@ import { StoreSettings, ThemeSettings, PaymentSettings } from '@/components/admi
 
 // Hook for store settings
 export function useStoreSettings() {
+  const t = useTranslations('settings.messages')
   const { tenant, refreshTenant } = useTenant()
   const { setSaving, showSuccess, showError } = useSettings()
   const supabase = createClient()
@@ -68,7 +70,7 @@ export function useStoreSettings() {
     })
   }, [tenant])
 
-  const saveSettings = async () => {
+  const saveSettings = async (customMessage?: string) => {
     if (!tenant?.id) return
 
     try {
@@ -98,11 +100,10 @@ export function useStoreSettings() {
 
       if (error) throw error
 
-      await refreshTenant()
-      showSuccess('Store settings saved successfully!')
+      showSuccess(customMessage || t('storeSettingsSaved'))
     } catch (error) {
       console.error('Error saving store settings:', error)
-      showError('Failed to save store settings')
+      showError(t('failedToSaveStore'))
     } finally {
       setSaving(false)
     }
@@ -117,6 +118,7 @@ export function useStoreSettings() {
 
 // Hook for theme settings
 export function useThemeSettings() {
+  const t = useTranslations('settings.messages')
   const { tenant } = useTenant()
   const { setSaving, showSuccess, showError } = useSettings()
   const supabase = createClient()
@@ -181,10 +183,10 @@ export function useThemeSettings() {
 
       if (error) throw error
 
-      showSuccess('Theme settings saved successfully!')
+      showSuccess(t('themeSettingsSaved'))
     } catch (error) {
       console.error('Error saving theme settings:', error)
-      showError('Failed to save theme settings')
+      showError(t('failedToSaveTheme'))
     } finally {
       setSaving(false)
     }
@@ -199,6 +201,7 @@ export function useThemeSettings() {
 
 // Hook for payment settings
 export function usePaymentSettings() {
+  const t = useTranslations('settings.messages')
   const { tenant } = useTenant()
   const { setSaving, showSuccess, showError } = useSettings()
   const [paymentMethods, setPaymentMethods] = useState<PaymentSettings>([])
@@ -255,10 +258,10 @@ export function usePaymentSettings() {
       }
 
       await PaymentMethodsService.savePaymentMethodsConfig(tenant.id, paymentMethods)
-      showSuccess('Payment settings saved successfully!')
+      showSuccess(t('paymentSettingsSaved'))
     } catch (error) {
       console.error('Error saving payment settings:', error)
-      showError('Failed to save payment settings')
+      showError(t('failedToSavePayments'))
     } finally {
       setSaving(false)
     }

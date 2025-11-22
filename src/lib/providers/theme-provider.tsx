@@ -51,17 +51,6 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       root.style.setProperty('--sidebar-ring', colors.ring)
     }
     
-    // Apply custom CSS if provided
-    if (themeConfig.custom_css) {
-      let styleElement = document.getElementById('tenant-custom-css')
-      if (!styleElement) {
-        styleElement = document.createElement('style')
-        styleElement.id = 'tenant-custom-css'
-        document.head.appendChild(styleElement)
-      }
-      styleElement.textContent = themeConfig.custom_css
-    }
-    
   }, [tenant?.theme_config, isAdmin])
   
   // Watch for dark mode changes

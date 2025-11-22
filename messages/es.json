@@ -560,7 +560,6 @@
       "brandAssets": "Activos de Marca",
       "colorScheme": "Esquema de Colores",
       "typography": "Tipografía",
-      "customCss": "CSS Personalizado",
       "paymentMethods": "Métodos de Pago",
       "inviteNewUser": "Invitar Nuevo Usuario",
       "teamMembers": "Miembros del Equipo",
@@ -576,6 +575,15 @@
       "paymentMethods": "Configure qué métodos de pago están disponibles para sus clientes.",
       "adminTheme": "Selecciona un tema para la interfaz del panel de administración",
       "storeTheme": "Selecciona un tema para la tienda pública de cara al cliente"
+    },
+    "options": {
+      "color": "Color",
+      "image": "Imagen"
+    },
+    "buttons": {
+      "chooseImage": "Elegir Imagen",
+      "uploadLogo": "Subir Logo",
+      "uploadFavicon": "Subir Favicon"
     },
     "paymentMethods": {
       "cashOnDelivery": {
@@ -692,7 +700,6 @@
       "backgroundColor": "Color de Fondo",
       "textColor": "Color del Texto",
       "fontFamily": "Familia de Fuente",
-      "customCss": "CSS Personalizado",
       "inventoryTracking": "Seguimiento de Inventario",
       "allowBackorders": "Permitir Pedidos Pendientes",
       "autoFulfillOrders": "Cumplir Pedidos Automáticamente",
@@ -767,8 +774,7 @@
       "state": "San José",
       "postalCode": "10101",
       "selectCountry": "Seleccionar país",
-      "colorValue": "#3B82F6",
-      "customCss": "/* Agregue su CSS personalizado aquí */\n.clase-personalizada {\n  color: #333;\n}"
+      "colorValue": "#3B82F6"
     }
   },
   "analytics": {

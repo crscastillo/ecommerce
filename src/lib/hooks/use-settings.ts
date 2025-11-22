@@ -130,8 +130,7 @@ export function useThemeSettings() {
     background_color: '#FFFFFF',
     text_color: '#111827',
     logo_url: '',
-    favicon_url: '',
-    custom_css: ''
+    favicon_url: ''
   })
 
   // Load settings from tenant
@@ -149,7 +148,6 @@ export function useThemeSettings() {
       text_color: themeConfig.text_color || '#111827',
       logo_url: tenant.logo_url || '',
       favicon_url: themeConfig.favicon_url || '',
-      custom_css: themeConfig.custom_css || '',
       hero_background_type: themeConfig.hero_background_type || 'color',
       hero_background_value: themeConfig.hero_background_value || ''
     })
@@ -174,7 +172,6 @@ export function useThemeSettings() {
             background_color: settings.background_color,
             text_color: settings.text_color,
             favicon_url: settings.favicon_url,
-            custom_css: settings.custom_css,
             hero_background_type: settings.hero_background_type,
             hero_background_value: settings.hero_background_value
           },

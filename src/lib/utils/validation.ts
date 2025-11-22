@@ -110,9 +110,7 @@ export function validateThemeSettings(settings: ThemeSettings): ValidationResult
   }
 
   // CSS validation (basic check)
-  if (settings.custom_css && settings.custom_css.length > 10000) {
-    errors.push(createError('custom_css', 'Custom CSS must be less than 10,000 characters'))
-  }
+
 
   return {
     isValid: errors.length === 0,

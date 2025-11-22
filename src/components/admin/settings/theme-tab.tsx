@@ -17,7 +17,6 @@ interface ThemeSettings {
   text_color: string
   logo_url: string
   favicon_url: string
-  custom_css: string
   hero_background_type?: 'color' | 'image'
   hero_background_value?: string
   admin_theme?: string
@@ -322,26 +321,10 @@ export function ThemeTab({ settings, onSettingsChange, onSave, saving }: ThemeTa
           </div>
         </CardContent>
       </Card>
-      <Card>
-        <CardHeader><CardTitle>{t('sections.customCss')}</CardTitle></CardHeader>
-        <CardContent>
-          <div>
-            <Label htmlFor="custom-css">{t('labels.customCss')}</Label>
-            <Textarea
-              id="custom-css"
-              value={settings.custom_css}
-              onChange={(e) => updateSettings({ custom_css: e.target.value })}
-              placeholder={t('placeholders.customCss')}
-              rows={8}
-              className="font-mono text-sm"
-            />
-          </div>
           <Button onClick={onSave} disabled={saving} className="mt-4">
             <Save className="h-4 w-4 mr-2" />
             {saving ? tCommon('saving') : tCommon('saveThemeSettings')}
           </Button>
-        </CardContent>
-      </Card>
     </div>
   )
 }

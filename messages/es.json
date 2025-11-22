@@ -42,6 +42,7 @@
     "saveConfiguration": "Guardar Configuración",
     "characters": "caracteres",
     "saveThemeSettings": "Guardar Configuración del Tema",
+    "uploading": "Subiendo...",
     "savePaymentSettings": "Guardar Configuración de Pagos",
     "savePluginSettings": "Guardar Configuración de Plugins",
     "deleteStore": "Eliminar Tienda",
@@ -566,10 +567,15 @@
       "accountInformation": "Información de la Cuenta",
       "dangerZone": "Zona de Peligro",
       "availablePlugins": "Plugins Disponibles",
-      "passwordSecurity": "Contraseña y Seguridad"
+      "passwordSecurity": "Contraseña y Seguridad",
+      "adminTheme": "Tema del Panel de Administración",
+      "storeTheme": "Tema de la Tienda Pública",
+      "heroBackground": "Fondo de la Sección Hero"
     },
     "descriptions": {
-      "paymentMethods": "Configure qué métodos de pago están disponibles para sus clientes."
+      "paymentMethods": "Configure qué métodos de pago están disponibles para sus clientes.",
+      "adminTheme": "Selecciona un tema para la interfaz del panel de administración",
+      "storeTheme": "Selecciona un tema para la tienda pública de cara al cliente"
     },
     "paymentMethods": {
       "cashOnDelivery": {
@@ -703,7 +709,10 @@
       "alertEmail": "Email de Alerta",
       "subscriptionTier": "Nivel de Suscripción",
       "storeStatus": "Estado de la Tienda",
-      "created": "Creado"
+      "created": "Creado",
+      "backgroundType": "Tipo de Fondo",
+      "heroBackgroundColor": "Color de Fondo Hero",
+      "heroBackgroundImage": "Imagen de Fondo Hero"
     },
     "roles": {
       "owner": "Propietario",
@@ -757,7 +766,9 @@
       "city": "San José",
       "state": "San José",
       "postalCode": "10101",
-      "selectCountry": "Seleccionar país"
+      "selectCountry": "Seleccionar país",
+      "colorValue": "#3B82F6",
+      "customCss": "/* Agregue su CSS personalizado aquí */\n.clase-personalizada {\n  color: #333;\n}"
     }
   },
   "analytics": {

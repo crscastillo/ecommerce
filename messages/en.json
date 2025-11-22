@@ -42,6 +42,7 @@
     "saveConfiguration": "Save Configuration",
     "characters": "characters",
     "saveThemeSettings": "Save Theme Settings",
+    "uploading": "Uploading...",
     "savePaymentSettings": "Save Payment Settings",
     "savePluginSettings": "Save Plugin Settings",
     "deleteStore": "Delete Store",
@@ -555,10 +556,15 @@
       "accountInformation": "Account Information",
       "dangerZone": "Danger Zone",
       "availablePlugins": "Available Plugins",
-      "passwordSecurity": "Password & Security"
+      "passwordSecurity": "Password & Security",
+      "adminTheme": "Admin Dashboard Theme",
+      "storeTheme": "Public Store Theme",
+      "heroBackground": "Hero Section Background"
     },
     "descriptions": {
-      "paymentMethods": "Configure which payment methods are available to your customers."
+      "paymentMethods": "Configure which payment methods are available to your customers.",
+      "adminTheme": "Select a theme for your admin dashboard interface",
+      "storeTheme": "Select a theme for your public-facing storefront"
     },
     "paymentMethods": {
       "cashOnDelivery": {
@@ -692,7 +698,10 @@
       "alertEmail": "Alert Email",
       "subscriptionTier": "Subscription Tier",
       "storeStatus": "Store Status",
-      "created": "Created"
+      "created": "Created",
+      "backgroundType": "Background Type",
+      "heroBackgroundColor": "Hero Background Color",
+      "heroBackgroundImage": "Hero Background Image"
     },
     "roles": {
       "owner": "Owner",
@@ -746,7 +755,9 @@
       "city": "New York",
       "state": "NY",
       "postalCode": "10001",
-      "selectCountry": "Select country"
+      "selectCountry": "Select country",
+      "colorValue": "#3B82F6",
+      "customCss": "/* Add your custom CSS here */\n.custom-class {\n  color: #333;\n}"
     }
   },
   "analytics": {

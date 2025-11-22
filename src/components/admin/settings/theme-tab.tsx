@@ -204,9 +204,9 @@ export function ThemeTab({ settings, onSettingsChange, onSave, saving }: ThemeTa
         <CardHeader>
           <div className="flex items-center gap-2">
             <Palette className="h-5 w-5" />
-            <CardTitle>Admin Dashboard Theme</CardTitle>
+            <CardTitle>{t('sections.adminTheme')}</CardTitle>
           </div>
-          <CardDescription>Select a theme for your admin dashboard interface</CardDescription>
+          <CardDescription>{t('descriptions.adminTheme')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
@@ -237,9 +237,9 @@ export function ThemeTab({ settings, onSettingsChange, onSave, saving }: ThemeTa
         <CardHeader>
           <div className="flex items-center gap-2">
             <Palette className="h-5 w-5" />
-            <CardTitle>Public Store Theme</CardTitle>
+            <CardTitle>{t('sections.storeTheme')}</CardTitle>
           </div>
-          <CardDescription>Select a theme for your public-facing storefront</CardDescription>
+          <CardDescription>{t('descriptions.storeTheme')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
@@ -267,32 +267,32 @@ export function ThemeTab({ settings, onSettingsChange, onSave, saving }: ThemeTa
         </CardContent>
       </Card>
       <Card>
-        <CardHeader><CardTitle>Hero Section Background</CardTitle></CardHeader>
+        <CardHeader><CardTitle>{t('sections.heroBackground')}</CardTitle></CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <Label htmlFor="hero-background-type">Background Type</Label>
+            <Label htmlFor="hero-background-type">{t('labels.backgroundType')}</Label>
             <Select value={heroType} onValueChange={(value) => updateSettings({ hero_background_type: value as 'color' | 'image', hero_background_value: '' })}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="color">Color</SelectItem>
-                <SelectItem value="image">Image</SelectItem>
+                <SelectItem value="color">{t('options.color')}</SelectItem>
+                <SelectItem value="image">{t('options.image')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
           {heroType === 'color' ? (
             <div>
-              <Label htmlFor="hero-background-color">Hero Background Color</Label>
+              <Label htmlFor="hero-background-color">{t('labels.heroBackgroundColor')}</Label>
               <div className="flex space-x-2">
                 <Input id="hero-background-color" type="color" value={heroValue} onChange={(e) => updateSettings({ hero_background_value: e.target.value })} className="w-20" />
-                <Input value={heroValue} onChange={(e) => updateSettings({ hero_background_value: e.target.value })} placeholder="#3B82F6" />
+                <Input value={heroValue} onChange={(e) => updateSettings({ hero_background_value: e.target.value })} placeholder={t('placeholders.colorValue')} />
               </div>
             </div>
           ) : (
             <div className="space-y-2">
-              <Label htmlFor="hero-background-image">Hero Background Image</Label>
+              <Label htmlFor="hero-background-image">{t('labels.heroBackgroundImage')}</Label>
               <div className="flex items-center space-x-4">
                 <Button type="button" variant="secondary" disabled={uploadingHero} onClick={() => document.getElementById('hero-bg-file')?.click()}>
-                  {uploadingHero ? <span className="flex items-center"><span className="animate-spin mr-2 h-4 w-4 border-b-2 border-white rounded-full"></span>Uploading...</span> : 'Choose Image'}
+                  {uploadingHero ? <span className="flex items-center"><span className="animate-spin mr-2 h-4 w-4 border-b-2 border-white rounded-full"></span>{tCommon('uploading')}</span> : t('buttons.chooseImage')}
                 </Button>
                 <input id="hero-bg-file" type="file" accept="image/*" style={{ display: 'none' }} onChange={handleImageUpload} disabled={uploadingHero} />
                 {heroValue && <img src={heroValue} alt="Hero preview" className="rounded shadow max-h-20 border" />}
@@ -307,7 +307,7 @@ export function ThemeTab({ settings, onSettingsChange, onSave, saving }: ThemeTa
           <div className="space-y-2">
             <Label htmlFor="logo-upload">{t('labels.logoUrl')}</Label>
             <Button type="button" variant="secondary" disabled={uploadingLogo} onClick={() => document.getElementById('logo-file')?.click()}>
-              {uploadingLogo ? <span className="flex items-center"><span className="animate-spin mr-2 h-4 w-4 border-b-2 border-white rounded-full"></span>Uploading...</span> : 'Upload Logo'}
+              {uploadingLogo ? <span className="flex items-center"><span className="animate-spin mr-2 h-4 w-4 border-b-2 border-white rounded-full"></span>{tCommon('uploading')}</span> : t('buttons.uploadLogo')}
             </Button>
             <input id="logo-file" type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => handleAssetUpload(e, 'logo_url')} disabled={uploadingLogo} />
             {settings.logo_url && <img src={settings.logo_url} alt="Logo preview" className="mt-2 rounded shadow max-h-20" />}
@@ -315,7 +315,7 @@ export function ThemeTab({ settings, onSettingsChange, onSave, saving }: ThemeTa
           <div className="space-y-2">
             <Label htmlFor="favicon-upload">{t('labels.faviconUrl')}</Label>
             <Button type="button" variant="secondary" disabled={uploadingFavicon} onClick={() => document.getElementById('favicon-file')?.click()}>
-              {uploadingFavicon ? <span className="flex items-center"><span className="animate-spin mr-2 h-4 w-4 border-b-2 border-white rounded-full"></span>Uploading...</span> : 'Upload Favicon'}
+              {uploadingFavicon ? <span className="flex items-center"><span className="animate-spin mr-2 h-4 w-4 border-b-2 border-white rounded-full"></span>{tCommon('uploading')}</span> : t('buttons.uploadFavicon')}
             </Button>
             <input id="favicon-file" type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => handleAssetUpload(e, 'favicon_url')} disabled={uploadingFavicon} />
             {settings.favicon_url && <img src={settings.favicon_url} alt="Favicon preview" className="mt-2 rounded shadow max-h-10" />}
@@ -331,7 +331,7 @@ export function ThemeTab({ settings, onSettingsChange, onSave, saving }: ThemeTa
               id="custom-css"
               value={settings.custom_css}
               onChange={(e) => updateSettings({ custom_css: e.target.value })}
-              placeholder="/* Add your custom CSS here */&#10;.custom-class {&#10;  color: #333;&#10;}"
+              placeholder={t('placeholders.customCss')}
               rows={8}
               className="font-mono text-sm"
             />

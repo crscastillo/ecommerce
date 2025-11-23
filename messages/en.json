@@ -280,6 +280,17 @@
         "pending": "Pending"
       }
     },
+    "modal": {
+      "inviteUser": {
+        "title": "Invite New User",
+        "description": "Send an invitation to a new team member to join your organization.",
+        "emailLabel": "Email Address",
+        "emailPlaceholder": "Enter email address",
+        "roleLabel": "Role",
+        "send": "Send Invitation",
+        "sending": "Sending..."
+      }
+    },
     "sections": {
       "inviteNewUser": "Invite New User",
       "teamMembers": "Team Members"

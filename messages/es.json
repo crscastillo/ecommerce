@@ -755,6 +755,17 @@
         "pending": "Pendiente"
       }
     },
+    "modal": {
+      "inviteUser": {
+        "title": "Invitar Nuevo Usuario",
+        "description": "Envía una invitación a un nuevo miembro del equipo para unirse a tu organización.",
+        "emailLabel": "Dirección de Correo",
+        "emailPlaceholder": "Ingresa la dirección de correo",
+        "roleLabel": "Rol",
+        "send": "Enviar Invitación",
+        "sending": "Enviando..."
+      }
+    },
     "sections": {
       "inviteNewUser": "Invitar Nuevo Usuario",
       "teamMembers": "Miembros del Equipo"

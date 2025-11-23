@@ -327,6 +327,7 @@ export function useTenantUsers() {
   const [users, setUsers] = useState<any[]>([])
   const [inviteEmail, setInviteEmail] = useState('')
   const [inviteRole, setInviteRole] = useState('staff')
+  const [inviteModalOpen, setInviteModalOpen] = useState(false)
 
   useEffect(() => {
     if (!tenant?.id) return
@@ -433,6 +434,7 @@ export function useTenantUsers() {
 
       showSuccess(message)
       setInviteEmail('')
+      setInviteModalOpen(false)
       loadUsers()
     } catch (error) {
       console.error('Error inviting user:', error)
@@ -563,6 +565,8 @@ export function useTenantUsers() {
     setInviteEmail,
     inviteRole,
     setInviteRole,
+    inviteModalOpen,
+    setInviteModalOpen,
     inviteUser,
     updateUserRole,
     removeUser,

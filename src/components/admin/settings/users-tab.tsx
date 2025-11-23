@@ -24,7 +24,15 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
-import { Plus, Users, Trash2, Mail } from 'lucide-react'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { Plus, Users, Trash2, Mail, UserPlus } from 'lucide-react'
 
 interface TenantUser {
   id: string
@@ -42,9 +50,11 @@ interface UsersTabProps {
   tenantUsers: TenantUser[]
   inviteEmail: string
   inviteRole: string
+  inviteModalOpen: boolean
   saving: boolean
   onInviteEmailChange: (email: string) => void
   onInviteRoleChange: (role: string) => void
+  onInviteModalOpenChange: (open: boolean) => void
   onInviteUser: () => Promise<void>
   onUpdateUserRole: (userId: string, role: string) => Promise<void>
   onRemoveUser: (userId: string) => Promise<void>
@@ -56,9 +66,11 @@ export function UsersTab({
   tenantUsers,
   inviteEmail,
   inviteRole,
+  inviteModalOpen,
   saving,
   onInviteEmailChange,
   onInviteRoleChange,
+  onInviteModalOpenChange,
   onInviteUser,
   onUpdateUserRole,
   onRemoveUser,
@@ -68,42 +80,19 @@ export function UsersTab({
   const t = useTranslations('settings')
   const tCommon = useTranslations('common')
 
+  const handleInviteSubmit = async () => {
+    await onInviteUser()
+  }
+
   return (
     <>
       <Card>
-        <CardHeader>
-          <CardTitle>{t('sections.inviteNewUser')}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex space-x-4">
-            <div className="flex-1">
-              <Input
-                placeholder={t('users.inviteEmail')}
-                value={inviteEmail}
-                onChange={(e) => onInviteEmailChange(e.target.value)}
-              />
-            </div>
-            <Select value={inviteRole} onValueChange={onInviteRoleChange}>
-              <SelectTrigger className="w-32">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="admin">{t('users.roles.admin')}</SelectItem>
-                <SelectItem value="staff">{t('users.roles.staff')}</SelectItem>
-                <SelectItem value="viewer">{t('users.roles.viewer')}</SelectItem>
-              </SelectContent>
-            </Select>
-            <Button onClick={onInviteUser} disabled={saving || !inviteEmail.trim()}>
-              <Plus className="h-4 w-4 mr-2" />
-              {t('users.inviteButton')}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
           <CardTitle>{t('sections.teamMembers')}</CardTitle>
+          <Button onClick={() => onInviteModalOpenChange(true)}>
+            <UserPlus className="h-4 w-4 mr-2" />
+            {t('users.inviteButton')}
+          </Button>
         </CardHeader>
         <CardContent>
           {tenantUsers.length === 0 ? (
@@ -187,6 +176,61 @@ export function UsersTab({
           )}
         </CardContent>
       </Card>
+
+      {/* Invite User Modal */}
+      <Dialog open={inviteModalOpen} onOpenChange={onInviteModalOpenChange}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>{t('modal.inviteUser.title')}</DialogTitle>
+            <DialogDescription>
+              {t('modal.inviteUser.description')}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="space-y-2">
+              <label htmlFor="email" className="text-sm font-medium">
+                {t('modal.inviteUser.emailLabel')}
+              </label>
+              <Input
+                id="email"
+                type="email"
+                placeholder={t('modal.inviteUser.emailPlaceholder')}
+                value={inviteEmail}
+                onChange={(e) => onInviteEmailChange(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <label htmlFor="role" className="text-sm font-medium">
+                {t('modal.inviteUser.roleLabel')}
+              </label>
+              <Select value={inviteRole} onValueChange={onInviteRoleChange}>
+                <SelectTrigger id="role">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="admin">{t('users.roles.admin')}</SelectItem>
+                  <SelectItem value="staff">{t('users.roles.staff')}</SelectItem>
+                  <SelectItem value="viewer">{t('users.roles.viewer')}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => onInviteModalOpenChange(false)}
+            >
+              {tCommon('cancel')}
+            </Button>
+            <Button 
+              onClick={handleInviteSubmit} 
+              disabled={saving || !inviteEmail.trim()}
+            >
+              {saving ? t('modal.inviteUser.sending') : t('modal.inviteUser.send')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   )
 }

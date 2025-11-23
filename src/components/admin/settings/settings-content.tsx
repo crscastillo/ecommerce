@@ -299,9 +299,11 @@ export function SettingsContent({ tenant, searchParams, router }: SettingsConten
             tenantUsers={tenantUsers.users}
             inviteEmail={tenantUsers.inviteEmail}
             inviteRole={tenantUsers.inviteRole}
+            inviteModalOpen={tenantUsers.inviteModalOpen}
             saving={state.saving}
             onInviteEmailChange={tenantUsers.setInviteEmail}
             onInviteRoleChange={tenantUsers.setInviteRole}
+            onInviteModalOpenChange={tenantUsers.setInviteModalOpen}
             onInviteUser={tenantUsers.inviteUser}
             onUpdateUserRole={tenantUsers.updateUserRole}
             onRemoveUser={tenantUsers.removeUser}

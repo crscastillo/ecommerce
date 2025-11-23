@@ -305,6 +305,7 @@ export function SettingsContent({ tenant, searchParams, router }: SettingsConten
             onInviteUser={tenantUsers.inviteUser}
             onUpdateUserRole={tenantUsers.updateUserRole}
             onRemoveUser={tenantUsers.removeUser}
+            onResendInvitation={tenantUsers.resendInvitation}
             getRoleBadgeVariant={getRoleBadgeVariant}
           />
         </TabsContent>

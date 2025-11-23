@@ -633,6 +633,7 @@
       "invited": "Invitado",
       "removeTeamMember": "Eliminar Miembro del Equipo",
       "removeConfirmation": "¿Está seguro de que desea eliminar este miembro del equipo? Esta acción no se puede deshacer.",
+      "resendInvitation": "Reenviar email de invitación",
       "roles": {
         "admin": "Administrador",
         "staff": "Personal",
@@ -735,11 +736,41 @@
       "failedToSaveTheme": "Error al guardar configuración de tema",
       "failedToSavePayments": "Error al guardar configuración de pagos"
     },
+    "users": {
+      "inviteEmail": "Ingresa dirección de email",
+      "inviteButton": "Invitar Usuario",
+      "noTeamMembers": "Aún no hay miembros del equipo",
+      "inviteUsersHelp": "Invita usuarios para colaborar en tu tienda.",
+      "pendingInvitation": "Invitación Pendiente",
+      "invited": "Invitado el",
+      "removeTeamMember": "Remover Miembro del Equipo",
+      "removeConfirmation": "¿Estás seguro de que quieres remover este miembro del equipo? Perderán acceso a tu tienda.",
+      "resendInvitation": "Reenviar email de invitación",
+      "roles": {
+        "admin": "Administrador",
+        "staff": "Personal",
+        "viewer": "Visualizador"
+      },
+      "status": {
+        "pending": "Pendiente"
+      }
+    },
+    "sections": {
+      "inviteNewUser": "Invitar Nuevo Usuario",
+      "teamMembers": "Miembros del Equipo"
+    },
     "header": {
       "visitStore": "Visitar Tienda",
       "accountSettings": "Configuración de Cuenta",
       "signOut": "Cerrar Sesión",
       "searchPlaceholder": "Buscar productos, pedidos..."
+    },
+    "footer": {
+      "copyright": "Todos los derechos reservados",
+      "poweredBy": "Desarrollado por",
+      "privacyPolicy": "Política de Privacidad",
+      "termsOfService": "Términos de Servicio",
+      "support": "Soporte"
     },
     "validation": {
       "storeNameRequired": "El nombre de la tienda es requerido",

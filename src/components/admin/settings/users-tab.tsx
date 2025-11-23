@@ -24,7 +24,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
-import { Plus, Users, Trash2 } from 'lucide-react'
+import { Plus, Users, Trash2, Mail } from 'lucide-react'
 
 interface TenantUser {
   id: string
@@ -32,6 +32,7 @@ interface TenantUser {
   role: string
   is_active: boolean
   invited_at: string
+  type?: 'user' | 'invitation'
   user?: {
     email: string
   }
@@ -47,6 +48,7 @@ interface UsersTabProps {
   onInviteUser: () => Promise<void>
   onUpdateUserRole: (userId: string, role: string) => Promise<void>
   onRemoveUser: (userId: string) => Promise<void>
+  onResendInvitation: (invitationId: string) => Promise<void>
   getRoleBadgeVariant: (role: string) => 'default' | 'secondary' | 'outline'
 }
 
@@ -60,6 +62,7 @@ export function UsersTab({
   onInviteUser,
   onUpdateUserRole,
   onRemoveUser,
+  onResendInvitation,
   getRoleBadgeVariant
 }: UsersTabProps) {
   const t = useTranslations('settings')
@@ -145,6 +148,17 @@ export function UsersTab({
                         <SelectItem value="viewer">{t('users.roles.viewer')}</SelectItem>
                       </SelectContent>
                     </Select>
+                    {!user.is_active && user.type === 'invitation' && (
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => onResendInvitation(user.id)}
+                        disabled={saving}
+                        title={t('users.resendInvitation')}
+                      >
+                        <Mail className="h-4 w-4" />
+                      </Button>
+                    )}
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
                         <Button variant="outline" size="sm">

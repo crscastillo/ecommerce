@@ -337,7 +337,8 @@ export function useTenantUsers() {
     if (!tenant?.id) return
 
     try {
-      const { data, error } = await supabase
+      // Load actual tenant users
+      const { data: tenantUsersData, error: tenantUsersError } = await supabase
         .from('tenant_users')
         .select(`
           id,
@@ -352,14 +353,46 @@ export function useTenantUsers() {
         .eq('tenant_id', tenant.id)
         .order('invited_at', { ascending: false })
 
-      if (error) {
-        console.error('Error loading tenant users:', error)
+      if (tenantUsersError) {
+        console.error('Error loading tenant users:', tenantUsersError)
         return
       }
 
-      setUsers(data || [])
+      // Load pending invitations from tenant_users_invitations table
+      const { data: invitationsData, error: invitationsError } = await supabase
+        .from('tenant_users_invitations')
+        .select(`
+          id,
+          tenant_id,
+          email,
+          role,
+          invited_at,
+          expires_at,
+          is_active
+        `)
+        .eq('tenant_id', tenant.id)
+        .eq('is_active', true)
+        .order('invited_at', { ascending: false })
+
+      const pendingInvitations = invitationsError ? [] : (invitationsData || [])
+
+      // Combine and format the data
+      const combinedUsers = [
+        ...(tenantUsersData || []).map(user => ({ ...user, type: 'user' })),
+        ...pendingInvitations.map(invitation => ({ 
+          ...invitation, 
+          type: 'invitation',
+          tenant_id: tenant.id,
+          user_id: invitation.email, // Use email as user_id for display
+          permissions: {},
+          accepted_at: null,
+          is_active: false // Mark invitations as not active users
+        }))
+      ].sort((a, b) => new Date(b.invited_at).getTime() - new Date(a.invited_at).getTime())
+
+      setUsers(combinedUsers)
     } catch (error) {
-      console.error('Error loading tenant users:', error)
+      console.error('Error loading users and invitations:', error)
     }
   }
 
@@ -369,25 +402,41 @@ export function useTenantUsers() {
     try {
       setSaving(true)
       
-      const { error } = await supabase
-        .from('tenant_users')
-        .insert({
-          tenant_id: tenant.id,
-          user_id: `pending-${Date.now()}`,
-          role: inviteRole,
-          permissions: {},
-          is_active: false,
-          invited_at: new Date().toISOString()
+      const response = await fetch('/api/users/invite', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          tenantId: tenant.id,
+          email: inviteEmail.trim(),
+          role: inviteRole
         })
+      })
 
-      if (error) throw error
+      const result = await response.json()
 
-      showSuccess('User invitation sent successfully!')
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to send invitation')
+      }
+
+      // Handle different email statuses
+      let message = 'User invitation created successfully!'
+      
+      if (result.email_status === 'sent') {
+        message = 'User invitation sent successfully! The user will receive an email with instructions.'
+      } else if (result.email_status === 'user_exists') {
+        message = 'Invitation created! Note: This user already has an account and can sign in directly.'
+      } else if (result.email_status === 'failed') {
+        message = `Invitation created but email failed to send: ${result.email_error || 'Unknown error'}`
+      }
+
+      showSuccess(message)
       setInviteEmail('')
       loadUsers()
     } catch (error) {
       console.error('Error inviting user:', error)
-      showError('Failed to send invitation')
+      showError(error instanceof Error ? error.message : 'Failed to send invitation')
     } finally {
       setSaving(false)
     }
@@ -417,19 +466,94 @@ export function useTenantUsers() {
     if (!tenant?.id) return
 
     try {
-      const { error } = await supabase
-        .from('tenant_users')
-        .delete()
-        .eq('id', userId)
-        .eq('tenant_id', tenant.id)
+      // Find the user in our current users list to determine if it's a real user or invitation
+      const userToRemove = users.find(user => user.id === userId)
+      
+      if (!userToRemove) {
+        showError('User not found')
+        return
+      }
 
-      if (error) throw error
+      if (userToRemove.type === 'invitation') {
+        // Remove invitation from tenant's pending_invitations
+        await removeInvitation(userId)
+      } else {
+        // Remove real user from tenant_users table
+        const { error } = await supabase
+          .from('tenant_users')
+          .delete()
+          .eq('id', userId)
+          .eq('tenant_id', tenant.id)
+
+        if (error) throw error
+      }
 
       showSuccess('User removed successfully!')
       loadUsers()
     } catch (error) {
       console.error('Error removing user:', error)
       showError('Failed to remove user')
+    }
+  }
+
+  const removeInvitation = async (invitationId: string) => {
+    if (!tenant?.id) return
+
+    try {
+      // Delete the invitation from tenant_users_invitations table
+      const { error } = await supabase
+        .from('tenant_users_invitations')
+        .delete()
+        .eq('id', invitationId)
+        .eq('tenant_id', tenant.id)
+
+      if (error) throw error
+    } catch (error) {
+      throw error
+    }
+  }
+
+  const resendInvitation = async (invitationId: string) => {
+    if (!tenant?.id) return
+
+    try {
+      setSaving(true)
+      
+      const response = await fetch('/api/users/resend-invite', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          invitationId,
+          tenantId: tenant.id
+        })
+      })
+
+      const result = await response.json()
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to resend invitation')
+      }
+
+      // Handle different email statuses
+      let message = 'Invitation resent successfully!'
+      
+      if (result.email_status === 'sent') {
+        message = 'Invitation resent successfully! The user will receive a new email with instructions.'
+      } else if (result.email_status === 'user_exists') {
+        message = 'Note: This user already has an account and can sign in directly.'
+      } else if (result.email_status === 'failed') {
+        message = `Invitation updated but email failed to send: ${result.email_error || 'Unknown error'}`
+      }
+
+      showSuccess(message)
+      loadUsers()
+    } catch (error) {
+      console.error('Error resending invitation:', error)
+      showError(error instanceof Error ? error.message : 'Failed to resend invitation')
+    } finally {
+      setSaving(false)
     }
   }
 
@@ -442,5 +566,6 @@ export function useTenantUsers() {
     inviteUser,
     updateUserRole,
     removeUser,
+    resendInvitation,
   }
 }

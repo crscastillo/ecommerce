@@ -239,6 +239,13 @@
       "accountSettings": "Account Settings",
       "signOut": "Sign Out"
     },
+    "footer": {
+      "copyright": "All rights reserved",
+      "poweredBy": "Powered by",
+      "privacyPolicy": "Privacy Policy",
+      "termsOfService": "Terms of Service",
+      "support": "Support"
+    },
     "roles": {
       "owner": "Owner",
       "admin": "Admin", 
@@ -253,6 +260,29 @@
       "failedToSaveStore": "Failed to save store settings",
       "failedToSaveTheme": "Failed to save theme settings",
       "failedToSavePayments": "Failed to save payment settings"
+    },
+    "users": {
+      "inviteEmail": "Enter email address",
+      "inviteButton": "Invite User",
+      "noTeamMembers": "No team members yet",
+      "inviteUsersHelp": "Invite users to collaborate on your store.",
+      "pendingInvitation": "Pending Invitation",
+      "invited": "Invited on",
+      "removeTeamMember": "Remove Team Member",
+      "removeConfirmation": "Are you sure you want to remove this team member? They will lose access to your store.",
+      "resendInvitation": "Resend invitation email",
+      "roles": {
+        "admin": "Admin",
+        "staff": "Staff",
+        "viewer": "Viewer"
+      },
+      "status": {
+        "pending": "Pending"
+      }
+    },
+    "sections": {
+      "inviteNewUser": "Invite New User",
+      "teamMembers": "Team Members"
     }
   }
 }

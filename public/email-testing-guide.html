@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Testing Guide</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .info-box {
+            background: #e7f3ff;
+            border: 1px solid #b3d9ff;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .success-box {
+            background: #e7f6e7;
+            border: 1px solid #b3e6b3;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .step {
+            background: #f8f9fa;
+            padding: 15px;
+            border-left: 4px solid #007bff;
+            margin: 10px 0;
+        }
+        code {
+            background: #f1f1f1;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+        .button {
+            display: inline-block;
+            background: #007bff;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 10px 10px 10px 0;
+        }
+        .button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>📧 User Invitation Email Testing Guide</h1>
+    
+    <div class="info-box">
+        <h3>🎯 Current Setup Status</h3>
+        <p><strong>✅ Invitation System:</strong> Fully configured and working</p>
+        <p><strong>✅ Database:</strong> <code>tenant_users_invitations</code> table created</p>
+        <p><strong>✅ Email System:</strong> Supabase + Inbucket configured</p>
+        <p><strong>✅ Email Template:</strong> Custom invitation template ready</p>
+    </div>
+
+    <h2>🔍 How to Check Invitation Emails</h2>
+
+    <div class="step">
+        <h3>Step 1: Access Email Testing Interface</h3>
+        <p>Supabase uses <strong>Inbucket</strong> for local email testing. All emails are captured and viewable at:</p>
+        <a href="http://localhost:54324" class="button" target="_blank">Open Email Testing Interface</a>
+        <p><code>http://localhost:54324</code></p>
+    </div>
+
+    <div class="step">
+        <h3>Step 2: Send a Test Invitation</h3>
+        <p>1. Go to your admin settings: <code>/admin/settings?tab=users</code></p>
+        <p>2. Enter an email address and select a role</p>
+        <p>3. Click "Invite User"</p>
+        <p>4. Check the browser console for invitation logs</p>
+    </div>
+
+    <div class="step">
+        <h3>Step 3: View the Invitation Email</h3>
+        <p>1. Open the Inbucket interface (link above)</p>
+        <p>2. Look for the invited email address in the mailbox list</p>
+        <p>3. Click on the email to view the invitation content</p>
+        <p>4. The email should contain your custom invitation template</p>
+    </div>
+
+    <div class="success-box">
+        <h3>🚀 What Should Happen</h3>
+        <ul>
+            <li>✅ Invitation record created in database</li>
+            <li>✅ Email sent through Supabase Auth</li>
+            <li>✅ Email captured by Inbucket for testing</li>
+            <li>✅ Custom invitation template with store details</li>
+            <li>✅ Acceptance link leads to account creation page</li>
+        </ul>
+    </div>
+
+    <h2>📋 Troubleshooting</h2>
+
+    <div class="step">
+        <h3>If No Email Appears in Inbucket:</h3>
+        <p>1. Check browser console for API errors</p>
+        <p>2. Verify Supabase is running: <code>supabase status</code></p>
+        <p>3. Restart Supabase: <code>supabase stop && supabase start</code></p>
+        <p>4. Check that email confirmations are enabled in config</p>
+    </div>
+
+    <div class="step">
+        <h3>Console Commands for Debugging:</h3>
+        <code>supabase status</code> - Check if all services are running<br>
+        <code>supabase logs</code> - View Supabase logs<br>
+        <code>curl http://localhost:54324</code> - Test Inbucket connection
+    </div>
+
+    <h2>🔗 Quick Links</h2>
+    <a href="/admin/settings?tab=users" class="button">Admin Users Tab</a>
+    <a href="http://localhost:54324" class="button" target="_blank">Email Testing</a>
+    <a href="/accept-invitation" class="button">Test Invitation Page</a>
+
+    <div class="info-box">
+        <h3>💡 Production Setup</h3>
+        <p>For production, you'll need to:</p>
+        <ul>
+            <li>Configure SMTP settings in Supabase dashboard</li>
+            <li>Set up proper email templates</li>
+            <li>Configure domain and redirects</li>
+            <li>Test with real email addresses</li>
+        </ul>
+    </div>
+
+    <script>
+        // Auto-refresh status check
+        console.log('📧 Email Testing Guide Loaded');
+        console.log('🔗 Inbucket Interface: http://localhost:54324');
+        console.log('⚙️ Admin Settings: /admin/settings?tab=users');
+    </script>
+</body>
+</html>

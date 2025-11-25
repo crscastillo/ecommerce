@@ -96,9 +96,7 @@ export function PaymentMethodSelector({
                 <span className="text-xs bg-gray-200 px-2 py-1 rounded">MC</span>
                 {method.id === 'stripe' && <span className="text-xs bg-gray-200 px-2 py-1 rounded">Amex</span>}
               </div>
-              {method.testMode && (
-                <Badge variant="outline" className="mt-2">Test Mode</Badge>
-              )}
+
             </CardContent>
           </Card>
         ))}

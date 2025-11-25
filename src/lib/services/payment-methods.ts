@@ -13,7 +13,6 @@ export interface PaymentMethodConfig {
     secretKey?: string
     webhookSecret?: string
   }
-  testMode?: boolean
   metadata?: Record<string, any>
 }
 

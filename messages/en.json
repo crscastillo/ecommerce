@@ -56,6 +56,45 @@
     "searchLabel": "Search:",
     "all": "All"
   },
+  "header": {
+    "defaultStoreName": "Our Store",
+    "navigation": {
+      "products": "Products",
+      "featuredProducts": "Featured Products",
+      "featuredProductsDescription": "Discover our newest and most popular items.",
+      "loadingCategories": "Loading categories...",
+      "browseCategoryCollection": "Browse our {category} collection",
+      "viewAllProducts": "View All Products",
+      "browseCompleteCatalog": "Browse our complete product catalog",
+      "noCategoriesAvailable": "No categories available",
+      "about": "About"
+    },
+    "search": {
+      "search": "Search...",
+      "searchProducts": "Search products..."
+    }
+  },
+  "footer": {
+    "storeName": "Ecommerce Store",
+    "storeDescription": "Your one-stop shop for all your needs. Quality products, great prices, and exceptional service.",
+    "sections": {
+      "products": "Products",
+      "company": "Company",
+      "support": "Support"
+    },
+    "links": {
+      "electronics": "Electronics",
+      "clothing": "Clothing",
+      "homeGarden": "Home & Garden",
+      "about": "About",
+      "contact": "Contact",
+      "helpCenter": "Help Center",
+      "shippingInfo": "Shipping Info",
+      "returns": "Returns",
+      "systemStatus": "System Status"
+    },
+    "copyright": "© {year} {storeName}. All rights reserved."
+  },
   "navigation": {
     "dashboard": "Dashboard",
     "products": "Products",

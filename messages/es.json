@@ -58,6 +58,45 @@
     "active": "Activo",
     "inactive": "Inactivo"
   },
+  "header": {
+    "defaultStoreName": "Nuestra Tienda",
+    "navigation": {
+      "products": "Productos",
+      "featuredProducts": "Productos Destacados",
+      "featuredProductsDescription": "Descubre nuestros artículos más nuevos y populares.",
+      "loadingCategories": "Cargando categorías...",
+      "browseCategoryCollection": "Explorar nuestra colección de {category}",
+      "viewAllProducts": "Ver Todos los Productos",
+      "browseCompleteCatalog": "Navega nuestro catálogo completo de productos",
+      "noCategoriesAvailable": "No hay categorías disponibles",
+      "about": "Acerca de"
+    },
+    "search": {
+      "search": "Buscar...",
+      "searchProducts": "Buscar productos..."
+    }
+  },
+  "footer": {
+    "storeName": "Tienda Ecommerce",
+    "storeDescription": "Tu tienda única para todas tus necesidades. Productos de calidad, excelentes precios y servicio excepcional.",
+    "sections": {
+      "products": "Productos",
+      "company": "Empresa",
+      "support": "Soporte"
+    },
+    "links": {
+      "electronics": "Electrónicos",
+      "clothing": "Ropa",
+      "homeGarden": "Hogar y Jardín",
+      "about": "Acerca de",
+      "contact": "Contacto",
+      "helpCenter": "Centro de Ayuda",
+      "shippingInfo": "Información de Envío",
+      "returns": "Devoluciones",
+      "systemStatus": "Estado del Sistema"
+    },
+    "copyright": "© {year} {storeName}. Todos los derechos reservados."
+  },
   "navigation": {
     "dashboard": "Panel de Control",
     "products": "Productos",
@@ -473,21 +512,6 @@
     "noBrandsMatchFilters": "No hay marcas que coincidan con los filtros actuales. Intenta ajustar tus criterios de búsqueda."
   },
   "settings": {
-    "viewInStore": "Ver en Tienda",
-    "filterProducts": "Filtrar Productos",
-    "searchProductsPlaceholder": "Buscar productos...",
-    "noProductsFoundFiltered": "Ningún producto coincide con los filtros actuales. Intenta ajustar tus criterios de búsqueda.",
-    "noProductsFoundEmpty": "Comienza agregando tu primer producto a la tienda.",
-    "statusLabel": "Estado:",
-    "typeLabel": "Tipo:",
-    "typeOptions": {
-      "all": "Todos",
-      "single": "Simple",
-      "variable": "Variable",
-      "digital": "Digital"
-    }
-  },
-  "settings": {
     "title": "Configuración",
     "loading": "Cargando configuración...",
     "general": "General",
@@ -767,8 +791,21 @@
       }
     },
     "sections": {
+      "storeInformation": "Información de la Tienda",
+      "storeConfiguration": "Configuración de la Tienda",
+      "brandAssets": "Activos de Marca",
+      "colorScheme": "Esquema de Colores",
+      "typography": "Tipografía",
+      "paymentMethods": "Métodos de Pago",
       "inviteNewUser": "Invitar Nuevo Usuario",
-      "teamMembers": "Miembros del Equipo"
+      "teamMembers": "Miembros del Equipo",
+      "accountInformation": "Información de la Cuenta",
+      "dangerZone": "Zona de Peligro",
+      "availablePlugins": "Plugins Disponibles",
+      "passwordSecurity": "Contraseña y Seguridad",
+      "adminTheme": "Tema del Panel de Administración",
+      "storeTheme": "Tema de la Tienda Pública",
+      "heroBackground": "Fondo de la Sección Hero"
     },
     "header": {
       "visitStore": "Visitar Tienda",

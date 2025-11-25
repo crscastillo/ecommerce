@@ -72,6 +72,7 @@ export function PaymentsTab({
                 case 'google_pay': return <div className="text-xl">🎯</div>
                 case 'bank_transfer': return <div className="text-xl">🏦</div>
                 case 'mobile_bank_transfer': return <div className="text-xl">📱</div>
+                case 'cash_on_delivery': return <div className="text-xl">💵</div>
                 default: return <CreditCard className="h-6 w-6" />
               }
             }
@@ -95,6 +96,7 @@ export function PaymentsTab({
                 case 'google_pay': return 'Accept Google Pay payments on supported browsers'
                 case 'bank_transfer': return 'Allow customers to pay via direct bank transfer'
                 case 'mobile_bank_transfer': return 'Allow customers to pay via mobile bank transfer'
+                case 'cash_on_delivery': return 'Allow customers to pay with cash when order is delivered'
                 default: return 'Payment method configuration'
               }
             }
@@ -112,7 +114,6 @@ export function PaymentsTab({
                       <h3 className="font-medium flex items-center gap-2">
                         {method.name}
                         {method.enabled && <Badge variant="default">Enabled</Badge>}
-                        {method.testMode && <Badge variant="outline">Test Mode</Badge>}
                         {(method.id === 'stripe' || method.id === 'tilopay') && (
                           <Badge className={`text-xs ${getBadgeColor(method.id)}`}>Pro+</Badge>
                         )}

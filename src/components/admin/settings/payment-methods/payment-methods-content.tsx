@@ -30,7 +30,6 @@ interface PaymentMethodConfig {
   description: string
   icon: React.ComponentType<{ className?: string }>
   fees?: string
-  testMode?: boolean
   bankDetails?: {
     bankName?: string
     accountNumber?: string
@@ -56,8 +55,7 @@ export function PaymentMethodsContent() {
       },
       description: 'Accept credit cards, debit cards, and digital wallets with Stripe\'s secure payment processing.',
       icon: CreditCard,
-      fees: '2.9% + 30¢ per transaction',
-      testMode: true
+      fees: '2.9% + 30¢ per transaction'
     },
     {
       id: 'bank_transfer',
@@ -239,7 +237,6 @@ export function PaymentMethodsContent() {
                       <CardTitle className="flex items-center space-x-2">
                         <span>{method.name}</span>
                         {method.enabled && <Badge variant="default">Enabled</Badge>}
-                        {method.testMode && <Badge variant="outline">Test Mode</Badge>}
                       </CardTitle>
                       <p className="text-sm text-gray-600 mt-1">{method.description}</p>
                       {method.fees && (

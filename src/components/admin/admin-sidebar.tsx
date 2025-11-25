@@ -35,7 +35,6 @@ const navigationItems = [
   { key: 'brands', href: '/admin/brands', icon: BadgeCheck },
   { key: 'analytics', href: '/admin/analytics', icon: BarChart3 },
   { key: 'pages', href: '/admin/pages', icon: FileText },
-  { key: 'billing', href: '/admin/billing', icon: CreditCard },
   { key: 'settings', href: '/admin/settings', icon: Settings },
 ]
 
@@ -154,7 +153,7 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
                 {tenant?.subscription_tier || (tenant?.settings as any)?.plan || 'Starter'} Plan
               </Badge>
               <Link 
-                href="/admin/billing"
+                href="/admin/settings?tab=billing"
                 className="text-xs text-blue-600 hover:text-blue-800"
                 onClick={onClose}
               >

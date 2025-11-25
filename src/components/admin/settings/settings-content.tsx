@@ -14,7 +14,8 @@ import {
   CreditCard,
   Cog,
   Puzzle,
-  ChevronDown
+  ChevronDown,
+  Receipt
 } from 'lucide-react'
 
 // Import hooks
@@ -211,6 +212,12 @@ export function SettingsContent({ tenant, searchParams, router }: SettingsConten
                   <span>{t('tabs.payments')}</span>
                 </div>
               </SelectItem>
+              <SelectItem value="billing">
+                <div className="flex items-center space-x-2">
+                  <Receipt className="h-4 w-4" />
+                  <span>{t('tabs.billing')}</span>
+                </div>
+              </SelectItem>
               {pluginFeatures.hasAnyPlugins && (
                 <SelectItem value="plugins">
                   <div className="flex items-center space-x-2">
@@ -237,7 +244,7 @@ export function SettingsContent({ tenant, searchParams, router }: SettingsConten
 
         {/* Desktop: Full Tab Navigation */}
         <div className="hidden md:block">
-          <TabsList className={pluginFeatures.hasAnyPlugins ? "grid w-full grid-cols-7" : "grid w-full grid-cols-6"}>
+          <TabsList className={pluginFeatures.hasAnyPlugins ? "grid w-full grid-cols-8" : "grid w-full grid-cols-7"}>
             <TabsTrigger value="store" className="flex items-center space-x-2">
               <Store className="h-4 w-4" />
               <span>{t('tabs.store')}</span>
@@ -253,6 +260,10 @@ export function SettingsContent({ tenant, searchParams, router }: SettingsConten
             <TabsTrigger value="payments" className="flex items-center space-x-2">
               <CreditCard className="h-4 w-4" />
               <span>{t('tabs.payments')}</span>
+            </TabsTrigger>
+            <TabsTrigger value="billing" className="flex items-center space-x-2">
+              <Receipt className="h-4 w-4" />
+              <span>{t('tabs.billing')}</span>
             </TabsTrigger>
             {pluginFeatures.hasAnyPlugins && (
               <TabsTrigger value="plugins" className="flex items-center space-x-2">
@@ -316,6 +327,11 @@ export function SettingsContent({ tenant, searchParams, router }: SettingsConten
             onSave={paymentSettings.saveSettings}
             saving={state.saving}
           />
+        </TabsContent>
+
+        {/* Billing & Subscriptions */}
+        <TabsContent value="billing" className="space-y-6">
+          <BillingTab saving={state.saving} />
         </TabsContent>
 
         {/* Plugins Management */}

@@ -565,6 +565,9 @@ export class FeatureFlagsService {
         case 'analytics_dashboard':
           result.analytics = isEnabled
           break
+        case 'pages_management':
+          result.pages = isEnabled
+          break
         // Add more feature mappings as needed
       }
     })

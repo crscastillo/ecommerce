@@ -48,17 +48,19 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
   const { tenant, isLoading } = useTenant()
   const t = useTranslations('navigation')
   const [analyticsEnabled, setAnalyticsEnabled] = useState(false)
+  const [pagesEnabled, setPagesEnabled] = useState(false)
 
-  // Check if analytics feature is enabled
+  // Check if features are enabled
   useEffect(() => {
-    const checkAnalyticsFeature = async () => {
+    const checkFeatures = async () => {
       if (tenant?.id) {
         const featureFlags = await FeatureFlagsService.getFeatureFlags(tenant.id)
         setAnalyticsEnabled(featureFlags.analytics || false)
+        setPagesEnabled(featureFlags.pages || false)
       }
     }
     
-    checkAnalyticsFeature()
+    checkFeatures()
   }, [tenant?.id])
 
   if (isLoading) {
@@ -116,6 +118,10 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
               .filter((item) => {
                 // Filter out analytics if feature is disabled
                 if (item.key === 'analytics' && !analyticsEnabled) {
+                  return false
+                }
+                // Filter out pages if feature is disabled
+                if (item.key === 'pages' && !pagesEnabled) {
                   return false
                 }
                 return true

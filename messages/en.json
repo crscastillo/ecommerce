@@ -421,5 +421,23 @@
       "inviteNewUser": "Invite New User",
       "teamMembers": "Team Members"
     }
+  },
+  "pages": {
+    "title": "Pages",
+    "subtitle": "Manage your store's static pages like About Us, Privacy Policy, and custom content",
+    "createPage": "Create Page",
+    "comingSoon": "Pages Feature Coming Soon",
+    "comingSoonDescription": "The advanced page management system is currently in development. You'll be able to create and manage custom pages for your store soon.",
+    "pagesList": "Pages Overview",
+    "status": {
+      "published": "Published",
+      "draft": "Draft",
+      "scheduled": "Scheduled"
+    },
+    "lastModified": "Last modified",
+    "by": "by",
+    "noPages": "No pages yet",
+    "noPagesDescription": "Start building your store's content with custom pages",
+    "createFirstPage": "Create your first page"
   }
 }

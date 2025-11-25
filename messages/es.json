@@ -1473,5 +1473,23 @@
       "AU": "Australia",
       "JP": "Japón"
     }
+  },
+  "pages": {
+    "title": "Páginas",
+    "subtitle": "Gestiona las páginas estáticas de tu tienda como Acerca de, Política de Privacidad y contenido personalizado",
+    "createPage": "Crear Página",
+    "comingSoon": "Función de Páginas Próximamente",
+    "comingSoonDescription": "El sistema avanzado de gestión de páginas está actualmente en desarrollo. Pronto podrás crear y administrar páginas personalizadas para tu tienda.",
+    "pagesList": "Vista General de Páginas",
+    "status": {
+      "published": "Publicado",
+      "draft": "Borrador",
+      "scheduled": "Programado"
+    },
+    "lastModified": "Última modificación",
+    "by": "por",
+    "noPages": "Aún no hay páginas",
+    "noPagesDescription": "Comienza a construir el contenido de tu tienda con páginas personalizadas",
+    "createFirstPage": "Crear tu primera página"
   }
 }

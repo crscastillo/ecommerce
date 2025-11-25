@@ -40,6 +40,7 @@ import {
 import { DomainSettings } from '@/components/admin/settings/domain-settings'
 import { SettingsMessage } from '@/components/admin/settings/settings-message'
 import { useSettings } from '@/lib/contexts/settings-context'
+import { BillingTab } from './billing-tab'
 
 interface SettingsContentProps {
   tenant: any

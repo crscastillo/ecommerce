@@ -7,6 +7,7 @@ export { PaymentsTab } from './payments-tab'
 export { PluginsTab } from './plugins-tab'
 export { UsersTab } from './users-tab'
 export { SecurityTab } from './security-tab'
+export { DomainSettings } from './domain-settings'
 
 // Settings Components
 export { SettingsMessage } from './settings-message'

@@ -30,6 +30,27 @@ export async function middleware(request: NextRequest) {
 
   // Handle main domain routing (for tenant signup, main site, etc.)
   if (isMainDomain) {
+    // Check if this might be a custom domain instead of main domain
+    const fullHostname = request.headers.get('host') || ''
+    const hostname = fullHostname.split(':')[0] // Remove port
+    
+    // Skip known development/platform domains for custom domain check
+    const platformDomains = [
+      'localhost',
+      process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN || 'aluro.shop',
+      `www.${process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN || 'aluro.shop'}`
+    ]
+    
+    const isKnownPlatformDomain = platformDomains.some(domain => 
+      hostname === domain || hostname.endsWith('.vercel.app')
+    )
+    
+    if (!isKnownPlatformDomain) {
+      console.log('[Middleware] Checking if main domain is actually a custom domain:', hostname)
+      // This could be a custom domain, pass null as subdomain to trigger domain lookup
+      return await handleTenantSubdomain(request, supabaseResponse, null)
+    }
+    
     return await handleMainDomain(request, supabaseResponse)
   }
 
@@ -110,7 +131,7 @@ async function handleMainDomain(request: NextRequest, supabaseResponse: NextResp
   return supabaseResponse
 }
 
-async function handleTenantSubdomain(request: NextRequest, supabaseResponse: NextResponse, subdomain: string) {
+async function handleTenantSubdomain(request: NextRequest, supabaseResponse: NextResponse, subdomain: string | null) {
   // Validate environment variables
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -144,25 +165,74 @@ async function handleTenantSubdomain(request: NextRequest, supabaseResponse: Nex
   )
 
   // Validate tenant exists and is active
-  console.log('[Middleware] Looking up tenant:', subdomain)
+  const fullHostname = request.headers.get('host') || ''
+  const hostname = fullHostname.split(':')[0] // Remove port
   
-  // Try with all columns first, fallback if columns don't exist
-  let { data: tenant, error } = await supabase
-    .from('tenants')
-    .select('id, name, subdomain, is_active, settings, owner_id, admin_language, store_language')
-    .eq('subdomain', subdomain)
-    .eq('is_active', true)
-    .maybeSingle()
+  let tenant: any = null
+  let error: any = null
+  
+  if (subdomain) {
+    // We have a subdomain, look up by subdomain first
+    console.log('[Middleware] Looking up tenant by subdomain:', subdomain)
+    
+    const { data: subdomainTenant, error: subdomainError } = await supabase
+      .from('tenants')
+      .select('id, name, subdomain, domain, is_active, settings, owner_id, admin_language, store_language')
+      .eq('subdomain', subdomain)
+      .eq('is_active', true)
+      .maybeSingle()
+    
+    tenant = subdomainTenant
+    error = subdomainError
+  }
+  
+  // If no subdomain or subdomain lookup failed, try custom domain lookup
+  if (!tenant && !error) {
+    console.log('[Middleware] Looking up tenant by custom domain:', hostname)
+    
+    const { data: domainTenant, error: domainError } = await supabase
+      .from('tenants')
+      .select('id, name, subdomain, domain, is_active, settings, owner_id, admin_language, store_language')
+      .eq('domain', hostname)
+      .eq('is_active', true)
+      .maybeSingle()
+    
+    tenant = domainTenant
+    error = domainError
+    
+    console.log('[Middleware] Custom domain lookup result:', { 
+      hostname, 
+      found: !!tenant,
+      error: error?.message 
+    })
+  }
 
   // If error might be due to missing columns, try with basic columns only
   if (error && error.message.includes('column')) {
     console.log('[Middleware] Trying basic tenant lookup due to column error:', error.message)
-    const { data: basicTenant, error: basicError } = await supabase
-      .from('tenants')
-      .select('id, name, subdomain, is_active, settings, owner_id')
-      .eq('subdomain', subdomain)
-      .eq('is_active', true)
-      .maybeSingle()
+    
+    let basicTenant: any = null
+    let basicError: any = null
+    
+    if (subdomain) {
+      const { data, error: err } = await supabase
+        .from('tenants')
+        .select('id, name, subdomain, domain, is_active, settings, owner_id')
+        .eq('subdomain', subdomain)
+        .eq('is_active', true)
+        .maybeSingle()
+      basicTenant = data
+      basicError = err
+    } else {
+      const { data, error: err } = await supabase
+        .from('tenants')
+        .select('id, name, subdomain, domain, is_active, settings, owner_id')
+        .eq('domain', hostname)
+        .eq('is_active', true)
+        .maybeSingle()
+      basicTenant = data
+      basicError = err
+    }
     
     // Add missing properties for compatibility
     if (basicTenant) {
@@ -179,9 +249,15 @@ async function handleTenantSubdomain(request: NextRequest, supabaseResponse: Nex
 
   console.log('[Middleware] Tenant lookup result:', { 
     subdomain, 
+    hostname,
     found: !!tenant, 
     error: error?.message,
-    tenant: tenant ? { id: tenant.id, name: tenant.name, subdomain: tenant.subdomain } : null
+    tenant: tenant ? { 
+      id: tenant.id, 
+      name: tenant.name, 
+      subdomain: tenant.subdomain, 
+      domain: tenant.domain 
+    } : null
   })
 
   if (error) {
@@ -214,6 +290,10 @@ async function handleTenantSubdomain(request: NextRequest, supabaseResponse: Nex
   supabaseResponse.headers.set('x-tenant-id', tenant.id)
   supabaseResponse.headers.set('x-tenant-subdomain', tenant.subdomain)
   supabaseResponse.headers.set('x-tenant-name', tenant.name)
+  if (tenant.domain) {
+    supabaseResponse.headers.set('x-tenant-domain', tenant.domain)
+  }
+  supabaseResponse.headers.set('x-access-method', subdomain ? 'subdomain' : 'custom-domain')
   
   // Determine locale based on route type (admin vs store) and tenant preferences
   const currentPath = request.nextUrl.pathname

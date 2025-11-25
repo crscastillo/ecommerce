@@ -800,9 +800,23 @@
       "configurationSaved": "¡Configuración guardada exitosamente!",
       "themeSettingsSaved": "¡Configuración de tema guardada exitosamente!",
       "paymentSettingsSaved": "¡Configuración de pagos guardada exitosamente!",
+      "domainUpdated": "¡Configuración de dominio actualizada exitosamente!",
       "failedToSaveStore": "Error al guardar configuración de tienda",
       "failedToSaveTheme": "Error al guardar configuración de tema",
       "failedToSavePayments": "Error al guardar configuración de pagos"
+    },
+    "domain": {
+      "title": "Configuración de Dominio",
+      "description": "Configura cómo los clientes acceden a tu tienda",
+      "currentSubdomain": "Subdominio Actual",
+      "customDomain": "Dominio Personalizado",
+      "currentCustomDomain": "Dominio Personalizado Actual",
+      "custom": "Personalizado",
+      "invalidFormat": "Por favor ingresa un formato de dominio válido",
+      "dnsInstructions": "Configuración DNS",
+      "dnsTitle": "Configura tus registros DNS",
+      "dnsDescription": "Para usar un dominio personalizado, agrega estos registros DNS a tu proveedor de dominio:",
+      "dnsNote": "Los cambios de DNS pueden tomar hasta 48 horas en propagarse mundialmente."
     },
     "users": {
       "inviteEmail": "Ingresa dirección de email",

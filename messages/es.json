@@ -58,6 +58,45 @@
     "active": "Activo",
     "inactive": "Inactivo"
   },
+  "header": {
+    "defaultStoreName": "Nuestra Tienda",
+    "navigation": {
+      "products": "Productos",
+      "featuredProducts": "Productos Destacados",
+      "featuredProductsDescription": "Descubre nuestros artículos más nuevos y populares.",
+      "loadingCategories": "Cargando categorías...",
+      "browseCategoryCollection": "Explorar nuestra colección de {category}",
+      "viewAllProducts": "Ver Todos los Productos",
+      "browseCompleteCatalog": "Navega nuestro catálogo completo de productos",
+      "noCategoriesAvailable": "No hay categorías disponibles",
+      "about": "Acerca de"
+    },
+    "search": {
+      "search": "Buscar...",
+      "searchProducts": "Buscar productos..."
+    }
+  },
+  "footer": {
+    "storeName": "Tienda Ecommerce",
+    "storeDescription": "Tu tienda única para todas tus necesidades. Productos de calidad, excelentes precios y servicio excepcional.",
+    "sections": {
+      "products": "Productos",
+      "company": "Empresa",
+      "support": "Soporte"
+    },
+    "links": {
+      "electronics": "Electrónicos",
+      "clothing": "Ropa",
+      "homeGarden": "Hogar y Jardín",
+      "about": "Acerca de",
+      "contact": "Contacto",
+      "helpCenter": "Centro de Ayuda",
+      "shippingInfo": "Información de Envío",
+      "returns": "Devoluciones",
+      "systemStatus": "Estado del Sistema"
+    },
+    "copyright": "© {year} {storeName}. Todos los derechos reservados."
+  },
   "navigation": {
     "dashboard": "Panel de Control",
     "products": "Productos",
@@ -473,21 +512,6 @@
     "noBrandsMatchFilters": "No hay marcas que coincidan con los filtros actuales. Intenta ajustar tus criterios de búsqueda."
   },
   "settings": {
-    "viewInStore": "Ver en Tienda",
-    "filterProducts": "Filtrar Productos",
-    "searchProductsPlaceholder": "Buscar productos...",
-    "noProductsFoundFiltered": "Ningún producto coincide con los filtros actuales. Intenta ajustar tus criterios de búsqueda.",
-    "noProductsFoundEmpty": "Comienza agregando tu primer producto a la tienda.",
-    "statusLabel": "Estado:",
-    "typeLabel": "Tipo:",
-    "typeOptions": {
-      "all": "Todos",
-      "single": "Simple",
-      "variable": "Variable",
-      "digital": "Digital"
-    }
-  },
-  "settings": {
     "title": "Configuración",
     "loading": "Cargando configuración...",
     "general": "General",
@@ -586,21 +610,65 @@
       "uploadFavicon": "Subir Favicon"
     },
     "paymentMethods": {
-      "cashOnDelivery": {
-        "name": "Pago Contra Entrega",
-        "description": "Permitir a los clientes pagar cuando reciban su pedido"
+      "traditional": {
+        "name": "Formulario de Tarjeta Tradicional",
+        "description": "Formulario básico de tarjeta para procesamiento manual de pagos. Requiere manejo manual de pagos."
       },
       "stripe": {
         "name": "Stripe",
-        "description": "Acepte tarjetas de crédito y otros métodos de pago con Stripe"
+        "description": "Acepta tarjetas de crédito, débito y billeteras digitales con el procesamiento seguro de Stripe."
       },
       "tilopay": {
         "name": "TiloPay",
-        "description": "Pasarela de pagos costarricense para tarjetas locales e internacionales"
+        "description": "Acepta pagos a través de la pasarela TiloPay (Costa Rica). Soporta monedas CRC y USD.",
+        "apiKeyPlaceholder": "Clave API de TiloPay",
+        "secretKeyPlaceholder": "Clave Secreta de TiloPay"
+      },
+      "paypal": {
+        "name": "PayPal",
+        "description": "Acepta pagos de PayPal y tarjetas de crédito a través de la plataforma PayPal.",
+        "clientIdPlaceholder": "ID de Cliente PayPal",
+        "clientSecretPlaceholder": "Secreto de Cliente PayPal"
+      },
+      "applePay": {
+        "name": "Apple Pay",
+        "description": "Acepta pagos de Apple Pay en Safari y dispositivos iOS."
+      },
+      "googlePay": {
+        "name": "Google Pay",
+        "description": "Acepta pagos de Google Pay en navegadores compatibles y dispositivos Android."
+      },
+      "cashOnDelivery": {
+        "name": "Pago Contra Entrega",
+        "description": "Permite a los clientes pagar con efectivo cuando se entrega el pedido."
+      },
+      "bankTransfer": {
+        "name": "Transferencia Bancaria",
+        "description": "Permite a los clientes pagar mediante transferencia bancaria directa. Proporciona detalles de cuenta bancaria e instrucciones."
+      },
+      "mobileBankTransfer": {
+        "name": "Transferencia Bancaria Móvil",
+        "description": "Permite a los clientes pagar mediante transferencia bancaria móvil (SINPE Móvil en Costa Rica)."
+      },
+      "default": {
+        "description": "Configuración de método de pago"
       },
       "publishableKey": "Clave Pública",
       "secretKey": "Clave Secreta",
       "apiKey": "Clave API",
+      "clientId": "ID de Cliente",
+      "clientSecret": "Secreto de Cliente",
+      "bankName": "Nombre del Banco",
+      "accountNumber": "Número de Cuenta",
+      "accountHolder": "Titular de la Cuenta",
+      "instructions": "Instrucciones",
+      "mobilePhoneNumber": "Número de Teléfono Bancario Móvil",
+      "bankNamePlaceholder": "Nombre de su Banco",
+      "accountNumberPlaceholder": "1234567890",
+      "accountHolderPlaceholder": "Nombre del Titular de la Cuenta",
+      "bankTransferInstructionsPlaceholder": "Por favor transfiera el monto total e incluya su número de pedido.",
+      "mobilePhoneNumberPlaceholder": "+506 1234-5678",
+      "mobileBankTransferInstructionsPlaceholder": "Por favor transfiera vía banca móvil e incluya su número de pedido.",
       "showKeys": "Mostrar Claves",
       "hideKeys": "Ocultar Claves",
       "tilopaySupports": "TiloPay soporta pagos en CRC y USD para Costa Rica."
@@ -767,8 +835,21 @@
       }
     },
     "sections": {
+      "storeInformation": "Información de la Tienda",
+      "storeConfiguration": "Configuración de la Tienda",
+      "brandAssets": "Activos de Marca",
+      "colorScheme": "Esquema de Colores",
+      "typography": "Tipografía",
+      "paymentMethods": "Métodos de Pago",
       "inviteNewUser": "Invitar Nuevo Usuario",
-      "teamMembers": "Miembros del Equipo"
+      "teamMembers": "Miembros del Equipo",
+      "accountInformation": "Información de la Cuenta",
+      "dangerZone": "Zona de Peligro",
+      "availablePlugins": "Plugins Disponibles",
+      "passwordSecurity": "Contraseña y Seguridad",
+      "adminTheme": "Tema del Panel de Administración",
+      "storeTheme": "Tema de la Tienda Pública",
+      "heroBackground": "Fondo de la Sección Hero"
     },
     "header": {
       "visitStore": "Visitar Tienda",

@@ -99,7 +99,6 @@ export interface PaymentMethodConfig {
   enabled: boolean
   requiresKeys: boolean
   keys?: PaymentKeys
-  testMode?: boolean
   metadata?: Record<string, any>
   bankDetails?: BankDetails
   description?: string

@@ -56,6 +56,45 @@
     "searchLabel": "Search:",
     "all": "All"
   },
+  "header": {
+    "defaultStoreName": "Our Store",
+    "navigation": {
+      "products": "Products",
+      "featuredProducts": "Featured Products",
+      "featuredProductsDescription": "Discover our newest and most popular items.",
+      "loadingCategories": "Loading categories...",
+      "browseCategoryCollection": "Browse our {category} collection",
+      "viewAllProducts": "View All Products",
+      "browseCompleteCatalog": "Browse our complete product catalog",
+      "noCategoriesAvailable": "No categories available",
+      "about": "About"
+    },
+    "search": {
+      "search": "Search...",
+      "searchProducts": "Search products..."
+    }
+  },
+  "footer": {
+    "storeName": "Ecommerce Store",
+    "storeDescription": "Your one-stop shop for all your needs. Quality products, great prices, and exceptional service.",
+    "sections": {
+      "products": "Products",
+      "company": "Company",
+      "support": "Support"
+    },
+    "links": {
+      "electronics": "Electronics",
+      "clothing": "Clothing",
+      "homeGarden": "Home & Garden",
+      "about": "About",
+      "contact": "Contact",
+      "helpCenter": "Help Center",
+      "shippingInfo": "Shipping Info",
+      "returns": "Returns",
+      "systemStatus": "System Status"
+    },
+    "copyright": "© {year} {storeName}. All rights reserved."
+  },
   "navigation": {
     "dashboard": "Dashboard",
     "products": "Products",
@@ -181,21 +220,65 @@
       "uploadFavicon": "Upload Favicon"
     },
     "paymentMethods": {
-      "cashOnDelivery": {
-        "name": "Cash on Delivery",
-        "description": "Allow customers to pay when they receive their order"
+      "traditional": {
+        "name": "Traditional Card Form",
+        "description": "Basic card form for manual payment processing. Requires manual payment handling."
       },
       "stripe": {
         "name": "Stripe",
-        "description": "Accept credit cards and other payment methods with Stripe"
+        "description": "Accept credit cards, debit cards, and digital wallets with Stripe's secure payment processing."
       },
       "tilopay": {
         "name": "TiloPay",
-        "description": "Costa Rican payment gateway for local and international cards"
+        "description": "Accept payments via TiloPay gateway (Costa Rica). Supports CRC and USD currencies.",
+        "apiKeyPlaceholder": "TiloPay API Key",
+        "secretKeyPlaceholder": "TiloPay Secret Key"
+      },
+      "paypal": {
+        "name": "PayPal",
+        "description": "Accept PayPal payments and credit cards through PayPal's platform.",
+        "clientIdPlaceholder": "PayPal Client ID",
+        "clientSecretPlaceholder": "PayPal Client Secret"
+      },
+      "applePay": {
+        "name": "Apple Pay",
+        "description": "Accept Apple Pay payments on Safari and iOS devices."
+      },
+      "googlePay": {
+        "name": "Google Pay",
+        "description": "Accept Google Pay payments on supported browsers and Android devices."
+      },
+      "cashOnDelivery": {
+        "name": "Cash on Delivery",
+        "description": "Allow customers to pay with cash when the order is delivered."
+      },
+      "bankTransfer": {
+        "name": "Bank Transfer",
+        "description": "Allow customers to pay via direct bank transfer. Provide bank account details and instructions."
+      },
+      "mobileBankTransfer": {
+        "name": "Mobile Bank Transfer",
+        "description": "Allow customers to pay via mobile bank transfer (SINPE Móvil in Costa Rica)."
+      },
+      "default": {
+        "description": "Payment method configuration"
       },
       "publishableKey": "Publishable Key",
       "secretKey": "Secret Key",
       "apiKey": "API Key",
+      "clientId": "Client ID",
+      "clientSecret": "Client Secret",
+      "bankName": "Bank Name",
+      "accountNumber": "Account Number",
+      "accountHolder": "Account Holder",
+      "instructions": "Instructions",
+      "mobilePhoneNumber": "Mobile Bank Phone Number",
+      "bankNamePlaceholder": "Your Bank Name",
+      "accountNumberPlaceholder": "1234567890",
+      "accountHolderPlaceholder": "Account Holder Name",
+      "bankTransferInstructionsPlaceholder": "Please transfer the total amount and include your order number.",
+      "mobilePhoneNumberPlaceholder": "+1234567890",
+      "mobileBankTransferInstructionsPlaceholder": "Please transfer via mobile banking and include your order number.",
       "showKeys": "Show Keys",
       "hideKeys": "Hide Keys",
       "tilopaySupports": "TiloPay supports CRC and USD payments for Costa Rica."

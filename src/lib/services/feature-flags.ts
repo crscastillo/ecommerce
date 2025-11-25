@@ -378,7 +378,6 @@ export class FeatureFlagsService {
       secretKey?: string
       webhookSecret?: string
     }
-    testMode?: boolean
     metadata?: Record<string, any>
     bankDetails?: {
       bankName?: string
@@ -401,19 +400,25 @@ export class FeatureFlagsService {
     }
     
     const configurations = data?.map(flag => {
-      // Check if the flag is available for this tier
+      // Check if the flag is enabled and available for this tier
       const tierHasAccess = flag.target_tiers ? flag.target_tiers.includes(tier) : true
       
-      // Don't include payment methods that aren't available for this tier
-      if (!tierHasAccess) return null
+      // Don't include payment methods that are disabled or not available for this tier
+      if (!flag.enabled || !tierHasAccess) return null
       
       // Map feature keys to payment method configurations
       const baseConfig = {
-        enabled: false, // User hasn't configured it yet
-        testMode: true
+        enabled: false // User hasn't configured it yet
       }
       
       switch (flag.feature_key) {
+        case 'payment_method_traditional':
+          return {
+            id: 'traditional',
+            name: flag.feature_name,
+            ...baseConfig,
+            requiresKeys: false
+          }
         case 'payment_method_stripe':
           return {
             id: 'stripe',
@@ -476,6 +481,38 @@ export class FeatureFlagsService {
             bankDetails: {
               phoneNumber: '',
               instructions: ''
+            }
+          }
+        case 'payment_method_applepay':
+          return {
+            id: 'apple_pay',
+            name: flag.feature_name,
+            ...baseConfig,
+            requiresKeys: false,
+            metadata: {
+              description: 'Accept Apple Pay payments on Safari and iOS devices',
+              supportedDevices: ['iOS', 'macOS Safari']
+            }
+          }
+        case 'payment_method_googlepay':
+          return {
+            id: 'google_pay',
+            name: flag.feature_name,
+            ...baseConfig,
+            requiresKeys: false,
+            metadata: {
+              description: 'Accept Google Pay payments on supported browsers and Android devices',
+              supportedDevices: ['Android', 'Chrome', 'Edge']
+            }
+          }
+        case 'payment_method_cash_on_delivery':
+          return {
+            id: 'cash_on_delivery',
+            name: flag.feature_name,
+            ...baseConfig,
+            requiresKeys: false,
+            metadata: {
+              description: 'Allow customers to pay with cash when the order is delivered'
             }
           }
         default:

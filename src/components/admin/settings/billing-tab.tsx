@@ -45,68 +45,71 @@ interface BillingTabProps {
   saving?: boolean
 }
 
-const plans: Plan[] = [
+const getPlans = (t: any): Plan[] => [
   {
     id: 'starter',
-    name: 'Starter',
+    name: t('plans.starter.name'),
     price: 0,
     interval: 'month',
     stripePriceId: 'price_starter_free',
     icon: <Rocket className="h-6 w-6" />,
     features: [
-      'Up to 100 products',
-      'Basic store customization',
-      'Standard payment methods',
-      'Basic analytics',
-      'Email support'
+      t('plans.starter.feature1'),
+      t('plans.starter.feature2'),
+      t('plans.starter.feature3'),
+      t('plans.starter.feature4'),
+      t('plans.starter.feature5')
     ]
   },
   {
     id: 'pro',
-    name: 'Professional',
+    name: t('plans.pro.name'),
     price: 29,
     interval: 'month',
     stripePriceId: 'price_pro_monthly',
     icon: <Crown className="h-6 w-6" />,
     recommended: true,
     features: [
-      'Unlimited products',
-      'Advanced customization',
-      'All payment methods',
-      'Advanced analytics',
-      'WhatsApp integration',
-      'Low stock alerts',
-      'Priority support',
-      'Custom domain'
+      t('plans.pro.feature1'),
+      t('plans.pro.feature2'),
+      t('plans.pro.feature3'),
+      t('plans.pro.feature4'),
+      t('plans.pro.feature5'),
+      t('plans.pro.feature6'),
+      t('plans.pro.feature7'),
+      t('plans.pro.feature8')
     ]
   },
   {
     id: 'enterprise',
-    name: 'Enterprise',
+    name: t('plans.enterprise.name'),
     price: 99,
     interval: 'month',
     stripePriceId: 'price_enterprise_monthly',
     icon: <Zap className="h-6 w-6" />,
     features: [
-      'Everything in Professional',
-      'Multi-store management',
-      'Advanced integrations',
-      'Custom plugins',
-      'Dedicated support',
-      'SLA guarantee',
-      'Advanced reporting',
-      'White-label solution'
+      t('plans.enterprise.feature1'),
+      t('plans.enterprise.feature2'),
+      t('plans.enterprise.feature3'),
+      t('plans.enterprise.feature4'),
+      t('plans.enterprise.feature5'),
+      t('plans.enterprise.feature6'),
+      t('plans.enterprise.feature7'),
+      t('plans.enterprise.feature8')
     ]
   }
 ]
 
 export function BillingTab({ saving = false }: BillingTabProps) {
   const t = useTranslations('settings')
+  const tb = useTranslations('settings.billing')
   const { tenant } = useTenant()
   const [subscription, setSubscription] = useState<Subscription | null>(null)
   const [loading, setLoading] = useState(true)
   const [upgrading, setUpgrading] = useState(false)
   const [selectedPlan, setSelectedPlan] = useState<string>('')
+  
+  const plans = getPlans(tb)
 
   useEffect(() => {
     if (tenant) {
@@ -143,7 +146,7 @@ export function BillingTab({ saving = false }: BillingTabProps) {
     setSelectedPlan(planId)
 
     try {
-      const plan = plans.find(p => p.id === planId)
+      const plan = plans.find((p: Plan) => p.id === planId)
       if (!plan) throw new Error('Plan not found')
 
       // Free plan - no payment needed
@@ -180,7 +183,7 @@ export function BillingTab({ saving = false }: BillingTabProps) {
 
     } catch (error) {
       console.error('Error upgrading plan:', error)
-      alert('Failed to process upgrade. Please try again.')
+      alert(tb('upgradeError') || 'Failed to process upgrade. Please try again.')
     } finally {
       setUpgrading(false)
       setSelectedPlan('')
@@ -209,9 +212,7 @@ export function BillingTab({ saving = false }: BillingTabProps) {
   const cancelSubscription = async () => {
     if (!subscription) return
 
-    if (confirm(t('billing.cancelConfirmation', { 
-      defaultMessage: 'Are you sure you want to cancel your subscription? You will lose access to premium features at the end of your billing period.' 
-    }))) {
+    if (confirm(tb('cancelConfirmation'))) {
       try {
         await fetch('/api/billing/cancel-subscription', {
           method: 'POST',
@@ -226,16 +227,14 @@ export function BillingTab({ saving = false }: BillingTabProps) {
         await loadSubscription()
       } catch (error) {
         console.error('Error canceling subscription:', error)
-        alert(t('billing.cancelError', { 
-          defaultMessage: 'Failed to cancel subscription. Please contact support.' 
-        }))
+        alert(tb('cancelError'))
       }
     }
   }
 
   const getCurrentPlan = () => {
     const planId = tenant?.subscription_tier || (tenant?.settings as any)?.plan || 'starter'
-    return plans.find(p => p.id === planId) || plans[0]
+    return plans.find((p: Plan) => p.id === planId) || plans[0]
   }
 
   const formatDate = (dateString: string) => {
@@ -270,7 +269,7 @@ export function BillingTab({ saving = false }: BillingTabProps) {
         <CardHeader>
           <CardTitle className="flex items-center">
             <CreditCard className="h-5 w-5 mr-2" />
-            {t('billing.currentPlan', { defaultMessage: 'Current Plan' })}
+            {tb('currentPlan')}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -282,7 +281,7 @@ export function BillingTab({ saving = false }: BillingTabProps) {
               <div>
                 <h3 className="font-medium text-lg">{currentPlan.name}</h3>
                 <p className="text-gray-600">
-                  ${currentPlan.price}/{currentPlan.interval}
+                  ${currentPlan.price}/{tb(`intervals.${currentPlan.interval}`)}
                 </p>
               </div>
             </div>
@@ -297,15 +296,15 @@ export function BillingTab({ saving = false }: BillingTabProps) {
                   </Badge>
                   <p className="text-sm text-gray-600">
                     {subscription.cancel_at_period_end 
-                      ? t('billing.cancelsOn', { defaultMessage: 'Cancels on' })
-                      : t('billing.renewsOn', { defaultMessage: 'Renews on' })
+                      ? tb('cancelsOn')
+                      : tb('renewsOn')
                     }{' '}
                     {formatDate(subscription.current_period_end)}
                   </p>
                 </div>
               ) : (
                 <Badge variant="outline">
-                  {t('billing.freePlan', { defaultMessage: 'Free Plan' })}
+                  {tb('freePlan')}
                 </Badge>
               )}
             </div>
@@ -318,16 +317,12 @@ export function BillingTab({ saving = false }: BillingTabProps) {
                   {subscription.cancel_at_period_end ? (
                     <span className="flex items-center text-orange-600">
                       <AlertTriangle className="h-4 w-4 mr-1" />
-                      {t('billing.subscriptionWillCancel', { 
-                        defaultMessage: 'Subscription will cancel at period end' 
-                      })}
+                      {tb('subscriptionWillCancel')}
                     </span>
                   ) : (
                     <span className="flex items-center text-green-600">
                       <CheckCircle className="h-4 w-4 mr-1" />
-                      {t('billing.activeSubscription', { 
-                        defaultMessage: 'Active subscription' 
-                      })}
+                      {tb('activeSubscription')}
                     </span>
                   )}
                 </span>
@@ -338,9 +333,7 @@ export function BillingTab({ saving = false }: BillingTabProps) {
                     onClick={cancelSubscription}
                     disabled={saving}
                   >
-                    {t('billing.cancelSubscription', { 
-                      defaultMessage: 'Cancel Subscription' 
-                    })}
+                    {tb('cancelSubscription')}
                   </Button>
                 )}
               </div>
@@ -352,10 +345,10 @@ export function BillingTab({ saving = false }: BillingTabProps) {
       {/* Available Plans */}
       <div>
         <h2 className="text-xl font-semibold mb-6">
-          {t('billing.choosePlan', { defaultMessage: 'Choose Your Plan' })}
+          {tb('choosePlan')}
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {plans.map((plan) => {
+          {plans.map((plan: Plan) => {
             const isCurrentPlan = plan.id === currentPlan.id
             const isUpgrade = plan.price > currentPlan.price
 
@@ -369,7 +362,7 @@ export function BillingTab({ saving = false }: BillingTabProps) {
                 {plan.recommended && (
                   <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
                     <Badge className="bg-blue-500">
-                      {t('billing.recommended', { defaultMessage: 'Recommended' })}
+                      {tb('recommended')}
                     </Badge>
                   </div>
                 )}
@@ -386,13 +379,13 @@ export function BillingTab({ saving = false }: BillingTabProps) {
                   <CardTitle className="text-xl">{plan.name}</CardTitle>
                   <div className="text-3xl font-bold">
                     ${plan.price}
-                    <span className="text-lg font-normal text-gray-600">/{plan.interval}</span>
+                    <span className="text-lg font-normal text-gray-600">/{tb(`intervals.${plan.interval}`)}</span>
                   </div>
                 </CardHeader>
 
                 <CardContent>
                   <ul className="space-y-3 mb-6">
-                    {plan.features.map((feature, index) => (
+                    {plan.features.map((feature: string, index: number) => (
                       <li key={index} className="flex items-center">
                         <Check className="h-4 w-4 text-green-500 mr-2 flex-shrink-0" />
                         <span className="text-sm">{feature}</span>
@@ -407,13 +400,13 @@ export function BillingTab({ saving = false }: BillingTabProps) {
                     onClick={() => handleUpgrade(plan.id)}
                   >
                     {upgrading && selectedPlan === plan.id ? (
-                      t('billing.processing', { defaultMessage: 'Processing...' })
+                      tb('processing')
                     ) : isCurrentPlan ? (
-                      t('billing.currentPlan', { defaultMessage: 'Current Plan' })
+                      tb('currentPlan')
                     ) : isUpgrade ? (
-                      t('billing.upgradeNow', { defaultMessage: 'Upgrade Now' })
+                      tb('upgradeNow')
                     ) : (
-                      t('billing.downgrade', { defaultMessage: 'Downgrade' })
+                      tb('downgrade')
                     )}
                   </Button>
                 </CardContent>
@@ -428,7 +421,7 @@ export function BillingTab({ saving = false }: BillingTabProps) {
         <Card>
           <CardHeader>
             <CardTitle>
-              {t('billing.billingInformation', { defaultMessage: 'Billing Information' })}
+              {tb('billingInformation')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -436,7 +429,7 @@ export function BillingTab({ saving = false }: BillingTabProps) {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label className="text-sm text-gray-600">
-                    {t('billing.billingPeriod', { defaultMessage: 'Billing Period' })}
+                    {tb('billingPeriod')}
                   </Label>
                   <p className="font-medium">
                     {formatDate(subscription.current_period_start)} - {formatDate(subscription.current_period_end)}
@@ -444,11 +437,11 @@ export function BillingTab({ saving = false }: BillingTabProps) {
                 </div>
                 <div>
                   <Label className="text-sm text-gray-600">
-                    {t('billing.nextPayment', { defaultMessage: 'Next Payment' })}
+                    {tb('nextPayment')}
                   </Label>
                   <p className="font-medium">
                     {subscription.cancel_at_period_end 
-                      ? t('billing.cancelled', { defaultMessage: 'N/A (Cancelled)' })
+                      ? tb('cancelled')
                       : formatDate(subscription.current_period_end)
                     }
                   </p>
@@ -459,14 +452,10 @@ export function BillingTab({ saving = false }: BillingTabProps) {
               
               <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-600">
-                  {t('billing.updatePaymentMethod', { 
-                    defaultMessage: 'Need to update your payment method?' 
-                  })}
+                  {tb('updatePaymentMethod')}
                 </span>
                 <Button variant="outline" size="sm" disabled={saving}>
-                  {t('billing.managePaymentMethods', { 
-                    defaultMessage: 'Manage Payment Methods' 
-                  })}
+                  {tb('managePaymentMethods')}
                 </Button>
               </div>
             </div>
@@ -478,44 +467,32 @@ export function BillingTab({ saving = false }: BillingTabProps) {
       <Card>
         <CardHeader>
           <CardTitle>
-            {t('billing.faq', { defaultMessage: 'Frequently Asked Questions' })}
+            {tb('faq')}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
             <h4 className="font-medium">
-              {t('billing.faqChangePlans', { 
-                defaultMessage: 'Can I change plans anytime?' 
-              })}
+              {tb('faqChangePlans')}
             </h4>
             <p className="text-sm text-gray-600">
-              {t('billing.faqChangePlansAnswer', { 
-                defaultMessage: 'Yes, you can upgrade or downgrade your plan at any time. Changes will be prorated.' 
-              })}
+              {tb('faqChangePlansAnswer')}
             </p>
           </div>
           <div>
             <h4 className="font-medium">
-              {t('billing.faqCancel', { 
-                defaultMessage: 'What happens if I cancel?' 
-              })}
+              {tb('faqCancel')}
             </h4>
             <p className="text-sm text-gray-600">
-              {t('billing.faqCancelAnswer', { 
-                defaultMessage: "You'll retain access to paid features until the end of your billing period, then automatically downgrade to the free plan." 
-              })}
+              {tb('faqCancelAnswer')}
             </p>
           </div>
           <div>
             <h4 className="font-medium">
-              {t('billing.faqRefunds', { 
-                defaultMessage: 'Do you offer refunds?' 
-              })}
+              {tb('faqRefunds')}
             </h4>
             <p className="text-sm text-gray-600">
-              {t('billing.faqRefundsAnswer', { 
-                defaultMessage: 'We offer a 30-day money-back guarantee for new subscriptions. Contact support for assistance.' 
-              })}
+              {tb('faqRefundsAnswer')}
             </p>
           </div>
         </CardContent>

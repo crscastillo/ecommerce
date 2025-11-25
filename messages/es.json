@@ -821,7 +821,44 @@
       "faqCancel": "¿Qué pasa si cancelo?",
       "faqCancelAnswer": "Mantendrás acceso a las funciones pagas hasta el final de tu período de facturación, luego se degradará automáticamente al plan gratuito.",
       "faqRefunds": "¿Ofrecen reembolsos?",
-      "faqRefundsAnswer": "Ofrecemos una garantía de devolución de dinero de 30 días para nuevas suscripciones. Contacta soporte para asistencia."
+      "faqRefundsAnswer": "Ofrecemos una garantía de devolución de dinero de 30 días para nuevas suscripciones. Contacta soporte para asistencia.",
+      "upgradeError": "Error al procesar la actualización. Por favor inténtalo de nuevo.",
+      "intervals": {
+        "month": "mes",
+        "year": "año"
+      },
+      "plans": {
+        "starter": {
+          "name": "Principiante",
+          "feature1": "Hasta 100 productos",
+          "feature2": "Personalización básica de tienda",
+          "feature3": "Métodos de pago estándar",
+          "feature4": "Analíticas básicas",
+          "feature5": "Soporte por email"
+        },
+        "pro": {
+          "name": "Profesional",
+          "feature1": "Productos ilimitados",
+          "feature2": "Personalización avanzada",
+          "feature3": "Todos los métodos de pago",
+          "feature4": "Analíticas avanzadas",
+          "feature5": "Integración WhatsApp",
+          "feature6": "Alertas de stock bajo",
+          "feature7": "Soporte prioritario",
+          "feature8": "Dominio personalizado"
+        },
+        "enterprise": {
+          "name": "Empresarial",
+          "feature1": "Todo en Profesional",
+          "feature2": "Gestión multi-tienda",
+          "feature3": "Integraciones avanzadas",
+          "feature4": "Plugins personalizados",
+          "feature5": "Soporte dedicado",
+          "feature6": "Garantía SLA",
+          "feature7": "Reportes avanzados",
+          "feature8": "Solución marca blanca"
+        }
+      }
     },
     "messages": {
       "storeSettingsSaved": "¡Configuración de tienda guardada exitosamente!",

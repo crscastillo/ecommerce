@@ -369,9 +369,23 @@
       "configurationSaved": "Configuration saved successfully!",
       "themeSettingsSaved": "Theme settings saved successfully!",
       "paymentSettingsSaved": "Payment settings saved successfully!",
+      "domainUpdated": "Domain settings updated successfully!",
       "failedToSaveStore": "Failed to save store settings",
       "failedToSaveTheme": "Failed to save theme settings",
       "failedToSavePayments": "Failed to save payment settings"
+    },
+    "domain": {
+      "title": "Domain Settings",
+      "description": "Configure how customers access your store",
+      "currentSubdomain": "Current Subdomain",
+      "customDomain": "Custom Domain",
+      "currentCustomDomain": "Current Custom Domain",
+      "custom": "Custom",
+      "invalidFormat": "Please enter a valid domain format",
+      "dnsInstructions": "DNS Configuration",
+      "dnsTitle": "Configure your DNS records",
+      "dnsDescription": "To use a custom domain, add these DNS records to your domain provider:",
+      "dnsNote": "DNS changes can take up to 48 hours to propagate worldwide."
     },
     "users": {
       "inviteEmail": "Enter email address",

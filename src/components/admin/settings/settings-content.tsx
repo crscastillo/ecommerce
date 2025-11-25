@@ -37,7 +37,7 @@ import {
   UsersTab,
   SecurityTab
 } from '@/components/admin/settings'
-import { BillingTab } from '@/components/admin/settings/billing-tab'
+import { DomainSettings } from '@/components/admin/settings/domain-settings'
 import { SettingsMessage } from '@/components/admin/settings/settings-message'
 import { useSettings } from '@/lib/contexts/settings-context'
 
@@ -90,6 +90,32 @@ export function SettingsContent({ tenant, searchParams, router }: SettingsConten
       setActiveTab(tabFromUrl)
     }
   }, [mounted, searchParams])
+
+  const handleDomainUpdate = async (domain: string | null) => {
+    try {
+      setSaving(true)
+      
+      const response = await fetch('/api/tenant/domain', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ domain }),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to update domain')
+      }
+
+      showSuccess(t('messages.domainUpdated'))
+    } catch (error) {
+      console.error('Error updating domain:', error)
+      showError(error instanceof Error ? error.message : 'Failed to update domain')
+    } finally {
+      setSaving(false)
+    }
+  }
 
   const handlePasswordReset = async () => {
     try {
@@ -263,6 +289,11 @@ export function SettingsContent({ tenant, searchParams, router }: SettingsConten
             settings={storeSettings.settings}
             onSettingsChange={storeSettings.setSettings}
             onSave={storeSettings.saveSettings}
+            saving={state.saving}
+          />
+          
+          <DomainSettings
+            onSave={handleDomainUpdate}
             saving={state.saving}
           />
         </TabsContent>

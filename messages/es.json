@@ -610,21 +610,65 @@
       "uploadFavicon": "Subir Favicon"
     },
     "paymentMethods": {
-      "cashOnDelivery": {
-        "name": "Pago Contra Entrega",
-        "description": "Permitir a los clientes pagar cuando reciban su pedido"
+      "traditional": {
+        "name": "Formulario de Tarjeta Tradicional",
+        "description": "Formulario básico de tarjeta para procesamiento manual de pagos. Requiere manejo manual de pagos."
       },
       "stripe": {
         "name": "Stripe",
-        "description": "Acepte tarjetas de crédito y otros métodos de pago con Stripe"
+        "description": "Acepta tarjetas de crédito, débito y billeteras digitales con el procesamiento seguro de Stripe."
       },
       "tilopay": {
         "name": "TiloPay",
-        "description": "Pasarela de pagos costarricense para tarjetas locales e internacionales"
+        "description": "Acepta pagos a través de la pasarela TiloPay (Costa Rica). Soporta monedas CRC y USD.",
+        "apiKeyPlaceholder": "Clave API de TiloPay",
+        "secretKeyPlaceholder": "Clave Secreta de TiloPay"
+      },
+      "paypal": {
+        "name": "PayPal",
+        "description": "Acepta pagos de PayPal y tarjetas de crédito a través de la plataforma PayPal.",
+        "clientIdPlaceholder": "ID de Cliente PayPal",
+        "clientSecretPlaceholder": "Secreto de Cliente PayPal"
+      },
+      "applePay": {
+        "name": "Apple Pay",
+        "description": "Acepta pagos de Apple Pay en Safari y dispositivos iOS."
+      },
+      "googlePay": {
+        "name": "Google Pay",
+        "description": "Acepta pagos de Google Pay en navegadores compatibles y dispositivos Android."
+      },
+      "cashOnDelivery": {
+        "name": "Pago Contra Entrega",
+        "description": "Permite a los clientes pagar con efectivo cuando se entrega el pedido."
+      },
+      "bankTransfer": {
+        "name": "Transferencia Bancaria",
+        "description": "Permite a los clientes pagar mediante transferencia bancaria directa. Proporciona detalles de cuenta bancaria e instrucciones."
+      },
+      "mobileBankTransfer": {
+        "name": "Transferencia Bancaria Móvil",
+        "description": "Permite a los clientes pagar mediante transferencia bancaria móvil (SINPE Móvil en Costa Rica)."
+      },
+      "default": {
+        "description": "Configuración de método de pago"
       },
       "publishableKey": "Clave Pública",
       "secretKey": "Clave Secreta",
       "apiKey": "Clave API",
+      "clientId": "ID de Cliente",
+      "clientSecret": "Secreto de Cliente",
+      "bankName": "Nombre del Banco",
+      "accountNumber": "Número de Cuenta",
+      "accountHolder": "Titular de la Cuenta",
+      "instructions": "Instrucciones",
+      "mobilePhoneNumber": "Número de Teléfono Bancario Móvil",
+      "bankNamePlaceholder": "Nombre de su Banco",
+      "accountNumberPlaceholder": "1234567890",
+      "accountHolderPlaceholder": "Nombre del Titular de la Cuenta",
+      "bankTransferInstructionsPlaceholder": "Por favor transfiera el monto total e incluya su número de pedido.",
+      "mobilePhoneNumberPlaceholder": "+506 1234-5678",
+      "mobileBankTransferInstructionsPlaceholder": "Por favor transfiera vía banca móvil e incluya su número de pedido.",
       "showKeys": "Mostrar Claves",
       "hideKeys": "Ocultar Claves",
       "tilopaySupports": "TiloPay soporta pagos en CRC y USD para Costa Rica."

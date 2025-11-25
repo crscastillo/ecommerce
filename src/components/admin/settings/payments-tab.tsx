@@ -87,18 +87,19 @@ export function PaymentsTab({
             }
 
             const getDescription = (methodId: string) => {
-              switch (methodId) {
-                case 'traditional': return 'Accept traditional card payments and cash on delivery'
-                case 'stripe': return 'Accept credit cards and digital wallets via Stripe'
-                case 'tilopay': return 'Accept payments via TiloPay gateway (Costa Rica)'
-                case 'paypal': return 'Accept PayPal payments and credit cards'
-                case 'apple_pay': return 'Accept Apple Pay payments on Safari and iOS devices'
-                case 'google_pay': return 'Accept Google Pay payments on supported browsers'
-                case 'bank_transfer': return 'Allow customers to pay via direct bank transfer'
-                case 'mobile_bank_transfer': return 'Allow customers to pay via mobile bank transfer'
-                case 'cash_on_delivery': return 'Allow customers to pay with cash when order is delivered'
-                default: return 'Payment method configuration'
-              }
+              const keyMap: Record<string, string> = {
+                'traditional': 'traditional',
+                'stripe': 'stripe', 
+                'tilopay': 'tilopay',
+                'paypal': 'paypal',
+                'apple_pay': 'applePay',
+                'google_pay': 'googlePay',
+                'cash_on_delivery': 'cashOnDelivery',
+                'bank_transfer': 'bankTransfer',
+                'mobile_bank_transfer': 'mobileBankTransfer'
+              };
+              const translationKey = keyMap[methodId];
+              return translationKey ? t(`paymentMethods.${translationKey}.description`) : t('paymentMethods.default.description');
             }
 
             return (
@@ -112,8 +113,30 @@ export function PaymentsTab({
                     </div>
                     <div>
                       <h3 className="font-medium flex items-center gap-2">
-                        {method.name}
-                        {method.enabled && <Badge variant="default">Enabled</Badge>}
+                        {(() => {
+                          const keyMap: Record<string, string> = {
+                            'traditional': 'traditional',
+                            'stripe': 'stripe', 
+                            'tilopay': 'tilopay',
+                            'paypal': 'paypal',
+                            'apple_pay': 'applePay',
+                            'google_pay': 'googlePay',
+                            'cash_on_delivery': 'cashOnDelivery',
+                            'bank_transfer': 'bankTransfer',
+                            'mobile_bank_transfer': 'mobileBankTransfer'
+                          };
+                          const translationKey = keyMap[method.id];
+                          if (translationKey) {
+                            const translatedName = t(`paymentMethods.${translationKey}.name`);
+                            // If translation returns the key itself, it means it wasn't found
+                            if (translatedName === `paymentMethods.${translationKey}.name`) {
+                              return method.name;
+                            }
+                            return translatedName;
+                          }
+                          return method.name;
+                        })()}
+                        {method.enabled && <Badge variant="default">{tCommon('active')}</Badge>}
                         {(method.id === 'stripe' || method.id === 'tilopay') && (
                           <Badge className={`text-xs ${getBadgeColor(method.id)}`}>Pro+</Badge>
                         )}
@@ -136,7 +159,7 @@ export function PaymentsTab({
                       {method.id === 'stripe' && (
                         <>
                           <div>
-                            <Label htmlFor={`${method.id}-pk`} className="text-sm">Publishable Key</Label>
+                            <Label htmlFor={`${method.id}-pk`} className="text-sm">{t('paymentMethods.publishableKey')}</Label>
                             <Input
                               id={`${method.id}-pk`}
                               value={method.keys?.publishableKey || ''}
@@ -146,7 +169,7 @@ export function PaymentsTab({
                             />
                           </div>
                           <div>
-                            <Label htmlFor={`${method.id}-sk`} className="text-sm">Secret Key</Label>
+                            <Label htmlFor={`${method.id}-sk`} className="text-sm">{t('paymentMethods.secretKey')}</Label>
                             <div className="relative">
                               <Input
                                 id={`${method.id}-sk`}
@@ -177,17 +200,17 @@ export function PaymentsTab({
                       {method.id === 'tilopay' && (
                         <>
                           <div>
-                            <Label htmlFor={`${method.id}-api`} className="text-sm">API Key</Label>
+                            <Label htmlFor={`${method.id}-api`} className="text-sm">{t('paymentMethods.apiKey')}</Label>
                             <Input
                               id={`${method.id}-api`}
                               value={method.keys?.publishableKey || ''}
                               onChange={(e) => updatePaymentMethodKey(method.id, 'publishableKey', e.target.value)}
-                              placeholder="TiloPay API Key"
+                              placeholder={t('paymentMethods.tilopay.apiKeyPlaceholder')}
                               className="font-mono text-sm"
                             />
                           </div>
                           <div>
-                            <Label htmlFor={`${method.id}-secret`} className="text-sm">Secret Key</Label>
+                            <Label htmlFor={`${method.id}-secret`} className="text-sm">{t('paymentMethods.secretKey')}</Label>
                             <div className="relative">
                               <Input
                                 id={`${method.id}-secret`}
@@ -218,17 +241,17 @@ export function PaymentsTab({
                       {method.id === 'paypal' && (
                         <>
                           <div>
-                            <Label htmlFor={`${method.id}-client`} className="text-sm">Client ID</Label>
+                            <Label htmlFor={`${method.id}-client`} className="text-sm">{t('paymentMethods.clientId')}</Label>
                             <Input
                               id={`${method.id}-client`}
                               value={method.keys?.publishableKey || ''}
                               onChange={(e) => updatePaymentMethodKey(method.id, 'publishableKey', e.target.value)}
-                              placeholder="PayPal Client ID"
+                              placeholder={t('paymentMethods.paypal.clientIdPlaceholder')}
                               className="font-mono text-sm"
                             />
                           </div>
                           <div>
-                            <Label htmlFor={`${method.id}-secret`} className="text-sm">Client Secret</Label>
+                            <Label htmlFor={`${method.id}-secret`} className="text-sm">{t('paymentMethods.clientSecret')}</Label>
                             <div className="relative">
                               <Input
                                 id={`${method.id}-secret`}
@@ -264,50 +287,50 @@ export function PaymentsTab({
                   <div className="px-4 pb-4 space-y-4 border-t bg-gray-50">
                     <div className="space-y-3 pt-4">
                       <div>
-                        <Label htmlFor="bank-name" className="text-sm">Bank Name</Label>
+                        <Label htmlFor="bank-name" className="text-sm">{t('paymentMethods.bankName')}</Label>
                         <Input
                           id="bank-name"
                           value={method.bankDetails?.bankName || ''}
                           onChange={(e) => updatePaymentMethod(method.id, {
                             bankDetails: { ...method.bankDetails, bankName: e.target.value }
                           })}
-                          placeholder="Your Bank Name"
+                          placeholder={t('paymentMethods.bankNamePlaceholder')}
                           className="text-sm"
                         />
                       </div>
                       <div>
-                        <Label htmlFor="account-number" className="text-sm">Account Number</Label>
+                        <Label htmlFor="account-number" className="text-sm">{t('paymentMethods.accountNumber')}</Label>
                         <Input
                           id="account-number"
                           value={method.bankDetails?.accountNumber || ''}
                           onChange={(e) => updatePaymentMethod(method.id, {
                             bankDetails: { ...method.bankDetails, accountNumber: e.target.value }
                           })}
-                          placeholder="1234567890"
+                          placeholder={t('paymentMethods.accountNumberPlaceholder')}
                           className="text-sm"
                         />
                       </div>
                       <div>
-                        <Label htmlFor="account-holder" className="text-sm">Account Holder</Label>
+                        <Label htmlFor="account-holder" className="text-sm">{t('paymentMethods.accountHolder')}</Label>
                         <Input
                           id="account-holder"
                           value={method.bankDetails?.accountHolder || ''}
                           onChange={(e) => updatePaymentMethod(method.id, {
                             bankDetails: { ...method.bankDetails, accountHolder: e.target.value }
                           })}
-                          placeholder="Account Holder Name"
+                          placeholder={t('paymentMethods.accountHolderPlaceholder')}
                           className="text-sm"
                         />
                       </div>
                       <div>
-                        <Label htmlFor="bank-instructions" className="text-sm">Instructions</Label>
+                        <Label htmlFor="bank-instructions" className="text-sm">{t('paymentMethods.instructions')}</Label>
                         <Input
                           id="bank-instructions"
                           value={method.bankDetails?.instructions || ''}
                           onChange={(e) => updatePaymentMethod(method.id, {
                             bankDetails: { ...method.bankDetails, instructions: e.target.value }
                           })}
-                          placeholder="Please transfer the total amount and include your order number."
+                          placeholder={t('paymentMethods.bankTransferInstructionsPlaceholder')}
                           className="text-sm"
                         />
                       </div>
@@ -320,26 +343,26 @@ export function PaymentsTab({
                   <div className="px-4 pb-4 space-y-4 border-t bg-gray-50">
                     <div className="space-y-3 pt-4">
                       <div>
-                        <Label htmlFor="mobile-bank-phone" className="text-sm">Mobile Bank Phone Number</Label>
+                        <Label htmlFor="mobile-bank-phone" className="text-sm">{t('paymentMethods.mobilePhoneNumber')}</Label>
                         <Input
                           id="mobile-bank-phone"
                           value={method.bankDetails?.phoneNumber || ''}
                           onChange={(e) => updatePaymentMethod(method.id, {
                             bankDetails: { ...method.bankDetails, phoneNumber: e.target.value }
                           })}
-                          placeholder="+1234567890"
+                          placeholder={t('paymentMethods.mobilePhoneNumberPlaceholder')}
                           className="text-sm"
                         />
                       </div>
                       <div>
-                        <Label htmlFor="mobile-bank-instructions" className="text-sm">Instructions</Label>
+                        <Label htmlFor="mobile-bank-instructions" className="text-sm">{t('paymentMethods.instructions')}</Label>
                         <Input
                           id="mobile-bank-instructions"
                           value={method.bankDetails?.instructions || ''}
                           onChange={(e) => updatePaymentMethod(method.id, {
                             bankDetails: { ...method.bankDetails, instructions: e.target.value }
                           })}
-                          placeholder="Please transfer via mobile banking and include your order number."
+                          placeholder={t('paymentMethods.mobileBankTransferInstructionsPlaceholder')}
                           className="text-sm"
                         />
                       </div>

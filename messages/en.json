@@ -362,7 +362,44 @@
       "faqCancel": "What happens if I cancel?",
       "faqCancelAnswer": "You'll retain access to paid features until the end of your billing period, then automatically downgrade to the free plan.",
       "faqRefunds": "Do you offer refunds?",
-      "faqRefundsAnswer": "We offer a 30-day money-back guarantee for new subscriptions. Contact support for assistance."
+      "faqRefundsAnswer": "We offer a 30-day money-back guarantee for new subscriptions. Contact support for assistance.",
+      "upgradeError": "Failed to process upgrade. Please try again.",
+      "intervals": {
+        "month": "month",
+        "year": "year"
+      },
+      "plans": {
+        "starter": {
+          "name": "Starter",
+          "feature1": "Up to 100 products",
+          "feature2": "Basic store customization",
+          "feature3": "Standard payment methods",
+          "feature4": "Basic analytics",
+          "feature5": "Email support"
+        },
+        "pro": {
+          "name": "Professional",
+          "feature1": "Unlimited products",
+          "feature2": "Advanced customization",
+          "feature3": "All payment methods",
+          "feature4": "Advanced analytics",
+          "feature5": "WhatsApp integration",
+          "feature6": "Low stock alerts",
+          "feature7": "Priority support",
+          "feature8": "Custom domain"
+        },
+        "enterprise": {
+          "name": "Enterprise",
+          "feature1": "Everything in Professional",
+          "feature2": "Multi-store management",
+          "feature3": "Advanced integrations",
+          "feature4": "Custom plugins",
+          "feature5": "Dedicated support",
+          "feature6": "SLA guarantee",
+          "feature7": "Advanced reporting",
+          "feature8": "White-label solution"
+        }
+      }
     },
     "messages": {
       "storeSettingsSaved": "Store settings saved successfully!",

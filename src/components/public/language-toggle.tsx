@@ -16,6 +16,7 @@ export function PublicLanguageToggle() {
 
   const toggleLanguage = () => {
     const newLocale = locale === 'es' ? 'en' : 'es'
+
     setLocale(newLocale)
   }
 
@@ -29,7 +30,7 @@ export function PublicLanguageToggle() {
     >
       <Globe className="h-4 w-4" />
       <span className="text-sm font-medium">
-        {locale === 'es' ? 'EN' : 'ES'}
+        {locale === 'es' ? 'ES' : 'EN'}
       </span>
     </Button>
   )

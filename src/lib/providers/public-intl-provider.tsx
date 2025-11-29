@@ -28,6 +28,7 @@ export function PublicIntlProvider({ children }: Props) {
   // Get messages for the current locale, fallback to Spanish (default)
   const messages = messagesMap[locale] || messagesMap.es
 
+
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
       {children}

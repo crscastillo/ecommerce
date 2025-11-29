@@ -4,52 +4,55 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { CheckCircle } from "lucide-react"
+import { useTranslations } from "next-intl"
 import Link from "next/link"
 
 export function PricingSection() {
+  const tPricing = useTranslations('homepage.pricing')
+  
   return (
     <section id="pricing" className="py-24 bg-gradient-to-b from-gray-50 to-white">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <Badge className="mb-4 bg-green-100 text-green-700 border-green-200">
-            PRICING
+            {tPricing('badge')}
           </Badge>
           <h2 className="text-3xl md:text-5xl font-bold mb-6 text-gray-900">
-            Simple, Transparent Pricing
+            {tPricing('title')}
           </h2>
-          <p className="text-xl text-gray-600">Choose the perfect plan for your business needs</p>
+          <p className="text-xl text-gray-600">{tPricing('subtitle')}</p>
         </div>
 
         <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
           <Card className="hover:shadow-2xl transition-all duration-300">
             <CardHeader className="text-center pb-8">
-              <CardTitle className="text-2xl mb-2">Starter</CardTitle>
+              <CardTitle className="text-2xl mb-2">{tPricing('starter.name')}</CardTitle>
               <div className="mb-2">
-                <span className="text-5xl font-bold text-gray-900">Free</span>
+                <span className="text-5xl font-bold text-gray-900">{tPricing('starter.price')}</span>
               </div>
-              <CardDescription className="text-base">Perfect for getting started</CardDescription>
+              <CardDescription className="text-base">{tPricing('starter.description')}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <ul className="space-y-4">
                 <li className="flex items-start">
                   <CheckCircle className="w-5 h-5 text-green-600 mr-3 mt-0.5 flex-shrink-0" />
-                  <span className="text-gray-700">Up to 10 products</span>
+                  <span className="text-gray-700">{tPricing('starter.features.feature1')}</span>
                 </li>
                 <li className="flex items-start">
                   <CheckCircle className="w-5 h-5 text-green-600 mr-3 mt-0.5 flex-shrink-0" />
-                  <span className="text-gray-700">Free subdomain</span>
+                  <span className="text-gray-700">{tPricing('starter.features.feature2')}</span>
                 </li>
                 <li className="flex items-start">
                   <CheckCircle className="w-5 h-5 text-green-600 mr-3 mt-0.5 flex-shrink-0" />
-                  <span className="text-gray-700">Basic themes</span>
+                  <span className="text-gray-700">{tPricing('starter.features.feature3')}</span>
                 </li>
                 <li className="flex items-start">
                   <CheckCircle className="w-5 h-5 text-green-600 mr-3 mt-0.5 flex-shrink-0" />
-                  <span className="text-gray-700">Email support</span>
+                  <span className="text-gray-700">{tPricing('starter.features.feature4')}</span>
                 </li>
               </ul>
               <Button className="w-full h-12 text-base" variant="outline" asChild>
-                <Link href="/signup">Get Started Free</Link>
+                <Link href="/signup">{tPricing('starter.cta')}</Link>
               </Button>
             </CardContent>
           </Card>
@@ -57,80 +60,80 @@ export function PricingSection() {
           <Card className="border-2 border-blue-500 shadow-2xl relative scale-105 hover:scale-110 transition-all duration-300">
             <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
               <Badge className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-1 text-sm shadow-lg">
-                Most Popular
+                {tPricing('professional.badge')}
               </Badge>
             </div>
             <CardHeader className="text-center pb-8 pt-8">
-              <CardTitle className="text-2xl mb-2">Professional</CardTitle>
+              <CardTitle className="text-2xl mb-2">{tPricing('professional.name')}</CardTitle>
               <div className="mb-2">
-                <span className="text-5xl font-bold text-gray-900">$29</span>
-                <span className="text-xl font-normal text-gray-600">/mo</span>
+                <span className="text-5xl font-bold text-gray-900">{tPricing('professional.price')}</span>
+                <span className="text-xl font-normal text-gray-600">{tPricing('professional.priceUnit')}</span>
               </div>
-              <CardDescription className="text-base">For growing businesses</CardDescription>
+              <CardDescription className="text-base">{tPricing('professional.description')}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <ul className="space-y-4">
                 <li className="flex items-start">
                   <CheckCircle className="w-5 h-5 text-green-600 mr-3 mt-0.5 flex-shrink-0" />
-                  <span className="text-gray-700">Unlimited products</span>
+                  <span className="text-gray-700">{tPricing('professional.features.feature1')}</span>
                 </li>
                 <li className="flex items-start">
                   <CheckCircle className="w-5 h-5 text-green-600 mr-3 mt-0.5 flex-shrink-0" />
-                  <span className="text-gray-700">Custom domain</span>
+                  <span className="text-gray-700">{tPricing('professional.features.feature2')}</span>
                 </li>
                 <li className="flex items-start">
                   <CheckCircle className="w-5 h-5 text-green-600 mr-3 mt-0.5 flex-shrink-0" />
-                  <span className="text-gray-700">Premium themes</span>
+                  <span className="text-gray-700">{tPricing('professional.features.feature3')}</span>
                 </li>
                 <li className="flex items-start">
                   <CheckCircle className="w-5 h-5 text-green-600 mr-3 mt-0.5 flex-shrink-0" />
-                  <span className="text-gray-700">Analytics dashboard</span>
+                  <span className="text-gray-700">{tPricing('professional.features.feature4')}</span>
                 </li>
                 <li className="flex items-start">
                   <CheckCircle className="w-5 h-5 text-green-600 mr-3 mt-0.5 flex-shrink-0" />
-                  <span className="text-gray-700">Priority support</span>
+                  <span className="text-gray-700">{tPricing('professional.features.feature5')}</span>
                 </li>
               </ul>
               <Button className="w-full h-12 text-base bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700" asChild>
-                <Link href="/signup">Start 14-Day Trial</Link>
+                <Link href="/signup">{tPricing('professional.cta')}</Link>
               </Button>
             </CardContent>
           </Card>
 
           <Card className="hover:shadow-2xl transition-all duration-300">
             <CardHeader className="text-center pb-8">
-              <CardTitle className="text-2xl mb-2">Enterprise</CardTitle>
+              <CardTitle className="text-2xl mb-2">{tPricing('enterprise.name')}</CardTitle>
               <div className="mb-2">
-                <span className="text-5xl font-bold text-gray-900">$99</span>
-                <span className="text-xl font-normal text-gray-600">/mo</span>
+                <span className="text-5xl font-bold text-gray-900">{tPricing('enterprise.price')}</span>
+                <span className="text-xl font-normal text-gray-600">{tPricing('enterprise.priceUnit')}</span>
               </div>
-              <CardDescription className="text-base">For large-scale operations</CardDescription>
+              <CardDescription className="text-base">{tPricing('enterprise.description')}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <ul className="space-y-4">
                 <li className="flex items-start">
                   <CheckCircle className="w-5 h-5 text-green-600 mr-3 mt-0.5 flex-shrink-0" />
-                  <span className="text-gray-700">Everything in Professional</span>
+                  <span className="text-gray-700">{tPricing('enterprise.features.feature1')}</span>
                 </li>
                 <li className="flex items-start">
                   <CheckCircle className="w-5 h-5 text-green-600 mr-3 mt-0.5 flex-shrink-0" />
-                  <span className="text-gray-700">Team management</span>
+                  <span className="text-gray-700">{tPricing('enterprise.features.feature2')}</span>
                 </li>
                 <li className="flex items-start">
                   <CheckCircle className="w-5 h-5 text-green-600 mr-3 mt-0.5 flex-shrink-0" />
-                  <span className="text-gray-700">Advanced analytics</span>
+                  <span className="text-gray-700">{tPricing('enterprise.features.feature3')}</span>
                 </li>
                 <li className="flex items-start">
                   <CheckCircle className="w-5 h-5 text-green-600 mr-3 mt-0.5 flex-shrink-0" />
-                  <span className="text-gray-700">API access</span>
+                  <span className="text-gray-700">{tPricing('enterprise.features.feature4')}</span>
                 </li>
                 <li className="flex items-start">
                   <CheckCircle className="w-5 h-5 text-green-600 mr-3 mt-0.5 flex-shrink-0" />
-                  <span className="text-gray-700">24/7 phone support</span>
+                  <span className="text-gray-700">{tPricing('enterprise.features.feature5')}</span>
                 </li>
               </ul>
               <Button className="w-full h-12 text-base" variant="outline" asChild>
-                <Link href="/signup">Contact Sales</Link>
+                <Link href="/signup">{tPricing('enterprise.cta')}</Link>
               </Button>
             </CardContent>
           </Card>

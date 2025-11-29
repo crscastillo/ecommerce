@@ -2,9 +2,12 @@
 
 import { Store } from "lucide-react"
 import Link from "next/link"
+import { useTranslations } from "next-intl"
 import { platformConfig } from "@/lib/config/platform"
 
 export function PlatformFooter() {
+  const tFooter = useTranslations('homepage.footer')
+  
   return (
     <footer className="bg-gray-900 text-white py-16">
       <div className="container mx-auto px-4">
@@ -15,7 +18,7 @@ export function PlatformFooter() {
               <span className="text-xl font-bold">{platformConfig.name}</span>
             </div>
             <p className="text-gray-400 text-sm leading-relaxed mb-6">
-              The easiest way to create and manage your online store. Trusted by thousands of businesses worldwide.
+              {tFooter('description')}
             </p>
             <div className="flex space-x-4">
               <a href="#" className="text-gray-400 hover:text-white transition-colors">
@@ -30,38 +33,38 @@ export function PlatformFooter() {
             </div>
           </div>
           <div>
-            <h3 className="font-semibold mb-4 text-lg">Product</h3>
+            <h3 className="font-semibold mb-4 text-lg">{tFooter('product')}</h3>
             <ul className="space-y-3 text-sm text-gray-400">
-              <li><Link href="#features" className="hover:text-white transition-colors">Features</Link></li>
-              <li><Link href="#pricing" className="hover:text-white transition-colors">Pricing</Link></li>
-              <li><Link href="/integrations" className="hover:text-white transition-colors">Integrations</Link></li>
+              <li><Link href="#features" className="hover:text-white transition-colors">{tFooter('links.features')}</Link></li>
+              <li><Link href="#pricing" className="hover:text-white transition-colors">{tFooter('links.pricing')}</Link></li>
+              <li><Link href="/integrations" className="hover:text-white transition-colors">{tFooter('links.integrations')}</Link></li>
             </ul>
           </div>
           <div>
-            <h3 className="font-semibold mb-4 text-lg">Support</h3>
+            <h3 className="font-semibold mb-4 text-lg">{tFooter('support')}</h3>
             <ul className="space-y-3 text-sm text-gray-400">
-              <li><Link href="#" className="hover:text-white transition-colors">Help Center</Link></li>
-              <li><Link href="/contact" className="hover:text-white transition-colors">Contact Us</Link></li>
-              <li><Link href="#" className="hover:text-white transition-colors">Documentation</Link></li>
-              <li><Link href="/status" className="hover:text-white transition-colors">System Status</Link></li>
+              <li><Link href="#" className="hover:text-white transition-colors">{tFooter('links.helpCenter')}</Link></li>
+              <li><Link href="/contact" className="hover:text-white transition-colors">{tFooter('links.contactUs')}</Link></li>
+              <li><Link href="#" className="hover:text-white transition-colors">{tFooter('links.documentation')}</Link></li>
+              <li><Link href="/status" className="hover:text-white transition-colors">{tFooter('links.systemStatus')}</Link></li>
             </ul>
           </div>
           <div>
-            <h3 className="font-semibold mb-4 text-lg">Company</h3>
+            <h3 className="font-semibold mb-4 text-lg">{tFooter('company')}</h3>
             <ul className="space-y-3 text-sm text-gray-400">
-              <li><Link href="#" className="hover:text-white transition-colors">About Us</Link></li>
-              <li><Link href="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
+              <li><Link href="#" className="hover:text-white transition-colors">{tFooter('links.aboutUs')}</Link></li>
+              <li><Link href="/privacy-policy" className="hover:text-white transition-colors">{tFooter('links.privacyPolicy')}</Link></li>
             </ul>
           </div>
         </div>
         <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-sm text-gray-400">
-            © 2025 {platformConfig.name}. All rights reserved.
+            {tFooter('copyright', { platformName: platformConfig.name })}
           </p>
           <div className="flex gap-6 text-sm text-gray-400">
-            <Link href="#" className="hover:text-white transition-colors">Terms of Service</Link>
-            <Link href="/privacy-policy" className="hover:text-white transition-colors">Privacy</Link>
-            <Link href="#" className="hover:text-white transition-colors">Cookies</Link>
+            <Link href="#" className="hover:text-white transition-colors">{tFooter('links.termsOfService')}</Link>
+            <Link href="/privacy-policy" className="hover:text-white transition-colors">{tFooter('links.privacy')}</Link>
+            <Link href="#" className="hover:text-white transition-colors">{tFooter('links.cookies')}</Link>
           </div>
         </div>
       </div>

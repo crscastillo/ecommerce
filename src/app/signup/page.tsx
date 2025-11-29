@@ -12,6 +12,7 @@ import { Store, Mail, Building, User, CheckCircle2, ArrowLeft, ArrowRight, Check
 import Link from 'next/link'
 import { isPlatformAdmin } from '@/lib/actions/admin-check'
 import { useRouter } from 'next/navigation'
+import { getBaseUrl } from '@/lib/utils'
 
 export default function TenantSignup() {
   const [step, setStep] = useState(1)
@@ -140,7 +141,7 @@ export default function TenantSignup() {
             full_name: 'Platform Administrator',
             role: 'platform_admin'
           },
-          emailRedirectTo: `${window.location.origin}/platform`
+          emailRedirectTo: `${getBaseUrl()}/platform`
         }
       })
 
@@ -211,7 +212,7 @@ export default function TenantSignup() {
         email,
         password,
         options: {
-          emailRedirectTo: `${location.origin}/auth/callback?setup=tenant`,
+          emailRedirectTo: `${getBaseUrl()}/auth/callback?setup=tenant`,
         },
       })
 

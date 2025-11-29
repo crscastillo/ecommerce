@@ -830,33 +830,44 @@
       "plans": {
         "starter": {
           "name": "Principiante",
-          "feature1": "Hasta 100 productos",
-          "feature2": "Personalización básica de tienda",
-          "feature3": "Métodos de pago estándar",
-          "feature4": "Analíticas básicas",
-          "feature5": "Soporte por email"
+          "price": "Gratis",
+          "description": "Perfecto para empezar",
+          "features": {
+            "feature1": "Hasta 10 productos",
+            "feature2": "Subdominio gratuito",
+            "feature3": "Temas básicos",
+            "feature4": "Soporte por email"
+          },
+          "cta": "Comenzar Gratis"
         },
-        "pro": {
+        "professional": {
           "name": "Profesional",
-          "feature1": "Productos ilimitados",
-          "feature2": "Personalización avanzada",
-          "feature3": "Todos los métodos de pago",
-          "feature4": "Analíticas avanzadas",
-          "feature5": "Integración WhatsApp",
-          "feature6": "Alertas de stock bajo",
-          "feature7": "Soporte prioritario",
-          "feature8": "Dominio personalizado"
+          "price": "$29",
+          "priceUnit": "/mes",
+          "description": "Para negocios en crecimiento",
+          "badge": "Más Popular",
+          "features": {
+            "feature1": "Productos ilimitados",
+            "feature2": "Dominio personalizado",
+            "feature3": "Temas premium",
+            "feature4": "Panel de analíticas",
+            "feature5": "Soporte prioritario"
+          },
+          "cta": "Prueba de 14 Días"
         },
         "enterprise": {
           "name": "Empresarial",
-          "feature1": "Todo en Profesional",
-          "feature2": "Gestión multi-tienda",
-          "feature3": "Integraciones avanzadas",
-          "feature4": "Plugins personalizados",
-          "feature5": "Soporte dedicado",
-          "feature6": "Garantía SLA",
-          "feature7": "Reportes avanzados",
-          "feature8": "Solución marca blanca"
+          "price": "$99",
+          "priceUnit": "/mes",
+          "description": "Para operaciones a gran escala",
+          "features": {
+            "feature1": "Todo en Profesional",
+            "feature2": "Gestión de equipos",
+            "feature3": "Analíticas avanzadas",
+            "feature4": "Acceso API",
+            "feature5": "Soporte telefónico 24/7"
+          },
+          "cta": "Contactar Ventas"
         }
       }
     },
@@ -1280,12 +1291,12 @@
         "name": "Starter",
         "price": "Gratis",
         "description": "Perfecto para empezar",
-        "features": [
-          "Hasta 10 productos",
-          "Subdominio gratis",
-          "Temas básicos",
-          "Soporte por email"
-        ],
+        "features": {
+          "feature1": "Hasta 10 productos",
+          "feature2": "Subdominio gratis",
+          "feature3": "Temas básicos",
+          "feature4": "Soporte por email"
+        },
         "cta": "Comenzar Gratis"
       },
       "professional": {
@@ -1294,13 +1305,13 @@
         "priceUnit": "/mes",
         "description": "Para negocios en crecimiento",
         "badge": "Más Popular",
-        "features": [
-          "Productos ilimitados",
-          "Dominio personalizado",
-          "Temas premium",
-          "Panel de analíticas",
-          "Soporte prioritario"
-        ],
+        "features": {
+          "feature1": "Productos ilimitados",
+          "feature2": "Dominio personalizado",
+          "feature3": "Temas premium",
+          "feature4": "Panel de analíticas",
+          "feature5": "Soporte prioritario"
+        },
         "cta": "Prueba de 14 Días"
       },
       "enterprise": {
@@ -1308,13 +1319,13 @@
         "price": "$99",
         "priceUnit": "/mes",
         "description": "Para operaciones a gran escala",
-        "features": [
-          "Todo en Profesional",
-          "Gestión de equipos",
-          "Analíticas avanzadas",
-          "Acceso API",
-          "Soporte telefónico 24/7"
-        ],
+        "features": {
+          "feature1": "Todo en Profesional",
+          "feature2": "Gestión de equipos",
+          "feature3": "Analíticas avanzadas",
+          "feature4": "Acceso API",
+          "feature5": "Soporte telefónico 24/7"
+        },
         "cta": "Contactar Ventas"
       }
     },

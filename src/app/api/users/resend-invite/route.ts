@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
         // Send invitation email using Supabase Auth
         try {
           // Construct URL with tenant subdomain
-          const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+          const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000')
           const tenantUrl = baseUrl.includes('localhost') 
             ? `${tenantData.subdomain}.${baseUrl}` 
             : `https://${tenantData.subdomain}.${baseUrl.replace('https://', '')}`

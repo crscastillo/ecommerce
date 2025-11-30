@@ -11,6 +11,7 @@ import { Store, AlertCircle } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { redirectToUserTenantAdmin } from '@/lib/utils/tenant-redirects'
+import { useTranslations } from 'next-intl'
 
 export default function Login() {
   const [email, setEmail] = useState('')
@@ -22,6 +23,7 @@ export default function Login() {
   const [tenantInfo, setTenantInfo] = useState<{name: string, subdomain: string, id: string} | null>(null)
   const router = useRouter()
   const supabase = createClient()
+  const t = useTranslations('auth')
 
   // Check if user is already authenticated and detect subdomain on component mount
   useEffect(() => {
@@ -307,7 +309,7 @@ export default function Login() {
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Checking authentication...</p>
+          <p className="text-gray-600">{t('checkingAuth')}</p>
         </div>
       </div>
     )
@@ -324,42 +326,42 @@ export default function Login() {
             </span>
           </div>
           <CardTitle className="text-2xl font-bold text-center">
-            {isOnSubdomain ? 'Admin Login' : 'Sign in to your account'}
+            {isOnSubdomain ? t('adminLogin') : t('signinToAccount')}
           </CardTitle>
           <CardDescription className="text-center">
             {isOnSubdomain ? (
               tenantInfo ? (
-                <>Sign in to manage <strong>{tenantInfo.name}</strong></>
+                <>{t('signinToManage')} <strong>{tenantInfo.name}</strong></>
               ) : (
-                'Sign in to access the admin panel'
+                t('signinToAdmin')
               )
             ) : (
-              'Enter your email and password to access your account'
+              t('enterCredentials')
             )}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
-              <Label htmlFor="email">Email address</Label>
+              <Label htmlFor="email">{t('emailAddress')}</Label>
               <Input
                 id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                placeholder="Enter your email"
+                placeholder={t('enterEmail')}
               />
             </div>
             <div>
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">{t('password')}</Label>
               <Input
                 id="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                placeholder="Enter your password"
+                placeholder={t('enterPassword')}
               />
             </div>
             
@@ -381,8 +383,8 @@ export default function Login() {
               disabled={loading || (isOnSubdomain && !tenantInfo)} 
               className="w-full"
             >
-              {loading ? 'Signing in...' : (
-                isOnSubdomain ? 'Sign in to Admin' : 'Sign in'
+              {loading ? t('signingIn') : (
+                isOnSubdomain ? t('signinToAdminBtn') : t('signIn')
               )}
             </Button>
           </form>
@@ -393,13 +395,13 @@ export default function Login() {
                 href={getMainDomainUrl()}
                 className="text-blue-600 hover:text-blue-500"
               >
-                ← Back to main site
+                {t('backToMainSite')}
               </Link>
             ) : (
               <>
-                <span className="text-gray-600">Don't have an account? </span>
+                <span className="text-gray-600">{t('dontHaveAccount')} </span>
                 <Link href="/signup" className="font-medium text-blue-600 hover:text-blue-500">
-                  Sign up
+                  {t('signUp')}
                 </Link>
               </>
             )}
@@ -407,7 +409,7 @@ export default function Login() {
           
           {isOnSubdomain && tenantInfo && (
             <div className="mt-4 text-center text-xs text-gray-500 border-t pt-4">
-              Tenant: {tenantInfo.subdomain}
+              {t('tenant')}: {tenantInfo.subdomain}
             </div>
           )}
         </CardContent>

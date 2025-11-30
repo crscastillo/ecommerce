@@ -13,6 +13,7 @@ import Link from 'next/link'
 import { isPlatformAdmin } from '@/lib/actions/admin-check'
 import { useRouter } from 'next/navigation'
 import { getBaseUrl } from '@/lib/utils'
+import { useTranslations } from 'next-intl'
 
 export default function TenantSignup() {
   const [step, setStep] = useState(1)
@@ -35,6 +36,7 @@ export default function TenantSignup() {
   
   const router = useRouter()
   const supabase = createClient()
+  const t = useTranslations('auth')
 
   const validateSubdomain = (value: string) => {
     // Simple validation: 3-30 chars, alphanumeric and hyphens, no consecutive hyphens, no start/end with hyphen
@@ -242,21 +244,21 @@ export default function TenantSignup() {
             <div className="mx-auto w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-4">
               <Check className="w-6 h-6 text-green-600" />
             </div>
-            <CardTitle className="text-2xl font-bold">Store Created Successfully!</CardTitle>
+            <CardTitle className="text-2xl font-bold">{t('storeCreatedSuccessfully')}</CardTitle>
             <CardDescription>
-              Your store "{storeName}" has been created at {subdomain}.{platformConfig.getDomain()}
+              {t('storeCreatedAt', { storeName, subdomain, domain: platformConfig.getDomain() })}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-gray-600 mb-4">
-              Please check your email <strong>{email}</strong> and click the verification link to activate your account and complete your store setup.
+              {t('checkEmailVerification', { email: <strong>{email}</strong> })}
             </p>
             <p className="text-xs text-gray-500 mb-4">
-              After verification, you'll be automatically redirected to complete your store configuration.
+              {t('afterVerificationRedirect')}
             </p>
             <div className="text-center">
               <Link href="/login" className="text-blue-600 hover:text-blue-500 text-sm">
-                Already verified? Sign in here
+                {t('alreadyVerified')}
               </Link>
             </div>
           </CardContent>
@@ -280,8 +282,8 @@ export default function TenantSignup() {
             </div>
           </div>
           <div className="flex justify-between mt-2 text-xs text-gray-600">
-            <span>Account</span>
-            <span>Store Details</span>
+            <span>{t('account')}</span>
+            <span>{t('storeDetails')}</span>
           </div>
         </div>
 
@@ -292,12 +294,12 @@ export default function TenantSignup() {
               <span className="text-xl font-bold">{platformConfig.name}</span>
             </div>
             <CardTitle className="text-2xl font-bold text-center">
-              {step === 1 ? 'Create Your Account' : 'Set Up Your Store'}
+              {step === 1 ? t('createYourAccount') : t('setupYourStore')}
             </CardTitle>
             <CardDescription className="text-center">
               {step === 1 
-                ? 'Start by creating your account' 
-                : 'Configure your online store'
+                ? t('startByCreating') 
+                : t('configureStore')
               }
             </CardDescription>
           </CardHeader>
@@ -305,29 +307,29 @@ export default function TenantSignup() {
             {step === 1 && (
               <form onSubmit={handleStep1Submit} className="space-y-4">
                 <div>
-                  <Label htmlFor="email">Email address</Label>
+                  <Label htmlFor="email">{t('emailAddress')}</Label>
                   <Input
                     id="email"
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    placeholder="Enter your email"
+                    placeholder={t('enterEmail')}
                   />
                 </div>
                 <div>
-                  <Label htmlFor="password">Password</Label>
+                  <Label htmlFor="password">{t('password')}</Label>
                   <Input
                     id="password"
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    placeholder="Create a password"
+                    placeholder={t('createPassword')}
                     minLength={6}
                   />
                   <p className="text-xs text-gray-500 mt-1">
-                    Must be at least 6 characters
+                    {t('mustBe6Chars')}
                   </p>
                 </div>
 
@@ -347,25 +349,25 @@ export default function TenantSignup() {
 
                 {successMessage ? (
                   <Button type="button" className="w-full" disabled>
-                    Check Your Email
+                    {t('checkYourEmail')}
                   </Button>
                 ) : (
                   <Button type="submit" className="w-full" disabled={loading}>
                     {loading ? (
                       <>
                         <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Creating Account...
+                        {t('creatingAccount')}
                       </>
                     ) : (
-                      'Continue'
+                      t('continue')
                     )}
                   </Button>
                 )}
 
                 <p className="text-center text-sm text-gray-600">
-                  Already have an account?{' '}
+                  {t('alreadyHaveAccount')}{' '}
                   <Link href="/login" className="text-blue-600 hover:text-blue-500">
-                    Sign in
+                    {t('signIn')}
                   </Link>
                 </p>
               </form>
@@ -374,18 +376,18 @@ export default function TenantSignup() {
             {step === 2 && (
               <form onSubmit={handleStep2Submit} className="space-y-4">
                 <div>
-                  <Label htmlFor="storeName">Store Name *</Label>
+                  <Label htmlFor="storeName">{t('storeName')} *</Label>
                   <Input
                     id="storeName"
                     value={storeName}
                     onChange={(e) => setStoreName(e.target.value)}
                     required
-                    placeholder="My Awesome Store"
+                    placeholder={t('storeNamePlaceholder')}
                   />
                 </div>
 
                 <div>
-                  <Label htmlFor="subdomain">Store Subdomain *</Label>
+                  <Label htmlFor="subdomain">{t('storeSubdomain')} *</Label>
                   <div className="flex">
                     <Input
                       id="subdomain"
@@ -464,7 +466,7 @@ export default function TenantSignup() {
                     onClick={() => setStep(1)}
                     className="flex-1"
                   >
-                    Back
+                    {t('back')}
                   </Button>
                   <Button 
                     type="submit" 
@@ -474,10 +476,10 @@ export default function TenantSignup() {
                     {loading ? (
                       <>
                         <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                        Creating...
+                        {t('creating')}
                       </>
                     ) : (
-                      'Create Store'
+                      t('createStore')
                     )}
                   </Button>
                 </div>

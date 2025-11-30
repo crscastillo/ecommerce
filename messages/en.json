@@ -90,7 +90,7 @@
     "creating": "Creating...",
     "storeCreatedSuccessfully": "Store Created Successfully!",
     "storeCreatedAt": "Your store \"{storeName}\" has been created at {subdomain}.{domain}",
-    "checkEmailVerification": "Please check your email {email} and click the verification link to activate your account and complete your store setup.",
+    "checkEmailVerification": "Please check your email <email>{email}</email> and click the verification link to activate your account and complete your store setup.",
     "afterVerificationRedirect": "After verification, you'll be automatically redirected to complete your store configuration.",
     "alreadyVerified": "Already verified? Sign in here",
     "checkYourEmail": "Check Your Email",

@@ -1281,7 +1281,7 @@
     "creating": "Creando...",
     "storeCreatedSuccessfully": "¡Tienda Creada Exitosamente!",
     "storeCreatedAt": "Tu tienda \"{storeName}\" ha sido creada en {subdomain}.{domain}",
-    "checkEmailVerification": "Por favor revisa tu correo electrónico {email} y haz clic en el enlace de verificación para activar tu cuenta y completar la configuración de tu tienda.",
+    "checkEmailVerification": "Por favor revisa tu correo electrónico <email>{email}</email> y haz clic en el enlace de verificación para activar tu cuenta y completar la configuración de tu tienda.",
     "afterVerificationRedirect": "Después de la verificación, serás redirigido automáticamente para completar la configuración de tu tienda.",
     "alreadyVerified": "¿Ya verificado? Inicia sesión aquí",
     "checkYourEmail": "Revisa Tu Correo",

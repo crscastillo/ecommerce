@@ -251,7 +251,9 @@ export default function TenantSignup() {
           </CardHeader>
           <CardContent>
             <p className="text-sm text-gray-600 mb-4">
-              {t('checkEmailVerification', { email: <strong>{email}</strong> })}
+              {t.rich('checkEmailVerification', { 
+                email: (chunks) => <strong>{email}</strong>
+              })}
             </p>
             <p className="text-xs text-gray-500 mb-4">
               {t('afterVerificationRedirect')}

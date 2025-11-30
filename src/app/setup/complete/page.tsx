@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Check, Loader2, AlertCircle } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { getBaseDomain } from '@/lib/utils'
 
 export default function SetupComplete() {
   const [loading, setLoading] = useState(true)
@@ -120,7 +121,6 @@ export default function SetupComplete() {
         // Redirect to admin after a short delay
         setTimeout(() => {
           const subdomain = tenant.subdomain
-          const host = window.location.host
           
           // Build the admin URL based on environment
           let adminUrl: string
@@ -129,9 +129,9 @@ export default function SetupComplete() {
             // For development: subdomain.localhost:3000/admin
             adminUrl = `http://${subdomain}.localhost:3000/admin`
           } else {
-            // For production: subdomain.domain.com/admin
-            const mainDomain = host.replace(/^[^.]*\./, '') // Remove any subdomain
-            adminUrl = `https://${subdomain}.${mainDomain}/admin`
+            // For production: subdomain.basedomain.com/admin
+            const baseDomain = getBaseDomain()
+            adminUrl = `https://${subdomain}.${baseDomain}/admin`
           }
           
           console.log('Redirecting to admin:', adminUrl)
@@ -232,14 +232,13 @@ export default function SetupComplete() {
                 size="sm"
                 onClick={() => {
                   const subdomain = tenantData.subdomain
-                  const host = window.location.host
                   
                   let adminUrl: string
                   if (process.env.NODE_ENV === 'development') {
                     adminUrl = `http://${subdomain}.localhost:3000/admin`
                   } else {
-                    const mainDomain = host.replace(/^[^.]*\./, '')
-                    adminUrl = `https://${subdomain}.${mainDomain}/admin`
+                    const baseDomain = getBaseDomain()
+                    adminUrl = `https://${subdomain}.${baseDomain}/admin`
                   }
                   
                   console.log('Manual redirect to admin:', adminUrl)

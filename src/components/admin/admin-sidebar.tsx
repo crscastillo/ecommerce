@@ -28,11 +28,11 @@ import { cn } from '@/lib/utils'
 // Navigation items with translation keys
 const navigationItems = [
   { key: 'dashboard', href: '/admin', icon: Home },
+  { key: 'categories', href: '/admin/categories', icon: Tag },
+  { key: 'brands', href: '/admin/brands', icon: BadgeCheck },
   { key: 'products', href: '/admin/products', icon: Package },
   { key: 'orders', href: '/admin/orders', icon: ShoppingCart },
   { key: 'customers', href: '/admin/customers', icon: Users },
-  { key: 'categories', href: '/admin/categories', icon: Tag },
-  { key: 'brands', href: '/admin/brands', icon: BadgeCheck },
   { key: 'analytics', href: '/admin/analytics', icon: BarChart3 },
   { key: 'pages', href: '/admin/pages', icon: FileText },
   { key: 'settings', href: '/admin/settings', icon: Settings },

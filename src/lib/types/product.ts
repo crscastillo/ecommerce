@@ -81,3 +81,47 @@ export const statusOptions = [
   { value: 'active', label: 'Active' },
   { value: 'inactive', label: 'Inactive' }
 ] as const
+
+export interface ProductFormData {
+  name: string
+  slug: string
+  description: string
+  short_description: string
+  product_type: ProductType
+  sku: string
+  price: string
+  compare_price: string
+  cost_price: string
+  track_inventory: boolean
+  inventory_quantity: string
+  allow_backorder: boolean
+  weight: string
+  category_id: string
+  brand_id: string
+  is_active: boolean
+  is_featured: boolean
+  seo_title: string
+  seo_description: string
+}
+
+export const defaultProductFormData: ProductFormData = {
+  name: '',
+  slug: '',
+  description: '',
+  short_description: '',
+  product_type: 'single',
+  sku: '',
+  price: '',
+  compare_price: '',
+  cost_price: '',
+  track_inventory: true,
+  inventory_quantity: '',
+  allow_backorder: false,
+  weight: '',
+  category_id: '',
+  brand_id: '',
+  is_active: true,
+  is_featured: false,
+  seo_title: '',
+  seo_description: '',
+}

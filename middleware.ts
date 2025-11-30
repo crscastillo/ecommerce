@@ -299,12 +299,15 @@ async function handleTenantSubdomain(request: NextRequest, supabaseResponse: Nex
   const currentPath = request.nextUrl.pathname
   let locale = 'en'
   
+  // Access language settings from tenant.settings JSONB field
+  const tenantSettings = (tenant.settings as any) || {}
+  
   if (currentPath.startsWith('/admin')) {
     // Use admin language for admin routes
-    locale = tenant.admin_language || 'en'
+    locale = tenantSettings.admin_language || 'en'
   } else {
     // Use store language for public routes
-    locale = tenant.store_language || 'en'
+    locale = tenantSettings.store_language || 'en'
   }
   
   supabaseResponse.headers.set('x-locale', locale)
@@ -316,8 +319,8 @@ async function handleTenantSubdomain(request: NextRequest, supabaseResponse: Nex
     'x-locale': locale,
     'currentPath': currentPath,
     'isAdmin': currentPath.startsWith('/admin'),
-    'admin_language': tenant.admin_language,
-    'store_language': tenant.store_language
+    'admin_language': tenantSettings.admin_language,
+    'store_language': tenantSettings.store_language
   })
 
   const pathname = request.nextUrl.pathname

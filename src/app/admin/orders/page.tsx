@@ -213,8 +213,8 @@ export default function OrdersPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">{t('title')}</h1>
+      <div>
+        <h1 className="text-2xl md:text-3xl font-bold">{t('title')}</h1>
       </div>
 
       {/* Stats Cards */}

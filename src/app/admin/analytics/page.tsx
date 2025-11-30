@@ -82,14 +82,30 @@ export default function AnalyticsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-2">
-          <BarChart3 className="h-8 w-8 text-gray-600" />
-          <h1 className="text-3xl font-bold">{t('title')}</h1>
+      <div className="space-y-3 md:space-y-0">
+        {/* Mobile Header */}
+        <div className="flex flex-col space-y-3 md:hidden">
+          <div className="flex items-center space-x-2">
+            <BarChart3 className="h-6 w-6 text-gray-600" />
+            <h1 className="text-xl font-bold">{t('title')}</h1>
+          </div>
+          <div className="flex justify-start">
+            <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+              {t('comingSoon')}
+            </Badge>
+          </div>
         </div>
-        <Badge variant="secondary" className="bg-blue-100 text-blue-800">
-          {t('comingSoon')}
-        </Badge>
+        
+        {/* Desktop Header */}
+        <div className="hidden md:flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <BarChart3 className="h-8 w-8 text-gray-600" />
+            <h1 className="text-3xl font-bold">{t('title')}</h1>
+          </div>
+          <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+            {t('comingSoon')}
+          </Badge>
+        </div>
       </div>
 
       {/* Coming Soon Notice */}

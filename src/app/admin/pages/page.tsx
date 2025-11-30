@@ -42,15 +42,32 @@ export default function PagesPage() {
     <div className="container mx-auto px-6 py-8">
       {/* Header */}
       <div className="mb-8">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">{t('title')}</h1>
-            <p className="text-gray-600 mt-2">{t('subtitle')}</p>
+        <div className="space-y-3 md:space-y-0">
+          {/* Mobile Header */}
+          <div className="flex flex-col space-y-3 md:hidden">
+            <div>
+              <h1 className="text-xl font-bold text-gray-900">{t('title')}</h1>
+              <p className="text-gray-600 text-sm mt-1">{t('subtitle')}</p>
+            </div>
+            <div className="flex justify-start">
+              <Button size="sm">
+                <Plus className="h-4 w-4 mr-2" />
+                {t('createPage')}
+              </Button>
+            </div>
           </div>
-          <Button>
-            <Plus className="h-4 w-4 mr-2" />
-            {t('createPage')}
-          </Button>
+          
+          {/* Desktop Header */}
+          <div className="hidden md:flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">{t('title')}</h1>
+              <p className="text-gray-600 mt-2">{t('subtitle')}</p>
+            </div>
+            <Button>
+              <Plus className="h-4 w-4 mr-2" />
+              {t('createPage')}
+            </Button>
+          </div>
         </div>
       </div>
 

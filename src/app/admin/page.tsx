@@ -117,20 +117,41 @@ export default function AdminDashboard() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">{t('dashboard.title')}</h1>
-          <p className="text-muted-foreground">
-            {t('dashboard.welcomeBack', { storeName: tenant?.name || '' })}
-          </p>
+      <div className="space-y-3 md:space-y-0">
+        {/* Mobile Header */}
+        <div className="flex flex-col space-y-3 md:hidden">
+          <div>
+            <h1 className="text-xl font-bold tracking-tight">{t('dashboard.title')}</h1>
+            <p className="text-muted-foreground text-sm">
+              {t('dashboard.welcomeBack', { storeName: tenant?.name || '' })}
+            </p>
+          </div>
+          <div className="flex justify-start">
+            <Button asChild size="sm">
+              <Link href="/admin/products/new">
+                <Plus className="mr-2 h-4 w-4" />
+                {t('products.addProduct')}
+              </Link>
+            </Button>
+          </div>
         </div>
-        <div className="flex items-center space-x-2">
-          <Button asChild>
-            <Link href="/admin/products/new">
-              <Plus className="mr-2 h-4 w-4" />
-              {t('products.addProduct')}
-            </Link>
-          </Button>
+        
+        {/* Desktop Header */}
+        <div className="hidden md:flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">{t('dashboard.title')}</h1>
+            <p className="text-muted-foreground">
+              {t('dashboard.welcomeBack', { storeName: tenant?.name || '' })}
+            </p>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Button asChild>
+              <Link href="/admin/products/new">
+                <Plus className="mr-2 h-4 w-4" />
+                {t('products.addProduct')}
+              </Link>
+            </Button>
+          </div>
         </div>
       </div>
 

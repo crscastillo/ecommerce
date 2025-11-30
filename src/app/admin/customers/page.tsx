@@ -131,19 +131,40 @@ export default function CustomersPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
-          <p className="text-muted-foreground">
-            {t('description')}
-          </p>
+      <div className="space-y-3 md:space-y-0">
+        {/* Mobile Header */}
+        <div className="flex flex-col space-y-3 md:hidden">
+          <div>
+            <h1 className="text-xl font-bold tracking-tight">{t('title')}</h1>
+            <p className="text-muted-foreground text-sm">
+              {t('description')}
+            </p>
+          </div>
+          <div className="flex justify-start">
+            <Button asChild size="sm">
+              <Link href="/admin/customers/new">
+                <Plus className="mr-2 h-4 w-4" />
+                {t('addCustomer')}
+              </Link>
+            </Button>
+          </div>
         </div>
-        <Button asChild>
-          <Link href="/admin/customers/new">
-            <Plus className="mr-2 h-4 w-4" />
-            {t('addCustomer')}
-          </Link>
-        </Button>
+        
+        {/* Desktop Header */}
+        <div className="hidden md:flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
+            <p className="text-muted-foreground">
+              {t('description')}
+            </p>
+          </div>
+          <Button asChild>
+            <Link href="/admin/customers/new">
+              <Plus className="mr-2 h-4 w-4" />
+              {t('addCustomer')}
+            </Link>
+          </Button>
+        </div>
       </div>
 
       {/* Stats Cards */}

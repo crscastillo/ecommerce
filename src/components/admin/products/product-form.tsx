@@ -719,10 +719,12 @@ export function ProductForm({ initialData, mode }: ProductFormProps) {
             </CardHeader>
             <CardContent>
               <ImageUpload
-                images={productImages}
-                onChange={setProductImages}
+                tenantId={tenant?.id || ''}
+                productId={mode === 'edit' ? initialData?.id : undefined}
+                initialImages={productImages}
                 maxImages={10}
-                acceptedFileTypes={['image/jpeg', 'image/png', 'image/webp']}
+                onImagesChange={setProductImages}
+                disabled={loading}
               />
             </CardContent>
           </Card>

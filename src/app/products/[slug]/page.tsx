@@ -268,8 +268,6 @@ export default function ProductPage() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Breadcrumb */}
         <ProductBreadcrumb
-          productName={product.name}
-          brand={product.brand}
           category={product.category}
           t={t}
         />

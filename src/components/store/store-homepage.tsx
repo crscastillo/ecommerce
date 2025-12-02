@@ -89,10 +89,10 @@ export default function StoreHomepage({ tenant }: StoreHomepageProps) {
   ];
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <>
       {/* Hero Section */}
       <section
-        className={`text-center py-20 rounded-lg mb-12 ${heroType === 'color' ? 'text-white' : ''}`}
+        className={`text-center py-28 md:py-32 lg:py-48 mb-12 ${heroType === 'color' ? 'text-white' : ''}`}
         style={
           heroType === 'image'
             ? {
@@ -122,6 +122,7 @@ export default function StoreHomepage({ tenant }: StoreHomepageProps) {
         </div>
       </section>
 
+      <div className="container mx-auto px-4 pb-8">
       {/* Top Products Section */}
       <section className="mb-16">
         <h2 className="text-3xl font-bold text-center mb-8">
@@ -130,7 +131,7 @@ export default function StoreHomepage({ tenant }: StoreHomepageProps) {
         <div className="max-w-6xl mx-auto">
         
         {productsLoading ? (
-          <div className="flex flex-wrap justify-center gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 justify-items-center">
             {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
               <div key={i} className="w-full max-w-[280px]">
                 <Card className="hover:shadow-lg transition-shadow h-full flex flex-col">
@@ -147,7 +148,7 @@ export default function StoreHomepage({ tenant }: StoreHomepageProps) {
             ))}
           </div>
         ) : products.length > 0 ? (
-          <div className="flex flex-wrap justify-center gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 justify-items-center">
             {products.slice(0, 8).map((product) => (
               <div key={product.id} className="w-full max-w-[280px]">
                 <ProductCard
@@ -168,6 +169,13 @@ export default function StoreHomepage({ tenant }: StoreHomepageProps) {
             </Button>
           </div>
         )}
+        
+        {/* View All Products Link */}
+        <div className="text-center mt-8">
+          <Button variant="outline" asChild>
+            <Link href="/products">{t('store.viewAllProducts')}</Link>
+          </Button>
+        </div>
         </div>
       </section>
 
@@ -267,6 +275,7 @@ export default function StoreHomepage({ tenant }: StoreHomepageProps) {
           </Button>
         </div>
       </section>
-    </div>
+      </div>
+    </>
   );
 }

@@ -1,7 +1,27 @@
 import Link from "next/link"
 import { useTranslations } from "next-intl"
 
-export function Footer() {
+interface Category {
+  id: string
+  name: string
+  slug: string
+  description: string | null
+  image_url: string | null
+  parent_id: string | null
+  sort_order: number
+  is_active: boolean
+  seo_title: string | null
+  seo_description: string | null
+  created_at: string
+  updated_at: string
+  tenant_id: string
+}
+
+interface FooterProps {
+  categories?: Category[]
+}
+
+export function Footer({ categories = [] }: FooterProps) {
   const t = useTranslations('footer')
   return (
     <footer className="border-t bg-background">
@@ -16,21 +36,26 @@ export function Footer() {
           <div className="space-y-4">
             <h4 className="text-sm font-semibold">{t('sections.products')}</h4>
             <ul className="space-y-2 text-sm">
-              <li>
-                <Link href="/products/electronics" className="text-muted-foreground hover:text-foreground">
-                  {t('links.electronics')}
-                </Link>
-              </li>
-              <li>
-                <Link href="/products/clothing" className="text-muted-foreground hover:text-foreground">
-                  {t('links.clothing')}
-                </Link>
-              </li>
-              <li>
-                <Link href="/products/home" className="text-muted-foreground hover:text-foreground">
-                  {t('links.homeGarden')}
-                </Link>
-              </li>
+              {categories.length > 0 ? (
+                categories.slice(0, 5).map((category) => (
+                  <li key={category.id}>
+                    <Link 
+                      href={`/products/category/${category.slug}`} 
+                      className="text-muted-foreground hover:text-foreground"
+                    >
+                      {category.name}
+                    </Link>
+                  </li>
+                ))
+              ) : (
+                <>
+                  <li>
+                    <Link href="/products" className="text-muted-foreground hover:text-foreground">
+                      {t('links.allProducts')}
+                    </Link>
+                  </li>
+                </>
+              )}
             </ul>
           </div>
           <div className="space-y-4">

@@ -1233,46 +1233,31 @@
         "year": "año"
       },
       "plans": {
-        "starter": {
-          "name": "Principiante",
-          "price": "Gratis",
-          "description": "Perfecto para empezar",
-          "features": {
-            "feature1": "Hasta 10 productos",
-            "feature2": "Subdominio gratuito",
-            "feature3": "Temas básicos",
-            "feature4": "Soporte por email"
-          },
-          "cta": "Comenzar Gratis"
+        "free": {
+          "name": "Gratis",
+          "feature1": "1-25 productos",
+          "feature2": "0-25 pedidos por mes",
+          "feature3": "Pagos por transferencia",
+          "feature4": "Transferencia móvil",
+          "feature5": "Soporte básico"
         },
-        "professional": {
-          "name": "Profesional",
-          "price": "$29",
-          "priceUnit": "/mes",
-          "description": "Para negocios en crecimiento",
-          "badge": "Más Popular",
-          "features": {
-            "feature1": "Productos ilimitados",
-            "feature2": "Dominio personalizado",
-            "feature3": "Temas premium",
-            "feature4": "Panel de analíticas",
-            "feature5": "Soporte prioritario"
-          },
-          "cta": "Prueba de 14 Días"
+        "business": {
+          "name": "Negocio",
+          "feature1": "26-100 productos",
+          "feature2": "Pedidos ilimitados",
+          "feature3": "Todos los métodos de pago",
+          "feature4": "Procesamiento de tarjetas",
+          "feature5": "Soporte Stripe y TiloPay",
+          "feature6": "Soporte prioritario"
         },
-        "enterprise": {
-          "name": "Empresarial",
-          "price": "$99",
-          "priceUnit": "/mes",
-          "description": "Para operaciones a gran escala",
-          "features": {
-            "feature1": "Todo en Profesional",
-            "feature2": "Gestión de equipos",
-            "feature3": "Analíticas avanzadas",
-            "feature4": "Acceso API",
-            "feature5": "Soporte telefónico 24/7"
-          },
-          "cta": "Contactar Ventas"
+        "pro": {
+          "name": "Pro",
+          "feature1": "Productos ilimitados",
+          "feature2": "Pedidos ilimitados",
+          "feature3": "Todos los métodos de pago",
+          "feature4": "Analíticas avanzadas",
+          "feature5": "Integraciones personalizadas",
+          "feature6": "Soporte dedicado"
         }
       }
     },
@@ -1856,46 +1841,47 @@
       "badge": "PRECIOS",
       "title": "Precios Simples y Transparentes",
       "subtitle": "Elige el plan perfecto para las necesidades de tu negocio",
-      "starter": {
-        "name": "Starter",
-        "price": "Gratis",
+      "free": {
+        "name": "Gratis",
+        "price": "$0",
+        "priceUnit": "/mes",
         "description": "Perfecto para empezar",
         "features": {
-          "feature1": "Hasta 10 productos",
-          "feature2": "Subdominio gratis",
-          "feature3": "Temas básicos",
-          "feature4": "Soporte por email"
+          "feature1": "1-25 productos",
+          "feature2": "0-25 pedidos por mes",
+          "feature3": "Pagos por transferencia",
+          "feature4": "Soporte básico"
         },
         "cta": "Comenzar Gratis"
       },
-      "professional": {
-        "name": "Profesional",
-        "price": "$29",
+      "business": {
+        "name": "Negocio",
+        "price": "$39",
         "priceUnit": "/mes",
         "description": "Para negocios en crecimiento",
         "badge": "Más Popular",
         "features": {
-          "feature1": "Productos ilimitados",
-          "feature2": "Dominio personalizado",
-          "feature3": "Temas premium",
-          "feature4": "Panel de analíticas",
-          "feature5": "Soporte prioritario"
+          "feature1": "26-100 productos",
+          "feature2": "Pedidos ilimitados",
+          "feature3": "Todos los métodos de pago",
+          "feature4": "Procesamiento de tarjetas",
+          "feature5": "Soporte Stripe y TiloPay"
         },
-        "cta": "Prueba de 14 Días"
+        "cta": "Comenzar Prueba Gratis"
       },
-      "enterprise": {
-        "name": "Empresarial",
-        "price": "$99",
+      "pro": {
+        "name": "Pro",
+        "price": "$69",
         "priceUnit": "/mes",
         "description": "Para operaciones a gran escala",
         "features": {
-          "feature1": "Todo en Profesional",
-          "feature2": "Gestión de equipos",
-          "feature3": "Analíticas avanzadas",
-          "feature4": "Acceso API",
-          "feature5": "Soporte telefónico 24/7"
+          "feature1": "Productos ilimitados",
+          "feature2": "Pedidos ilimitados",
+          "feature3": "Todos los métodos de pago",
+          "feature4": "Analíticas avanzadas",
+          "feature5": "Integraciones personalizadas"
         },
-        "cta": "Contactar Ventas"
+        "cta": "Comenzar Prueba Gratis"
       }
     },
     "cta": {

@@ -30,7 +30,7 @@ export function PluginsTab({ tenant }: PluginsTabProps) {
     const loadPluginFeatures = async () => {
       try {
         const features = await FeatureFlagsService.getEnabledPluginFeaturesForTier(
-          tenant.subscription_tier as 'basic' | 'pro' | 'enterprise'
+          tenant.subscription_tier as 'free' | 'business' | 'pro'
         )
         setPluginFeatures(features)
       } catch (error) {

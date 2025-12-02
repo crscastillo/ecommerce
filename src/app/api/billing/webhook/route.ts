@@ -128,7 +128,7 @@ export async function POST(request: NextRequest) {
         if (subscriptionData) {
           await supabase
             .from('tenants')
-            .update({ plan: 'starter' })
+            .update({ plan: 'free' })
             .eq('id', subscriptionData.tenant_id)
 
           await supabase
@@ -159,10 +159,10 @@ export async function POST(request: NextRequest) {
 
 function getPlanIdFromPriceId(priceId: string): string {
   const priceIdMap: Record<string, string> = {
-    'price_starter_free': 'starter',
-    'price_pro_monthly': 'pro',
-    'price_enterprise_monthly': 'enterprise'
+    'price_free': 'free',
+    'price_business_monthly': 'business',
+    'price_pro_monthly': 'pro'
   }
   
-  return priceIdMap[priceId] || 'starter'
+  return priceIdMap[priceId] || 'free'
 }

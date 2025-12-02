@@ -1079,35 +1079,31 @@
         "year": "year"
       },
       "plans": {
-        "starter": {
-          "name": "Starter",
-          "feature1": "Up to 100 products",
-          "feature2": "Basic store customization",
-          "feature3": "Standard payment methods",
-          "feature4": "Basic analytics",
-          "feature5": "Email support"
+        "free": {
+          "name": "Free",
+          "feature1": "1-25 products",
+          "feature2": "0-25 orders per month",
+          "feature3": "Transfer payments",
+          "feature4": "Mobile transfer payments",
+          "feature5": "Basic support"
+        },
+        "business": {
+          "name": "Business",
+          "feature1": "26-100 products",
+          "feature2": "Unlimited orders",
+          "feature3": "All payment methods",
+          "feature4": "Credit card processing",
+          "feature5": "Stripe & TiloPay support",
+          "feature6": "Priority support"
         },
         "pro": {
-          "name": "Professional",
+          "name": "Pro",
           "feature1": "Unlimited products",
-          "feature2": "Advanced customization",
+          "feature2": "Unlimited orders",
           "feature3": "All payment methods",
           "feature4": "Advanced analytics",
-          "feature5": "WhatsApp integration",
-          "feature6": "Low stock alerts",
-          "feature7": "Priority support",
-          "feature8": "Custom domain"
-        },
-        "enterprise": {
-          "name": "Enterprise",
-          "feature1": "Everything in Professional",
-          "feature2": "Multi-store management",
-          "feature3": "Advanced integrations",
-          "feature4": "Custom plugins",
-          "feature5": "Dedicated support",
-          "feature6": "SLA guarantee",
-          "feature7": "Advanced reporting",
-          "feature8": "White-label solution"
+          "feature5": "Custom integrations",
+          "feature6": "Dedicated support"
         }
       }
     },
@@ -1318,46 +1314,47 @@
       "badge": "PRICING",
       "title": "Simple, Transparent Pricing",
       "subtitle": "Choose the perfect plan for your business needs",
-      "starter": {
-        "name": "Starter",
-        "price": "Free",
+      "free": {
+        "name": "Free",
+        "price": "$0",
+        "priceUnit": "/month",
         "description": "Perfect for getting started",
         "features": {
-          "feature1": "Up to 10 products",
-          "feature2": "Free subdomain",
-          "feature3": "Basic themes",
-          "feature4": "Email support"
+          "feature1": "1-25 products",
+          "feature2": "0-25 orders per month",
+          "feature3": "Transfer & mobile payments",
+          "feature4": "Basic support"
         },
         "cta": "Get Started Free"
       },
-      "professional": {
-        "name": "Professional",
-        "price": "$29",
+      "business": {
+        "name": "Business",
+        "price": "$39",
         "priceUnit": "/month",
         "description": "For growing businesses",
         "badge": "Most Popular",
         "features": {
-          "feature1": "Unlimited products",
-          "feature2": "Custom domain",
-          "feature3": "Premium themes",
-          "feature4": "Analytics dashboard",
-          "feature5": "Priority support"
+          "feature1": "26-100 products",
+          "feature2": "Unlimited orders",
+          "feature3": "All payment methods",
+          "feature4": "Credit card processing",
+          "feature5": "Stripe & TiloPay support"
         },
-        "cta": "14-Day Free Trial"
+        "cta": "Start Free Trial"
       },
-      "enterprise": {
-        "name": "Enterprise",
-        "price": "$99",
+      "pro": {
+        "name": "Pro",
+        "price": "$69",
         "priceUnit": "/month",
         "description": "For large-scale operations",
         "features": {
-          "feature1": "Everything in Professional",
-          "feature2": "Team management",
-          "feature3": "Advanced analytics",
-          "feature4": "API access",
-          "feature5": "24/7 phone support"
+          "feature1": "Unlimited products",
+          "feature2": "Unlimited orders",
+          "feature3": "All payment methods",
+          "feature4": "Advanced analytics",
+          "feature5": "Custom integrations"
         },
-        "cta": "Contact Sales"
+        "cta": "Start Free Trial"
       }
     },
     "cta": {

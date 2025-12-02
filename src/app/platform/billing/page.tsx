@@ -67,41 +67,41 @@ interface BillingStats {
 const defaultPlans: SubscriptionPlan[] = [
   {
     id: '1',
-    name: 'Basic',
-    price: 29.99,
+    name: 'Free',
+    price: 0,
     billing_cycle: 'monthly',
-    features: ['Up to 100 products', 'Basic analytics', 'Email support', 'SSL certificate'],
-    max_products: 100,
-    max_orders_per_month: 1000,
-    storage_gb: 5,
+    features: ['1-25 products', '0-25 orders per month', 'Transfer payments', 'Mobile transfer payments', 'Basic support'],
+    max_products: 25,
+    max_orders_per_month: 25,
+    storage_gb: 1,
     is_active: true,
-    stripe_price_id: 'price_basic_monthly',
+    stripe_price_id: 'price_free',
     created_at: new Date().toISOString()
   },
   {
     id: '2',
-    name: 'Pro',
-    price: 79.99,
+    name: 'Business',
+    price: 39,
     billing_cycle: 'monthly',
-    features: ['Up to 1000 products', 'Advanced analytics', 'Priority support', 'Custom domain', 'API access'],
-    max_products: 1000,
-    max_orders_per_month: 10000,
-    storage_gb: 50,
+    features: ['26-100 products', 'Unlimited orders', 'All payment methods', 'Credit card processing', 'Stripe & TiloPay', 'Priority support'],
+    max_products: 100,
+    max_orders_per_month: -1, // unlimited
+    storage_gb: 10,
     is_active: true,
-    stripe_price_id: 'price_pro_monthly',
+    stripe_price_id: 'price_business_monthly',
     created_at: new Date().toISOString()
   },
   {
     id: '3',
-    name: 'Enterprise',
-    price: 199.99,
+    name: 'Pro',
+    price: 69,
     billing_cycle: 'monthly',
-    features: ['Unlimited products', 'Custom analytics', 'Phone support', 'White label', 'Advanced API'],
+    features: ['Unlimited products', 'Unlimited orders', 'All payment methods', 'Advanced analytics', 'Custom integrations', 'Dedicated support'],
     max_products: -1, // unlimited
     max_orders_per_month: -1, // unlimited
-    storage_gb: 500,
+    storage_gb: 50,
     is_active: true,
-    stripe_price_id: 'price_enterprise_monthly',
+    stripe_price_id: 'price_pro_monthly',
     created_at: new Date().toISOString()
   }
 ]

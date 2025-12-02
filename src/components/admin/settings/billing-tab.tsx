@@ -47,55 +47,51 @@ interface BillingTabProps {
 
 const getPlans = (t: any): Plan[] => [
   {
-    id: 'starter',
-    name: t('plans.starter.name'),
+    id: 'free',
+    name: t('plans.free.name'),
     price: 0,
     interval: 'month',
-    stripePriceId: 'price_starter_free',
+    stripePriceId: 'price_free',
     icon: <Rocket className="h-6 w-6" />,
     features: [
-      t('plans.starter.feature1'),
-      t('plans.starter.feature2'),
-      t('plans.starter.feature3'),
-      t('plans.starter.feature4'),
-      t('plans.starter.feature5')
+      t('plans.free.feature1'),
+      t('plans.free.feature2'),
+      t('plans.free.feature3'),
+      t('plans.free.feature4'),
+      t('plans.free.feature5')
+    ]
+  },
+  {
+    id: 'business',
+    name: t('plans.business.name'),
+    price: 39,
+    interval: 'month',
+    stripePriceId: 'price_business_monthly',
+    icon: <Crown className="h-6 w-6" />,
+    recommended: true,
+    features: [
+      t('plans.business.feature1'),
+      t('plans.business.feature2'),
+      t('plans.business.feature3'),
+      t('plans.business.feature4'),
+      t('plans.business.feature5'),
+      t('plans.business.feature6')
     ]
   },
   {
     id: 'pro',
     name: t('plans.pro.name'),
-    price: 29,
+    price: 69,
     interval: 'month',
     stripePriceId: 'price_pro_monthly',
-    icon: <Crown className="h-6 w-6" />,
-    recommended: true,
+    icon: <Zap className="h-6 w-6" />,
     features: [
       t('plans.pro.feature1'),
       t('plans.pro.feature2'),
       t('plans.pro.feature3'),
       t('plans.pro.feature4'),
       t('plans.pro.feature5'),
-      t('plans.pro.feature6'),
-      t('plans.pro.feature7'),
-      t('plans.pro.feature8')
-    ]
-  },
-  {
-    id: 'enterprise',
-    name: t('plans.enterprise.name'),
-    price: 99,
-    interval: 'month',
-    stripePriceId: 'price_enterprise_monthly',
-    icon: <Zap className="h-6 w-6" />,
-    features: [
-      t('plans.enterprise.feature1'),
-      t('plans.enterprise.feature2'),
-      t('plans.enterprise.feature3'),
-      t('plans.enterprise.feature4'),
-      t('plans.enterprise.feature5'),
-      t('plans.enterprise.feature6'),
-      t('plans.enterprise.feature7'),
-      t('plans.enterprise.feature8')
+      t('plans.pro.feature6')
     ]
   }
 ]
@@ -233,7 +229,7 @@ export function BillingTab({ saving = false }: BillingTabProps) {
   }
 
   const getCurrentPlan = () => {
-    const planId = tenant?.subscription_tier || (tenant?.settings as any)?.plan || 'starter'
+    const planId = tenant?.subscription_tier || (tenant?.settings as any)?.plan || 'free'
     return plans.find((p: Plan) => p.id === planId) || plans[0]
   }
 
@@ -370,8 +366,8 @@ export function BillingTab({ saving = false }: BillingTabProps) {
                 <CardHeader className="text-center">
                   <div className="flex justify-center mb-4">
                     <div className={`p-3 rounded-lg ${
-                      plan.id === 'starter' ? 'bg-gray-100' :
-                      plan.id === 'pro' ? 'bg-blue-100' : 'bg-purple-100'
+                      plan.id === 'free' ? 'bg-gray-100' :
+                      plan.id === 'business' ? 'bg-blue-100' : 'bg-purple-100'
                     }`}>
                       {plan.icon}
                     </div>

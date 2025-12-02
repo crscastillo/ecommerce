@@ -345,11 +345,15 @@ export function SettingsContent({ tenant, searchParams, router }: SettingsConten
         <TabsContent value="shipping" className="space-y-6">
           <ShippingTab
             shippingMethods={shippingSettings.shippingMethods}
-            onShippingMethodsChange={shippingSettings.setShippingMethods}
+            onShippingMethodsChange={(methods) => {
+              shippingSettings.setShippingMethods(methods)
+            }}
             onSave={async () => {
               try {
                 await shippingSettings.saveShippingSettings(shippingSettings.shippingMethods)
                 showSuccess(t('messages.shippingSaved'))
+                // Refresh the settings after successful save
+                await shippingSettings.refreshShippingSettings()
               } catch (error: any) {
                 showError(error.message || 'Failed to save shipping settings')
               }

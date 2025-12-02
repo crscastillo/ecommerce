@@ -1085,7 +1085,7 @@
       "maxWeight": "Maximum Weight",
       "maxWeightDescription": "Maximum package weight for this shipping method",
       "exampleCalculation": "Example Calculation",
-      "exampleText": "Base rate: ${baseRate} + Weight × ${perKgRate}/kg. Free shipping over ${freeThreshold}"
+      "exampleText": "Base rate: {baseRate} + Weight × {perKgRate}/kg. Free shipping over {freeThreshold}"
     },
     "messages": {
       "storeSettingsSaved": "Store settings saved successfully!",
@@ -1145,7 +1145,9 @@
       "active": "Active",
       "inactive": "Inactive",
       "save": "Save",
-      "saving": "Saving..."
+      "saving": "Saving...",
+      "enabled": "Enabled",
+      "disabled": "Disabled"
     }
   },
   "pages": {

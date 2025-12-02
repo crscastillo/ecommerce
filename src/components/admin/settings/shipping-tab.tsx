@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -9,6 +9,8 @@ import { Switch } from '@/components/ui/switch'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Save, Truck, Package, Settings as SettingsIcon } from 'lucide-react'
+import { useTenant } from '@/lib/contexts/tenant-context'
+import { formatPrice } from '@/lib/utils/currency'
 
 export interface ShippingMethod {
   id: string
@@ -39,6 +41,7 @@ export function ShippingTab({
 }: ShippingTabProps) {
   const t = useTranslations('settings')
   const tCommon = useTranslations('common')
+  const { tenant } = useTenant()
 
   // Initialize with default weight-based method if no methods exist
   const [methods, setMethods] = useState<ShippingMethod[]>(() => {
@@ -48,7 +51,7 @@ export function ShippingTab({
           id: 'weight_based',
           name: 'Weight Based Shipping',
           description: 'Calculate shipping costs based on package weight',
-          enabled: false,
+          enabled: true,
           type: 'weight_based',
           config: {
             base_rate: 5.00,
@@ -61,6 +64,30 @@ export function ShippingTab({
     }
     return shippingMethods
   })
+
+  // Sync local state with props when shippingMethods changes
+  useEffect(() => {
+    if (shippingMethods.length > 0) {
+      setMethods(shippingMethods)
+    } else {
+      // If no methods from props, ensure we have default method
+      setMethods([
+        {
+          id: 'weight_based',
+          name: 'Weight Based Shipping',
+          description: 'Calculate shipping costs based on package weight',
+          enabled: true,
+          type: 'weight_based',
+          config: {
+            base_rate: 5.00,
+            per_kg_rate: 2.50,
+            free_threshold: 100.00,
+            max_weight: 50
+          }
+        }
+      ])
+    }
+  }, [shippingMethods])
 
   const updateMethod = (id: string, updates: Partial<ShippingMethod>) => {
     const updatedMethods = methods.map(method => 
@@ -76,6 +103,12 @@ export function ShippingTab({
 
     const updatedConfig = { ...method.config, [configKey]: value }
     updateMethod(id, { config: updatedConfig })
+  }
+
+  // Get currency symbol for display
+  const getCurrencySymbol = () => {
+    const currency = tenant?.settings?.currency || 'USD'
+    return currency === 'USD' ? '$' : currency
   }
 
   const handleSave = async () => {
@@ -126,7 +159,7 @@ export function ShippingTab({
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor={`base-rate-${method.id}`}>
-                      {t('shipping.baseRate')} ($)
+                      {t('shipping.baseRate')} ({getCurrencySymbol()})
                     </Label>
                     <Input
                       id={`base-rate-${method.id}`}
@@ -144,7 +177,7 @@ export function ShippingTab({
 
                   <div className="space-y-2">
                     <Label htmlFor={`per-kg-rate-${method.id}`}>
-                      {t('shipping.perKgRate')} ($)
+                      {t('shipping.perKgRate')} ({getCurrencySymbol()})
                     </Label>
                     <Input
                       id={`per-kg-rate-${method.id}`}
@@ -162,7 +195,7 @@ export function ShippingTab({
 
                   <div className="space-y-2">
                     <Label htmlFor={`free-threshold-${method.id}`}>
-                      {t('shipping.freeThreshold')} ($)
+                      {t('shipping.freeThreshold')} ({getCurrencySymbol()})
                     </Label>
                     <Input
                       id={`free-threshold-${method.id}`}
@@ -202,9 +235,9 @@ export function ShippingTab({
                   <h4 className="text-sm font-medium mb-2">{t('shipping.exampleCalculation')}</h4>
                   <p className="text-sm text-muted-foreground">
                     {t('shipping.exampleText', {
-                      baseRate: (method.config.base_rate || 0).toFixed(2),
-                      perKgRate: (method.config.per_kg_rate || 0).toFixed(2),
-                      freeThreshold: (method.config.free_threshold || 0).toFixed(2)
+                      baseRate: formatPrice(method.config.base_rate || 0, tenant),
+                      perKgRate: formatPrice(method.config.per_kg_rate || 0, tenant),
+                      freeThreshold: formatPrice(method.config.free_threshold || 0, tenant)
                     })}
                   </p>
                 </div>
@@ -212,14 +245,6 @@ export function ShippingTab({
             )}
           </Card>
         ))}
-      </div>
-
-      {/* Save Button - Footer */}
-      <div className="flex justify-end pt-6 border-t">
-        <Button onClick={handleSave} disabled={saving}>
-          <Save className="h-4 w-4 mr-2" />
-          {saving ? tCommon('saving') : tCommon('saveChanges')}
-        </Button>
       </div>
     </div>
   )

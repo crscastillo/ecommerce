@@ -1293,7 +1293,7 @@
       "maxWeight": "Peso Máximo",
       "maxWeightDescription": "Peso máximo del paquete para este método de envío",
       "exampleCalculation": "Ejemplo de Cálculo",
-      "exampleText": "Tarifa base: ${baseRate} + Peso × ${perKgRate}/kg. Envío gratis sobre ${freeThreshold}"
+      "exampleText": "Tarifa base: {baseRate} + Peso × {perKgRate}/kg. Envío gratis sobre {freeThreshold}"
     },
     "domain": {
       "title": "Configuración de Dominio",
@@ -1417,7 +1417,9 @@
       "active": "Activo",
       "inactive": "Inactivo",
       "save": "Guardar",
-      "saving": "Guardando..."
+      "saving": "Guardando...",
+      "enabled": "Habilitado",
+      "disabled": "Deshabilitado"
     }
   },
   "analytics": {

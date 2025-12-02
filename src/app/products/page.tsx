@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, Suspense } from 'react'
+import { useState, useEffect, Suspense, useCallback } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { useTenant } from '@/lib/contexts/tenant-context'
 import { useTranslations } from 'next-intl'
@@ -54,6 +54,15 @@ function ProductsPageContent() {
     return sortParam && ['newest', 'price-low', 'price-high', 'name'].includes(sortParam) ? sortParam : 'newest'
   })
   const [showMobileFilters, setShowMobileFilters] = useState(false)
+  const [maxProductPrice, setMaxProductPrice] = useState<number>(1000)
+  const [priceRange, setPriceRange] = useState<{ min: number; max: number }>(() => {
+    const minPrice = searchParams?.get('min_price')
+    const maxPrice = searchParams?.get('max_price')
+    return {
+      min: minPrice ? parseFloat(minPrice) : 0,
+      max: maxPrice ? parseFloat(maxPrice) : 1000
+    }
+  })
 
   // Update URL when filters change
   const updateURL = (newParams: {
@@ -61,6 +70,7 @@ function ProductsPageContent() {
     category?: string[]
     brand?: string[]
     sort?: string
+    priceRange?: { min: number; max: number }
   }) => {
     const params = new URLSearchParams(searchParams?.toString())
     
@@ -100,9 +110,68 @@ function ProductsPageContent() {
       }
     }
     
+    // Update price range
+    if (newParams.priceRange !== undefined) {
+      if (newParams.priceRange.min > 0) {
+        params.set('min_price', newParams.priceRange.min.toString())
+      } else {
+        params.delete('min_price')
+      }
+      if (newParams.priceRange.max < maxProductPrice) {
+        params.set('max_price', newParams.priceRange.max.toString())
+      } else {
+        params.delete('max_price')
+      }
+    }
+    
     const newURL = params.toString() ? `?${params.toString()}` : '/products'
     router.replace(newURL, { scroll: false })
   }
+
+  // Smart rounding function based on price scale
+  const getSmartRounding = (price: number) => {
+    if (price <= 100) return 5        // Round to 5s for prices under 100
+    if (price <= 1000) return 50      // Round to 50s for prices under 1000
+    if (price <= 10000) return 500    // Round to 500s for prices under 10000
+    return 5000                       // Round to 5000s for higher prices
+  }
+
+  const smartRound = (price: number, roundingUnit: number) => {
+    return Math.ceil(price / roundingUnit) * roundingUnit
+  }
+
+  // Calculate price statistics from products
+  const calculatePriceStats = (products: Product[]) => {
+    if (!products.length) return { maxPrice: 1000 }
+    
+    const prices = products.flatMap(product => {
+      if (product.product_type === 'variable' && product.variants?.length) {
+        return product.variants.map(v => v.price).filter((price): price is number => price !== null)
+      }
+      return [product.price]
+    })
+    
+    const maxPrice = Math.max(...prices)
+    const roundingUnit = getSmartRounding(maxPrice)
+    const roundedMax = smartRound(maxPrice, roundingUnit)
+    return { maxPrice: Math.max(roundedMax, roundingUnit * 4) } // Ensure at least 4 units for range generation
+  }
+
+  // Debounced price range change to prevent excessive API calls
+  const [debouncedPriceRange, setDebouncedPriceRange] = useState(priceRange)
+  
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      setDebouncedPriceRange(priceRange)
+    }, 300)
+    return () => clearTimeout(timeoutId)
+  }, [priceRange])
+
+  useEffect(() => {
+    if (debouncedPriceRange !== priceRange) {
+      updateURL({ priceRange: debouncedPriceRange })
+    }
+  }, [debouncedPriceRange])
 
   useEffect(() => {
     if (!tenant?.id) return
@@ -148,6 +217,14 @@ function ProductsPageContent() {
           filters.brand_slugs = selectedBrands.join(',')
         }
 
+        if (debouncedPriceRange.min > 0) {
+          filters.min_price = debouncedPriceRange.min
+        }
+
+        if (debouncedPriceRange.max < maxProductPrice) {
+          filters.max_price = debouncedPriceRange.max
+        }
+
         // Load products with filters
         let productsResult
         if (searchQuery) {
@@ -163,6 +240,14 @@ function ProductsPageContent() {
             return a.is_featured ? -1 : 1
           })
           setProducts(sorted)
+          
+          // Calculate dynamic price range based on all products (not just filtered ones)
+          // Get all products first to calculate proper max price
+          const allProductsResult = await getProducts(tenant.id, { is_active: true })
+          if (allProductsResult.data) {
+            const { maxPrice } = calculatePriceStats(allProductsResult.data)
+            setMaxProductPrice(maxPrice)
+          }
         } else {
           console.error('Error loading products:', productsResult.error)
         }
@@ -178,7 +263,7 @@ function ProductsPageContent() {
     }
 
     loadData()
-  }, [tenant?.id, selectedCategories, selectedBrands, searchQuery, sortBy])
+  }, [tenant?.id, selectedCategories, selectedBrands, searchQuery, sortBy, debouncedPriceRange.min, debouncedPriceRange.max])
 
   const handleCategoryChange = (categorySlug: string, checked: boolean) => {
     const newCategories = checked 
@@ -198,15 +283,21 @@ function ProductsPageContent() {
     updateURL({ brand: newBrands })
   }
 
+  const handlePriceRangeChange = useCallback((min: number, max: number) => {
+    const newPriceRange = { min, max }
+    setPriceRange(newPriceRange)
+  }, [])
+
   const clearFilters = () => {
     setSelectedCategories([])
     setSelectedBrands([])
     setSearchQuery('')
     setSortBy('newest')
-    updateURL({ category: [], brand: [], search: '', sort: 'newest' })
+    setPriceRange({ min: 0, max: maxProductPrice })
+    updateURL({ category: [], brand: [], search: '', sort: 'newest', priceRange: { min: 0, max: maxProductPrice } })
   }
 
-  const hasActiveFilters = !!(selectedCategories.length > 0 || selectedBrands.length > 0 || searchQuery)
+  const hasActiveFilters = !!(selectedCategories.length > 0 || selectedBrands.length > 0 || searchQuery || priceRange.min > 0 || priceRange.max < maxProductPrice)
 
   if (!tenant) {
     return (
@@ -243,8 +334,12 @@ function ProductsPageContent() {
           brands={brands}
           selectedBrands={selectedBrands}
           onBrandChange={handleBrandChange}
+          priceRange={priceRange}
+          onPriceRangeChange={handlePriceRangeChange}
+          maxProductPrice={maxProductPrice}
           hasActiveFilters={hasActiveFilters}
           onClearFilters={clearFilters}
+          tenant={tenant}
           t={t}
         />
 
@@ -278,7 +373,14 @@ function ProductsPageContent() {
               setSearchQuery('')
               updateURL({ search: '' })
             }}
+            priceRange={priceRange}
+            onRemovePriceRange={() => {
+              const defaultRange = { min: 0, max: maxProductPrice }
+              setPriceRange(defaultRange)
+              updateURL({ priceRange: defaultRange })
+            }}
             onClearAll={clearFilters}
+            tenant={tenant}
             t={t}
           />
 
@@ -311,7 +413,11 @@ function ProductsPageContent() {
         brands={brands}
         selectedBrands={selectedBrands}
         onBrandChange={handleBrandChange}
+        priceRange={priceRange}
+        onPriceRangeChange={handlePriceRangeChange}
+        maxProductPrice={maxProductPrice}
         onClearFilters={clearFilters}
+        tenant={tenant}
         t={t}
       />
     </div>

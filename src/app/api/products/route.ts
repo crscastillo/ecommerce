@@ -107,6 +107,8 @@ export async function GET(request: NextRequest) {
   const brandSlug = searchParams.get('brand_slug') // Keep for backward compatibility
   const search = searchParams.get('search')
   const sortBy = searchParams.get('sort_by') || 'newest'
+  const minPrice = searchParams.get('min_price')
+  const maxPrice = searchParams.get('max_price')
 
   if (!tenantId) {
     return NextResponse.json({ error: 'tenant_id is required' }, { status: 400 })
@@ -216,6 +218,21 @@ export async function GET(request: NextRequest) {
 
     if (search) {
       query = query.or(`name.ilike.%${search}%,description.ilike.%${search}%,short_description.ilike.%${search}%`)
+    }
+
+    // Apply price range filters
+    if (minPrice) {
+      const minPriceNum = parseFloat(minPrice)
+      if (!isNaN(minPriceNum)) {
+        query = query.gte('price', minPriceNum)
+      }
+    }
+
+    if (maxPrice) {
+      const maxPriceNum = parseFloat(maxPrice)
+      if (!isNaN(maxPriceNum)) {
+        query = query.lte('price', maxPriceNum)
+      }
     }
 
     // Apply sorting

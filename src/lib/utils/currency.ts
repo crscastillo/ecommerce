@@ -45,3 +45,34 @@ export const formatPrice = (price: number, tenant?: Tenant | null) => {
     currency: currency,
   }).format(price)
 }
+
+// Get currency symbol from tenant settings
+export const getCurrencySymbol = (tenant?: Tenant | null): string => {
+  const currency = tenant?.settings?.currency || 'USD'
+  
+  const currencySymbolMap: Record<string, string> = {
+    'USD': '$',
+    'EUR': '€',
+    'GBP': '£',
+    'JPY': '¥',
+    'CAD': '$',
+    'AUD': '$',
+    'CHF': 'Fr',
+    'CNY': '¥',
+    'SEK': 'kr',
+    'NZD': '$',
+    'MXN': '$',
+    'SGD': '$',
+    'HKD': '$',
+    'NOK': 'kr',
+    'TRY': '₺',
+    'RUB': '₽',
+    'INR': '₹',
+    'BRL': 'R$',
+    'ZAR': 'R',
+    'KRW': '₩',
+    'CRC': '₡',
+  }
+  
+  return currencySymbolMap[currency] || '$'
+}

@@ -2,6 +2,8 @@
 
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { getCurrencySymbol } from '@/lib/utils/currency'
+import { Tenant } from '@/lib/contexts/tenant-context'
 
 interface Category {
   id: string
@@ -24,7 +26,10 @@ interface ActiveFiltersProps {
   onRemoveBrand: (brandSlug: string) => void
   searchQuery: string
   onRemoveSearch: () => void
+  priceRange?: { min: number; max: number }
+  onRemovePriceRange?: () => void
   onClearAll: () => void
+  tenant?: Tenant | null
   t: any
 }
 
@@ -37,10 +42,16 @@ export function ActiveFilters({
   onRemoveBrand,
   searchQuery,
   onRemoveSearch,
+  priceRange,
+  onRemovePriceRange,
   onClearAll,
+  tenant,
   t
 }: ActiveFiltersProps) {
-  const hasFilters = selectedCategories.length > 0 || selectedBrands.length > 0 || searchQuery
+  // Get currency symbol from tenant
+  const currencySymbol = getCurrencySymbol(tenant)
+  const hasActivePriceRange = priceRange && (priceRange.min > 0 || priceRange.max < 1000)
+  const hasFilters = selectedCategories.length > 0 || selectedBrands.length > 0 || searchQuery || hasActivePriceRange
 
   if (!hasFilters) return null
 
@@ -83,6 +94,18 @@ export function ActiveFilters({
           {t('products.search')}: "{searchQuery}"
           <button
             onClick={onRemoveSearch}
+            className="ml-1 hover:text-red-600"
+          >
+            ×
+          </button>
+        </Badge>
+      )}
+      
+      {hasActivePriceRange && onRemovePriceRange && (
+        <Badge variant="secondary" className="gap-1">
+          {t('products.priceRange') || 'Price'}: {currencySymbol}{priceRange?.min || 0} - {currencySymbol}{priceRange?.max || 1000}
+          <button
+            onClick={onRemovePriceRange}
             className="ml-1 hover:text-red-600"
           >
             ×

@@ -353,8 +353,8 @@ export function ProductForm({ initialData, mode }: ProductFormProps) {
 
       {/* Success Message */}
       {success && (
-        <Alert>
-          <AlertCircle className="h-4 w-4" />
+        <Alert className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 max-w-md animate-in slide-in-from-top-2 bg-green-50 border-green-200 text-green-800">
+          <AlertCircle className="h-4 w-4 text-green-600" />
           <AlertDescription>
             {mode === 'create' ? t('productCreatedSuccessfully') : t('productUpdatedSuccessfully')}
           </AlertDescription>
@@ -363,8 +363,8 @@ export function ProductForm({ initialData, mode }: ProductFormProps) {
 
       {/* Error Message */}
       {error && (
-        <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
+        <Alert className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 max-w-md animate-in slide-in-from-top-2 bg-red-50 border-red-200 text-red-800">
+          <AlertCircle className="h-4 w-4 text-red-600" />
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}

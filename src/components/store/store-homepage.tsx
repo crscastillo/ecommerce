@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import Image from "next/image";
+import { ProductCard } from "@/components/product-card";
 import { getCategories, getProducts, type Category, type Product } from "@/lib/services/api";
 
 interface StoreHomepageProps {
@@ -126,74 +127,36 @@ export default function StoreHomepage({ tenant }: StoreHomepageProps) {
         <h2 className="text-3xl font-bold text-center mb-8">
           {t('store.topProducts')}
         </h2>
+        <div className="max-w-6xl mx-auto">
         
         {productsLoading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 justify-items-center">
+          <div className="flex flex-wrap justify-center gap-6">
             {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-              <Card key={i} className="hover:shadow-lg transition-shadow">
-                <CardHeader className="p-4">
-                  <div className="h-4 bg-gray-200 rounded animate-pulse mb-2"></div>
-                  <div className="h-3 bg-gray-200 rounded animate-pulse w-3/4"></div>
-                </CardHeader>
-                <CardContent className="p-4 pt-0">
-                  <div className="bg-gray-200 h-48 rounded-md mb-4 animate-pulse"></div>
-                  <div className="h-4 bg-gray-200 rounded animate-pulse w-1/2"></div>
-                </CardContent>
-              </Card>
+              <div key={i} className="w-full max-w-[280px]">
+                <Card className="hover:shadow-lg transition-shadow h-full flex flex-col">
+                  <div className="aspect-square bg-gray-200 animate-pulse"></div>
+                  <CardContent className="p-4 flex flex-col h-full">
+                    <div className="flex-1 space-y-2">
+                      <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+                      <div className="h-3 bg-gray-200 rounded animate-pulse w-3/4"></div>
+                      <div className="h-4 bg-gray-200 rounded animate-pulse w-1/2"></div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
             ))}
           </div>
         ) : products.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 justify-items-center">
-            {products.slice(0, 8).map((product) => {
-              const productImage = product.images?.[0] || null;
-              const hasDiscount = product.compare_price && product.compare_price > product.price;
-              const discountPercentage = hasDiscount 
-                ? Math.round(((product.compare_price! - product.price) / product.compare_price!) * 100)
-                : 0;
-
-              return (
-                <Card key={product.id} className="hover:shadow-lg transition-shadow group">
-                  <CardContent className="p-4">
-                    <div className="relative h-48 rounded-md mb-4 overflow-hidden bg-gray-100">
-                      {productImage ? (
-                        <Image
-                          src={productImage}
-                          alt={product.name}
-                          fill
-                          className="object-cover transition-transform group-hover:scale-105"
-                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                        />
-                      ) : (
-                        <div className="flex items-center justify-center w-full h-full bg-gradient-to-br from-gray-100 to-gray-200">
-                          <span className="text-gray-400 text-sm">{t('store.noImage')}</span>
-                        </div>
-                      )}
-                      {hasDiscount && (
-                        <Badge className="absolute top-2 right-2 bg-red-500">
-                          -{discountPercentage}%
-                        </Badge>
-                      )}
-                    </div>
-                    <h3 className="font-semibold text-sm mb-2 line-clamp-2">{product.name}</h3>
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className="font-bold text-lg">
-                        ${product.price.toFixed(2)}
-                      </span>
-                      {hasDiscount && (
-                        <span className="text-sm text-gray-500 line-through">
-                          ${product.compare_price!.toFixed(2)}
-                        </span>
-                      )}
-                    </div>
-                    <Button size="sm" className="w-full" asChild>
-                      <Link href={`/products/${product.slug}`}>
-                        {t('store.viewProduct')}
-                      </Link>
-                    </Button>
-                  </CardContent>
-                </Card>
-              );
-            })}
+          <div className="flex flex-wrap justify-center gap-6">
+            {products.slice(0, 8).map((product) => (
+              <div key={product.id} className="w-full max-w-[280px]">
+                <ProductCard
+                  product={product}
+                  viewMode="grid"
+                  tenantSettings={{}}
+                />
+              </div>
+            ))}
           </div>
         ) : (
           <div className="text-center py-12">
@@ -205,6 +168,7 @@ export default function StoreHomepage({ tenant }: StoreHomepageProps) {
             </Button>
           </div>
         )}
+        </div>
       </section>
 
       {/* Featured Categories */}

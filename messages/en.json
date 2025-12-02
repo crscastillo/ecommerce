@@ -153,6 +153,7 @@
     "sortOrderDescription": "Lower numbers appear first in the brand list",
     "brandLogo": "Brand Logo",
     "filters": "Filters",
+    "search": "Search brands...",
     "searchBrands": "Search brands...",
     "all": "All",
     "brandsWithCount": "{count, plural, one {# brand} other {# brands}}",
@@ -1303,7 +1304,10 @@
     "filters": "Filters",
     "clearFilters": "Clear All Filters",
     "showingResults": "Showing {count} results",
-    "noResults": "No products found matching your criteria"
+    "noResults": "No products found matching your criteria",
+    "topProducts": "Top Products",
+    "noImage": "No Image",
+    "noFeaturedProducts": "No featured products available yet. Check back soon!"
   },
   "success": {
     "productCreated": "Product created successfully",

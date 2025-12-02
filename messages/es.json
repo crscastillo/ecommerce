@@ -95,6 +95,7 @@
     "sortOrderDescription": "Los números más bajos aparecen primero en la lista de marcas",
     "brandLogo": "Logo de la Marca",
     "filters": "Filtros",
+    "search": "Buscar marcas...",
     "searchBrands": "Buscar marcas...",
     "all": "Todas",
     "brandsWithCount": "{count, plural, one {# marca} other {# marcas}}",
@@ -1508,7 +1509,10 @@
     "filters": "Filtros",
     "clearFilters": "Limpiar Todos los Filtros",
     "showingResults": "Mostrando {count} resultados",
-    "noResults": "No se encontraron productos que coincidan con sus criterios"
+    "noResults": "No se encontraron productos que coincidan con sus criterios",
+    "topProducts": "Productos Destacados",
+    "noImage": "Sin Imagen",
+    "noFeaturedProducts": "Aún no hay productos destacados disponibles. ¡Vuelve pronto!"
   },
   "product": {
     "featured": "Destacado",

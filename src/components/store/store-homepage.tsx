@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import Image from "next/image";
-import { getCategories, type Category } from "@/lib/services/api";
+import { getCategories, getProducts, type Category, type Product } from "@/lib/services/api";
 
 interface StoreHomepageProps {
   tenant?: {
@@ -20,7 +20,9 @@ interface StoreHomepageProps {
 
 export default function StoreHomepage({ tenant }: StoreHomepageProps) {
   const [categories, setCategories] = useState<Category[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [productsLoading, setProductsLoading] = useState(true);
   const t = useTranslations();
 
   const storeName = tenant?.name || t('store.defaultStoreName');
@@ -31,36 +33,48 @@ export default function StoreHomepage({ tenant }: StoreHomepageProps) {
   const heroValue = tenant?.theme_config?.hero_background_value || '';
 
   useEffect(() => {
-    async function fetchCategories() {
-      console.log('StoreHomepage: fetchCategories called with tenant:', tenant);
-      
+    async function fetchData() {
       if (!tenant?.id) {
         console.log('StoreHomepage: No tenant ID available:', tenant);
         setLoading(false);
+        setProductsLoading(false);
         return;
       }
 
+      // Fetch categories and products in parallel
       try {
-        console.log('StoreHomepage: Fetching categories via API service for tenant:', tenant.id);
+        const [categoriesResult, productsResult] = await Promise.all([
+          getCategories(tenant.id, { is_active: true, limit: 6 }),
+          getProducts(tenant.id, { 
+            is_active: true, 
+            is_featured: true, 
+            limit: 8,
+            sort_by: 'newest'
+          })
+        ]);
         
-        const result = await getCategories(tenant.id, { is_active: true, limit: 6 });
-        console.log('StoreHomepage: API service response:', result);
-        
-        if (result.error) {
-          console.error('StoreHomepage: API service returned error:', result.error);
-          throw new Error(result.error);
+        if (categoriesResult.error) {
+          console.error('StoreHomepage: Categories API error:', categoriesResult.error);
         } else {
-          console.log('StoreHomepage: Categories fetched successfully, count:', result.data?.length);
-          setCategories(result.data || []);
+          console.log('StoreHomepage: Categories fetched successfully, count:', categoriesResult.data?.length);
+          setCategories(categoriesResult.data || []);
+        }
+
+        if (productsResult.error) {
+          console.error('StoreHomepage: Products API error:', productsResult.error);
+        } else {
+          console.log('StoreHomepage: Products fetched successfully, count:', productsResult.data?.length);
+          setProducts(productsResult.data || []);
         }
       } catch (error) {
-        console.error('StoreHomepage: Error fetching categories:', error);
+        console.error('StoreHomepage: Error fetching data:', error);
       } finally {
         setLoading(false);
+        setProductsLoading(false);
       }
     }
 
-    fetchCategories();
+    fetchData();
   }, [tenant?.id]);
 
   // Predefined color schemes for categories
@@ -105,6 +119,92 @@ export default function StoreHomepage({ tenant }: StoreHomepageProps) {
             {t('common.learnMore')}
           </Button>
         </div>
+      </section>
+
+      {/* Top Products Section */}
+      <section className="mb-16">
+        <h2 className="text-3xl font-bold text-center mb-8">
+          {t('store.topProducts')}
+        </h2>
+        
+        {productsLoading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 justify-items-center">
+            {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+              <Card key={i} className="hover:shadow-lg transition-shadow">
+                <CardHeader className="p-4">
+                  <div className="h-4 bg-gray-200 rounded animate-pulse mb-2"></div>
+                  <div className="h-3 bg-gray-200 rounded animate-pulse w-3/4"></div>
+                </CardHeader>
+                <CardContent className="p-4 pt-0">
+                  <div className="bg-gray-200 h-48 rounded-md mb-4 animate-pulse"></div>
+                  <div className="h-4 bg-gray-200 rounded animate-pulse w-1/2"></div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        ) : products.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 justify-items-center">
+            {products.slice(0, 8).map((product) => {
+              const productImage = product.images?.[0] || null;
+              const hasDiscount = product.compare_price && product.compare_price > product.price;
+              const discountPercentage = hasDiscount 
+                ? Math.round(((product.compare_price! - product.price) / product.compare_price!) * 100)
+                : 0;
+
+              return (
+                <Card key={product.id} className="hover:shadow-lg transition-shadow group">
+                  <CardContent className="p-4">
+                    <div className="relative h-48 rounded-md mb-4 overflow-hidden bg-gray-100">
+                      {productImage ? (
+                        <Image
+                          src={productImage}
+                          alt={product.name}
+                          fill
+                          className="object-cover transition-transform group-hover:scale-105"
+                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                        />
+                      ) : (
+                        <div className="flex items-center justify-center w-full h-full bg-gradient-to-br from-gray-100 to-gray-200">
+                          <span className="text-gray-400 text-sm">{t('store.noImage')}</span>
+                        </div>
+                      )}
+                      {hasDiscount && (
+                        <Badge className="absolute top-2 right-2 bg-red-500">
+                          -{discountPercentage}%
+                        </Badge>
+                      )}
+                    </div>
+                    <h3 className="font-semibold text-sm mb-2 line-clamp-2">{product.name}</h3>
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="font-bold text-lg">
+                        ${product.price.toFixed(2)}
+                      </span>
+                      {hasDiscount && (
+                        <span className="text-sm text-gray-500 line-through">
+                          ${product.compare_price!.toFixed(2)}
+                        </span>
+                      )}
+                    </div>
+                    <Button size="sm" className="w-full" asChild>
+                      <Link href={`/products/${product.slug}`}>
+                        {t('store.viewProduct')}
+                      </Link>
+                    </Button>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <p className="text-gray-600 mb-8">
+              {t('store.noFeaturedProducts')}
+            </p>
+            <Button asChild variant="outline">
+              <Link href="/products">{t('store.viewAllProducts')}</Link>
+            </Button>
+          </div>
+        )}
       </section>
 
       {/* Featured Categories */}

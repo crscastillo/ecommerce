@@ -42,11 +42,11 @@ function ProductsPageContent() {
   const [searchQuery, setSearchQuery] = useState(searchParams?.get('search') || '')
   const [selectedCategories, setSelectedCategories] = useState<string[]>(() => {
     const categoryParam = searchParams?.get('category')
-    return categoryParam ? [categoryParam] : []
+    return categoryParam ? categoryParam.split(',').filter(Boolean) : []
   })
   const [selectedBrands, setSelectedBrands] = useState<string[]>(() => {
     const brandParam = searchParams?.get('brand')
-    return brandParam ? brandParam.split(',') : []
+    return brandParam ? brandParam.split(',').filter(Boolean) : []
   })
   const [viewMode, setViewMode] = useState<ViewMode>('grid')
   const [sortBy, setSortBy] = useState<SortOption>(() => {
@@ -86,7 +86,7 @@ function ProductsPageContent() {
     // Update category
     if (newParams.category !== undefined) {
       if (newParams.category.length > 0) {
-        params.set('category', newParams.category[0]) // For now, support single category
+        params.set('category', newParams.category.join(','))
       } else {
         params.delete('category')
       }

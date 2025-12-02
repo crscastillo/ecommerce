@@ -87,7 +87,7 @@ export function CategoryMobileCard({
                     variant="ghost" 
                     className="h-7 w-7 p-0"
                   >
-                    <Link href={`/admin/categories/${category.id}/edit`}>
+                    <Link href={`/admin/categories/${category.id}`}>
                       <Edit className="h-3 w-3" />
                     </Link>
                   </Button>

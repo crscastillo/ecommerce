@@ -151,6 +151,7 @@
     "sortOrder": "Sort Order",
     "sortOrderPlaceholder": "1",
     "sortOrderDescription": "Lower numbers appear first in the brand list",
+    "brandLogo": "Brand Logo",
     "filters": "Filters",
     "searchBrands": "Search brands...",
     "all": "All",
@@ -290,7 +291,47 @@
     "manageStoreCategories": "Manage your store categories and organization",
     "viewCategoryDetails": "View Category Details",
     "editCategoryDetails": "Edit Category Details",
-    "viewInStore": "View in Store"
+    "viewInStore": "View in Store",
+    "categoryImage": "Category Image",
+    "createCategory": "Create Category",
+    "editCategory": "Edit Category",
+    "editingCategory": "Editing {name}",
+    "saving": "Saving...",
+    "saveCategory": "Save Category",
+    "basicInformation": "Basic Information",
+    "essentialCategoryDetails": "Essential category details",
+    "categoryNameRequired": "Category Name (Required)",
+    "enterCategoryName": "Enter category name",
+    "urlSlugRequired": "URL Slug (Required)",
+    "categoryUrlSlug": "category-url-slug",
+    "slugIsAvailable": "Slug is available",
+    "description": "Description",
+    "categoryDescription": "Enter category description",
+    "seoInformation": "SEO Information",
+    "optimizeCategoryForSEO": "Optimize your category for search engines",
+    "seoTitle": "SEO Title",
+    "seoTitlePlaceholder": "Category name - Your store",
+    "seoDescription": "SEO Description",
+    "seoDescriptionPlaceholder": "Description for search engines",
+    "preview": "Preview",
+    "categoryNamePlaceholder": "Category Name",
+    "settings": "Settings",
+    "categoryStatus": "Category Status",
+    "categoryStatusDescription": "Category is currently {status} in your store",
+    "visible": "visible",
+    "hidden": "hidden",
+    "sortOrderDescription": "Lower numbers appear first in the category list",
+    "categoryNameIsRequired": "Category name is required",
+    "categorySlugIsRequired": "Category slug is required",
+    "slugInvalidCharacters": "Slug can only contain lowercase letters, numbers, and hyphens",
+    "sortOrderMustBeValid": "Sort order must be a valid number",
+    "errorCheckingSlugAvailability": "Error checking slug availability",
+    "slugAlreadyExists": "This slug already exists",
+    "categoryNotFound": "Category not found",
+    "failedToLoadCategory": "Failed to load category",
+    "loadingCategory": "Loading category...",
+    "categoryCreatedSuccessfully": "Category created successfully!",
+    "categoryUpdatedSuccessfully": "Category updated successfully!"
   },
   "cart": {
     "title": "Shopping Cart",
@@ -311,7 +352,69 @@
     "productsFound": "{count, plural, one {# product} other {# products}} found",
     "noProducts": "No products found",
     "noProductsDescription": "This category has no products yet.",
-    "browseOtherCategories": "Browse Other Categories"
+    "browseOtherCategories": "Browse Other Categories",
+    "form": {
+      "title": {
+        "new": "Create Category",
+        "edit": "Edit Category"
+      },
+      "fields": {
+        "name": {
+          "label": "Category Name",
+          "placeholder": "Enter category name",
+          "required": "Category name is required"
+        },
+        "slug": {
+          "label": "URL Slug",
+          "placeholder": "category-slug",
+          "description": "URL-friendly version of the name"
+        },
+        "description": {
+          "label": "Description",
+          "placeholder": "Enter category description"
+        },
+        "image": {
+          "label": "Category Image",
+          "description": "Upload an image for this category"
+        },
+        "parentCategory": {
+          "label": "Parent Category",
+          "placeholder": "Select parent category (optional)"
+        },
+        "status": {
+          "label": "Status",
+          "active": "Active",
+          "inactive": "Inactive",
+          "description": "Active categories are visible on the store"
+        },
+        "seo": {
+          "title": {
+            "label": "SEO Title",
+            "placeholder": "Enter SEO title"
+          },
+          "description": {
+            "label": "SEO Description",
+            "placeholder": "Enter SEO description"
+          },
+          "keywords": {
+            "label": "SEO Keywords",
+            "placeholder": "Enter keywords separated by commas"
+          }
+        }
+      },
+      "buttons": {
+        "create": "Create Category",
+        "update": "Update Category",
+        "cancel": "Cancel",
+        "creating": "Creating...",
+        "updating": "Updating..."
+      },
+      "sections": {
+        "basic": "Basic Information",
+        "seo": "SEO Settings",
+        "advanced": "Advanced Settings"
+      }
+    }
   },
   "common": {
     "save": "Save",

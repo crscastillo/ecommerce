@@ -1,66 +1,77 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
-import { AlertCircle, Save, ArrowLeft, Package, ExternalLink } from 'lucide-react'
-import { Alert, AlertDescription } from '@/components/ui/alert'
 import { ImageUpload } from '@/components/admin/image-upload'
-import { useBrandActions } from '@/lib/hooks/use-brands'
-import { BrandFormData, defaultBrandFormData, Brand } from '@/lib/types/brand'
-import { TenantDatabase } from '@/lib/supabase/tenant-database'
+import { AlertCircle, Save, ArrowLeft, FolderOpen, Loader2 } from 'lucide-react'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import { useTenant } from '@/lib/contexts/tenant-context'
 import { createClient } from '@/lib/supabase/client'
 import { useTranslations } from 'next-intl'
+import { TenantDatabase } from '@/lib/supabase/tenant-database'
+import { 
+  CategoryFormData, 
+  defaultCategoryFormData,
+  CategoryCreateData,
+  Category
+} from '@/lib/types/category'
+import Link from 'next/link'
 
-interface BrandFormProps {
-  initialData?: Brand
+interface CategoryFormProps {
+  initialData?: Category
   mode: 'create' | 'edit'
 }
 
-export function BrandForm({ initialData, mode }: BrandFormProps) {
+export function CategoryForm({ initialData, mode }: CategoryFormProps) {
   const router = useRouter()
   const { tenant } = useTenant()
-  const { createBrand, updateBrand, loading } = useBrandActions()
-  const t = useTranslations('brands')
+  const t = useTranslations('category.form')
+  const tCommon = useTranslations('common')
 
-  const [formData, setFormData] = useState<BrandFormData>(() => {
+  const [formData, setFormData] = useState<CategoryFormData>(() => {
     if (initialData) {
       return {
         name: initialData.name,
         slug: initialData.slug,
         description: initialData.description || '',
-        logo_url: initialData.logo_url || '',
-        website_url: initialData.website_url || '',
+        image_url: initialData.image_url || '',
+        parent_id: initialData.parent_id || '',
         sort_order: initialData.sort_order.toString(),
         is_active: initialData.is_active,
         seo_title: initialData.seo_title || '',
         seo_description: initialData.seo_description || ''
       }
     }
-    return { ...defaultBrandFormData }
+    return { ...defaultCategoryFormData }
   })
 
-  const [brandImages, setBrandImages] = useState<string[]>(
-    initialData?.logo_url ? [initialData.logo_url] : []
+  const [categoryImages, setCategoryImages] = useState<string[]>(
+    initialData?.image_url ? [initialData.image_url] : []
   )
-  const [errors, setErrors] = useState<Partial<BrandFormData>>({})
+  const [errors, setErrors] = useState<Partial<CategoryFormData>>({})
   const [slugManuallyEdited, setSlugManuallyEdited] = useState(!!initialData?.slug)
   const [slugValidating, setSlugValidating] = useState(false)
   const [slugValidationTimeout, setSlugValidationTimeout] = useState<NodeJS.Timeout | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [success, setSuccess] = useState(false)
 
   const generateSlug = (name: string) => {
     return name
       .toLowerCase()
-      .replace(/[^\w\s-]/g, '')
-      .replace(/[\s_-]+/g, '-')
-      .replace(/^-+|-+$/g, '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '')
   }
 
   const handleNameChange = (name: string) => {
@@ -104,52 +115,72 @@ export function BrandForm({ initialData, mode }: BrandFormProps) {
       
       try {
         const supabase = createClient()
-        
-        // Query directly for the slug
-        const { data: existingBrands } = await supabase
-          .from('brands')
+        let query = supabase
+          .from('categories')
           .select('id, slug')
           .eq('tenant_id', tenant.id)
           .eq('slug', slug)
-        
-        // Check if slug exists and it's not the current brand being edited
-        const isDuplicate = existingBrands && existingBrands.length > 0 && 
-          (!initialData || existingBrands[0].id !== initialData.id)
-        
+
+        // In edit mode, exclude the current category
+        if (mode === 'edit' && initialData?.id) {
+          query = query.neq('id', initialData.id)
+        }
+
+        const { data, error } = await query
+
+        if (error) {
+          console.error('Error checking slug uniqueness:', error)
+          setErrors(prev => ({ ...prev, slug: 'Error checking slug availability' }))
+          return
+        }
+
+        const isDuplicate = data && data.length > 0
         setErrors(prev => ({
           ...prev,
-          slug: isDuplicate ? t('slugAlreadyInUse') : undefined
+          slug: isDuplicate ? 'This slug is already in use' : undefined
         }))
-      } catch (error) {
-        console.error('Error validating slug:', error)
+      } catch (err) {
+        console.error('Error validating slug:', err)
+        setErrors(prev => ({ ...prev, slug: 'Error checking slug availability' }))
       } finally {
         setSlugValidating(false)
       }
-    }, 500) // 500ms debounce
+    }, 500)
 
     setSlugValidationTimeout(timeout)
   }
 
+  const handleInputChange = (field: keyof CategoryFormData, value: any) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }))
+
+    // Clear error for this field
+    if (errors[field]) {
+      setErrors(prev => {
+        const newErrors = { ...prev }
+        delete newErrors[field]
+        return newErrors
+      })
+    }
+  }
+
   const validateForm = (): boolean => {
-    const newErrors: Partial<BrandFormData> = {}
+    const newErrors: Partial<CategoryFormData> = {}
 
     if (!formData.name.trim()) {
-      newErrors.name = t('nameIsRequired')
+      newErrors.name = t('fields.name.required')
     }
 
     if (!formData.slug.trim()) {
-      newErrors.slug = t('slugIsRequired')
-    } else if (!/^[a-z0-9-]+$/.test(formData.slug)) {
-      newErrors.slug = t('slugInvalidFormat')
+      newErrors.slug = 'Category slug is required'
+    } else if (!/^[a-z0-9-]+$/.test(formData.slug.trim())) {
+      newErrors.slug = 'Slug can only contain lowercase letters, numbers, and hyphens'
     }
 
-    const sortOrder = parseInt(formData.sort_order)
-    if (isNaN(sortOrder) || sortOrder < 0) {
-      newErrors.sort_order = t('sortOrderMustBeValid')
-    }
-
-    if (formData.website_url && !formData.website_url.match(/^https?:\/\/.+/)) {
-      newErrors.website_url = t('websiteUrlMustBeValid')
+    if (formData.sort_order && isNaN(parseInt(formData.sort_order))) {
+      newErrors.sort_order = 'Sort order must be a valid number'
     }
 
     setErrors(newErrors)
@@ -160,78 +191,125 @@ export function BrandForm({ initialData, mode }: BrandFormProps) {
     e.preventDefault()
     
     if (!validateForm()) return
+    if (errors.slug) return // Don't submit if slug validation failed
+
+    if (!tenant?.id) {
+      setError('Tenant not found')
+      return
+    }
 
     try {
-      const brandData = {
-        name: formData.name,
-        slug: formData.slug,
-        description: formData.description || null,
-        logo_url: brandImages.length > 0 ? brandImages[0] : null,
-        website_url: formData.website_url || null,
-        sort_order: parseInt(formData.sort_order),
+      setLoading(true)
+      setError('')
+
+      const categoryData: CategoryCreateData = {
+        name: formData.name.trim(),
+        slug: formData.slug.trim(),
+        description: formData.description.trim() || null,
+        image_url: categoryImages.length > 0 ? categoryImages[0] : null,
+        parent_id: formData.parent_id || null,
+        sort_order: parseInt(formData.sort_order) || 0,
         is_active: formData.is_active,
-        seo_title: formData.seo_title || null,
-        seo_description: formData.seo_description || null
+        seo_title: formData.seo_title.trim() || null,
+        seo_description: formData.seo_description.trim() || null
       }
 
+      const tenantDb = new TenantDatabase(tenant.id)
+
       if (mode === 'create') {
-        await createBrand(brandData)
-        router.push('/admin/brands')
+        const { data, error: createError } = await tenantDb.createCategory(categoryData)
+        
+        if (createError) {
+          throw new Error(createError.message || 'Failed to create category')
+        }
+
+        setSuccess(true)
+        setTimeout(() => {
+          router.push('/admin/categories')
+        }, 1500)
       } else if (initialData) {
-        await updateBrand(initialData.id, brandData)
-        router.push('/admin/brands')
+        const { error: updateError } = await tenantDb.updateCategory(initialData.id, categoryData)
+        
+        if (updateError) {
+          throw new Error(updateError.message || 'Failed to update category')
+        }
+
+        setSuccess(true)
+        setTimeout(() => {
+          router.push('/admin/categories')
+        }, 1500)
       }
-    } catch (error) {
-      console.error('Failed to save brand:', error)
+    } catch (err: any) {
+      console.error('Error saving category:', err)
+      setError(err.message || 'An unexpected error occurred')
+    } finally {
+      setLoading(false)
     }
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => router.back()}
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            {t('back')}
+          <Button variant="outline" size="icon" asChild>
+            <Link href="/admin/categories">
+              <ArrowLeft className="h-4 w-4" />
+            </Link>
           </Button>
           <div>
             <h1 className="text-2xl font-bold">
-              {mode === 'create' ? t('createBrand') : t('editBrand')}
+              {mode === 'create' ? t('title.new') : t('title.edit')}
             </h1>
             {initialData && (
               <p className="text-muted-foreground">
-                {t('editingBrand', { name: initialData.name })}
+                {t('editingCategory', { name: initialData.name })}
               </p>
             )}
           </div>
         </div>
         <Button type="submit" disabled={loading}>
           <Save className="w-4 h-4 mr-2" />
-          {loading ? t('savingBrand') : t('saveBrand')}
+          {loading ? (mode === 'create' ? t('buttons.creating') : t('buttons.updating')) : (mode === 'create' ? t('buttons.create') : t('buttons.update'))}
         </Button>
       </div>
+
+      {/* Error Alert */}
+      {error && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+
+      {/* Success Alert */}
+      {success && (
+        <Alert className="border-green-200 bg-green-50">
+          <FolderOpen className="h-4 w-4 text-green-600" />
+          <AlertDescription className="text-green-600">
+            {mode === 'create' ? tCommon('categoryCreated') : tCommon('categoryUpdated')}
+          </AlertDescription>
+        </Alert>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
           {/* Basic Information */}
           <Card>
             <CardHeader>
-              <CardTitle>{t('basicInformation')}</CardTitle>
+              <CardTitle>{t('sections.basic')}</CardTitle>
+              <CardDescription>Enter the basic information for this category</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="name">{t('nameRequired')}</Label>
+                  <Label htmlFor="name">{t('fields.name.label')}</Label>
                   <Input
                     id="name"
                     value={formData.name}
                     onChange={(e) => handleNameChange(e.target.value)}
-                    placeholder={t('enterBrandName')}
+                    placeholder={t('fields.name.placeholder')}
+                    disabled={loading}
                   />
                   {errors.name && (
                     <Alert variant="destructive">
@@ -242,18 +320,19 @@ export function BrandForm({ initialData, mode }: BrandFormProps) {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="slug">{t('slugRequired')}</Label>
+                  <Label htmlFor="slug">{t('fields.slug.label')}</Label>
                   <div className="relative">
                     <Input
                       id="slug"
                       value={formData.slug}
                       onChange={(e) => handleSlugChange(e.target.value)}
-                      placeholder={t('brandSlugPlaceholder')}
+                      placeholder={t('fields.slug.placeholder')}
                       className={errors.slug ? 'border-red-500' : ''}
+                      disabled={loading}
                     />
                     {slugValidating && (
                       <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                        <div className="animate-spin h-4 w-4 border-2 border-gray-300 border-t-blue-600 rounded-full"></div>
+                        <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
                       </div>
                     )}
                   </div>
@@ -264,53 +343,56 @@ export function BrandForm({ initialData, mode }: BrandFormProps) {
                     </Alert>
                   )}
                   {!errors.slug && formData.slug && !slugValidating && (
-                    <p className="text-sm text-green-600">{t('slugIsAvailable')}</p>
+                    <p className="text-sm text-green-600">Slug is available</p>
                   )}
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="description">{t('description')}</Label>
+                <Label htmlFor="description">{t('fields.description.label')}</Label>
                 <Textarea
                   id="description"
                   value={formData.description}
-                  onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                  placeholder={t('enterBrandDescription')}
+                  onChange={(e) => handleInputChange('description', e.target.value)}
+                  placeholder={t('fields.description.placeholder')}
                   rows={3}
+                  disabled={loading}
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="website_url">{t('websiteUrl')}</Label>
+                <Label htmlFor="sort_order">Sort Order</Label>
                 <Input
-                  id="website_url"
-                  type="url"
-                  value={formData.website_url}
-                  onChange={(e) => setFormData(prev => ({ ...prev, website_url: e.target.value }))}
-                  placeholder={t('websiteUrlPlaceholder')}
+                  id="sort_order"
+                  type="number"
+                  min="0"
+                  value={formData.sort_order}
+                  onChange={(e) => handleInputChange('sort_order', e.target.value)}
+                  placeholder="0"
+                  disabled={loading}
                 />
-                {errors.website_url && (
+                {errors.sort_order && (
                   <Alert variant="destructive">
                     <AlertCircle className="h-4 w-4" />
-                    <AlertDescription>{errors.website_url}</AlertDescription>
+                    <AlertDescription>{errors.sort_order}</AlertDescription>
                   </Alert>
                 )}
               </div>
             </CardContent>
           </Card>
 
-          {/* Brand Logo */}
+          {/* Category Image */}
           <Card>
             <CardHeader>
-              <CardTitle>{t('brandLogo')}</CardTitle>
+              <CardTitle>{t('fields.image.label')}</CardTitle>
             </CardHeader>
             <CardContent>
               <ImageUpload
                 tenantId={tenant?.id || ''}
                 productId={mode === 'edit' ? initialData?.id : undefined}
-                initialImages={brandImages}
+                initialImages={categoryImages}
                 maxImages={1}
-                onImagesChange={setBrandImages}
+                onImagesChange={setCategoryImages}
                 disabled={loading}
               />
             </CardContent>
@@ -319,27 +401,30 @@ export function BrandForm({ initialData, mode }: BrandFormProps) {
           {/* SEO Information */}
           <Card>
             <CardHeader>
-              <CardTitle>{t('seoInformation')}</CardTitle>
+              <CardTitle>{t('sections.seo')}</CardTitle>
+              <CardDescription>Optimize this category for search engines</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="seo_title">{t('seoTitle')}</Label>
+                <Label htmlFor="seo_title">{t('fields.seo.title.label')}</Label>
                 <Input
                   id="seo_title"
                   value={formData.seo_title}
-                  onChange={(e) => setFormData(prev => ({ ...prev, seo_title: e.target.value }))}
-                  placeholder={t('seoTitlePlaceholder')}
+                  onChange={(e) => handleInputChange('seo_title', e.target.value)}
+                  placeholder={t('fields.seo.title.placeholder')}
+                  disabled={loading}
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="seo_description">{t('seoDescription')}</Label>
+                <Label htmlFor="seo_description">{t('fields.seo.description.label')}</Label>
                 <Textarea
                   id="seo_description"
                   value={formData.seo_description}
-                  onChange={(e) => setFormData(prev => ({ ...prev, seo_description: e.target.value }))}
-                  placeholder={t('seoDescriptionPlaceholder')}
+                  onChange={(e) => handleInputChange('seo_description', e.target.value)}
+                  placeholder={t('fields.seo.description.placeholder')}
                   rows={3}
+                  disabled={loading}
                 />
               </div>
             </CardContent>
@@ -355,11 +440,11 @@ export function BrandForm({ initialData, mode }: BrandFormProps) {
             <CardContent>
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
-                  {brandImages.length > 0 ? (
+                  {categoryImages.length > 0 ? (
                     <img
-                      src={brandImages[0]}
-                      alt="Brand logo"
-                      className="w-12 h-12 object-contain bg-white rounded border"
+                      src={categoryImages[0]}
+                      alt="Category image"
+                      className="w-12 h-12 object-cover bg-white rounded border"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement
                         target.style.display = 'none'
@@ -367,11 +452,11 @@ export function BrandForm({ initialData, mode }: BrandFormProps) {
                     />
                   ) : (
                     <div className="w-12 h-12 bg-gray-100 rounded flex items-center justify-center">
-                      <Package className="h-6 w-6 text-gray-400" />
+                      <FolderOpen className="h-6 w-6 text-gray-400" />
                     </div>
                   )}
                   <div>
-                    <h3 className="font-semibold">{formData.name || t('brandNamePlaceholder')}</h3>
+                    <h3 className="font-semibold">{formData.name || t('categoryNamePlaceholder')}</h3>
                     {formData.description && (
                       <p className="text-sm text-muted-foreground line-clamp-2">
                         {formData.description}
@@ -379,13 +464,6 @@ export function BrandForm({ initialData, mode }: BrandFormProps) {
                     )}
                   </div>
                 </div>
-
-                {formData.website_url && (
-                  <div className="flex items-center gap-2 text-sm text-blue-600">
-                    <ExternalLink className="h-4 w-4" />
-                    <span className="truncate">{formData.website_url}</span>
-                  </div>
-                )}
 
                 {formData.slug && (
                   <div className="font-mono text-xs bg-muted px-2 py-1 rounded">
@@ -399,43 +477,27 @@ export function BrandForm({ initialData, mode }: BrandFormProps) {
           {/* Settings */}
           <Card>
             <CardHeader>
-              <CardTitle>{t('settings')}</CardTitle>
+              <CardTitle>{t('sections.advanced')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <Label>{t('brandStatus')}</Label>
+                  <Label>{t('fields.status.label')}</Label>
                   <p className="text-sm text-muted-foreground">
-                    {t('brandStatusDescription', { status: formData.is_active ? t('visible') : t('hidden') })}
+                    {t('fields.status.description')}
                   </p>
                 </div>
                 <Switch
                   checked={formData.is_active}
-                  onCheckedChange={(checked) => setFormData(prev => ({ ...prev, is_active: checked }))}
+                  onCheckedChange={(checked) => handleInputChange('is_active', checked)}
+                  disabled={loading}
                 />
               </div>
 
               <Separator />
 
-              <div className="space-y-2">
-                <Label htmlFor="sort_order">{t('sortOrder')}</Label>
-                <Input
-                  id="sort_order"
-                  type="number"
-                  min="0"
-                  value={formData.sort_order}
-                  onChange={(e) => setFormData(prev => ({ ...prev, sort_order: e.target.value }))}
-                  placeholder={t('sortOrderPlaceholder')}
-                />
-                {errors.sort_order && (
-                  <Alert variant="destructive">
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertDescription>{errors.sort_order}</AlertDescription>
-                  </Alert>
-                )}
-                <p className="text-sm text-muted-foreground">
-                  {t('sortOrderDescription')}
-                </p>
+              <div className="text-sm text-muted-foreground">
+                <p>Categories with lower sort order appear first in listings</p>
               </div>
             </CardContent>
           </Card>

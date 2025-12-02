@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
+import Image from "next/image";
 import { getCategories, type Category } from "@/lib/services/api";
 
 interface StoreHomepageProps {
@@ -149,7 +150,19 @@ export default function StoreHomepage({ tenant }: StoreHomepageProps) {
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className={`bg-gradient-to-br ${colorScheme.bg} h-32 rounded-md mb-4`}></div>
+                    <div className="relative h-32 rounded-md mb-4 overflow-hidden">
+                      {category.image_url ? (
+                        <Image
+                          src={category.image_url}
+                          alt={category.name}
+                          fill
+                          className="object-cover transition-transform hover:scale-105"
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        />
+                      ) : (
+                        <div className={`bg-gradient-to-br ${colorScheme.bg} w-full h-full`}></div>
+                      )}
+                    </div>
                     <Badge variant="secondary">{colorScheme.badge}</Badge>
                   </CardContent>
                   <CardFooter>

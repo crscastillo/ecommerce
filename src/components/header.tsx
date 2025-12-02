@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -101,12 +102,27 @@ export function Header() {
                               <NavigationMenuLink asChild>
                                 <Link
                                   href={`/products/category/${category.slug}`}
-                                  className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                                  className="block select-none rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
                                 >
-                                  <div className="text-sm font-medium leading-none">{category.name}</div>
-                                  <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                                    {category.description || t('navigation.browseCategoryCollection', { category: category.name.toLowerCase() })}
-                                  </p>
+                                  <div className="flex items-center space-x-3">
+                                    {category.image_url && (
+                                      <div className="relative w-10 h-10 flex-shrink-0 rounded-md overflow-hidden">
+                                        <Image
+                                          src={category.image_url}
+                                          alt={category.name}
+                                          fill
+                                          className="object-cover"
+                                          sizes="40px"
+                                        />
+                                      </div>
+                                    )}
+                                    <div className="space-y-1 flex-1 min-w-0">
+                                      <div className="text-sm font-medium leading-none">{category.name}</div>
+                                      <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                                        {category.description || t('navigation.browseCategoryCollection', { category: category.name.toLowerCase() })}
+                                      </p>
+                                    </div>
+                                  </div>
                                 </Link>
                               </NavigationMenuLink>
                             </li>

@@ -77,6 +77,7 @@ export interface ProductsByCategoryResponse {
     id: string
     name: string
     description: string | null
+    image_url: string | null
   }
   products: Product[]
 }

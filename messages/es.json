@@ -93,6 +93,7 @@
     "sortOrder": "Orden de Clasificación",
     "sortOrderPlaceholder": "1",
     "sortOrderDescription": "Los números más bajos aparecen primero en la lista de marcas",
+    "brandLogo": "Logo de la Marca",
     "filters": "Filtros",
     "searchBrands": "Buscar marcas...",
     "all": "Todas",
@@ -156,7 +157,47 @@
     "manageStoreCategories": "Gestiona las categorías y organización de tu tienda",
     "viewCategoryDetails": "Ver Detalles de Categoría",
     "editCategoryDetails": "Editar Detalles de Categoría",
-    "viewInStore": "Ver en Tienda"
+    "viewInStore": "Ver en Tienda",
+    "categoryImage": "Imagen de Categoría",
+    "createCategory": "Crear Categoría",
+    "editCategory": "Editar Categoría",
+    "editingCategory": "Editando {name}",
+    "saving": "Guardando...",
+    "saveCategory": "Guardar Categoría",
+    "basicInformation": "Información Básica",
+    "essentialCategoryDetails": "Detalles esenciales de la categoría",
+    "categoryNameRequired": "Nombre de Categoría (Requerido)",
+    "enterCategoryName": "Ingrese el nombre de la categoría",
+    "urlSlugRequired": "URL Slug (Requerido)",
+    "categoryUrlSlug": "slug-url-categoria",
+    "slugIsAvailable": "El slug está disponible",
+    "description": "Descripción",
+    "categoryDescription": "Ingrese la descripción de la categoría",
+    "seoInformation": "Información SEO",
+    "optimizeCategoryForSEO": "Optimiza tu categoría para motores de búsqueda",
+    "seoTitle": "Título SEO",
+    "seoTitlePlaceholder": "Nombre de categoría - Tu tienda",
+    "seoDescription": "Descripción SEO",
+    "seoDescriptionPlaceholder": "Descripción para motores de búsqueda",
+    "preview": "Vista Previa",
+    "categoryNamePlaceholder": "Nombre de la Categoría",
+    "settings": "Configuración",
+    "categoryStatus": "Estado de la Categoría",
+    "categoryStatusDescription": "La categoría está actualmente {status} en tu tienda",
+    "visible": "visible",
+    "hidden": "oculta",
+    "sortOrderDescription": "Los números más bajos aparecen primero en la lista de categorías",
+    "categoryNameIsRequired": "El nombre de la categoría es requerido",
+    "categorySlugIsRequired": "El slug de la categoría es requerido",
+    "slugInvalidCharacters": "El slug solo puede contener letras minúsculas, números y guiones",
+    "sortOrderMustBeValid": "El orden de clasificación debe ser un número válido",
+    "errorCheckingSlugAvailability": "Error verificando la disponibilidad del slug",
+    "slugAlreadyExists": "Este slug ya existe",
+    "categoryNotFound": "Categoría no encontrada",
+    "failedToLoadCategory": "Error al cargar la categoría",
+    "loadingCategory": "Cargando categoría...",
+    "categoryCreatedSuccessfully": "¡Categoría creada exitosamente!",
+    "categoryUpdatedSuccessfully": "¡Categoría actualizada exitosamente!"
   },
   "common": {
     "save": "Guardar",
@@ -624,7 +665,69 @@
     "productsFound": "{count, plural, one {# producto} other {# productos}} encontrado{count, plural, one {} other {s}}",
     "noProducts": "No se encontraron productos",
     "noProductsDescription": "Esta categoría no tiene productos aún.",
-    "browseOtherCategories": "Explorar Otras Categorías"
+    "browseOtherCategories": "Explorar Otras Categorías",
+    "form": {
+      "title": {
+        "new": "Crear Categoría",
+        "edit": "Editar Categoría"
+      },
+      "fields": {
+        "name": {
+          "label": "Nombre de la Categoría",
+          "placeholder": "Ingresa el nombre de la categoría",
+          "required": "El nombre de la categoría es requerido"
+        },
+        "slug": {
+          "label": "Slug de URL",
+          "placeholder": "categoria-slug",
+          "description": "Versión amigable para URL del nombre"
+        },
+        "description": {
+          "label": "Descripción",
+          "placeholder": "Ingresa la descripción de la categoría"
+        },
+        "image": {
+          "label": "Imagen de la Categoría",
+          "description": "Sube una imagen para esta categoría"
+        },
+        "parentCategory": {
+          "label": "Categoría Padre",
+          "placeholder": "Selecciona categoría padre (opcional)"
+        },
+        "status": {
+          "label": "Estado",
+          "active": "Activo",
+          "inactive": "Inactivo",
+          "description": "Las categorías activas son visibles en la tienda"
+        },
+        "seo": {
+          "title": {
+            "label": "Título SEO",
+            "placeholder": "Ingresa el título SEO"
+          },
+          "description": {
+            "label": "Descripción SEO",
+            "placeholder": "Ingresa la descripción SEO"
+          },
+          "keywords": {
+            "label": "Palabras Clave SEO",
+            "placeholder": "Ingresa palabras clave separadas por comas"
+          }
+        }
+      },
+      "buttons": {
+        "create": "Crear Categoría",
+        "update": "Actualizar Categoría",
+        "cancel": "Cancelar",
+        "creating": "Creando...",
+        "updating": "Actualizando..."
+      },
+      "sections": {
+        "basic": "Información Básica",
+        "seo": "Configuración SEO",
+        "advanced": "Configuración Avanzada"
+      }
+    }
   },
   "orders": {
     "title": "Pedidos",

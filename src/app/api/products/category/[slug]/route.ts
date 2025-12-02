@@ -34,7 +34,7 @@ export async function GET(
     console.log('[API] Products by category - Fetching category with slug:', slug)
     const { data: category, error: categoryError } = await supabase
       .from('categories')
-      .select('id, name, description')
+      .select('id, name, description, image_url')
       .eq('tenant_id', tenantId)
       .eq('slug', slug)
       .eq('is_active', true)

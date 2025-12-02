@@ -7,6 +7,7 @@ import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { ProductCard } from '@/components/product-card'
 import Link from 'next/link'
+import Image from 'next/image'
 import { getProductsByCategory, type ProductsByCategoryResponse } from '@/lib/services/api'
 
 export default function CategoryProductsPage() {
@@ -110,9 +111,33 @@ export default function CategoryProductsPage() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Category Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">{category.name}</h1>
-          {category.description && (
-            <p className="text-lg text-gray-600">{category.description}</p>
+          {category.image_url && (
+            <div className="relative h-48 w-full mb-6 rounded-lg overflow-hidden">
+              <Image
+                src={category.image_url}
+                alt={category.name}
+                fill
+                className="object-cover"
+                sizes="100vw"
+                priority
+              />
+              <div className="absolute inset-0 bg-black bg-opacity-30 flex items-end">
+                <div className="p-6 text-white">
+                  <h1 className="text-4xl font-bold mb-2">{category.name}</h1>
+                  {category.description && (
+                    <p className="text-lg opacity-90">{category.description}</p>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+          {!category.image_url && (
+            <>
+              <h1 className="text-3xl font-bold text-gray-900 mb-4">{category.name}</h1>
+              {category.description && (
+                <p className="text-lg text-gray-600">{category.description}</p>
+              )}
+            </>
           )}
           <p className="text-sm text-gray-500 mt-2">
             {t('category.productsFound', { count: products.length })}

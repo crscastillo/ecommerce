@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { useTenant } from '@/lib/contexts/tenant-context'
 import { useTranslations } from 'next-intl'
 import { Package } from 'lucide-react'
@@ -28,20 +29,80 @@ interface Brand {
   slug: string
 }
 
-export default function ProductsPage() {
+function ProductsPageContent() {
   const { tenant } = useTenant()
   const t = useTranslations()
+  const router = useRouter()
+  const searchParams = useSearchParams()
   const [products, setProducts] = useState<Product[]>([])
   const [categories, setCategories] = useState<Category[]>([])
   const [brands, setBrands] = useState<Brand[]>([])
   const [tenantSettings, setTenantSettings] = useState<any>({})
   const [loading, setLoading] = useState(true)
-  const [searchQuery, setSearchQuery] = useState('')
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([])
-  const [selectedBrands, setSelectedBrands] = useState<string[]>([])
+  const [searchQuery, setSearchQuery] = useState(searchParams?.get('search') || '')
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(() => {
+    const categoryParam = searchParams?.get('category')
+    return categoryParam ? [categoryParam] : []
+  })
+  const [selectedBrands, setSelectedBrands] = useState<string[]>(() => {
+    const brandParam = searchParams?.get('brand')
+    return brandParam ? brandParam.split(',') : []
+  })
   const [viewMode, setViewMode] = useState<ViewMode>('grid')
-  const [sortBy, setSortBy] = useState<SortOption>('newest')
+  const [sortBy, setSortBy] = useState<SortOption>(() => {
+    const sortParam = searchParams?.get('sort') as SortOption
+    return sortParam && ['newest', 'price-low', 'price-high', 'name'].includes(sortParam) ? sortParam : 'newest'
+  })
   const [showMobileFilters, setShowMobileFilters] = useState(false)
+
+  // Update URL when filters change
+  const updateURL = (newParams: {
+    search?: string
+    category?: string[]
+    brand?: string[]
+    sort?: string
+  }) => {
+    const params = new URLSearchParams(searchParams?.toString())
+    
+    // Update search
+    if (newParams.search !== undefined) {
+      if (newParams.search) {
+        params.set('search', newParams.search)
+      } else {
+        params.delete('search')
+      }
+    }
+    
+    // Update category
+    if (newParams.category !== undefined) {
+      if (newParams.category.length > 0) {
+        params.set('category', newParams.category[0]) // For now, support single category
+      } else {
+        params.delete('category')
+      }
+    }
+    
+    // Update brands
+    if (newParams.brand !== undefined) {
+      if (newParams.brand.length > 0) {
+        params.set('brand', newParams.brand.join(','))
+      } else {
+        params.delete('brand')
+      }
+    }
+    
+    // Update sort
+    if (newParams.sort !== undefined) {
+      if (newParams.sort !== 'newest') {
+        params.set('sort', newParams.sort)
+      } else {
+        params.delete('sort')
+      }
+    }
+    
+    const newURL = params.toString() ? `?${params.toString()}` : '/products'
+    router.replace(newURL, { scroll: false })
+  }
 
   useEffect(() => {
     if (!tenant?.id) return
@@ -80,17 +141,11 @@ export default function ProductsPage() {
         }
 
         if (selectedCategories.length > 0) {
-          filters.category_ids = selectedCategories.join(',')
+          filters.category_slugs = selectedCategories.join(',')
         }
 
         if (selectedBrands.length > 0) {
-          // Find brand slugs by IDs using the current brands data
-          const brandSlugs = currentBrands
-            .filter(b => selectedBrands.includes(b.id))
-            .map(b => b.slug)
-          if (brandSlugs.length > 0) {
-            filters.brand_slugs = brandSlugs.join(',')
-          }
+          filters.brand_slugs = selectedBrands.join(',')
         }
 
         // Load products with filters
@@ -125,20 +180,22 @@ export default function ProductsPage() {
     loadData()
   }, [tenant?.id, selectedCategories, selectedBrands, searchQuery, sortBy])
 
-  const handleCategoryChange = (categoryId: string, checked: boolean) => {
-    if (checked) {
-      setSelectedCategories(prev => [...prev, categoryId])
-    } else {
-      setSelectedCategories(prev => prev.filter(id => id !== categoryId))
-    }
+  const handleCategoryChange = (categorySlug: string, checked: boolean) => {
+    const newCategories = checked 
+      ? [...selectedCategories, categorySlug]
+      : selectedCategories.filter(slug => slug !== categorySlug)
+    
+    setSelectedCategories(newCategories)
+    updateURL({ category: newCategories })
   }
 
-  const handleBrandChange = (brandId: string, checked: boolean) => {
-    if (checked) {
-      setSelectedBrands(prev => [...prev, brandId])
-    } else {
-      setSelectedBrands(prev => prev.filter(id => id !== brandId))
-    }
+  const handleBrandChange = (brandSlug: string, checked: boolean) => {
+    const newBrands = checked
+      ? [...selectedBrands, brandSlug]
+      : selectedBrands.filter(slug => slug !== brandSlug)
+    
+    setSelectedBrands(newBrands)
+    updateURL({ brand: newBrands })
   }
 
   const clearFilters = () => {
@@ -146,6 +203,7 @@ export default function ProductsPage() {
     setSelectedBrands([])
     setSearchQuery('')
     setSortBy('newest')
+    updateURL({ category: [], brand: [], search: '', sort: 'newest' })
   }
 
   const hasActiveFilters = !!(selectedCategories.length > 0 || selectedBrands.length > 0 || searchQuery)
@@ -197,7 +255,10 @@ export default function ProductsPage() {
             viewMode={viewMode}
             onViewModeChange={setViewMode}
             sortBy={sortBy}
-            onSortChange={setSortBy}
+            onSortChange={(newSort) => {
+              setSortBy(newSort)
+              updateURL({ sort: newSort })
+            }}
             hasActiveFilters={hasActiveFilters}
             activeFiltersCount={selectedCategories.length + selectedBrands.length + (searchQuery ? 1 : 0)}
             onShowMobileFilters={() => setShowMobileFilters(true)}
@@ -213,7 +274,10 @@ export default function ProductsPage() {
             brands={brands}
             onRemoveBrand={(brandId) => handleBrandChange(brandId, false)}
             searchQuery={searchQuery}
-            onRemoveSearch={() => setSearchQuery('')}
+            onRemoveSearch={() => {
+              setSearchQuery('')
+              updateURL({ search: '' })
+            }}
             onClearAll={clearFilters}
             t={t}
           />
@@ -237,7 +301,10 @@ export default function ProductsPage() {
         show={showMobileFilters}
         onClose={() => setShowMobileFilters(false)}
         searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
+        onSearchChange={(query) => {
+          setSearchQuery(query)
+          updateURL({ search: query })
+        }}
         categories={categories}
         selectedCategories={selectedCategories}
         onCategoryChange={handleCategoryChange}
@@ -248,5 +315,23 @@ export default function ProductsPage() {
         t={t}
       />
     </div>
+  )
+}
+
+export default function ProductsPage() {
+  return (
+    <Suspense fallback={
+      <div className="container mx-auto px-4 py-8">
+        <div className="mb-8">
+          <div className="h-8 bg-gray-200 rounded mb-2 max-w-md animate-pulse"></div>
+          <div className="h-4 bg-gray-200 rounded max-w-xl animate-pulse"></div>
+        </div>
+        <div className="animate-pulse">
+          <div className="h-64 bg-gray-200 rounded"></div>
+        </div>
+      </div>
+    }>
+      <ProductsPageContent />
+    </Suspense>
   )
 }

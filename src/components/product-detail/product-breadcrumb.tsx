@@ -22,7 +22,7 @@ export function ProductBreadcrumb({ category, t }: ProductBreadcrumbProps) {
         <>
           <span>/</span>
           <Link 
-            href={`/products/category/${category.slug}`} 
+            href={`/products?category=${category.slug}`} 
             className="hover:text-gray-900"
           >
             {category.name}

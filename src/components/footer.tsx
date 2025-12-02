@@ -40,7 +40,7 @@ export function Footer({ categories = [] }: FooterProps) {
                 categories.slice(0, 5).map((category) => (
                   <li key={category.id}>
                     <Link 
-                      href={`/products/category/${category.slug}`} 
+                      href={`/products?category=${category.slug}`} 
                       className="text-muted-foreground hover:text-foreground"
                     >
                       {category.name}

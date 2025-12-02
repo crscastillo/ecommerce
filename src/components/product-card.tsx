@@ -326,7 +326,7 @@ export function ProductCard({ product, viewMode = 'grid', tenantSettings = {} }:
                       {product.brand && <span className="text-gray-400">•</span>}
                       <span className="text-gray-600">{t('product.in')}</span>
                       <Link 
-                        href={`/products/category/${product.category.slug}`}
+                        href={`/products?category=${product.category.slug}`}
                         className="text-gray-600 hover:text-gray-900"
                       >
                         {product.category.name}
@@ -530,7 +530,7 @@ export function ProductCard({ product, viewMode = 'grid', tenantSettings = {} }:
             
             {product.category && (
               <Link 
-                href={`/products/category/${product.category.slug}`}
+                href={`/products?category=${product.category.slug}`}
                 className="text-xs sm:text-sm text-gray-600 hover:text-gray-900 block"
               >
                 {product.category.name}

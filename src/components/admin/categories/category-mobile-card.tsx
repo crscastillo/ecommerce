@@ -107,7 +107,7 @@ export function CategoryMobileCard({
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
-                        <Link href={`/products/category/${category.slug}`} target="_blank" className="text-xs">
+                        <Link href={`/products?category=${category.slug}`} target="_blank" className="text-xs">
                           <Eye className="mr-2 h-3 w-3" />
                           Preview
                         </Link>

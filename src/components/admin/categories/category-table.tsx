@@ -176,7 +176,7 @@ export function CategoryTable({
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
-                        <Link href={`/products/category/${category.slug}`} target="_blank">
+                        <Link href={`/products?category=${category.slug}`} target="_blank">
                           <Eye className="mr-2 h-4 w-4" />
                           {t('previewStore')}
                         </Link>

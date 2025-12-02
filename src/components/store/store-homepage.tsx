@@ -239,7 +239,7 @@ export default function StoreHomepage({ tenant }: StoreHomepageProps) {
                   </CardContent>
                   <CardFooter>
                     <Button asChild className="w-full">
-                      <Link href={`/products/category/${category.slug}`}>
+                      <Link href={`/products?category=${category.slug}`}>
                         {t('store.browseCategory', { categoryName: category.name })}
                       </Link>
                     </Button>

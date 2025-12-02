@@ -8,11 +8,13 @@ import { Search } from 'lucide-react'
 interface Category {
   id: string
   name: string
+  slug: string
 }
 
 interface Brand {
   id: string
   name: string
+  slug: string
 }
 
 interface ProductsSidebarProps {
@@ -20,10 +22,10 @@ interface ProductsSidebarProps {
   onSearchChange: (query: string) => void
   categories: Category[]
   selectedCategories: string[]
-  onCategoryChange: (categoryId: string, checked: boolean) => void
+  onCategoryChange: (categorySlug: string, checked: boolean) => void
   brands: Brand[]
   selectedBrands: string[]
-  onBrandChange: (brandId: string, checked: boolean) => void
+  onBrandChange: (brandSlug: string, checked: boolean) => void
   hasActiveFilters: boolean
   onClearFilters: () => void
   t: any
@@ -83,8 +85,8 @@ export function ProductsSidebar({
                 <label key={category.id} className="flex items-center space-x-2">
                   <input
                     type="checkbox"
-                    checked={selectedCategories.includes(category.id)}
-                    onChange={(e) => onCategoryChange(category.id, e.target.checked)}
+                    checked={selectedCategories.includes(category.slug)}
+                    onChange={(e) => onCategoryChange(category.slug, e.target.checked)}
                     className="w-4 h-4 text-blue-600"
                   />
                   <span className="text-sm text-gray-700">{category.name}</span>
@@ -101,8 +103,8 @@ export function ProductsSidebar({
                 <label key={brand.id} className="flex items-center space-x-2">
                   <input
                     type="checkbox"
-                    checked={selectedBrands.includes(brand.id)}
-                    onChange={(e) => onBrandChange(brand.id, e.target.checked)}
+                    checked={selectedBrands.includes(brand.slug)}
+                    onChange={(e) => onBrandChange(brand.slug, e.target.checked)}
                     className="w-4 h-4 text-blue-600"
                   />
                   <span className="text-sm text-gray-700">{brand.name}</span>

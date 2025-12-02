@@ -67,7 +67,7 @@ export function ProductInfoHeader({
               {brand && <span className="text-gray-400">•</span>}
               <span className="text-gray-600">{t('product.in')}</span>
               <Link 
-                href={`/products/category/${category.slug}`}
+                href={`/products?category=${category.slug}`}
                 className="font-medium text-blue-600 hover:text-blue-800"
               >
                 {category.name}

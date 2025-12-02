@@ -6,20 +6,22 @@ import { Badge } from '@/components/ui/badge'
 interface Category {
   id: string
   name: string
+  slug: string
 }
 
 interface Brand {
   id: string
   name: string
+  slug: string
 }
 
 interface ActiveFiltersProps {
   selectedCategories: string[]
   categories: Category[]
-  onRemoveCategory: (categoryId: string) => void
+  onRemoveCategory: (categorySlug: string) => void
   selectedBrands: string[]
   brands: Brand[]
-  onRemoveBrand: (brandId: string) => void
+  onRemoveBrand: (brandSlug: string) => void
   searchQuery: string
   onRemoveSearch: () => void
   onClearAll: () => void
@@ -46,13 +48,13 @@ export function ActiveFilters({
     <div className="mt-4 flex items-center gap-2 flex-wrap">
       <span className="text-sm text-gray-600">{t('products.activeFilters')}:</span>
       
-      {selectedCategories.map(categoryId => {
-        const category = categories.find(c => c.id === categoryId)
+      {selectedCategories.map(categorySlug => {
+        const category = categories.find(c => c.slug === categorySlug)
         return category ? (
-          <Badge key={categoryId} variant="secondary" className="gap-1">
+          <Badge key={categorySlug} variant="secondary" className="gap-1">
             {t('products.category')}: {category.name}
             <button
-              onClick={() => onRemoveCategory(categoryId)}
+              onClick={() => onRemoveCategory(categorySlug)}
               className="ml-1 hover:text-red-600"
             >
               ×
@@ -61,13 +63,13 @@ export function ActiveFilters({
         ) : null
       })}
       
-      {selectedBrands.map(brandId => {
-        const brand = brands.find(b => b.id === brandId)
+      {selectedBrands.map(brandSlug => {
+        const brand = brands.find(b => b.slug === brandSlug)
         return brand ? (
-          <Badge key={brandId} variant="secondary" className="gap-1">
+          <Badge key={brandSlug} variant="secondary" className="gap-1">
             {t('products.brand')}: {brand.name}
             <button
-              onClick={() => onRemoveBrand(brandId)}
+              onClick={() => onRemoveBrand(brandSlug)}
               className="ml-1 hover:text-red-600"
             >
               ×

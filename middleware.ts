@@ -28,6 +28,18 @@ export async function middleware(request: NextRequest) {
     userAgent: request.headers.get('user-agent')?.slice(0, 50)
   })
 
+  // Redirect old category URLs to new query parameter format
+  if (request.nextUrl.pathname.startsWith('/products/category/')) {
+    const categorySlug = request.nextUrl.pathname.split('/products/category/')[1]
+    if (categorySlug) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/products'
+      url.searchParams.set('category', categorySlug)
+      console.log('[Middleware] Redirecting category URL to:', url.toString())
+      return NextResponse.redirect(url)
+    }
+  }
+
   // Handle main domain routing (for tenant signup, main site, etc.)
   if (isMainDomain) {
     // Check if this might be a custom domain instead of main domain

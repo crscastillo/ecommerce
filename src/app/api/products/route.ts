@@ -101,6 +101,7 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
   const tenantId = searchParams.get('tenant_id')
   const categoryIds = searchParams.get('category_ids')
+  const categorySlugs = searchParams.get('category_slugs')
   const brandSlugs = searchParams.get('brand_slugs')
   const categoryId = searchParams.get('category_id') // Keep for backward compatibility
   const brandSlug = searchParams.get('brand_slug') // Keep for backward compatibility
@@ -126,6 +127,26 @@ export async function GET(request: NextRequest) {
     
     console.log('API: Fetching products for tenant:', tenantId)
     
+    // Handle multiple category slugs
+    let categoryIdsFromSlugs: string[] = []
+    const allCategorySlugs = categorySlugs ? categorySlugs.split(',') : []
+    
+    if (allCategorySlugs.length > 0) {
+      const { data: categoryData, error: categoryError } = await supabase
+        .from('categories')
+        .select('id, slug')
+        .eq('tenant_id', tenantId)
+        .in('slug', allCategorySlugs)
+        .eq('is_active', true)
+      
+      if (categoryError) {
+        console.error('Error fetching categories:', categoryError)
+      } else if (categoryData) {
+        categoryIdsFromSlugs = categoryData.map(category => category.id)
+        console.log('Found category IDs for slugs:', allCategorySlugs, '→', categoryIdsFromSlugs)
+      }
+    }
+    
     // Handle multiple brand slugs
     let brandIds: string[] = []
     const allBrandSlugs = brandSlugs ? brandSlugs.split(',') : (brandSlug ? [brandSlug] : [])
@@ -146,8 +167,9 @@ export async function GET(request: NextRequest) {
       }
     }
     
-    // Handle multiple category IDs
-    const allCategoryIds = categoryIds ? categoryIds.split(',') : (categoryId ? [categoryId] : [])
+    // Handle multiple category IDs (from both direct IDs and converted slugs)
+    const directCategoryIds = categoryIds ? categoryIds.split(',') : (categoryId ? [categoryId] : [])
+    const allCategoryIds = [...directCategoryIds, ...categoryIdsFromSlugs]
     
     let query = supabase
       .from('products')

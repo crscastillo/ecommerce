@@ -330,8 +330,8 @@ export default function CheckoutPage() {
                   showSubmitButton={false}
                 />
                 
-                {/* Show shipping methods after address is filled */}
-                {shippingInfo.address && shippingInfo.city && shippingInfo.state && shippingInfo.zipCode && tenant?.id && (
+                {/* Show shipping methods when we have basic location info */}
+                {shippingInfo.zipCode && shippingInfo.country && tenant?.id && (
                   <ShippingMethodSelector
                     items={items}
                     shippingInfo={shippingInfo}

@@ -250,28 +250,28 @@ export function CategoryForm({ initialData, mode }: CategoryFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Button variant="outline" size="icon" asChild>
+      <div className="space-y-4">
+        {/* Back button - Mobile first */}
+        <div className="flex items-center">
+          <Button variant="outline" size="sm" asChild>
             <Link href="/admin/categories">
-              <ArrowLeft className="h-4 w-4" />
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              <span className="hidden sm:inline">{t('buttons.backToCategories')}</span>
             </Link>
           </Button>
-          <div>
-            <h1 className="text-2xl font-bold">
-              {mode === 'create' ? t('title.new') : t('title.edit')}
-            </h1>
-            {initialData && (
-              <p className="text-muted-foreground">
-                {t('editingCategory', { name: initialData.name })}
-              </p>
-            )}
-          </div>
         </div>
-        <Button type="submit" disabled={loading}>
-          <Save className="w-4 h-4 mr-2" />
-          {loading ? (mode === 'create' ? t('buttons.creating') : t('buttons.updating')) : (mode === 'create' ? t('buttons.create') : t('buttons.update'))}
-        </Button>
+        
+        {/* Title section */}
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
+            {mode === 'create' ? t('title.new') : t('title.edit')}
+          </h1>
+          {initialData && (
+            <p className="text-sm sm:text-base text-muted-foreground mt-1">
+              {t('editingCategory', { name: initialData.name })}
+            </p>
+          )}
+        </div>
       </div>
 
       {/* Error Alert */}
@@ -398,8 +398,8 @@ export function CategoryForm({ initialData, mode }: CategoryFormProps) {
             </CardContent>
           </Card>
 
-          {/* SEO Information */}
-          <Card>
+          {/* SEO Information - Hidden on mobile */}
+          <Card className="hidden sm:block">
             <CardHeader>
               <CardTitle>{t('sections.seo')}</CardTitle>
               <CardDescription>Optimize this category for search engines</CardDescription>
@@ -502,6 +502,14 @@ export function CategoryForm({ initialData, mode }: CategoryFormProps) {
             </CardContent>
           </Card>
         </div>
+      </div>
+      
+      {/* Save Button - Bottom Right */}
+      <div className="flex justify-end pt-6 border-t">
+        <Button type="submit" disabled={loading}>
+          <Save className="w-4 h-4 mr-2" />
+          {loading ? (mode === 'create' ? t('buttons.creating') : t('buttons.updating')) : (mode === 'create' ? t('buttons.create') : t('buttons.update'))}
+        </Button>
       </div>
     </form>
   )

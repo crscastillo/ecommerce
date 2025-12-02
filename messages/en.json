@@ -478,6 +478,61 @@
     "searchLabel": "Search:",
     "all": "All"
   },
+  "category": {
+    "form": {
+      "title": {
+        "new": "Create Category",
+        "edit": "Edit Category"
+      },
+      "editingCategory": "Editing {name}",
+      "sections": {
+        "basic": "Basic Information",
+        "seo": "SEO Settings",
+        "advanced": "Advanced Settings"
+      },
+      "fields": {
+        "name": {
+          "label": "Category Name",
+          "placeholder": "Enter category name",
+          "required": "Category name is required"
+        },
+        "slug": {
+          "label": "URL Slug",
+          "placeholder": "category-url-slug"
+        },
+        "description": {
+          "label": "Description",
+          "placeholder": "Enter category description"
+        },
+        "image": {
+          "label": "Category Image"
+        },
+        "seo": {
+          "title": {
+            "label": "SEO Title",
+            "placeholder": "Enter SEO title"
+          },
+          "description": {
+            "label": "SEO Description",
+            "placeholder": "Enter SEO description"
+          }
+        },
+        "status": {
+          "label": "Status",
+          "description": "Enable or disable this category"
+        }
+      },
+      "buttons": {
+        "backToCategories": "Back to Categories",
+        "create": "Create Category",
+        "update": "Update Category",
+        "creating": "Creating...",
+        "updating": "Updating..."
+      },
+      "preview": "Preview",
+      "categoryNamePlaceholder": "Category Name"
+    }
+  },
   "checkout": {
     "title": "Checkout",
     "billingAddress": "Billing Address",

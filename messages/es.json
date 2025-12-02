@@ -1576,6 +1576,61 @@
     "proceedToCheckout": "Proceder al Pago",
     "itemsInCart": "{count} artículos en el carrito"
   },
+  "category": {
+    "form": {
+      "title": {
+        "new": "Crear Categoría",
+        "edit": "Editar Categoría"
+      },
+      "editingCategory": "Editando {name}",
+      "sections": {
+        "basic": "Información Básica",
+        "seo": "Configuración SEO",
+        "advanced": "Configuración Avanzada"
+      },
+      "fields": {
+        "name": {
+          "label": "Nombre de Categoría",
+          "placeholder": "Ingrese nombre de categoría",
+          "required": "El nombre de categoría es requerido"
+        },
+        "slug": {
+          "label": "Slug URL",
+          "placeholder": "slug-url-categoria"
+        },
+        "description": {
+          "label": "Descripción",
+          "placeholder": "Ingrese descripción de la categoría"
+        },
+        "image": {
+          "label": "Imagen de Categoría"
+        },
+        "seo": {
+          "title": {
+            "label": "Título SEO",
+            "placeholder": "Ingrese título SEO"
+          },
+          "description": {
+            "label": "Descripción SEO",
+            "placeholder": "Ingrese descripción SEO"
+          }
+        },
+        "status": {
+          "label": "Estado",
+          "description": "Habilitar o deshabilitar esta categoría"
+        }
+      },
+      "buttons": {
+        "backToCategories": "Volver a Categorías",
+        "create": "Crear Categoría",
+        "update": "Actualizar Categoría",
+        "creating": "Creando...",
+        "updating": "Actualizando..."
+      },
+      "preview": "Vista Previa",
+      "categoryNamePlaceholder": "Nombre de Categoría"
+    }
+  },
   "checkout": {
     "title": "Finalizar Compra",
     "billingAddress": "Dirección de Facturación",

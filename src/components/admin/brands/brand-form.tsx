@@ -188,32 +188,32 @@ export function BrandForm({ initialData, mode }: BrandFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
+      {/* Header */}
+      <div className="space-y-4">
+        {/* Back button - Mobile first */}
+        <div className="flex items-center">
           <Button
             type="button"
             variant="outline"
             size="sm"
             onClick={() => router.back()}
           >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            {t('back')}
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            <span className="hidden sm:inline">{t('back')}</span>
           </Button>
-          <div>
-            <h1 className="text-2xl font-bold">
-              {mode === 'create' ? t('createBrand') : t('editBrand')}
-            </h1>
-            {initialData && (
-              <p className="text-muted-foreground">
-                {t('editingBrand', { name: initialData.name })}
-              </p>
-            )}
-          </div>
         </div>
-        <Button type="submit" disabled={loading}>
-          <Save className="w-4 h-4 mr-2" />
-          {loading ? t('savingBrand') : t('saveBrand')}
-        </Button>
+        
+        {/* Title section */}
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
+            {mode === 'create' ? t('createBrand') : t('editBrand')}
+          </h1>
+          {initialData && (
+            <p className="text-sm sm:text-base text-muted-foreground mt-1">
+              {t('editingBrand', { name: initialData.name })}
+            </p>
+          )}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -316,8 +316,8 @@ export function BrandForm({ initialData, mode }: BrandFormProps) {
             </CardContent>
           </Card>
 
-          {/* SEO Information */}
-          <Card>
+          {/* SEO Information - Hidden on mobile */}
+          <Card className="hidden sm:block">
             <CardHeader>
               <CardTitle>{t('seoInformation')}</CardTitle>
             </CardHeader>
@@ -440,6 +440,14 @@ export function BrandForm({ initialData, mode }: BrandFormProps) {
             </CardContent>
           </Card>
         </div>
+      </div>
+      
+      {/* Save Button - Bottom Right */}
+      <div className="flex justify-end pt-6 border-t">
+        <Button type="submit" disabled={loading}>
+          <Save className="w-4 h-4 mr-2" />
+          {loading ? t('savingBrand') : t('saveBrand')}
+        </Button>
       </div>
     </form>
   )

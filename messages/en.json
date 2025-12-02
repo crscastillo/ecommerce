@@ -218,6 +218,7 @@
     "priceRequired": "Price *",
     "priceIsRequired": "Price is required",
     "comparePrice": "Compare Price",
+    "priceRange": "Price Range",
     "comparePriceDescription": "Show customers the original price for discounts",
     "costPrice": "Cost Price",
     "costPriceDescription": "For profit margin calculations (not shown to customers)",

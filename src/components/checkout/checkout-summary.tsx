@@ -50,7 +50,9 @@ export function CheckoutSummary({
           
           <div className="flex justify-between">
             <span>Shipping</span>
-            <span className="text-green-600">Free</span>
+            <span className={shipping === 0 ? "text-green-600" : ""}>
+              {shipping === 0 ? 'Free' : formatPrice(shipping, tenant)}
+            </span>
           </div>
           
           <div className="flex justify-between">

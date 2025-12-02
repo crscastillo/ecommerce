@@ -16,7 +16,8 @@ import {
   PaymentMethodSelector, 
   TraditionalCardForm,
   OrderReview,
-  CheckoutSummary 
+  CheckoutSummary,
+  ShippingMethodSelector
 } from '@/components/checkout'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
@@ -48,6 +49,8 @@ export default function CheckoutPage() {
   const [tiloPayPaymentMethod, setTiloPayPaymentMethod] = useState<any>(null)
   const [availablePaymentMethods, setAvailablePaymentMethods] = useState<PaymentMethodConfig[]>([])
   const [loadingPaymentMethods, setLoadingPaymentMethods] = useState(true)
+  const [selectedShippingMethodId, setSelectedShippingMethodId] = useState<string | undefined>()
+  const [shippingPrice, setShippingPrice] = useState(0)
   
   const [shippingInfo, setShippingInfo] = useState<ShippingInfo>({
     firstName: '',
@@ -133,9 +136,14 @@ export default function CheckoutPage() {
   }
 
   const subtotal = getTotalPrice()
-  const shipping = 0 // Free shipping
+  const shipping = shippingPrice
   const tax = subtotal * 0.08 // 8% tax
   const total = subtotal + shipping + tax
+
+  const handleShippingMethodChange = (methodId: string, price: number) => {
+    setSelectedShippingMethodId(methodId)
+    setShippingPrice(price)
+  }
 
   const handleShippingSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -155,6 +163,12 @@ export default function CheckoutPage() {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(shippingInfo.email)) {
       error('Invalid Email', 'Please enter a valid email address')
+      return
+    }
+    
+    // Validate shipping method is selected
+    if (!selectedShippingMethodId) {
+      error('Shipping Method Required', 'Please select a shipping method')
       return
     }
     
@@ -308,11 +322,36 @@ export default function CheckoutPage() {
           <div className="lg:col-span-2">
             {/* Shipping Information */}
             {currentStep === 'shipping' && (
-              <ShippingForm
-                shippingInfo={shippingInfo}
-                onUpdate={setShippingInfo}
-                onSubmit={handleShippingSubmit}
-              />
+              <div className="space-y-6">
+                <ShippingForm
+                  shippingInfo={shippingInfo}
+                  onUpdate={setShippingInfo}
+                  onSubmit={() => {}} // Handle submission separately
+                  showSubmitButton={false}
+                />
+                
+                {/* Show shipping methods after address is filled */}
+                {shippingInfo.address && shippingInfo.city && shippingInfo.state && shippingInfo.zipCode && tenant?.id && (
+                  <ShippingMethodSelector
+                    items={items}
+                    shippingInfo={shippingInfo}
+                    selectedMethodId={selectedShippingMethodId}
+                    onMethodChange={handleShippingMethodChange}
+                    formatPrice={formatPrice}
+                    tenant={tenant}
+                    tenantId={tenant.id}
+                  />
+                )}
+                
+                {/* Continue to Payment Button */}
+                {selectedShippingMethodId && (
+                  <div className="flex justify-end">
+                    <Button onClick={handleShippingSubmit} size="lg">
+                      Continue to Payment
+                    </Button>
+                  </div>
+                )}
+              </div>
             )}
 
             {/* Payment Information */}
@@ -486,7 +525,7 @@ export default function CheckoutPage() {
             <CheckoutSummary
               items={items}
               subtotal={subtotal}
-              shipping={0}
+              shipping={shipping}
               tax={tax}
               total={total}
               formatPrice={formatPrice}

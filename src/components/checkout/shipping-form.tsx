@@ -22,9 +22,10 @@ interface ShippingFormProps {
   shippingInfo: ShippingInfo
   onUpdate: (info: ShippingInfo) => void
   onSubmit: (e: React.FormEvent) => void
+  showSubmitButton?: boolean
 }
 
-export function ShippingForm({ shippingInfo, onUpdate, onSubmit }: ShippingFormProps) {
+export function ShippingForm({ shippingInfo, onUpdate, onSubmit, showSubmitButton = true }: ShippingFormProps) {
   const handleChange = (field: keyof ShippingInfo) => (e: React.ChangeEvent<HTMLInputElement>) => {
     onUpdate({ ...shippingInfo, [field]: e.target.value })
   }
@@ -121,9 +122,11 @@ export function ShippingForm({ shippingInfo, onUpdate, onSubmit }: ShippingFormP
             </div>
           </div>
           
-          <Button type="submit" className="w-full mt-6">
-            Continue to Payment
-          </Button>
+          {showSubmitButton && (
+            <Button type="submit" className="w-full mt-6">
+              Continue to Payment
+            </Button>
+          )}
         </form>
       </CardContent>
     </Card>

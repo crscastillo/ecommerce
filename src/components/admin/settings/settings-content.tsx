@@ -27,6 +27,7 @@ import {
   usePluginFeatures,
   useTenantUsers 
 } from '@/lib/hooks/use-settings'
+import { useShippingSettings } from '@/lib/hooks/use-shipping-settings'
 
 // Import components
 import { 
@@ -39,6 +40,7 @@ import {
   UsersTab,
   SecurityTab
 } from '@/components/admin/settings'
+import type { ShippingMethod } from '@/components/admin/settings/shipping-tab'
 import { DomainSettings } from '@/components/admin/settings/domain-settings'
 import { SettingsMessage } from '@/components/admin/settings/settings-message'
 import { useSettings } from '@/lib/contexts/settings-context'
@@ -65,9 +67,8 @@ export function SettingsContent({ tenant, searchParams, router }: SettingsConten
   const pluginFeatures = usePluginFeatures()
   const tenantUsers = useTenantUsers()
 
-  // Shipping methods state (will be replaced with proper hook later)
-  const [shippingMethods, setShippingMethods] = useState([])
-  const [savingShipping, setSavingShipping] = useState(false)
+  // Shipping settings hook
+  const shippingSettings = useShippingSettings()
 
   useEffect(() => {
     setMounted(true)
@@ -343,17 +344,17 @@ export function SettingsContent({ tenant, searchParams, router }: SettingsConten
         {/* Shipping Methods Settings */}
         <TabsContent value="shipping" className="space-y-6">
           <ShippingTab
-            shippingMethods={shippingMethods}
-            onShippingMethodsChange={setShippingMethods}
+            shippingMethods={shippingSettings.shippingMethods}
+            onShippingMethodsChange={shippingSettings.setShippingMethods}
             onSave={async () => {
-              setSavingShipping(true)
-              // TODO: Implement shipping methods save logic
-              setTimeout(() => {
-                setSavingShipping(false)
+              try {
+                await shippingSettings.saveShippingSettings(shippingSettings.shippingMethods)
                 showSuccess(t('messages.shippingSaved'))
-              }, 1000)
+              } catch (error: any) {
+                showError(error.message || 'Failed to save shipping settings')
+              }
             }}
-            saving={savingShipping}
+            saving={shippingSettings.saving}
           />
         </TabsContent>
 

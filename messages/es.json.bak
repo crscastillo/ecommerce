@@ -289,7 +289,6 @@
       "electronics": "Electrónicos",
       "clothing": "Ropa",
       "homeGarden": "Hogar y Jardín",
-      "allProducts": "Todos los Productos",
       "about": "Acerca de",
       "contact": "Contacto",
       "helpCenter": "Centro de Ayuda",
@@ -1412,12 +1411,6 @@
       "postalCode": "10101",
       "selectCountry": "Seleccionar país",
       "colorValue": "#3B82F6"
-    },
-    "common": {
-      "active": "Activo",
-      "inactive": "Inactivo",
-      "save": "Guardar",
-      "saving": "Guardando..."
     }
   },
   "analytics": {
@@ -1721,7 +1714,6 @@
       "electronics": "Electrónicos",
       "clothing": "Ropa",
       "homeGarden": "Hogar y Jardín",
-      "allProducts": "Todos los Productos",
       "about": "Acerca de",
       "contact": "Contacto",
       "helpCenter": "Centro de Ayuda",

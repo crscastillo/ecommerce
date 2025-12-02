@@ -10,7 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Badge } from '@/components/ui/badge'
 import { Save, Truck, Package, Settings as SettingsIcon } from 'lucide-react'
 
-interface ShippingMethod {
+export interface ShippingMethod {
   id: string
   name: string
   description: string

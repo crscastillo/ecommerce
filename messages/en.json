@@ -635,7 +635,9 @@
   "errors": {
     "accessDenied": "Access Denied",
     "noAdminPermission": "You don't have permission to access the admin panel.",
-    "needAdminAccess": "You need administrator access to view this page. Please contact your store owner if you believe this is an error."
+    "needAdminAccess": "You need administrator access to view this page. Please contact your store owner if you believe this is an error.",
+    "storeNotFound": "Store Not Found",
+    "storeNotFoundDescription": "The store you are looking for could not be found or is not available."
   },
   "navigation": {
     "dashboard": "Dashboard",
@@ -1138,6 +1140,12 @@
         "send": "Send Invitation",
         "sending": "Sending..."
       }
+    },
+    "common": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "save": "Save",
+      "saving": "Saving..."
     }
   },
   "pages": {

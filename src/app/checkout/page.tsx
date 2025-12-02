@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useTranslations } from 'next-intl'
 import { useCart } from '@/lib/contexts/cart-context'
 import { useToast } from '@/lib/contexts/toast-context'
 import { useTenant } from '@/lib/contexts/tenant-context'
@@ -39,6 +40,7 @@ import type { PaymentInfo } from '@/components/checkout/types'
 
 export default function CheckoutPage() {
   const router = useRouter()
+  const t = useTranslations('checkout')
   const { items, getTotalPrice, getItemCount, clearCart } = useCart()
   const { success, error } = useToast()
   const { tenant } = useTenant()
@@ -149,30 +151,30 @@ export default function CheckoutPage() {
     e.preventDefault()
     
     // Basic validation
-    const requiredFields = ['firstName', 'lastName', 'email', 'address', 'city', 'state', 'zipCode']
+    const requiredFields = ['firstName', 'lastName', 'email', 'address', 'city', 'state', 'zipCode', 'country']
     const missingFields = requiredFields.filter(field => 
       !shippingInfo[field as keyof ShippingInfo].trim()
     )
     
     if (missingFields.length > 0) {
-      error('Missing Information', 'Please fill in all required fields')
+      error('Missing Information', t('errors.missingFields'))
       return
     }
     
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(shippingInfo.email)) {
-      error('Invalid Email', 'Please enter a valid email address')
+      error('Invalid Email', t('errors.invalidEmail'))
       return
     }
     
     // Validate shipping method is selected
     if (!selectedShippingMethodId) {
-      error('Shipping Method Required', 'Please select a shipping method')
+      error('Shipping Method Required', t('errors.shippingMethodRequired'))
       return
     }
     
-    success('Shipping Information Saved', 'Proceeding to payment details')
+    success(t('success.shippingSaved'), t('success.proceedingToPayment'))
     setCurrentStep('payment')
   }
 
@@ -182,10 +184,10 @@ export default function CheckoutPage() {
     if (paymentInfo.paymentMethod === 'stripe') {
       // Stripe payment will be handled by the Stripe component
       if (!stripePaymentMethod) {
-        error('Payment Required', 'Please complete your payment information')
+        error('Payment Required', t('errors.paymentRequired'))
         return
       }
-      success('Payment Information Saved', 'Please review your order')
+      success(t('success.paymentSaved'), t('success.reviewOrder'))
       setCurrentStep('review')
       return
     }
@@ -193,10 +195,10 @@ export default function CheckoutPage() {
     if (paymentInfo.paymentMethod === 'tilopay') {
       // TiloPay payment will be handled by the TiloPay component
       if (!tiloPayPaymentMethod) {
-        error('Payment Required', 'Please complete your payment information')
+        error('Payment Required', t('errors.paymentRequired'))
         return
       }
-      success('Payment Information Saved', 'Please review your order')
+      success(t('success.paymentSaved'), t('success.reviewOrder'))
       setCurrentStep('review')
       return
     }
@@ -347,7 +349,7 @@ export default function CheckoutPage() {
                 {selectedShippingMethodId && (
                   <div className="flex justify-end">
                     <Button onClick={handleShippingSubmit} size="lg">
-                      Continue to Payment
+                      {t('shipping.continueToPayment')}
                     </Button>
                   </div>
                 )}

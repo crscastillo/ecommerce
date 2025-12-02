@@ -69,6 +69,7 @@ export function OrderReview({
             <p>{shippingInfo.firstName} {shippingInfo.lastName}</p>
             <p>{shippingInfo.address}</p>
             <p>{shippingInfo.city}, {shippingInfo.state} {shippingInfo.zipCode}</p>
+            <p>{shippingInfo.country}</p>
             <p>{shippingInfo.email}</p>
           </div>
         </div>

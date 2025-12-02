@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useTranslations } from 'next-intl'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Label } from '@/components/ui/label'
@@ -47,6 +48,7 @@ export function ShippingMethodSelector({
   tenant,
   tenantId
 }: ShippingMethodSelectorProps) {
+  const t = useTranslations('checkout')
   const [shippingMethods, setShippingMethods] = useState<ShippingMethod[]>([])
   const [calculationResult, setCalculationResult] = useState<ShippingCalculationResult | null>(null)
   const [loading, setLoading] = useState(true)
@@ -116,12 +118,12 @@ export function ShippingMethodSelector({
         <CardHeader>
           <CardTitle className="flex items-center">
             <Truck className="w-5 h-5 mr-2" />
-            Shipping Method
+            {t('shippingMethod.title')}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-center py-4">
-            <p className="text-gray-600">Calculating shipping options...</p>
+            <p className="text-gray-600">{t('shippingMethod.calculating')}</p>
           </div>
         </CardContent>
       </Card>
@@ -134,12 +136,12 @@ export function ShippingMethodSelector({
         <CardHeader>
           <CardTitle className="flex items-center">
             <Truck className="w-5 h-5 mr-2" />
-            Shipping Method
+            {t('shippingMethod.title')}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-center py-4">
-            <p className="text-red-600">{error || 'No shipping methods available'}</p>
+            <p className="text-red-600">{error || t('shippingMethod.noMethods')}</p>
           </div>
         </CardContent>
       </Card>
@@ -151,19 +153,19 @@ export function ShippingMethodSelector({
       <CardHeader>
         <CardTitle className="flex items-center">
           <Truck className="w-5 h-5 mr-2" />
-          Shipping Method
+          {t('shippingMethod.title')}
         </CardTitle>
         {calculationResult.totalWeight > 0 && (
           <p className="text-sm text-gray-600 flex items-center">
             <Package className="w-4 h-4 mr-1" />
-            Package weight: {calculationResult.totalWeight.toFixed(1)} kg
+            {t('shippingMethod.packageWeight', { weight: calculationResult.totalWeight.toFixed(1) })}
           </p>
         )}
       </CardHeader>
       <CardContent>
         {calculationResult.availableMethods.length === 0 ? (
           <div className="text-center py-4">
-            <p className="text-gray-600">No shipping options available for your location</p>
+            <p className="text-gray-600">{t('shippingMethod.noMethods')}</p>
           </div>
         ) : (
           <RadioGroup 
@@ -191,12 +193,12 @@ export function ShippingMethodSelector({
                           <span className="font-medium">{method.name}</span>
                           {isRecommended && (
                             <Badge variant="secondary" className="text-xs">
-                              Recommended
+                              {t('shippingMethod.recommended')}
                             </Badge>
                           )}
                           {method.price === 0 && (
                             <Badge variant="default" className="text-xs bg-green-500">
-                              Free
+                              {t('shippingMethod.free')}
                             </Badge>
                           )}
                         </div>
@@ -210,7 +212,7 @@ export function ShippingMethodSelector({
                       </div>
                       <div className="text-right">
                         <div className="font-medium">
-                          {method.price === 0 ? 'Free' : formatPrice(method.price, tenant)}
+                          {method.price === 0 ? t('shippingMethod.free') : formatPrice(method.price, tenant)}
                         </div>
                       </div>
                     </Label>

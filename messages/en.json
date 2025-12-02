@@ -1123,7 +1123,15 @@
       "maxWeight": "Maximum Weight",
       "maxWeightDescription": "Maximum package weight for this shipping method",
       "exampleCalculation": "Example Calculation",
-      "exampleText": "Base rate: {baseRate} + Weight × {perKgRate}/kg. Free shipping over {freeThreshold}"
+      "exampleText": "Base rate: {baseRate} + Weight × {perKgRate}/kg. Free shipping over {freeThreshold}",
+      "shippingZones": "Shipping Zones",
+      "shippingZonesDescription": "Configure which countries and states this shipping method is available for",
+      "allowedCountries": "Allowed Countries",
+      "allowedStates": "Allowed States",
+      "addCountry": "Add a country",
+      "addState": "Add a state",
+      "allStates": "Available in all states",
+      "noCountriesSelected": "No countries selected. This method will be available worldwide."
     },
     "messages": {
       "storeSettingsSaved": "Store settings saved successfully!",
@@ -1447,5 +1455,79 @@
     "brandDeleted": "Brand deleted successfully",
     "orderPlaced": "Order placed successfully",
     "profileUpdated": "Profile updated successfully"
+  },
+  "checkout": {
+    "title": "Checkout",
+    "steps": {
+      "shipping": "Shipping",
+      "payment": "Payment",
+      "review": "Review"
+    },
+    "shipping": {
+      "title": "Shipping Information",
+      "firstName": "First Name",
+      "firstNamePlaceholder": "Enter your first name",
+      "lastName": "Last Name",
+      "lastNamePlaceholder": "Enter your last name",
+      "email": "Email",
+      "emailPlaceholder": "Enter your email address",
+      "phone": "Phone",
+      "phonePlaceholder": "Enter your phone number",
+      "address": "Address",
+      "addressPlaceholder": "Enter your street address",
+      "city": "City",
+      "cityPlaceholder": "Enter your city",
+      "state": "State",
+      "selectState": "Select a state",
+      "stateProvincePlaceholder": "Enter state/province",
+      "zipCode": "ZIP Code",
+      "zipCodePlaceholder": "Enter your ZIP code",
+      "country": "Country",
+      "selectCountry": "Select a country",
+      "continueToPayment": "Continue to Payment"
+    },
+    "shippingMethod": {
+      "title": "Shipping Method",
+      "calculating": "Calculating shipping options...",
+      "noMethods": "No shipping options available for your location",
+      "recommended": "Recommended",
+      "free": "Free",
+      "packageWeight": "Package weight: {weight} kg"
+    },
+    "payment": {
+      "title": "Payment Information",
+      "method": "Payment Method",
+      "cardNumber": "Card Number",
+      "expiryDate": "Expiry Date",
+      "cvv": "CVV",
+      "cardholderName": "Cardholder Name"
+    },
+    "review": {
+      "title": "Review Your Order",
+      "shippingAddress": "Shipping Address",
+      "paymentMethod": "Payment Method",
+      "orderItems": "Order Items",
+      "placeOrder": "Place Order",
+      "backToPayment": "Back to Payment"
+    },
+    "summary": {
+      "orderSummary": "Order Summary",
+      "subtotal": "Subtotal",
+      "shipping": "Shipping",
+      "tax": "Tax",
+      "total": "Total"
+    },
+    "errors": {
+      "missingFields": "Please fill in all required fields",
+      "invalidEmail": "Please enter a valid email address",
+      "shippingMethodRequired": "Please select a shipping method",
+      "paymentRequired": "Please complete your payment information"
+    },
+    "success": {
+      "shippingSaved": "Shipping Information Saved",
+      "proceedingToPayment": "Proceeding to payment details",
+      "paymentSaved": "Payment Information Saved",
+      "reviewOrder": "Please review your order"
+    }
   }
 }

@@ -1299,7 +1299,15 @@
       "maxWeight": "Peso Máximo",
       "maxWeightDescription": "Peso máximo del paquete para este método de envío",
       "exampleCalculation": "Ejemplo de Cálculo",
-      "exampleText": "Tarifa base: {baseRate} + Peso × {perKgRate}/kg. Envío gratis sobre {freeThreshold}"
+      "exampleText": "Tarifa base: {baseRate} + Peso × {perKgRate}/kg. Envío gratis sobre {freeThreshold}",
+      "shippingZones": "Zonas de Envío",
+      "shippingZonesDescription": "Configure en qué países y estados está disponible este método de envío",
+      "allowedCountries": "Países Permitidos",
+      "allowedStates": "Estados Permitidos",
+      "addCountry": "Agregar un país",
+      "addState": "Agregar un estado",
+      "allStates": "Disponible en todos los estados",
+      "noCountriesSelected": "No hay países seleccionados. Este método estará disponible en todo el mundo."
     },
     "domain": {
       "title": "Configuración de Dominio",
@@ -2100,5 +2108,79 @@
     "noPages": "Aún no hay páginas",
     "noPagesDescription": "Comienza a construir el contenido de tu tienda con páginas personalizadas",
     "createFirstPage": "Crear tu primera página"
+  },
+  "checkout": {
+    "title": "Finalizar Compra",
+    "steps": {
+      "shipping": "Envío",
+      "payment": "Pago",
+      "review": "Revisar"
+    },
+    "shipping": {
+      "title": "Información de Envío",
+      "firstName": "Nombre",
+      "firstNamePlaceholder": "Ingrese su nombre",
+      "lastName": "Apellido",
+      "lastNamePlaceholder": "Ingrese su apellido",
+      "email": "Correo Electrónico",
+      "emailPlaceholder": "Ingrese su correo electrónico",
+      "phone": "Teléfono",
+      "phonePlaceholder": "Ingrese su número de teléfono",
+      "address": "Dirección",
+      "addressPlaceholder": "Ingrese su dirección",
+      "city": "Ciudad",
+      "cityPlaceholder": "Ingrese su ciudad",
+      "state": "Estado",
+      "selectState": "Seleccione un estado",
+      "stateProvincePlaceholder": "Ingrese estado/provincia",
+      "zipCode": "Código Postal",
+      "zipCodePlaceholder": "Ingrese su código postal",
+      "country": "País",
+      "selectCountry": "Seleccione un país",
+      "continueToPayment": "Continuar al Pago"
+    },
+    "shippingMethod": {
+      "title": "Método de Envío",
+      "calculating": "Calculando opciones de envío...",
+      "noMethods": "No hay opciones de envío disponibles para su ubicación",
+      "recommended": "Recomendado",
+      "free": "Gratis",
+      "packageWeight": "Peso del paquete: {weight} kg"
+    },
+    "payment": {
+      "title": "Información de Pago",
+      "method": "Método de Pago",
+      "cardNumber": "Número de Tarjeta",
+      "expiryDate": "Fecha de Vencimiento",
+      "cvv": "CVV",
+      "cardholderName": "Nombre del Titular"
+    },
+    "review": {
+      "title": "Revisar su Pedido",
+      "shippingAddress": "Dirección de Envío",
+      "paymentMethod": "Método de Pago",
+      "orderItems": "Artículos del Pedido",
+      "placeOrder": "Realizar Pedido",
+      "backToPayment": "Volver al Pago"
+    },
+    "summary": {
+      "orderSummary": "Resumen del Pedido",
+      "subtotal": "Subtotal",
+      "shipping": "Envío",
+      "tax": "Impuesto",
+      "total": "Total"
+    },
+    "errors": {
+      "missingFields": "Por favor complete todos los campos requeridos",
+      "invalidEmail": "Por favor ingrese un correo electrónico válido",
+      "shippingMethodRequired": "Por favor seleccione un método de envío",
+      "paymentRequired": "Por favor complete su información de pago"
+    },
+    "success": {
+      "shippingSaved": "Información de Envío Guardada",
+      "proceedingToPayment": "Procediendo a los detalles de pago",
+      "paymentSaved": "Información de Pago Guardada",
+      "reviewOrder": "Por favor revise su pedido"
+    }
   }
 }

@@ -61,6 +61,11 @@ export function calculateShipping(request: ShippingCalculationRequest): Shipping
   for (const method of shippingMethods) {
     if (!method.enabled) continue
     
+    // Check shipping zone restrictions
+    if (!isShippingMethodAvailable(method, shippingAddress)) {
+      continue // Skip this method if not available for shipping address
+    }
+    
     let shippingPrice = 0
     let estimatedDays = '3-5 business days'
     
@@ -113,6 +118,53 @@ export function calculateShipping(request: ShippingCalculationRequest): Shipping
     recommendedMethodId,
     totalWeight
   }
+}
+
+/**
+ * Check if a shipping method is available for the given address
+ */
+function isShippingMethodAvailable(
+  method: ShippingMethod,
+  shippingAddress?: { country: string; state: string; zipCode: string }
+): boolean {
+  // If no shipping zones configured, method is available worldwide
+  if (!method.shipping_zones) {
+    return true
+  }
+  
+  // If no shipping address provided, assume available (will be checked at checkout)
+  if (!shippingAddress) {
+    return true
+  }
+  
+  const { allowed_countries, restricted_countries, allowed_states, restricted_states } = method.shipping_zones
+  const { country, state } = shippingAddress
+  
+  // Check restricted countries first
+  if (restricted_countries && restricted_countries.includes(country)) {
+    return false
+  }
+  
+  // If allowed countries specified, check if country is in the list
+  if (allowed_countries && allowed_countries.length > 0) {
+    if (!allowed_countries.includes(country)) {
+      return false
+    }
+  }
+  
+  // Check state restrictions for the specific country
+  if (restricted_states && restricted_states[country] && restricted_states[country].includes(state)) {
+    return false
+  }
+  
+  // If allowed states specified for this country, check if state is in the list
+  if (allowed_states && allowed_states[country] && allowed_states[country].length > 0) {
+    if (!allowed_states[country].includes(state)) {
+      return false
+    }
+  }
+  
+  return true
 }
 
 /**

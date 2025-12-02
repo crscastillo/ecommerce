@@ -198,7 +198,7 @@ export function MobileFilters({
                 {/* Simple input fields */}
                 <div className="flex items-center space-x-2">
                   <div className="flex-1">
-                    <Label className="text-xs text-gray-500 mb-1 block">Min Price</Label>
+                    <Label className="text-xs text-gray-500 mb-1 block">{t('products.minPrice')}</Label>
                     <Input
                       type="number"
                       placeholder="0"
@@ -213,10 +213,10 @@ export function MobileFilters({
                   </div>
                   <span className="text-gray-400 text-sm pt-5">-</span>
                   <div className="flex-1">
-                    <Label className="text-xs text-gray-500 mb-1 block">Max Price</Label>
+                    <Label className="text-xs text-gray-500 mb-1 block">{t('products.maxPrice')}</Label>
                     <Input
                       type="number"
-                      placeholder="No limit"
+                      placeholder={t('products.noLimit')}
                       value={priceRange.max === maxProductPrice ? '' : priceRange.max || ''}
                       onChange={(e) => {
                         const newMax = parseFloat(e.target.value) || maxProductPrice
@@ -233,14 +233,14 @@ export function MobileFilters({
                 {(priceRange.min > 0 || priceRange.max < maxProductPrice) && (
                   <div className="text-center p-2 bg-blue-50 rounded-lg">
                     <span className="text-sm font-medium text-blue-800">
-                      {currencySymbol}{priceRange.min} - {priceRange.max === maxProductPrice ? 'No limit' : currencySymbol + priceRange.max}
+                      {currencySymbol}{priceRange.min} - {priceRange.max === maxProductPrice ? t('products.noLimit') : currencySymbol + priceRange.max}
                     </span>
                   </div>
                 )}
                 
                 {/* Quick preset buttons */}
                 <div className="space-y-2">
-                  <Label className="text-xs text-gray-500">Quick Filters</Label>
+                  <Label className="text-xs text-gray-500">{t('products.quickFilters')}</Label>
                   <div className="grid grid-cols-2 gap-2">
                     {priceRanges.map((range, index) => (
                       <Button
@@ -260,7 +260,7 @@ export function MobileFilters({
                     className="w-full h-7 text-xs text-gray-500"
                     onClick={() => onPriceRangeChange(0, maxProductPrice)}
                   >
-                    Clear price filter
+                    {t('products.clearPriceFilter')}
                   </Button>
                 </div>
               </div>

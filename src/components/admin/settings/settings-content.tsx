@@ -15,7 +15,8 @@ import {
   Cog,
   Puzzle,
   ChevronDown,
-  Receipt
+  Receipt,
+  Truck
 } from 'lucide-react'
 
 // Import hooks
@@ -33,6 +34,7 @@ import {
   ConfigurationTab, 
   ThemeTab,
   PaymentsTab,
+  ShippingTab,
   PluginsTab,
   UsersTab,
   SecurityTab
@@ -62,6 +64,10 @@ export function SettingsContent({ tenant, searchParams, router }: SettingsConten
   const paymentSettings = usePaymentSettings()
   const pluginFeatures = usePluginFeatures()
   const tenantUsers = useTenantUsers()
+
+  // Shipping methods state (will be replaced with proper hook later)
+  const [shippingMethods, setShippingMethods] = useState([])
+  const [savingShipping, setSavingShipping] = useState(false)
 
   useEffect(() => {
     setMounted(true)
@@ -245,7 +251,7 @@ export function SettingsContent({ tenant, searchParams, router }: SettingsConten
 
         {/* Desktop: Full Tab Navigation */}
         <div className="hidden md:block">
-          <TabsList className={pluginFeatures.hasAnyPlugins ? "grid w-full grid-cols-8" : "grid w-full grid-cols-7"}>
+          <TabsList className={pluginFeatures.hasAnyPlugins ? "grid w-full grid-cols-9" : "grid w-full grid-cols-8"}>
             <TabsTrigger value="store" className="flex items-center space-x-2">
               <Store className="h-4 w-4" />
               <span>{t('tabs.store')}</span>
@@ -261,6 +267,10 @@ export function SettingsContent({ tenant, searchParams, router }: SettingsConten
             <TabsTrigger value="payments" className="flex items-center space-x-2">
               <CreditCard className="h-4 w-4" />
               <span>{t('tabs.payments')}</span>
+            </TabsTrigger>
+            <TabsTrigger value="shipping" className="flex items-center space-x-2">
+              <Truck className="h-4 w-4" />
+              <span>{t('tabs.shipping')}</span>
             </TabsTrigger>
             <TabsTrigger value="billing" className="flex items-center space-x-2">
               <Receipt className="h-4 w-4" />
@@ -327,6 +337,23 @@ export function SettingsContent({ tenant, searchParams, router }: SettingsConten
             onPaymentMethodsChange={paymentSettings.setPaymentMethods}
             onSave={paymentSettings.saveSettings}
             saving={state.saving}
+          />
+        </TabsContent>
+
+        {/* Shipping Methods Settings */}
+        <TabsContent value="shipping" className="space-y-6">
+          <ShippingTab
+            shippingMethods={shippingMethods}
+            onShippingMethodsChange={setShippingMethods}
+            onSave={async () => {
+              setSavingShipping(true)
+              // TODO: Implement shipping methods save logic
+              setTimeout(() => {
+                setSavingShipping(false)
+                showSuccess(t('messages.shippingSaved'))
+              }, 1000)
+            }}
+            saving={savingShipping}
           />
         </TabsContent>
 

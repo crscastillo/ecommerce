@@ -77,6 +77,9 @@ export function ProductForm({ initialData, mode }: ProductFormProps) {
   const router = useRouter()
   const { tenant } = useTenant()
   const t = useTranslations('products')
+  
+  // Get weight unit from tenant settings, default to 'kg'
+  const weightUnit = tenant?.settings?.weight_unit || 'kg'
 
   const [formData, setFormData] = useState<ProductFormData>(() => {
     if (initialData) {
@@ -326,27 +329,26 @@ export function ProductForm({ initialData, mode }: ProductFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
+      <div className="space-y-4">
+        {/* Back button - Mobile first */}
+        <div className="flex items-center">
           <Button type="button" variant="ghost" size="sm" onClick={() => router.push('/admin/products')}>
             <ArrowLeft className="mr-2 h-4 w-4" />
-            {t('backToProducts')}
+            <span className="hidden sm:inline">{t('backToProducts')}</span>
           </Button>
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">
-              {mode === 'create' ? t('createProduct') : t('editProduct')}
-            </h1>
-            {initialData && (
-              <p className="text-muted-foreground">
-                {t('editingProduct', { name: initialData.name })}
-              </p>
-            )}
-          </div>
         </div>
-        <Button type="submit" disabled={loading}>
-          <Save className="w-4 h-4 mr-2" />
-          {loading ? t('savingProduct') : t('saveProduct')}
-        </Button>
+        
+        {/* Title section */}
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
+            {mode === 'create' ? t('createProduct') : t('editProduct')}
+          </h1>
+          {initialData && (
+            <p className="text-sm sm:text-base text-muted-foreground mt-1">
+              {t('editingProduct', { name: initialData.name })}
+            </p>
+          )}
+        </div>
       </div>
 
       {/* Success Message */}
@@ -590,7 +592,7 @@ export function ProductForm({ initialData, mode }: ProductFormProps) {
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="weight">{t('weight')}</Label>
+                        <Label htmlFor="weight">{t('weight')} ({weightUnit})</Label>
                         <Input
                           id="weight"
                           type="number"
@@ -598,10 +600,10 @@ export function ProductForm({ initialData, mode }: ProductFormProps) {
                           min="0"
                           value={formData.weight}
                           onChange={(e) => handleInputChange('weight', e.target.value)}
-                          placeholder="0.00"
+                          placeholder={`0.00 ${weightUnit}`}
                         />
                         <p className="text-sm text-muted-foreground">
-                          {t('weightDescription')}
+                          {t('weightDescription')} {t('weightUnitNote', { unit: weightUnit === 'kg' ? t('weightUnitKg') : t('weightUnitLbs') })}
                         </p>
                       </div>
                     </div>
@@ -624,8 +626,8 @@ export function ProductForm({ initialData, mode }: ProductFormProps) {
             </Card>
           )}
 
-          {/* SEO */}
-          <Card>
+          {/* SEO - Hidden on mobile */}
+          <Card className="hidden sm:block">
             <CardHeader>
               <CardTitle>{t('seo')}</CardTitle>
               <CardDescription>{t('searchEngineOptimization')}</CardDescription>
@@ -778,6 +780,14 @@ export function ProductForm({ initialData, mode }: ProductFormProps) {
             </Card>
           )}
         </div>
+      </div>
+      
+      {/* Save Button - Bottom Right */}
+      <div className="flex justify-end pt-6 border-t">
+        <Button type="submit" disabled={loading}>
+          <Save className="w-4 h-4 mr-2" />
+          {loading ? t('savingProduct') : t('saveProduct')}
+        </Button>
       </div>
     </form>
   )

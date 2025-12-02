@@ -37,7 +37,8 @@ import {
   Zap,
   Shield,
   CreditCard,
-  Puzzle
+  Puzzle,
+  Truck
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { FeatureFlagsService, FeatureFlag as DBFeatureFlag } from '@/lib/services/feature-flags'
@@ -47,7 +48,7 @@ interface FeatureFlag {
   name: string
   key: string
   description: string
-  category: 'platform' | 'tenant' | 'user' | 'experimental' | 'payment_methods' | 'security' | 'plugins'
+  category: 'platform' | 'tenant' | 'user' | 'experimental' | 'payment_methods' | 'security' | 'plugins' | 'shipping'
   is_enabled: boolean
   rollout_percentage: number
   target_tiers: string[]
@@ -101,6 +102,7 @@ export default function FeatureFlagsPage() {
         if (flag.category === 'payment_methods') category = 'payment_methods'
         else if (flag.category === 'security') category = 'security'
         else if (flag.category === 'plugins') category = 'plugins'
+        else if (flag.category === 'shipping') category = 'shipping'
         else if (flag.category === 'tenant') category = 'tenant'
         else if (flag.category === 'user') category = 'user'
         else if (flag.category === 'experimental') category = 'experimental'
@@ -291,6 +293,7 @@ export default function FeatureFlagsPage() {
       case 'user': return <Shield className="h-4 w-4" />
       case 'security': return <Shield className="h-4 w-4" />
       case 'plugins': return <Puzzle className="h-4 w-4" />
+      case 'shipping': return <Truck className="h-4 w-4" />
       case 'experimental': return <Zap className="h-4 w-4" />
       default: return <Flag className="h-4 w-4" />
     }
@@ -304,6 +307,7 @@ export default function FeatureFlagsPage() {
       case 'user': return 'bg-purple-100 text-purple-800'
       case 'security': return 'bg-red-100 text-red-800'
       case 'plugins': return 'bg-yellow-100 text-yellow-800'
+      case 'shipping': return 'bg-emerald-100 text-emerald-800'
       case 'experimental': return 'bg-orange-100 text-orange-800'
       default: return 'bg-gray-100 text-gray-800'
     }
@@ -366,6 +370,7 @@ export default function FeatureFlagsPage() {
                 <SelectItem value="user">User</SelectItem>
                 <SelectItem value="security">Security</SelectItem>
                 <SelectItem value="plugins">Plugins</SelectItem>
+                <SelectItem value="shipping">Shipping</SelectItem>
                 <SelectItem value="experimental">Experimental</SelectItem>
               </SelectContent>
             </Select>
@@ -550,6 +555,7 @@ export default function FeatureFlagsPage() {
                   <SelectItem value="user">User</SelectItem>
                   <SelectItem value="security">Security</SelectItem>
                   <SelectItem value="plugins">Plugins</SelectItem>
+                  <SelectItem value="shipping">Shipping</SelectItem>
                   <SelectItem value="experimental">Experimental</SelectItem>
                 </SelectContent>
               </Select>

@@ -153,11 +153,11 @@ export function ConfigurationTab({ settings, onSettingsChange, onSave, saving }:
 
   const validateAllFields = () => {
     const allErrors: Record<string, ValidationError[]> = {}
-    const fieldsToValidate = ['currency', 'timezone', 'tax_rate', 'low_stock_threshold']
+    const fieldsToValidate = ['currency', 'timezone', 'tax_rate', 'low_stock_threshold', 'weight_unit']
     
     fieldsToValidate.forEach(fieldName => {
       let value
-      if (fieldName === 'currency' || fieldName === 'timezone' || fieldName === 'tax_rate' || fieldName === 'low_stock_threshold') {
+      if (fieldName === 'currency' || fieldName === 'timezone' || fieldName === 'tax_rate' || fieldName === 'low_stock_threshold' || fieldName === 'weight_unit') {
         value = settings.settings[fieldName]
       }
       
@@ -233,6 +233,32 @@ export function ConfigurationTab({ settings, onSettingsChange, onSave, saving }:
               <p className="text-sm text-destructive mt-1 flex items-center gap-1">
                 <AlertCircle className="h-3 w-3" />
                 {getFieldError('currency')}
+              </p>
+            )}
+          </div>
+          <div>
+            <Label htmlFor="weight_unit" className={hasFieldError('weight_unit') ? 'text-destructive' : ''}>
+              {t('labels.weightUnit')}
+            </Label>
+            <Select 
+              value={settings.settings.weight_unit || 'kg'} 
+              onValueChange={(value) => {
+                updateSetting('weight_unit', value)
+                handleFieldBlur('weight_unit', value)
+              }}
+            >
+              <SelectTrigger className={hasFieldError('weight_unit') ? 'border-destructive focus:ring-destructive' : ''}>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="kg">⚖️ kg - Kilograms</SelectItem>
+                <SelectItem value="lbs">⚖️ lbs - Pounds</SelectItem>
+              </SelectContent>
+            </Select>
+            {getFieldError('weight_unit') && (
+              <p className="text-sm text-destructive mt-1 flex items-center gap-1">
+                <AlertCircle className="h-3 w-3" />
+                {getFieldError('weight_unit')}
               </p>
             )}
           </div>

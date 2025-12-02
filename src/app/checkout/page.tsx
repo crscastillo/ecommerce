@@ -7,6 +7,7 @@ import { useToast } from '@/lib/contexts/toast-context'
 import { useTenant } from '@/lib/contexts/tenant-context'
 import { PaymentMethodsService, type PaymentMethodConfig } from '@/lib/services/payment-methods'
 import { formatPrice } from '@/lib/utils/currency'
+import { getShippingMethods } from '@/lib/utils/shipping'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { StripePaymentWrapper } from '@/components/stripe-payment'
@@ -53,6 +54,8 @@ export default function CheckoutPage() {
   const [loadingPaymentMethods, setLoadingPaymentMethods] = useState(true)
   const [selectedShippingMethodId, setSelectedShippingMethodId] = useState<string | undefined>()
   const [shippingPrice, setShippingPrice] = useState(0)
+  const [shippingMethods, setShippingMethods] = useState<any[]>([])
+  const [loadingShippingMethods, setLoadingShippingMethods] = useState(true)
   
   const [shippingInfo, setShippingInfo] = useState<ShippingInfo>({
     firstName: '',
@@ -101,6 +104,25 @@ export default function CheckoutPage() {
     }
 
     loadPaymentMethods()
+  }, [tenant?.id])
+  
+  // Load shipping methods early for country filtering
+  useEffect(() => {
+    const loadShippingMethods = async () => {
+      if (!tenant?.id) return
+      
+      try {
+        setLoadingShippingMethods(true)
+        const methods = await getShippingMethods(tenant.id)
+        setShippingMethods(methods)
+      } catch (err) {
+        console.error('Error loading shipping methods:', err)
+      } finally {
+        setLoadingShippingMethods(false)
+      }
+    }
+    
+    loadShippingMethods()
   }, [tenant?.id])
 
   // Redirect if cart is empty
@@ -330,6 +352,7 @@ export default function CheckoutPage() {
                   onUpdate={setShippingInfo}
                   onSubmit={() => {}} // Handle submission separately
                   showSubmitButton={false}
+                  shippingMethods={shippingMethods}
                 />
                 
                 {/* Show shipping methods when we have basic location info */}

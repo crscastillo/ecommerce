@@ -93,9 +93,10 @@ interface ShippingFormProps {
   onUpdate: (info: ShippingInfo) => void
   onSubmit: (e: React.FormEvent) => void
   showSubmitButton?: boolean
+  shippingMethods?: any[]
 }
 
-export function ShippingForm({ shippingInfo, onUpdate, onSubmit, showSubmitButton = true }: ShippingFormProps) {
+export function ShippingForm({ shippingInfo, onUpdate, onSubmit, showSubmitButton = true, shippingMethods = [] }: ShippingFormProps) {
   const t = useTranslations('checkout')
   
   const handleChange = (field: keyof ShippingInfo) => (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -105,6 +106,42 @@ export function ShippingForm({ shippingInfo, onUpdate, onSubmit, showSubmitButto
   const handleCountryChange = (value: string) => {
     onUpdate({ ...shippingInfo, country: value })
   }
+  
+  // Filter countries based on available shipping methods
+  const getAvailableCountries = () => {
+    if (!shippingMethods || shippingMethods.length === 0) {
+      return AMERICAS_COUNTRIES // Show all if no shipping methods loaded yet
+    }
+    
+    const allowedCountries = new Set<string>()
+    
+    shippingMethods.forEach(method => {
+      if (!method.enabled || !method.shipping_zones) {
+        // If no zones configured or method disabled, skip
+        return
+      }
+      
+      const { allowed_countries, restricted_countries } = method.shipping_zones
+      
+      if (!allowed_countries || allowed_countries.length === 0) {
+        // No restrictions means worldwide - add all countries
+        AMERICAS_COUNTRIES.forEach(country => allowedCountries.add(country.code))
+      } else {
+        // Add specifically allowed countries
+        allowed_countries.forEach(code => allowedCountries.add(code))
+      }
+      
+      // Remove restricted countries
+      if (restricted_countries) {
+        restricted_countries.forEach(code => allowedCountries.delete(code))
+      }
+    })
+    
+    // Filter AMERICAS_COUNTRIES to only include allowed ones
+    return AMERICAS_COUNTRIES.filter(country => allowedCountries.has(country.code))
+  }
+  
+  const availableCountries = getAvailableCountries()
 
   return (
     <Card>
@@ -274,11 +311,17 @@ export function ShippingForm({ shippingInfo, onUpdate, onSubmit, showSubmitButto
                   <SelectValue placeholder={t('shipping.selectCountry')} />
                 </SelectTrigger>
                 <SelectContent>
-                  {AMERICAS_COUNTRIES.map((country) => (
-                    <SelectItem key={country.code} value={country.code}>
-                      {country.name}
+                  {availableCountries.length > 0 ? (
+                    availableCountries.map((country) => (
+                      <SelectItem key={country.code} value={country.code}>
+                        {country.name}
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <SelectItem value="" disabled>
+                      No countries available for shipping
                     </SelectItem>
-                  ))}
+                  )}
                 </SelectContent>
               </Select>
             </div>

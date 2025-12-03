@@ -13,7 +13,6 @@ export default function DebugPage() {
     fetch('/api/debug-headers')
       .then(res => res.json())
       .then(setDebugInfo)
-      .catch(console.error)
   }, [])
 
   return (

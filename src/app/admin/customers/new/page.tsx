@@ -119,7 +119,6 @@ export default function NewCustomerPage() {
       const { data: customer, error } = await tenantDb.createCustomer(customerData);
 
       if (error) {
-        console.error('Error creating customer:', error);
         showError(`Failed to create customer: ${error.message}`);
         return;
       }
@@ -127,7 +126,6 @@ export default function NewCustomerPage() {
       showSuccess('Customer created successfully');
       router.push(`/admin/customers/${customer.id}`);
     } catch (error) {
-      console.error('Error creating customer:', error);
       showError('Failed to create customer');
     } finally {
       setIsLoading(false);

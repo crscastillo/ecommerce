@@ -34,7 +34,6 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (invitationError || !invitation) {
-      console.error('Invitation not found:', invitationError)
       return NextResponse.json(
         { error: 'Invitation not found or already used' },
         { status: 404 }
@@ -58,7 +57,6 @@ export async function POST(request: NextRequest) {
         .eq('id', invitationId)
 
       if (updateError) {
-        console.error('Error updating invitation expiry:', updateError)
         return NextResponse.json(
           { error: 'Failed to update invitation' },
           { status: 500 }
@@ -75,7 +73,6 @@ export async function POST(request: NextRequest) {
 
     if (userExists) {
       emailStatus = 'user_exists'
-      console.log('User already exists:', invitation.email)
     } else {
       // Get tenant subdomain for proper URL construction
       const { data: tenantData, error: subdomainError } = await supabase
@@ -85,7 +82,6 @@ export async function POST(request: NextRequest) {
         .single()
 
       if (subdomainError || !tenantData) {
-        console.error('Error fetching tenant subdomain:', subdomainError)
         emailStatus = 'failed'
         emailError = 'Failed to get tenant information'
       } else {
@@ -104,8 +100,6 @@ export async function POST(request: NextRequest) {
             }
           }
 
-          console.log('Resending invitation email to:', invitation.email)
-          console.log('Invitation options with tenant URL:', inviteOptions)
 
           const { data: inviteData, error: inviteError } = await supabase.auth.admin.inviteUserByEmail(
             inviteOptions.email,
@@ -113,15 +107,12 @@ export async function POST(request: NextRequest) {
           )
 
           if (inviteError) {
-            console.error('Supabase invite error:', inviteError)
             emailStatus = 'failed'
             emailError = inviteError.message
           } else {
-            console.log('Invitation resent successfully:', inviteData)
             emailStatus = 'sent'
           }
         } catch (emailErr) {
-          console.error('Error sending invitation email:', emailErr)
           emailStatus = 'failed'
           emailError = emailErr instanceof Error ? emailErr.message : 'Unknown email error'
         }
@@ -137,7 +128,6 @@ export async function POST(request: NextRequest) {
       .eq('id', invitationId)
 
     if (logError) {
-      console.warn('Warning: Could not update invitation timestamp:', logError)
     }
 
     return NextResponse.json({
@@ -153,7 +143,6 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Error resending invitation:', error)
     return NextResponse.json(
       { 
         error: 'Internal server error',

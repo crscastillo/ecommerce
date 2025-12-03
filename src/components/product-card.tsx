@@ -106,40 +106,28 @@ export function ProductCard({ product, viewMode = 'grid', tenantSettings = {} }:
   }
 
   const getProductInventoryStatus = () => {
-    console.log('Checking inventory for product:', product.name, {
-      product_type: product.product_type,
-      inventory_quantity: product.inventory_quantity,
-      track_inventory: product.track_inventory,
-      variants: product.variants?.length || 0,
-      variantsData: product.variants
-    })
     
     if (product.product_type === 'variable') {
       // If variants are expected but not loaded, treat as loading state
       if (!product.variants || !Array.isArray(product.variants)) {
-        console.log('Variable product but no variants array loaded yet')
         return { isOutOfStock: false, totalStock: 0 }
       }
       
       if (product.variants.length > 0) {
         const activeVariants = product.variants.filter(v => v.is_active)
-        console.log('Active variants:', activeVariants.length, activeVariants.map(v => ({ id: v.id, inventory_quantity: v.inventory_quantity, is_active: v.is_active })))
         
         if (activeVariants.length === 0) return { isOutOfStock: true, totalStock: 0 }
         
         const totalStock = activeVariants.reduce((sum, v) => sum + (v.inventory_quantity || 0), 0)
         const isOutOfStock = totalStock <= 0
         
-        console.log('Variable product stock calculation:', { totalStock, isOutOfStock })
         return { isOutOfStock, totalStock }
       } else {
-        console.log('Variable product has no variants')
         return { isOutOfStock: true, totalStock: 0 }
       }
     }
     
     const isOutOfStock = product.track_inventory && product.inventory_quantity <= 0
-    console.log('Single product stock calculation:', { isOutOfStock, inventory_quantity: product.inventory_quantity, track_inventory: product.track_inventory })
     return { isOutOfStock, totalStock: product.inventory_quantity }
   }
 
@@ -173,7 +161,6 @@ export function ProductCard({ product, viewMode = 'grid', tenantSettings = {} }:
         return product.images
       }
     } catch (error) {
-      console.error('Error parsing product images:', error)
     }
     return '/placeholder-product.svg' // SVG placeholder image
   }
@@ -195,7 +182,6 @@ export function ProductCard({ product, viewMode = 'grid', tenantSettings = {} }:
 
   // Handle add to cart
   const handleAddToCart = async (e: React.MouseEvent) => {
-    console.log('handleAddToCart called')
     e.preventDefault() // Prevent navigation if card is wrapped in Link
     e.stopPropagation()
     
@@ -210,18 +196,6 @@ export function ProductCard({ product, viewMode = 'grid', tenantSettings = {} }:
 
       const maxQuantity = product.track_inventory ? totalStock : undefined
 
-      // Debug log for addToCart payload
-      console.log('AddToCart payload:', {
-        id: product.id,
-        name: product.name,
-        slug: product.slug,
-        price: currentPrice,
-        image: productImage,
-        maxQuantity: maxQuantity
-      })
-      // Debug log for cart items before
-      console.log('Cart items before:', items)
-
       addToCart({
         id: product.id,
         name: product.name,
@@ -233,7 +207,7 @@ export function ProductCard({ product, viewMode = 'grid', tenantSettings = {} }:
 
       // Debug log for cart items after (async, so use setTimeout)
       setTimeout(() => {
-        console.log('Cart items after:', items)
+
       }, 500)
 
       success(
@@ -241,7 +215,6 @@ export function ProductCard({ product, viewMode = 'grid', tenantSettings = {} }:
         `${product.name} has been added to your cart`
       )
     } catch (err) {
-      console.error('Error adding to cart:', err)
       showError(
         'Failed to add to cart',
         'Please try again later'

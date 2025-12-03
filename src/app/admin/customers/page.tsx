@@ -81,13 +81,11 @@ export default function CustomersPage() {
       const { data, error } = await query
 
       if (error) {
-        console.error('Error loading customers:', error)
         return
       }
 
       setCustomers(data || [])
     } catch (error) {
-      console.error('Error:', error)
     } finally {
       setLoading(false)
     }
@@ -103,7 +101,6 @@ export default function CustomersPage() {
         .eq('tenant_id', tenant.id)
 
       if (error) {
-        console.error('Error loading customer stats:', error)
         return
       }
 
@@ -119,7 +116,6 @@ export default function CustomersPage() {
         averageOrderValue
       })
     } catch (error) {
-      console.error('Error loading stats:', error)
     }
   }
 

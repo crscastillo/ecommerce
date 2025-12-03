@@ -23,7 +23,6 @@ export async function GET(request: NextRequest) {
       .eq('is_active', true)
 
     if (tenantsError) {
-      console.error('Error checking user tenants:', tenantsError)
       return NextResponse.json(
         { error: 'Failed to check tenant status' },
         { status: 500 }
@@ -37,7 +36,6 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('API error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

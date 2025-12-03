@@ -22,16 +22,13 @@ export async function GET(request: NextRequest) {
     })
 
     if (error) {
-      console.error('Session transfer failed:', error)
       return NextResponse.redirect(new URL('/login', request.url))
     }
 
     if (!user) {
-      console.error('No user found after session transfer')
       return NextResponse.redirect(new URL('/login', request.url))
     }
 
-    console.log('Session transferred successfully for user:', user.email)
 
     // Create response that redirects to the intended destination
     const response = NextResponse.redirect(new URL(redirectTo, request.url))
@@ -48,7 +45,6 @@ export async function GET(request: NextRequest) {
 
     return response
   } catch (error) {
-    console.error('Unexpected error during session transfer:', error)
     return NextResponse.redirect(new URL('/login', request.url))
   }
 }

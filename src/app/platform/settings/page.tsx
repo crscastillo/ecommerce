@@ -98,7 +98,6 @@ export default function PlatformSettingsPage() {
       const email = await getPlatformAdminEmail()
       setAdminEmail(email)
     } catch (error) {
-      console.error('Error loading admin email:', error)
       setAdminEmail('error-loading-email')
     }
   }
@@ -115,7 +114,6 @@ export default function PlatformSettingsPage() {
         setSecuritySettings(parsed.security || securitySettings)
       }
     } catch (err) {
-      console.error('Error loading settings:', err)
     }
   }
 
@@ -139,7 +137,6 @@ export default function PlatformSettingsPage() {
       setMessage('Settings saved successfully!')
       setMessageType('success')
     } catch (err: any) {
-      console.error('Error saving settings:', err)
       setMessage(err.message || 'Failed to save settings')
       setMessageType('error')
     } finally {

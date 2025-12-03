@@ -23,7 +23,6 @@ export async function GET(request: NextRequest) {
       }
     )
     
-    console.log('API: Fetching brands for tenant:', tenantId)
     
     let query = supabase
       .from('brands')
@@ -48,17 +47,13 @@ export async function GET(request: NextRequest) {
 
     const { data, error } = await query
 
-    console.log('API: Database response:', { data: data?.length, error })
 
     if (error) {
-      console.error('Database error:', error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    console.log('API: Returning brands:', data?.length || 0)
     return NextResponse.json({ data })
   } catch (error) {
-    console.error('Server error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

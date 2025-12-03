@@ -97,19 +97,16 @@ export default function Login() {
               await redirectToUserTenantAdmin(user, {
                 fallbackPath: '/signup',
                 onError: (error) => {
-                  console.error('Redirect failed:', error)
                   router.push('/signup')
                 }
               })
               return
             } catch (error) {
-              console.error('Error checking admin status:', error)
               setMessage('Error checking authentication. Please try again.')
             }
           }
         }
       } catch (error) {
-        console.error('Auth/domain check failed:', error)
         setMessage('An error occurred during authentication check.')
       } finally {
         setCheckingAuth(false)
@@ -217,7 +214,6 @@ export default function Login() {
 
       return !!memberCheck
     } catch (error) {
-      console.error('Error validating user for tenant:', error)
       return false
     }
   }
@@ -285,19 +281,16 @@ export default function Login() {
           await redirectToUserTenantAdmin(data.user, {
             fallbackPath: '/signup', // If no tenant found, redirect to signup
             onError: (error) => {
-              console.error('Redirect failed:', error)
               setMessage('Unable to find your tenant. Please contact support or create a new store.')
               setLoading(false)
             }
           })
         } catch (adminCheckError) {
-          console.error('Error checking admin status:', adminCheckError)
           setMessage('Error verifying authentication. Please try again.')
           setLoading(false)
         }
       }
     } catch (error) {
-      console.error('Login error:', error)
       setMessage('An unexpected error occurred')
       setLoading(false)
     }

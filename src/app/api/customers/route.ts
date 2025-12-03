@@ -22,7 +22,6 @@ export async function POST(request: NextRequest) {
       }
     )
     
-    console.log('API: Creating customer for tenant:', tenant_id)
     
     // Create the customer
     const { data: customer, error: customerError } = await supabase
@@ -35,15 +34,12 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (customerError) {
-      console.error('Customer creation error:', customerError)
       return NextResponse.json({ error: customerError.message }, { status: 500 })
     }
 
-    console.log('API: Customer created successfully:', customer.id)
 
     return NextResponse.json({ data: customer })
   } catch (error) {
-    console.error('Server error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -75,7 +71,6 @@ export async function GET(request: NextRequest) {
       }
     )
     
-    console.log('API: Fetching customers for tenant:', tenantId)
     
     let query = supabase
       .from('customers')
@@ -97,17 +92,13 @@ export async function GET(request: NextRequest) {
 
     const { data, error } = await query
 
-    console.log('API: Database response:', { data: data?.length, error })
 
     if (error) {
-      console.error('Database error:', error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    console.log('API: Returning customers:', data?.length || 0)
     return NextResponse.json({ data })
   } catch (error) {
-    console.error('Server error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -136,8 +127,6 @@ export async function PUT(request: NextRequest) {
       }
     )
     
-    console.log('API: Updating customer for tenant:', tenant_id)
-    console.log('API: Customer ID:', customer_id)
     
     // Update the customer
     const { data: customer, error: customerError } = await supabase
@@ -149,14 +138,11 @@ export async function PUT(request: NextRequest) {
       .single()
 
     if (customerError) {
-      console.error('Customer update error:', customerError)
       return NextResponse.json({ error: customerError.message }, { status: 500 })
     }
 
-    console.log('API: Customer updated successfully:', customer.id)
     return NextResponse.json({ data: customer })
   } catch (error) {
-    console.error('Server error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

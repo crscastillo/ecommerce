@@ -113,7 +113,6 @@ export function PaymentMethodsContent() {
           }))
         }
       } catch (err) {
-        console.error('Error loading payment methods config:', err)
       }
     }
 

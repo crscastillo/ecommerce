@@ -128,12 +128,12 @@ export function ShippingForm({ shippingInfo, onUpdate, onSubmit, showSubmitButto
         AMERICAS_COUNTRIES.forEach(country => allowedCountries.add(country.code))
       } else {
         // Add specifically allowed countries
-        allowed_countries.forEach(code => allowedCountries.add(code))
+        allowed_countries.forEach((code: string) => allowedCountries.add(code))
       }
       
       // Remove restricted countries
       if (restricted_countries) {
-        restricted_countries.forEach(code => allowedCountries.delete(code))
+        restricted_countries.forEach((code: string) => allowedCountries.delete(code))
       }
     })
     

@@ -11,11 +11,9 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    console.log(`Testing payment methods for tenant ${tenantId} with tier ${tier}`)
     
     const methods = await PaymentMethodsService.getPaymentMethodsConfig(tenantId, tier)
     
-    console.log('Payment methods loaded:', methods.map(m => ({ id: m.id, name: m.name, enabled: m.enabled })))
     
     return NextResponse.json({ 
       tenant_id: tenantId,
@@ -24,7 +22,6 @@ export async function GET(request: NextRequest) {
       total_methods: methods.length
     })
   } catch (error) {
-    console.error('Error testing payment methods:', error)
     return NextResponse.json(
       { error: 'Internal server error', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }

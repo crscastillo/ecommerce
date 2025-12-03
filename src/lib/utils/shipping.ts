@@ -203,7 +203,6 @@ export async function getShippingMethods(tenantId: string): Promise<ShippingMeth
     const data = await response.json()
     return data.shipping_methods || []
   } catch (error) {
-    console.error('Error fetching shipping methods:', error)
     
     // Return default shipping method as fallback
     return [{

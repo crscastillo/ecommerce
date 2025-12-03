@@ -38,7 +38,6 @@ export default function PlatformLayout({
 
         setIsAuthorized(true)
       } catch (error) {
-        console.error('Auth check failed:', error)
         router.push('/login')
       } finally {
         setIsLoading(false)

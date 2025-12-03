@@ -27,7 +27,6 @@ export function useShippingSettings() {
 
       setShippingMethods(data.shipping_methods || [])
     } catch (err: any) {
-      console.error('Error loading shipping settings:', err)
       setError(err.message)
     } finally {
       setLoading(false)
@@ -64,7 +63,6 @@ export function useShippingSettings() {
       setShippingMethods(methods)
       return data
     } catch (err: any) {
-      console.error('Error saving shipping settings:', err)
       setError(err.message)
       throw err
     } finally {

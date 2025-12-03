@@ -45,13 +45,6 @@ export default function TenantSignup() {
     const hasValidChars = regex.test(value)
     const noConsecutiveHyphens = !value.includes('--')
     
-    console.log('Validating subdomain:', value, {
-      isValidLength,
-      hasValidChars,
-      noConsecutiveHyphens,
-      overall: isValidLength && hasValidChars && noConsecutiveHyphens
-    })
-    
     return isValidLength && hasValidChars && noConsecutiveHyphens
   }
 
@@ -72,13 +65,11 @@ export default function TenantSignup() {
       // If data exists, subdomain is taken
       // If no data and no error, subdomain is available
       if (error) {
-        console.error('Error checking subdomain:', error)
         setSubdomainAvailable(false)
       } else {
         setSubdomainAvailable(!data)  // Available if no data found
       }
     } catch (err) {
-      console.error('Subdomain check failed:', err)
       setSubdomainAvailable(false)
     } finally {
       setCheckingSubdomain(false)
@@ -94,7 +85,6 @@ export default function TenantSignup() {
     
     if (cleanValue.length >= 3) {
       const timeoutId = setTimeout(() => {
-        console.log('Checking subdomain:', cleanValue, 'Valid:', validateSubdomain(cleanValue))
         checkSubdomainAvailability(cleanValue)
       }, 500)
       
@@ -167,7 +157,6 @@ export default function TenantSignup() {
       }
     } catch (error) {
       setError('Something went wrong. Please try again.')
-      console.error('Platform admin signup error:', error)
     } finally {
       setLoading(false)
     }
@@ -229,7 +218,6 @@ export default function TenantSignup() {
       setSuccess(true)
 
     } catch (err) {
-      console.error('Error creating account:', err)
       setError(err instanceof Error ? err.message : 'Failed to create account')
     } finally {
       setLoading(false)

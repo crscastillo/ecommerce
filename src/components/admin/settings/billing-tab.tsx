@@ -129,7 +129,6 @@ export function BillingTab({ saving = false }: BillingTabProps) {
         setSubscription(data)
       }
     } catch (error) {
-      console.error('Error loading subscription:', error)
     } finally {
       setLoading(false)
     }
@@ -178,7 +177,6 @@ export function BillingTab({ saving = false }: BillingTabProps) {
       }
 
     } catch (error) {
-      console.error('Error upgrading plan:', error)
       alert(tb('upgradeError') || 'Failed to process upgrade. Please try again.')
     } finally {
       setUpgrading(false)
@@ -201,7 +199,6 @@ export function BillingTab({ saving = false }: BillingTabProps) {
         window.location.reload()
       }
     } catch (error) {
-      console.error('Error updating plan:', error)
     }
   }
 
@@ -222,7 +219,6 @@ export function BillingTab({ saving = false }: BillingTabProps) {
 
         await loadSubscription()
       } catch (error) {
-        console.error('Error canceling subscription:', error)
         alert(tb('cancelError'))
       }
     }

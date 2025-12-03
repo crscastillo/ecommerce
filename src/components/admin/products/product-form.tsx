@@ -135,7 +135,7 @@ export function ProductForm({ initialData, mode }: ProductFormProps) {
         const { data: brandsData } = await tenantDb.getBrands({ is_active: true })
         setBrands(brandsData || [])
       } catch (err) {
-        console.error('Error loading categories and brands:', err)
+        // Handle loading error silently
       }
     }
 
@@ -204,7 +204,7 @@ export function ProductForm({ initialData, mode }: ProductFormProps) {
           slug: isDuplicate ? t('slugAlreadyInUse') : undefined
         }))
       } catch (error) {
-        console.error('Error validating slug:', error)
+        // Handle validation error silently
       } finally {
         setSlugValidating(false)
       }
@@ -319,7 +319,6 @@ export function ProductForm({ initialData, mode }: ProductFormProps) {
       }
 
     } catch (err: any) {
-      console.error('Error saving product:', err)
       setError(err.message || t('failedToSaveProduct'))
     } finally {
       setLoading(false)

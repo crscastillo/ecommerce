@@ -58,7 +58,6 @@ export default function ResetPasswordPage() {
         
         setValidatingSession(false)
       } catch (error) {
-        console.error('Error validating session:', error)
         setMessage({ 
           type: 'error', 
           text: 'Failed to validate reset session. Please try again.' 
@@ -106,7 +105,6 @@ export default function ResetPasswordPage() {
       }, 2000)
 
     } catch (error: any) {
-      console.error('Error updating password:', error)
       setMessage({ 
         type: 'error', 
         text: error.message || 'Failed to update password. Please try again.' 

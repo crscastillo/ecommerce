@@ -102,7 +102,6 @@ export function useStoreSettings() {
 
       showSuccess(customMessage || t('storeSettingsSaved'))
     } catch (error) {
-      console.error('Error saving store settings:', error)
       showError(t('failedToSaveStore'))
     } finally {
       setSaving(false)
@@ -185,7 +184,6 @@ export function useThemeSettings() {
 
       showSuccess(t('themeSettingsSaved'))
     } catch (error) {
-      console.error('Error saving theme settings:', error)
       showError(t('failedToSaveTheme'))
     } finally {
       setSaving(false)
@@ -215,7 +213,6 @@ export function usePaymentSettings() {
         const methods = await PaymentMethodsService.getPaymentMethodsConfig(tenant.id, tier)
         setPaymentMethods(methods)
       } catch (error) {
-        console.error('Error loading payment methods:', error)
       }
     }
 
@@ -260,7 +257,6 @@ export function usePaymentSettings() {
       await PaymentMethodsService.savePaymentMethodsConfig(tenant.id, paymentMethods)
       showSuccess(t('paymentSettingsSaved'))
     } catch (error) {
-      console.error('Error saving payment settings:', error)
       showError(t('failedToSavePayments'))
     } finally {
       setSaving(false)
@@ -295,7 +291,6 @@ export function usePluginFeatures() {
         )
         setPluginFeatures(features)
       } catch (error) {
-        console.error('Failed to load plugin features:', error)
       } finally {
         setLoaded(true)
       }
@@ -355,7 +350,6 @@ export function useTenantUsers() {
         .order('invited_at', { ascending: false })
 
       if (tenantUsersError) {
-        console.error('Error loading tenant users:', tenantUsersError)
         return
       }
 
@@ -393,7 +387,6 @@ export function useTenantUsers() {
 
       setUsers(combinedUsers)
     } catch (error) {
-      console.error('Error loading users and invitations:', error)
     }
   }
 
@@ -437,7 +430,6 @@ export function useTenantUsers() {
       setInviteModalOpen(false)
       loadUsers()
     } catch (error) {
-      console.error('Error inviting user:', error)
       showError(error instanceof Error ? error.message : 'Failed to send invitation')
     } finally {
       setSaving(false)
@@ -459,7 +451,6 @@ export function useTenantUsers() {
       showSuccess('User role updated successfully!')
       loadUsers()
     } catch (error) {
-      console.error('Error updating user role:', error)
       showError('Failed to update user role')
     }
   }
@@ -493,7 +484,6 @@ export function useTenantUsers() {
       showSuccess('User removed successfully!')
       loadUsers()
     } catch (error) {
-      console.error('Error removing user:', error)
       showError('Failed to remove user')
     }
   }
@@ -552,7 +542,6 @@ export function useTenantUsers() {
       showSuccess(message)
       loadUsers()
     } catch (error) {
-      console.error('Error resending invitation:', error)
       showError(error instanceof Error ? error.message : 'Failed to resend invitation')
     } finally {
       setSaving(false)

@@ -81,7 +81,6 @@ export async function POST(request: NextRequest) {
     }
 
   } catch (error: any) {
-    console.error('Stripe payment error:', error)
     return NextResponse.json({
       error: error.message || 'Payment processing failed'
     }, { status: 500 })

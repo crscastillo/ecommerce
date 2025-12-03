@@ -93,7 +93,6 @@ export default function PlatformDashboard() {
       setRecentTenants(recent)
 
     } catch (err: any) {
-      console.error('Error loading dashboard data:', err)
       setError(err.message || 'Failed to load dashboard data')
     } finally {
       setLoading(false)

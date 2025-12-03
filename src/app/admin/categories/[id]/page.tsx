@@ -43,7 +43,6 @@ export default function CategoryPage() {
 
         setCategory(data)
       } catch (err: any) {
-        console.error('Error loading category:', err)
         setError(err.message || t('failedToLoadCategory'))
       } finally {
         setLoading(false)

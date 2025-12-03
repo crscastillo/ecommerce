@@ -7,14 +7,11 @@ export async function GET(
 ) {
   try {
     const { slug } = await params
-    console.log('[API] Brand detail - Starting request for slug:', slug)
     
     // Get tenant from headers (set by middleware) or query params
     const tenantId = request.headers.get('x-tenant-id') || new URL(request.url).searchParams.get('tenant_id')
-    console.log('[API] Brand detail - Tenant ID:', tenantId)
     
     if (!tenantId) {
-      console.error('[API] Brand detail - No tenant ID found')
       return NextResponse.json({ error: 'Tenant not found' }, { status: 404 })
     }
 
@@ -31,7 +28,6 @@ export async function GET(
     )
 
     // Fetch brand by slug
-    console.log('[API] Brand detail - Fetching brand with slug:', slug)
     const { data: brand, error: brandError } = await supabase
       .from('brands')
       .select(`
@@ -49,7 +45,6 @@ export async function GET(
       .single()
 
     if (brandError) {
-      console.error('[API] Brand detail - Brand fetch error:', brandError)
       if (brandError.code === 'PGRST116') {
         return NextResponse.json({ error: 'Brand not found' }, { status: 404 })
       }
@@ -57,14 +52,8 @@ export async function GET(
     }
 
     if (!brand) {
-      console.log('[API] Brand detail - Brand not found for slug:', slug)
       return NextResponse.json({ error: 'Brand not found' }, { status: 404 })
     }
-
-    console.log('[API] Brand detail - Found brand:', {
-      name: brand.name,
-      id: brand.id
-    })
 
     return NextResponse.json({ 
       brand: brand
@@ -74,7 +63,6 @@ export async function GET(
       }
     })
   } catch (error) {
-    console.error('[API] Brand detail - Unexpected error:', error)
     return NextResponse.json(
       { error: 'Internal server error' }, 
       { status: 500 }

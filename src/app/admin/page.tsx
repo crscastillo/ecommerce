@@ -88,7 +88,6 @@ export default function AdminDashboard() {
       })
 
     } catch (error) {
-      console.error('Error loading dashboard stats:', error)
     } finally {
       setIsLoading(false)
     }

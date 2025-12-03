@@ -71,7 +71,6 @@ export async function POST(request: NextRequest) {
       .select()
 
     if (error) {
-      console.error('Error creating variants:', error)
       return NextResponse.json({ error: 'Failed to create variants', details: error }, { status: 500 })
     }
 
@@ -81,7 +80,6 @@ export async function POST(request: NextRequest) {
       variants: data 
     })
   } catch (error) {
-    console.error('[CREATE VARIANTS] Error:', error)
     return NextResponse.json(
       { error: 'Internal server error', details: error }, 
       { status: 500 }

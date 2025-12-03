@@ -29,7 +29,6 @@ export class PaymentMethodsService {
       const availableConfigs = await this.getDefaultPaymentMethods(tier)
       
       if (availableConfigs.length === 0) {
-        console.warn(`No payment methods available for tier: ${tier} - no feature flags found`)
         return []
       }
 
@@ -37,7 +36,6 @@ export class PaymentMethodsService {
       const response = await fetch(`/api/payment-settings?tenant_id=${tenantId}`)
       
       if (!response.ok) {
-        console.warn('Failed to fetch saved payment settings, using feature flag defaults')
         return availableConfigs
       }
 
@@ -64,7 +62,6 @@ export class PaymentMethodsService {
       // Return feature flag configurations if no saved settings exist
       return availableConfigs
     } catch (error) {
-      console.error('Error loading payment methods config:', error)
       // Return empty array if feature flags fail - no hardcoded fallback
       return []
     }
@@ -92,9 +89,7 @@ export class PaymentMethodsService {
       }
 
       const result = await response.json()
-      console.log('Payment settings saved successfully:', result.data)
     } catch (error) {
-      console.error('Error saving payment methods config:', error)
       throw error
     }
   }
@@ -106,12 +101,10 @@ export class PaymentMethodsService {
       const configurations = await FeatureFlagsService.getPaymentMethodConfigurations(tier)
       
       if (configurations.length === 0) {
-        console.warn(`No payment method feature flags found for tier ${tier}`)
       }
       
       return configurations
     } catch (error) {
-      console.error('Error loading payment methods from feature flags:', error)
       return []
     }
   }

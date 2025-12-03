@@ -129,7 +129,6 @@ export function CategoryForm({ initialData, mode }: CategoryFormProps) {
         const { data, error } = await query
 
         if (error) {
-          console.error('Error checking slug uniqueness:', error)
           setErrors(prev => ({ ...prev, slug: 'Error checking slug availability' }))
           return
         }
@@ -140,7 +139,6 @@ export function CategoryForm({ initialData, mode }: CategoryFormProps) {
           slug: isDuplicate ? 'This slug is already in use' : undefined
         }))
       } catch (err) {
-        console.error('Error validating slug:', err)
         setErrors(prev => ({ ...prev, slug: 'Error checking slug availability' }))
       } finally {
         setSlugValidating(false)
@@ -240,7 +238,6 @@ export function CategoryForm({ initialData, mode }: CategoryFormProps) {
         }, 1500)
       }
     } catch (err: any) {
-      console.error('Error saving category:', err)
       setError(err.message || 'An unexpected error occurred')
     } finally {
       setLoading(false)

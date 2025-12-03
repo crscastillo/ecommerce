@@ -41,10 +41,8 @@ export function Header() {
         if (result.data) {
           setCategories(result.data)
         } else {
-          console.error('Error loading categories:', result.error)
         }
       } catch (error) {
-        console.error('Error loading categories:', error)
       } finally {
         setLoadingCategories(false)
       }

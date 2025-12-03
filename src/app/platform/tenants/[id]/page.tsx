@@ -166,7 +166,6 @@ export default function TenantDetailPage() {
       ])
 
     } catch (err: any) {
-      console.error('Error loading tenant details:', err)
       setError(err.message || 'Failed to load tenant details')
     } finally {
       setLoading(false)
@@ -188,7 +187,6 @@ export default function TenantDetailPage() {
 
       setTenant({ ...tenant, is_active: newStatus })
     } catch (err: any) {
-      console.error('Error updating tenant status:', err)
       alert('Failed to update tenant status')
     }
   }

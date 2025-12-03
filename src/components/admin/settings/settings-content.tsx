@@ -118,7 +118,6 @@ export function SettingsContent({ tenant, searchParams, router }: SettingsConten
 
       showSuccess(t('messages.domainUpdated'))
     } catch (error) {
-      console.error('Error updating domain:', error)
       showError(error instanceof Error ? error.message : 'Failed to update domain')
     } finally {
       setSaving(false)
@@ -140,7 +139,6 @@ export function SettingsContent({ tenant, searchParams, router }: SettingsConten
 
       showSuccess('Password reset email sent successfully!')
     } catch (error) {
-      console.error('Error sending password reset:', error)
       showError('Failed to send password reset email')
     } finally {
       setSaving(false)
@@ -153,7 +151,6 @@ export function SettingsContent({ tenant, searchParams, router }: SettingsConten
       await supabase.auth.signOut()
       window.location.href = '/login'
     } catch (error) {
-      console.error('Error signing out:', error)
       showError('Failed to sign out')
     } finally {
       setSaving(false)

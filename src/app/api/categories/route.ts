@@ -22,7 +22,6 @@ export async function GET(request: NextRequest) {
       }
     )
     
-    console.log('API: Fetching categories for tenant:', tenantId)
     
     const { data, error } = await supabase
       .from('categories')
@@ -31,17 +30,13 @@ export async function GET(request: NextRequest) {
       .eq('is_active', true)
       .order('sort_order', { ascending: true })
 
-    console.log('API: Database response:', { data, error })
 
     if (error) {
-      console.error('Database error:', error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    console.log('API: Returning categories:', data)
     return NextResponse.json({ data })
   } catch (error) {
-    console.error('Server error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

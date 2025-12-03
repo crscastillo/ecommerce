@@ -30,7 +30,6 @@ export function ConditionalLayout({ children }: ConditionalLayoutProps) {
           setCategories(result.data || []);
         }
       } catch (error) {
-        console.error('Error fetching categories for footer:', error);
       }
     }
 

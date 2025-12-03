@@ -30,11 +30,10 @@ export function PluginsTab({ tenant }: PluginsTabProps) {
     const loadPluginFeatures = async () => {
       try {
         const features = await FeatureFlagsService.getEnabledPluginFeaturesForTier(
-          tenant.subscription_tier as 'free' | 'business' | 'pro'
+          (tenant.subscription_tier === 'free' ? 'basic' : tenant.subscription_tier === 'business' ? 'pro' : 'enterprise') as 'basic' | 'pro' | 'enterprise'
         )
         setPluginFeatures(features)
       } catch (error) {
-        console.error('Failed to load plugin features:', error)
         // Keep default disabled state on error
       } finally {
         setFeaturesLoading(false)

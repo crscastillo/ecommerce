@@ -41,7 +41,6 @@ export function PaymentsTab({
         const flags = await FeatureFlagsService.getEnabledPaymentMethods()
         setEnabledFlags(flags)
       } catch (error) {
-        console.error('Failed to load payment method flags:', error)
       }
     }
     loadFlags()

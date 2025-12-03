@@ -75,7 +75,6 @@ export function useProducts(filters: ProductFilters): UseProductsReturn {
 
       setProducts(productsWithParsedVariants)
     } catch (err: any) {
-      console.error('Error loading products:', err)
       setError(err.message || 'Failed to load products')
       setProducts([])
     } finally {
@@ -209,7 +208,6 @@ export function useTenantSettings(): UseTenantSettingsReturn {
 
         setSettings(data?.settings || {})
       } catch (err: any) {
-        console.error('Error loading tenant settings:', err)
         setError(err.message || 'Failed to load settings')
         setSettings({})
       } finally {

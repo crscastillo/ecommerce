@@ -55,7 +55,6 @@ export async function POST(request: NextRequest) {
       message: 'Peakmode tenant updated with admin_language=en, store_language=es'
     })
   } catch (error) {
-    console.error('Error updating tenant:', error)
     return NextResponse.json(
       { error: 'Internal server error' }, 
       { status: 500 }

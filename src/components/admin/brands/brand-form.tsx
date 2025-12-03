@@ -121,7 +121,7 @@ export function BrandForm({ initialData, mode }: BrandFormProps) {
           slug: isDuplicate ? t('slugAlreadyInUse') : undefined
         }))
       } catch (error) {
-        console.error('Error validating slug:', error)
+        // Handle validation error silently
       } finally {
         setSlugValidating(false)
       }
@@ -182,7 +182,7 @@ export function BrandForm({ initialData, mode }: BrandFormProps) {
         router.push('/admin/brands')
       }
     } catch (error) {
-      console.error('Failed to save brand:', error)
+      // Handle save error silently
     }
   }
 

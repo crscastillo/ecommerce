@@ -123,7 +123,6 @@ export default function FeatureFlagsPage() {
       
       setFeatureFlags(uiFlags)
     } catch (err) {
-      console.error('Error loading feature flags:', err)
       setError('Failed to load feature flags')
       // Fallback to empty array if database fails
       setFeatureFlags([])
@@ -166,7 +165,6 @@ export default function FeatureFlagsPage() {
       setMessage(`Feature flag "${flag.name}" ${updatedFlag.is_enabled ? 'enabled' : 'disabled'}`)
       setTimeout(() => setMessage(''), 3000)
     } catch (err: any) {
-      console.error('Error toggling feature flag:', err)
       setError('Failed to toggle feature flag')
     }
   }
@@ -183,7 +181,6 @@ export default function FeatureFlagsPage() {
       setMessage(`Rollout percentage updated to ${percentage}%`)
       setTimeout(() => setMessage(''), 3000)
     } catch (err: any) {
-      console.error('Error updating rollout:', err)
       setError('Failed to update rollout percentage')
     }
   }
@@ -266,7 +263,6 @@ export default function FeatureFlagsPage() {
       setIsDialogOpen(false)
       setTimeout(() => setMessage(''), 3000)
     } catch (err: any) {
-      console.error('Error saving feature flag:', err)
       setError('Failed to save feature flag: ' + (err.message || 'Unknown error'))
     }
   }
@@ -280,7 +276,6 @@ export default function FeatureFlagsPage() {
       setMessage(`Feature flag "${flag?.name}" deleted`)
       setTimeout(() => setMessage(''), 3000)
     } catch (err: any) {
-      console.error('Error deleting feature flag:', err)
       setError('Failed to delete feature flag')
     }
   }

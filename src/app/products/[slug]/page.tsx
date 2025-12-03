@@ -65,7 +65,6 @@ export default function ProductPage() {
           }
         }
       } catch (err) {
-        console.error('Error fetching product:', err)
         setError(err instanceof Error ? err.message : 'Failed to fetch product')
       } finally {
         setLoading(false)
@@ -174,7 +173,6 @@ export default function ProductPage() {
       // Reset quantity to 1 after adding
       setQuantity(1)
     } catch (err) {
-      console.error('Error adding to cart:', err)
       showError(
         'Failed to add to cart',
         'Please try again later'

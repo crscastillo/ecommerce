@@ -184,8 +184,6 @@ function ProductsPageContent() {
         const categoriesResult = await getCategories(tenant.id, { is_active: true })
         if (categoriesResult.data) {
           setCategories(categoriesResult.data)
-        } else {
-          console.error('Error loading categories:', categoriesResult.error)
         }
 
         // Load brands
@@ -198,8 +196,6 @@ function ProductsPageContent() {
               currentBrands = brandsResult.data
               setBrands(brandsResult.data)
             }
-          } else {
-            console.error('Error loading brands')
           }
         }
 
@@ -248,15 +244,13 @@ function ProductsPageContent() {
             const { maxPrice } = calculatePriceStats(allProductsResult.data)
             setMaxProductPrice(maxPrice)
           }
-        } else {
-          console.error('Error loading products:', productsResult.error)
         }
 
         // For now, use empty tenant settings since we removed the direct DB call
         // TODO: Create an API route for tenant settings if needed
         setTenantSettings({})
       } catch (error) {
-        console.error('Error loading products:', error)
+        // Handle error silently
       } finally {
         setLoading(false)
       }

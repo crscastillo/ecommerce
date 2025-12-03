@@ -165,7 +165,6 @@ export function TenantProvider({ children, initialTenant }: TenantProviderProps)
               const portSuffix = currentPort ? `:${currentPort}` : ''
               const redirectUrl = `${protocol}//${tenantHostname}${portSuffix}/admin`
               
-              console.log('Redirecting to tenant subdomain:', redirectUrl)
               window.location.href = redirectUrl
               return
             }
@@ -226,7 +225,6 @@ export function TenantProvider({ children, initialTenant }: TenantProviderProps)
                 const portSuffix = currentPort ? `:${currentPort}` : ''
                 const redirectUrl = `${protocol}//${tenantHostname}${portSuffix}/admin`
                 
-                console.log('Redirecting to member tenant subdomain:', redirectUrl)
                 window.location.href = redirectUrl
                 return
               }
@@ -278,7 +276,6 @@ export function TenantProvider({ children, initialTenant }: TenantProviderProps)
         setTenantUser(null)
       }
     } catch (err) {
-      console.error('Error loading tenant:', err)
       setError(err instanceof Error ? err.message : 'Failed to load tenant')
     } finally {
       setIsLoading(false)

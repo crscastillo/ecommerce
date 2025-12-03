@@ -46,7 +46,6 @@ export default function BrandDetailPage() {
           setBrand(data)
         }
       } catch (err: any) {
-        console.error('Error loading brand:', err)
         setError(err.message || 'Failed to load brand')
       } finally {
         setLoading(false)

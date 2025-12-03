@@ -96,7 +96,6 @@ export default function CheckoutPage() {
           }))
         }
       } catch (err) {
-        console.error('Error loading payment methods:', err)
         error('Payment Methods Error', 'Failed to load available payment methods')
       } finally {
         setLoadingPaymentMethods(false)
@@ -116,7 +115,6 @@ export default function CheckoutPage() {
         const methods = await getShippingMethods(tenant.id)
         setShippingMethods(methods)
       } catch (err) {
-        console.error('Error loading shipping methods:', err)
       } finally {
         setLoadingShippingMethods(false)
       }
@@ -264,7 +262,6 @@ export default function CheckoutPage() {
     setIsProcessing(true)
     try {
       // Debug log for items payload
-      console.log('Order POST items payload:', items)
       const response = await fetch('/api/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

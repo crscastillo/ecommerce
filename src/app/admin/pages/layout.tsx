@@ -39,7 +39,6 @@ export default async function PagesLayout({
 
     return <>{children}</>
   } catch (error) {
-    console.error('Error checking pages feature access:', error)
     redirect('/admin')
   }
 }

@@ -1616,7 +1616,9 @@
     "limitedStock": "Solo quedan {count}",
     "sku": "SKU",
     "brand": "Marca",
-    "category": "Categoría"
+    "category": "Categoría",
+    "each": "c/u",
+    "continue": "Continuar"
   },
   "category": {
     "form": {

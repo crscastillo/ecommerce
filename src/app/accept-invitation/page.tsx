@@ -128,7 +128,6 @@ function AcceptInvitationContent() {
         }
       }
     } catch (error) {
-      console.error('Error loading invitation:', error)
       setError('Failed to load invitation details')
     } finally {
       setLoading(false)
@@ -195,7 +194,6 @@ function AcceptInvitationContent() {
         })
 
       if (tenantUserError) {
-        console.error('Error adding user to tenant:', tenantUserError)
       }
 
       // Mark invitation as accepted
@@ -215,7 +213,6 @@ function AcceptInvitationContent() {
       }, 2000)
 
     } catch (error) {
-      console.error('Error accepting invitation:', error)
       setError('Failed to accept invitation. Please try again.')
     } finally {
       setSubmitting(false)

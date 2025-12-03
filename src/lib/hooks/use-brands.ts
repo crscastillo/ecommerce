@@ -80,7 +80,6 @@ export function useBrands(filters: BrandFilters): UseBrandsReturn {
 
       setBrands(brandsWithCounts)
     } catch (err: any) {
-      console.error('Error loading brands:', err)
       setError(err.message || 'Failed to load brands')
       setBrands([])
     } finally {

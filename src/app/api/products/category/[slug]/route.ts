@@ -7,14 +7,11 @@ export async function GET(
 ) {
   try {
     const { slug } = await params
-    console.log('[API] Products by category - Starting request for slug:', slug)
     
     // Get tenant from headers (set by middleware) or query params
     const tenantId = request.headers.get('x-tenant-id') || new URL(request.url).searchParams.get('tenant_id')
-    console.log('[API] Products by category - Tenant ID:', tenantId)
     
     if (!tenantId) {
-      console.error('[API] Products by category - No tenant ID found')
       return NextResponse.json({ error: 'Tenant not found' }, { status: 404 })
     }
 
@@ -31,7 +28,6 @@ export async function GET(
     )
 
     // First, find the category by slug
-    console.log('[API] Products by category - Fetching category with slug:', slug)
     const { data: category, error: categoryError } = await supabase
       .from('categories')
       .select('id, name, description, image_url')
@@ -41,19 +37,15 @@ export async function GET(
       .single()
 
     if (categoryError) {
-      console.error('[API] Products by category - Category fetch error:', categoryError)
       return NextResponse.json({ error: 'Category not found' }, { status: 404 })
     }
 
     if (!category) {
-      console.log('[API] Products by category - Category not found for slug:', slug)
       return NextResponse.json({ error: 'Category not found' }, { status: 404 })
     }
 
-    console.log('[API] Products by category - Found category:', category)
 
     // Now fetch products in this category
-    console.log('[API] Products by category - Fetching products for category ID:', category.id)
     const { data: products, error: productsError } = await supabase
       .from('products')
       .select(`
@@ -83,11 +75,9 @@ export async function GET(
       .order('created_at', { ascending: false })
 
     if (productsError) {
-      console.error('[API] Products by category - Products fetch error:', productsError)
       return NextResponse.json({ error: 'Failed to fetch products' }, { status: 500 })
     }
 
-    console.log('[API] Products by category - Found products:', products?.length || 0)
 
     // Fetch variants for variable products
     if (products && products.length > 0) {
@@ -96,7 +86,6 @@ export async function GET(
         .map(product => product.id)
 
       if (productIds.length > 0) {
-        console.log('[API] Products by category - Fetching variants for', productIds.length, 'variable products')
         
         const { data: variants, error: variantsError } = await supabase
           .from('product_variants')
@@ -106,7 +95,6 @@ export async function GET(
           .eq('is_active', true)
 
         if (variantsError) {
-          console.error('[API] Products by category - Variants fetch error:', variantsError)
         } else {
           // Group variants by product_id and attach to products
           const variantsByProduct = variants.reduce((acc, variant) => {
@@ -121,7 +109,6 @@ export async function GET(
           products.forEach(product => {
             if (product.product_type === 'variable') {
               ;(product as any).variants = variantsByProduct[product.id] || []
-              console.log(`[API] Products by category - Product ${product.name} has ${(product as any).variants.length} variants`)
             }
           })
         }
@@ -133,7 +120,6 @@ export async function GET(
       products: products || []
     })
   } catch (error) {
-    console.error('[API] Products by category - Unexpected error:', error)
     return NextResponse.json(
       { error: 'Internal server error' }, 
       { status: 500 }

@@ -80,7 +80,6 @@ export function useCategories(filters: CategoryFilters): UseCategoriesReturn {
 
       setCategories(categoriesWithCounts)
     } catch (err: any) {
-      console.error('Error loading categories:', err)
       setError(err.message || 'Failed to load categories')
       setCategories([])
     } finally {

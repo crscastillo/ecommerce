@@ -98,34 +98,32 @@ export default function CartPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           {/* Page Header */}
           <div className="mb-8">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex flex-col gap-4">
               <div>
                 <h1 className="flex items-center gap-2 text-2xl font-bold text-gray-900">
                   <ShoppingCart className="w-6 h-6" />
                   {t('title')}
                 </h1>
-                <div className="flex items-center gap-4 mt-2">
+                <div className="mt-2">
                   <p className="text-gray-600">
                     {getItemCount()} {getItemCount() === 1 ? t('item') : t('items')} {t('inYourCart')}
                   </p>
-                  <Badge variant="secondary" className="bg-blue-100 text-blue-800">
-                    {formatPrice(getTotalPrice(), tenant)} {t('totalAmount')}
-                  </Badge>
                 </div>
               </div>
               
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
                 <Link href="/products">
                   <Button variant="outline" size="sm" className="flex items-center gap-2">
                     <ArrowLeft className="w-4 h-4" />
-                    {t('continueShopping')}
+                    <span className="hidden xs:inline">{t('continueShopping')}</span>
+                    <span className="xs:hidden">{t('continue')}</span>
                   </Button>
                 </Link>
-                <Button variant="ghost" size="sm" className="hidden sm:flex items-center gap-2">
+                <Button variant="ghost" size="sm" className="hidden lg:flex items-center gap-2">
                   <Bookmark className="w-4 h-4" />
                   {t('saveCart')}
                 </Button>
-                <Button variant="ghost" size="sm" className="hidden sm:flex items-center gap-2">
+                <Button variant="ghost" size="sm" className="hidden lg:flex items-center gap-2">
                   <Share2 className="w-4 h-4" />
                   {t('share')}
                 </Button>
@@ -133,59 +131,10 @@ export default function CartPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
-            {/* Cart Items */}
-            <div className="xl:col-span-3">
-              <div className="space-y-4">
-                {/* Quick Actions Bar */}
-                <Card className="border-l-4 border-l-blue-500">
-                  <CardContent className="px-3 py-1.5">
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
-                      <div className="flex items-center gap-4">
-                        <div className="text-xs">
-                          <span className="font-medium text-gray-900">{t('quickActions')}</span>
-                        </div>
-                        <div className="flex gap-2">
-                          <Button variant="ghost" size="sm" className="text-xs">
-                            {t('selectAll')}
-                          </Button>
-                          <Button variant="ghost" size="sm" className="text-xs text-red-600">
-                            {t('removeSelected')}
-                          </Button>
-                        </div>
-                      </div>
-                      
-                      <div className="text-sm text-gray-600">
-                        {t('estimatedDelivery')}
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-                
-                {/* Cart Items List */}
-                {items.map((item, index) => (
-                  <div key={item.id} className="relative">
-                    <CartItemCard
-                      item={item}
-                      tenant={tenant}
-                      onUpdateQuantity={updateQuantity}
-                      onRemove={removeFromCart}
-                      formatPrice={formatPrice}
-                    />
-                    {index < items.length - 1 && (
-                      <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 z-10">
-                        <div className="bg-gray-300 rounded-full p-1">
-                          <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Order Summary */}
-            <div className="xl:col-span-1">
+          {/* Mobile Layout (xs, sm, and md) */}
+          <div className="block lg:hidden">
+            {/* Mobile Cart Summary at Top */}
+            <div className="mb-6">
               <CartSummary
                 itemCount={getItemCount()}
                 totalPrice={getTotalPrice()}
@@ -193,21 +142,83 @@ export default function CartPage() {
                 formatPrice={formatPrice}
               />
             </div>
+            
+            {/* Mobile Cart Items */}
+            <div className="space-y-4">
+              {items.map((item, index) => (
+                <div key={item.id} className="relative">
+                  <CartItemCard
+                    item={item}
+                    tenant={tenant}
+                    onUpdateQuantity={updateQuantity}
+                    onRemove={removeFromCart}
+                    formatPrice={formatPrice}
+                  />
+                  {index < items.length - 1 && (
+                    <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 z-10">
+                      <div className="bg-gray-300 rounded-full p-1">
+                        <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Desktop/Tablet Layout (lg and up) */}
+          <div className="hidden lg:block">
+            <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
+              {/* Cart Items */}
+              <div className="xl:col-span-3">
+                <div className="space-y-4">
+                  {/* Cart Items List */}
+                  {items.map((item, index) => (
+                    <div key={item.id} className="relative">
+                      <CartItemCard
+                        item={item}
+                        tenant={tenant}
+                        onUpdateQuantity={updateQuantity}
+                        onRemove={removeFromCart}
+                        formatPrice={formatPrice}
+                      />
+                      {index < items.length - 1 && (
+                        <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 z-10">
+                          <div className="bg-gray-300 rounded-full p-1">
+                            <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Order Summary */}
+              <div className="xl:col-span-1">
+                <CartSummary
+                  itemCount={getItemCount()}
+                  totalPrice={getTotalPrice()}
+                  tenant={tenant}
+                  formatPrice={formatPrice}
+                />
+              </div>
+            </div>
           </div>
           
           {/* Recently Viewed / Recommendations */}
-          <div className="mt-16">
+          <div className="mt-8 lg:mt-16">
             <Card>
-              <CardContent className="p-6">
+              <CardContent className="p-4 lg:p-6">
                 <h3 className="text-base font-semibold text-gray-900 mb-4">
                   {t('youMightAlsoLike')}
                 </h3>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 lg:gap-4">
                   {[1, 2, 3, 4].map(i => (
                     <div key={i} className="group cursor-pointer">
                       <div className="aspect-square bg-gray-200 rounded-lg mb-2 group-hover:shadow-md transition-shadow"></div>
-                      <div className="text-sm font-medium text-gray-900 line-clamp-2">{t('recommendedProduct')} {i}</div>
-                      <div className="text-sm text-gray-600">{formatPrice(29.99 * i, tenant)}</div>
+                      <div className="text-xs lg:text-sm font-medium text-gray-900 line-clamp-2">{t('recommendedProduct')} {i}</div>
+                      <div className="text-xs lg:text-sm text-gray-600">{formatPrice(29.99 * i, tenant)}</div>
                     </div>
                   ))}
                 </div>

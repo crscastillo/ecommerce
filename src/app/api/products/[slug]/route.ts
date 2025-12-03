@@ -7,16 +7,11 @@ export async function GET(
 ) {
   try {
     const { slug } = await params
-    console.log('[API] Product detail - Starting request for slug:', slug)
     
     // Get tenant from headers (set by middleware) or query params
     const tenantId = request.headers.get('x-tenant-id') || new URL(request.url).searchParams.get('tenant_id')
-    console.log('[API] Product detail - Tenant ID:', tenantId)
-    console.log('[API] Product detail - Headers:', Object.fromEntries(request.headers.entries()))
-    console.log('[API] Product detail - URL:', request.url)
     
     if (!tenantId) {
-      console.error('[API] Product detail - No tenant ID found')
       return NextResponse.json({ error: 'Tenant not found' }, { status: 404 })
     }
 
@@ -33,7 +28,6 @@ export async function GET(
     )
 
     // Fetch product with category information and product type
-    console.log('[API] Product detail - Fetching product with slug:', slug)
     const { data: product, error: productError } = await supabase
       .from('products')
       .select(`
@@ -70,7 +64,6 @@ export async function GET(
       .single()
 
     if (productError) {
-      console.error('[API] Product detail - Product fetch error:', productError)
       if (productError.code === 'PGRST116') {
         return NextResponse.json({ error: 'Product not found' }, { status: 404 })
       }
@@ -78,20 +71,12 @@ export async function GET(
     }
 
     if (!product) {
-      console.log('[API] Product detail - Product not found for slug:', slug)
       return NextResponse.json({ error: 'Product not found' }, { status: 404 })
     }
-
-    console.log('[API] Product detail - Found product:', {
-      name: product.name,
-      product_type: product.product_type,
-      id: product.id
-    })
 
     // If it's a variable product, fetch its variants
     let variants: any[] = []
     if (product.product_type === 'variable') {
-      console.log('[API] Product detail - Fetching variants for variable product')
       const { data: variantData, error: variantError } = await supabase
         .from('product_variants')
         .select(`
@@ -113,13 +98,10 @@ export async function GET(
         .order('title')
 
       if (variantError) {
-        console.error('[API] Product detail - Variant fetch error:', variantError)
       } else {
         variants = variantData || []
-        console.log('[API] Product detail - Found variants:', variants.length)
       }
     } else {
-      console.log('[API] Product detail - Product type is:', product.product_type, '- not variable, skipping variant fetch')
     }
 
     return NextResponse.json({ 
@@ -133,7 +115,6 @@ export async function GET(
       }
     })
   } catch (error) {
-    console.error('[API] Product detail - Unexpected error:', error)
     return NextResponse.json(
       { error: 'Internal server error' }, 
       { status: 500 }

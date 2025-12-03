@@ -42,7 +42,6 @@ export async function POST(request: NextRequest) {
       }
     )
 
-    console.log('API: Inviting user:', { tenantId, email, role })
 
     // Check if tenant exists and get tenant details
     const { data: tenant, error: tenantError } = await supabase
@@ -52,7 +51,6 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (tenantError) {
-      console.error('Error fetching tenant:', tenantError)
       return NextResponse.json(
         { error: 'Tenant not found' },
         { status: 404 }
@@ -87,14 +85,12 @@ export async function POST(request: NextRequest) {
       .select()
 
     if (error) {
-      console.error('Error creating invitation:', error)
       return NextResponse.json(
         { error: error.message },
         { status: 500 }
       )
     }
 
-    console.log('API: User invitation created successfully:', data[0])
 
     // Get tenant subdomain for proper URL construction
     const { data: tenantData, error: subdomainError } = await supabase
@@ -104,7 +100,6 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (subdomainError || !tenantData) {
-      console.error('Error fetching tenant subdomain:', subdomainError)
       return NextResponse.json(
         { error: 'Failed to get tenant information' },
         { status: 500 }
@@ -116,12 +111,8 @@ export async function POST(request: NextRequest) {
     let emailError = null
 
     try {
-      console.log('API: Attempting to send invitation email to:', email)
-      console.log('API: Using Supabase URL:', process.env.NEXT_PUBLIC_SUPABASE_URL)
-      console.log('API: Service role key available:', !!process.env.SUPABASE_SERVICE_ROLE_KEY)
       
       // User doesn't exist, use Supabase invite (we'll handle existing users later)
-      console.log('API: Sending Supabase invitation email...')
       
       // Construct URL with tenant subdomain
       const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000')
@@ -129,7 +120,6 @@ export async function POST(request: NextRequest) {
         ? `${tenantData.subdomain}.${baseUrl}` 
         : `https://${tenantData.subdomain}.${baseUrl.replace('https://', '')}`
       const redirectUrl = `${tenantUrl}/accept-invitation?invitation_id=${data[0].id}`
-      console.log('API: Redirect URL with tenant subdomain:', redirectUrl)
 
       const { data: inviteData, error: inviteError } = await supabase.auth.admin.inviteUserByEmail(email, {
         data: {
@@ -142,26 +132,19 @@ export async function POST(request: NextRequest) {
       })
 
       if (inviteError) {
-        console.error('❌ Error sending invitation email:', inviteError)
-        console.error('Invite error details:', JSON.stringify(inviteError, null, 2))
         emailStatus = 'failed'
         emailError = inviteError.message || 'Failed to send invitation email'
         
         // Check for common errors
         if (inviteError.message?.includes('User already registered')) {
-          console.log('API: User already exists - invitation recorded but no email sent')
           emailStatus = 'user_exists'
           emailError = 'User already has an account and can sign in directly'
         }
       } else {
-        console.log('✅ API: Invitation email sent successfully!')
-        console.log('Invitation data:', inviteData)
         emailStatus = 'sent'
       }
 
     } catch (err) {
-      console.error('❌ Error in email invitation process:', err)
-      console.error('Email error details:', JSON.stringify(err, null, 2))
       emailStatus = 'failed'
       emailError = (err as Error).message || 'Unexpected error sending invitation email'
     }
@@ -174,7 +157,6 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('User invitation error:', error)
     return NextResponse.json(
       { error: 'An unexpected error occurred during user invitation.' },
       { status: 500 }

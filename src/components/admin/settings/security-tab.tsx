@@ -64,7 +64,6 @@ export function SecurityTab({
         )
         setSecurityFeatures(features)
       } catch (error) {
-        console.error('Failed to load security features:', error)
         // Keep default disabled state on error
       } finally {
         setFeaturesLoading(false)

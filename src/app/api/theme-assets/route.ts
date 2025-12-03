@@ -60,7 +60,6 @@ export async function POST(request: NextRequest) {
     const folder = folderMap[assetType as keyof typeof folderMap]
     const filePath = `${tenantId}/${folder}/${fileName}`
 
-    console.log('API: Uploading theme asset:', { tenantId, assetType, filePath, fileSize: file.size })
 
     // Upload to Supabase Storage
     const { data, error } = await supabase.storage
@@ -71,7 +70,6 @@ export async function POST(request: NextRequest) {
       })
 
     if (error) {
-      console.error('Storage upload error:', error)
       return NextResponse.json(
         { error: error.message },
         { status: 500 }
@@ -83,7 +81,6 @@ export async function POST(request: NextRequest) {
       .from('public-assets')
       .getPublicUrl(filePath)
 
-    console.log('API: Theme asset uploaded successfully:', urlData.publicUrl)
 
     return NextResponse.json({
       success: true,
@@ -92,7 +89,6 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Theme asset upload error:', error)
     return NextResponse.json(
       { error: 'An unexpected error occurred during upload.' },
       { status: 500 }

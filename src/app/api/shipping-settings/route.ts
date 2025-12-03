@@ -26,8 +26,6 @@ export async function POST(request: NextRequest) {
       }
     )
     
-    console.log('API: Saving shipping methods for tenant:', tenant_id)
-    
     // First check if record exists
     const { data: existing } = await supabase
       .from('tenant_shipping_settings')
@@ -67,18 +65,14 @@ export async function POST(request: NextRequest) {
     }
 
     if (error) {
-      console.error('Shipping settings save error:', error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
-
-    console.log('API: Shipping settings saved successfully')
     return NextResponse.json({ 
       message: 'Shipping settings saved successfully',
       data 
     })
 
   } catch (error: any) {
-    console.error('API Error:', error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }
@@ -104,8 +98,6 @@ export async function GET(request: NextRequest) {
       }
     )
 
-    console.log('API: Fetching shipping settings for tenant:', tenantId)
-
     const { data, error } = await supabase
       .from('tenant_shipping_settings')
       .select('*')
@@ -115,7 +107,6 @@ export async function GET(request: NextRequest) {
     if (error) {
       if (error.code === 'PGRST116') {
         // No record found, return default shipping methods
-        console.log('API: No shipping settings found, returning defaults')
         return NextResponse.json({
           shipping_methods: [
             {
@@ -135,17 +126,13 @@ export async function GET(request: NextRequest) {
         })
       }
       
-      console.error('API Error:', error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
-
-    console.log('API: Returning shipping settings:', data ? 'found' : 'not found')
     return NextResponse.json({
       shipping_methods: data?.shipping_methods || []
     })
 
   } catch (error: any) {
-    console.error('API Error:', error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }

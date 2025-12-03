@@ -33,7 +33,6 @@ export default function SetupComplete() {
         }
 
         const pendingTenant = JSON.parse(pendingTenantStr)
-        console.log('Completing tenant setup:', pendingTenant)
 
         // Check ignore flag early
         if (ignore) return
@@ -82,7 +81,6 @@ export default function SetupComplete() {
           // No tenant exists - create new one
           // Prevent concurrent API calls
           if (apiCalling || ignore) {
-            console.log('API call already in progress or component unmounted, skipping...')
             return
           }
           setApiCalling(true)
@@ -134,15 +132,12 @@ export default function SetupComplete() {
             adminUrl = `https://${subdomain}.${baseDomain}/admin`
           }
           
-          console.log('Redirecting to admin:', adminUrl)
           window.location.href = adminUrl
         }, 2000) // 2 second delay
 
         // Don't auto-redirect for now - let user click button
-        console.log('Tenant setup complete!', tenant.name)
 
       } catch (err) {
-        console.error('Setup error:', err)
         const errorMessage = err instanceof Error ? err.message : 'Failed to complete store setup'
         setError(errorMessage)
       } finally {
@@ -241,7 +236,6 @@ export default function SetupComplete() {
                     adminUrl = `https://${subdomain}.${baseDomain}/admin`
                   }
                   
-                  console.log('Manual redirect to admin:', adminUrl)
                   window.location.href = adminUrl
                 }}
               >

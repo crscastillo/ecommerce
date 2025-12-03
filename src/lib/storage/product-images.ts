@@ -59,7 +59,6 @@ export class ProductImageStorage {
         })
 
       if (error) {
-        console.error('Storage upload error:', error)
         return {
           success: false,
           error: error.message
@@ -77,7 +76,6 @@ export class ProductImageStorage {
         path: filePath
       }
     } catch (error) {
-      console.error('Upload error:', error)
       return {
         success: false,
         error: 'An unexpected error occurred during upload.'
@@ -109,7 +107,6 @@ export class ProductImageStorage {
         .remove([imagePath])
 
       if (error) {
-        console.error('Storage delete error:', error)
         return {
           success: false,
           error: error.message
@@ -118,7 +115,6 @@ export class ProductImageStorage {
 
       return { success: true }
     } catch (error) {
-      console.error('Delete error:', error)
       return {
         success: false,
         error: 'An unexpected error occurred during deletion.'
@@ -136,7 +132,6 @@ export class ProductImageStorage {
         .remove(imagePaths)
 
       if (error) {
-        console.error('Storage delete error:', error)
         return {
           success: false,
           error: error.message
@@ -145,7 +140,6 @@ export class ProductImageStorage {
 
       return { success: true }
     } catch (error) {
-      console.error('Delete error:', error)
       return {
         success: false,
         error: 'An unexpected error occurred during deletion.'
@@ -192,7 +186,6 @@ export class ProductImageStorage {
       // Upload the file
       return this.uploadImage({ ...uploadOptions, file })
     } catch (error) {
-      console.error('Download and upload error:', error)
       return {
         success: false,
         error: 'Failed to download and upload image from URL.'
@@ -215,7 +208,6 @@ export class ProductImageStorage {
       
       return null
     } catch (error) {
-      console.error('Error extracting path from URL:', error)
       return null
     }
   }

@@ -22,9 +22,6 @@ export async function POST(request: NextRequest) {
       }
     )
     
-    console.log('API: Creating product for tenant:', tenant_id)
-    console.log('API: Product type:', productData.product_type)
-    console.log('API: Variants to create:', variants?.length || 0)
     
     // First, create the product (without variants in JSONB)
     const { data: product, error: productError } = await supabase
@@ -37,15 +34,12 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (productError) {
-      console.error('Product creation error:', productError)
       return NextResponse.json({ error: productError.message }, { status: 500 })
     }
 
-    console.log('API: Product created successfully:', product.id)
 
     // If it's a variable product with variants, create them in the product_variants table
     if (productData.product_type === 'variable' && variants && Array.isArray(variants) && variants.length > 0) {
-      console.log('API: Creating variants for variable product')
       
       const variantInserts = variants.map(variant => ({
         tenant_id,
@@ -70,11 +64,8 @@ export async function POST(request: NextRequest) {
         .select()
 
       if (variantsError) {
-        console.error('Variants creation error:', variantsError)
         // Don't fail the entire request, but log the error
-        console.warn('Failed to create variants, but product was created successfully')
       } else {
-        console.log('API: Created variants:', createdVariants.length)
       }
 
       // Return the product with the created variants
@@ -89,7 +80,6 @@ export async function POST(request: NextRequest) {
     // For non-variable products, just return the product
     return NextResponse.json({ data: product })
   } catch (error) {
-    console.error('Server error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -127,7 +117,6 @@ export async function GET(request: NextRequest) {
       }
     )
     
-    console.log('API: Fetching products for tenant:', tenantId)
     
     // Handle multiple category slugs
     let categoryIdsFromSlugs: string[] = []
@@ -142,10 +131,8 @@ export async function GET(request: NextRequest) {
         .eq('is_active', true)
       
       if (categoryError) {
-        console.error('Error fetching categories:', categoryError)
       } else if (categoryData) {
         categoryIdsFromSlugs = categoryData.map(category => category.id)
-        console.log('Found category IDs for slugs:', allCategorySlugs, '→', categoryIdsFromSlugs)
       }
     }
     
@@ -162,10 +149,8 @@ export async function GET(request: NextRequest) {
         .eq('is_active', true)
       
       if (brandError) {
-        console.error('Error fetching brands:', brandError)
       } else if (brandData) {
         brandIds = brandData.map(brand => brand.id)
-        console.log('Found brand IDs for slugs:', allBrandSlugs, '→', brandIds)
       }
     }
     
@@ -254,10 +239,8 @@ export async function GET(request: NextRequest) {
 
     const { data, error } = await query
 
-    console.log('API: Database response:', { data: data?.length, error })
 
     if (error) {
-      console.error('Database error:', error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
@@ -268,7 +251,6 @@ export async function GET(request: NextRequest) {
         .map(product => product.id)
 
       if (productIds.length > 0) {
-        console.log('API: Fetching variants for', productIds.length, 'variable products')
         
         const { data: variants, error: variantsError } = await supabase
           .from('product_variants')
@@ -278,7 +260,6 @@ export async function GET(request: NextRequest) {
           .eq('is_active', true)
 
         if (variantsError) {
-          console.error('Variants fetch error:', variantsError)
         } else {
           // Group variants by product_id and attach to products
           const variantsByProduct = variants.reduce((acc, variant) => {
@@ -293,17 +274,14 @@ export async function GET(request: NextRequest) {
           data.forEach(product => {
             if (product.product_type === 'variable') {
               ;(product as any).variants = variantsByProduct[product.id] || []
-              console.log(`API: Product ${product.name} has ${(product as any).variants.length} variants`)
             }
           })
         }
       }
     }
 
-    console.log('API: Returning products:', data?.length || 0)
     return NextResponse.json({ data })
   } catch (error) {
-    console.error('Server error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -332,10 +310,6 @@ export async function PUT(request: NextRequest) {
       }
     )
     
-    console.log('API: Updating product for tenant:', tenant_id)
-    console.log('API: Product ID:', product_id)
-    console.log('API: Product type:', productData.product_type)
-    console.log('API: Variants to update:', variants?.length || 0)
     
     // Update the product (without variants in JSONB)
     const { data: product, error: productError } = await supabase
@@ -347,15 +321,12 @@ export async function PUT(request: NextRequest) {
       .single()
 
     if (productError) {
-      console.error('Product update error:', productError)
       return NextResponse.json({ error: productError.message }, { status: 500 })
     }
 
-    console.log('API: Product updated successfully:', product.id)
 
     // Handle variants for variable products
     if (productData.product_type === 'variable' && variants && Array.isArray(variants)) {
-      console.log('API: Managing variants for variable product')
       
       // First, get existing variants
       const { data: existingVariants, error: existingError } = await supabase
@@ -365,7 +336,6 @@ export async function PUT(request: NextRequest) {
         .eq('tenant_id', tenant_id)
 
       if (existingError) {
-        console.error('Error fetching existing variants:', existingError)
       }
 
       // Delete all existing variants
@@ -377,9 +347,7 @@ export async function PUT(request: NextRequest) {
           .eq('tenant_id', tenant_id)
 
         if (deleteError) {
-          console.error('Error deleting existing variants:', deleteError)
         } else {
-          console.log('API: Deleted existing variants:', existingVariants.length)
         }
       }
 
@@ -408,10 +376,8 @@ export async function PUT(request: NextRequest) {
           .select()
 
         if (variantsError) {
-          console.error('Variants creation error:', variantsError)
           return NextResponse.json({ error: 'Failed to create variants: ' + variantsError.message }, { status: 500 })
         } else {
-          console.log('API: Created variants:', createdVariants.length)
         }
 
         // Return the product with the created variants
@@ -431,14 +397,12 @@ export async function PUT(request: NextRequest) {
         .eq('tenant_id', tenant_id)
 
       if (deleteError) {
-        console.error('Error deleting variants for non-variable product:', deleteError)
       }
     }
 
     // Return the updated product
     return NextResponse.json({ data: product })
   } catch (error) {
-    console.error('Server error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

@@ -135,7 +135,6 @@ export function CSVImportModal({ open, onOpenChange, onImportComplete }: CSVImpo
         
         setStep('mapping')
       } catch (error) {
-        console.error('Error parsing CSV:', error)
         alert('Error parsing CSV file. Please check the format and try again.')
       }
     }
@@ -351,10 +350,8 @@ export function CSVImportModal({ open, onOpenChange, onImportComplete }: CSVImpo
               if (uploadResult.success && uploadResult.url) {
                 productData.images = [uploadResult.url]
               } else {
-                console.warn(`Failed to upload image for row ${i + 1}: ${uploadResult.error}`)
               }
             } catch (error) {
-              console.warn(`Error processing image for row ${i + 1}:`, error)
             }
           }
         }
@@ -362,13 +359,11 @@ export function CSVImportModal({ open, onOpenChange, onImportComplete }: CSVImpo
         const result = await tenantDb.createProduct(productData)
         
         if (result.error) {
-          console.error(`Error importing row ${i + 1}:`, result.error)
           errorCount++
         } else {
           successCount++
         }
       } catch (error) {
-        console.error(`Error importing row ${i + 1}:`, error)
         errorCount++
       }
 

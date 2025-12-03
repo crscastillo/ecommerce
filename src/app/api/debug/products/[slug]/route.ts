@@ -61,7 +61,6 @@ export async function GET(
       allVariants: allVariants || []
     })
   } catch (error) {
-    console.error('[DEBUG] Error:', error)
     return NextResponse.json(
       { error: 'Debug error', details: error }, 
       { status: 500 }

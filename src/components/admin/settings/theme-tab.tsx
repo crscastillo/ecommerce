@@ -188,7 +188,6 @@ export function ThemeTab({ settings, onSettingsChange, onSave, saving, tenantId 
         updateSettings({ [field]: result.url })
       }
     } catch (err) {
-      console.error(`${field} upload error:`, err)
       alert('File upload failed: ' + (err as Error).message)
     } finally {
       setUploading(false)
@@ -226,7 +225,6 @@ export function ThemeTab({ settings, onSettingsChange, onSave, saving, tenantId 
         updateSettings({ hero_background_value: result.url })
       }
     } catch (err) {
-      console.error('Hero image upload error:', err)
       alert('Image upload failed: ' + (err as Error).message)
     } finally {
       setUploadingHero(false)

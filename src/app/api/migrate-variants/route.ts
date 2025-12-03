@@ -15,7 +15,6 @@ export async function POST(request: NextRequest) {
       }
     )
 
-    console.log('Starting migration of variants from JSONB to product_variants table...')
 
     // Find all products that have variants in the JSONB column
     const { data: products, error: productsError } = await supabase
@@ -26,11 +25,9 @@ export async function POST(request: NextRequest) {
       .neq('variants', '[]')
 
     if (productsError) {
-      console.error('Error fetching products:', productsError)
       return NextResponse.json({ error: 'Failed to fetch products' }, { status: 500 })
     }
 
-    console.log(`Found ${products.length} products with variants in JSONB`)
 
     let migratedCount = 0
     let errorCount = 0
@@ -38,13 +35,11 @@ export async function POST(request: NextRequest) {
 
     for (const product of products) {
       try {
-        console.log(`Migrating variants for product: ${product.name} (${product.id})`)
         
         // Parse the variants from JSONB
         const variants = Array.isArray(product.variants) ? product.variants : []
         
         if (variants.length === 0) {
-          console.log(`No variants found for product ${product.name}`)
           continue
         }
 
@@ -72,7 +67,6 @@ export async function POST(request: NextRequest) {
           .select()
 
         if (variantsError) {
-          console.error(`Failed to create variants for product ${product.name}:`, variantsError)
           errorCount++
           results.push({
             product: product.name,
@@ -89,7 +83,6 @@ export async function POST(request: NextRequest) {
           .eq('id', product.id)
 
         if (updateError) {
-          console.error(`Failed to clear variants JSONB for product ${product.name}:`, updateError)
           // Don't count this as a full error since variants were created
         }
 
@@ -100,9 +93,7 @@ export async function POST(request: NextRequest) {
           variantsCreated: createdVariants.length
         })
 
-        console.log(`Successfully migrated ${createdVariants.length} variants for ${product.name}`)
       } catch (error) {
-        console.error(`Error migrating product ${product.name}:`, error)
         errorCount++
         results.push({
           product: product.name,
@@ -112,7 +103,6 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    console.log(`Migration complete: ${migratedCount} products migrated, ${errorCount} errors`)
 
     return NextResponse.json({
       success: true,
@@ -123,7 +113,6 @@ export async function POST(request: NextRequest) {
       results
     })
   } catch (error) {
-    console.error('Migration error:', error)
     return NextResponse.json(
       { error: 'Migration failed', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }

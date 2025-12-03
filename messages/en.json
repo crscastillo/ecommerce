@@ -387,7 +387,9 @@
     "limitedStock": "Only {count} left",
     "sku": "SKU",
     "brand": "Brand",
-    "category": "Category"
+    "category": "Category",
+    "each": "each",
+    "continue": "Continue"
   },
   "category": {
     "notFound": "Category Not Found",

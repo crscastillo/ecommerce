@@ -53,7 +53,6 @@ export const redirectToUserTenantAdmin = async (
     // No tenant access, redirect to fallback
     window.location.href = fallbackPath
   } catch (error) {
-    console.error('Error checking user tenants:', error)
     if (onError) {
       onError(error)
     } else {
@@ -67,7 +66,6 @@ export const redirectToUserTenantAdmin = async (
  */
 export const redirectToTenantSubdomain = async (subdomain: string, path: string = '/admin') => {
   if (typeof window === 'undefined') {
-    console.warn('redirectToTenantSubdomain called on server side')
     return
   }
 
@@ -78,7 +76,6 @@ export const redirectToTenantSubdomain = async (subdomain: string, path: string 
   // Check if we're already on the target subdomain to prevent infinite loops
   const currentSubdomain = extractSubdomain(currentHostname)
   if (currentSubdomain === subdomain) {
-    console.log('Already on target subdomain, redirecting to admin path')
     window.location.href = path
     return
   }
@@ -109,7 +106,6 @@ export const redirectToTenantSubdomain = async (subdomain: string, path: string 
     // Transfer session by redirecting to a session-transfer endpoint on the subdomain
     const redirectUrl = `${protocol}//${tenantHostname}${portSuffix}/auth/session-transfer?access_token=${session.access_token}&refresh_token=${session.refresh_token}&redirect_to=${encodeURIComponent(path)}`
     
-    console.log('Redirecting to tenant subdomain with session transfer:', redirectUrl)
     
     // Add a small delay to prevent rapid redirects
     setTimeout(() => {
@@ -118,7 +114,6 @@ export const redirectToTenantSubdomain = async (subdomain: string, path: string 
   } else {
     // No session, just redirect normally
     const redirectUrl = `${protocol}//${tenantHostname}${portSuffix}${path}`
-    console.log('Redirecting to tenant subdomain without session:', redirectUrl)
     
     setTimeout(() => {
       window.location.href = redirectUrl

@@ -83,7 +83,6 @@ export class TenantDatabase {
         .order('created_at', { ascending: true })
 
       if (variantsResult.error) {
-        console.error('Error fetching variants:', variantsResult.error)
         // Don't fail the whole request, just return product without variants
         return { data: { ...productResult.data, variants: [] }, error: null }
       }

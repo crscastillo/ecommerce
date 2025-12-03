@@ -78,7 +78,6 @@ export default function EditCustomerPage() {
         .single()
 
       if (error) {
-        console.error('Error loading customer:', error)
         if (error.code === 'PGRST116') {
           setError(t('customerNotFound'))
           return
@@ -99,7 +98,6 @@ export default function EditCustomerPage() {
       setTags(customer.tags?.join(', ') || '')
       
     } catch (error) {
-      console.error('Error:', error)
       setError(t('errorLoadingCustomer'))
     } finally {
       setLoading(false)
@@ -146,7 +144,6 @@ export default function EditCustomerPage() {
         .eq('tenant_id', tenant.id)
 
       if (error) {
-        console.error('Error updating customer:', error)
         if (error.code === '23505') {
           setError(t('emailAlreadyExists'))
         } else {
@@ -166,7 +163,6 @@ export default function EditCustomerPage() {
       }, 1500)
       
     } catch (error) {
-      console.error('Error:', error)
       setError(t('errorUpdatingCustomer'))
     } finally {
       setSaving(false)

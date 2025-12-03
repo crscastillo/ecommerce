@@ -46,7 +46,6 @@ export default function AnalyticsPage() {
         
         setHasAccess(true)
       } catch (error) {
-        console.error('Error checking feature access:', error)
         // Redirect to dashboard on error
         router.replace('/admin')
       } finally {

@@ -56,7 +56,6 @@ export function DomainSettings({ onSave, saving = false }: DomainSettingsProps) 
     try {
       await onSave(domainToSave)
     } catch (error) {
-      console.error('Error saving domain:', error)
     }
   }
 

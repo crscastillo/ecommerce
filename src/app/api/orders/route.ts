@@ -29,7 +29,6 @@ export async function POST(request: NextRequest) {
       }
     )
     
-    console.log('API: Creating order for tenant:', tenant_id)
     
     // Create customer if guest checkout
     let customer_id = customer_info.id
@@ -60,7 +59,6 @@ export async function POST(request: NextRequest) {
           .single()
 
         if (customerError) {
-          console.error('Customer creation error:', customerError)
           return NextResponse.json({ error: customerError.message }, { status: 500 })
         }
 
@@ -95,7 +93,6 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (orderError) {
-      console.error('Order creation error:', orderError)
       return NextResponse.json({ error: orderError.message }, { status: 500 })
     }
 
@@ -118,9 +115,7 @@ export async function POST(request: NextRequest) {
       .insert(lineItems)
 
     if (lineItemsError) {
-      console.error('Line items creation error:', lineItemsError)
       // Don't fail the order, but log the error
-      console.warn('Failed to create line items, but order was created successfully')
     }
 
     // Update product inventory if tracking is enabled
@@ -134,7 +129,6 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    console.log('API: Order created successfully:', order.id)
 
     return NextResponse.json({ 
       data: {
@@ -143,7 +137,6 @@ export async function POST(request: NextRequest) {
       }
     })
   } catch (error) {
-    console.error('Server error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -195,13 +188,11 @@ export async function GET(request: NextRequest) {
     const { data, error } = await query
 
     if (error) {
-      console.error('Database error:', error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
     return NextResponse.json({ data })
   } catch (error) {
-    console.error('Server error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

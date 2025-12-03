@@ -95,7 +95,6 @@ export function ShippingMethodSelector({
         }
 
       } catch (err) {
-        console.error('Error calculating shipping:', err)
         setError('Failed to load shipping options')
       } finally {
         setLoading(false)

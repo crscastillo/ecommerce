@@ -87,7 +87,6 @@ export default function StatusPage() {
       setLastUpdate(new Date(data.timestamp).toLocaleString())
       setLoading(false)
     } catch (error) {
-      console.error('Failed to fetch status:', error)
       // Set error state
       setServices([
         {

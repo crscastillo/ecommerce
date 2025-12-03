@@ -111,7 +111,6 @@ export class ApiService {
 
       return { data: result.data || result, error: null }
     } catch (error) {
-      console.error(`API Error for ${url}:`, error)
       return {
         data: null,
         error: error instanceof Error ? error.message : 'Unknown error occurred'

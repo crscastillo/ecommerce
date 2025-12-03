@@ -63,7 +63,6 @@ export function PublicLanguageProvider({ children }: { children: ReactNode }) {
       // Save to cookie
       if (typeof window !== 'undefined') {
         document.cookie = `public-locale=${newLocale}; path=/; max-age=${365 * 24 * 60 * 60}` // 1 year
-        console.log('🍪 Cookie saved:', newLocale)
       }
     }
   }

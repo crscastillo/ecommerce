@@ -47,7 +47,6 @@ function PlatformHomepage() {
     await redirectToUserTenantAdmin(user, {
       fallbackPath: '/signup',
       onError: (error) => {
-        console.error('Admin redirect failed:', error)
         // Fallback to signup if user has no tenants
         window.location.href = '/signup'
       }

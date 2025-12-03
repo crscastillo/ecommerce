@@ -13,7 +13,6 @@ export default function TranslationDebugPage() {
     fetch('/api/debug-headers')
       .then(res => res.json())
       .then(data => setHeaders(data))
-      .catch(console.error)
   }, [])
 
   return (

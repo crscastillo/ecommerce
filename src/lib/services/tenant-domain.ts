@@ -84,7 +84,6 @@ export class TenantDomainService {
 
       return !error
     } catch (error) {
-      console.error('Error updating tenant domain:', error)
       return false
     }
   }

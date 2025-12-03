@@ -46,7 +46,6 @@ export class FeatureFlagsService {
       .order('feature_name', { ascending: true })
     
     if (error) {
-      console.error('Error fetching feature flags:', error)
       throw error
     }
     
@@ -69,7 +68,6 @@ export class FeatureFlagsService {
       .order('feature_name', { ascending: true })
     
     if (error) {
-      console.error('Error fetching feature flags by category:', error)
       throw error
     }
     
@@ -91,7 +89,6 @@ export class FeatureFlagsService {
       .eq('category', 'payment_methods')
     
     if (error) {
-      console.error('Error fetching payment method flags:', error)
       // Return all disabled as fallback for tier-specific
       return {
         stripe: false,
@@ -144,7 +141,6 @@ export class FeatureFlagsService {
       .eq('category', 'payment_methods')
     
     if (error) {
-      console.error('Error fetching payment method flags:', error)
       // Return all enabled as fallback
       return {
         stripe: true,
@@ -194,7 +190,6 @@ export class FeatureFlagsService {
       .single()
     
     if (error) {
-      console.error(`Error checking feature flag ${featureKey}:`, error)
       return false
     }
     
@@ -218,7 +213,6 @@ export class FeatureFlagsService {
       .single()
     
     if (error) {
-      console.error(`Error checking feature flag ${featureKey}:`, error)
       return false
     }
     
@@ -237,7 +231,6 @@ export class FeatureFlagsService {
       .eq('id', id)
     
     if (error) {
-      console.error('Error updating feature flag:', error)
       throw error
     }
   }
@@ -259,7 +252,6 @@ export class FeatureFlagsService {
       .eq('id', id)
     
     if (error) {
-      console.error('Error updating feature flag details:', error)
       throw error
     }
   }
@@ -276,7 +268,6 @@ export class FeatureFlagsService {
       .eq('category', 'security')
     
     if (error) {
-      console.error('Error fetching security feature flags:', error)
       // Return all disabled as fallback
       return {
         mfa_sms_enabled: false,
@@ -324,7 +315,6 @@ export class FeatureFlagsService {
       .eq('category', 'plugins')
     
     if (error) {
-      console.error('Error fetching plugin feature flags:', error)
       // Return all disabled as fallback
       return {
         plugin_google_analytics: false,
@@ -395,7 +385,6 @@ export class FeatureFlagsService {
       .order('feature_name', { ascending: true })
     
     if (error) {
-      console.error('Error fetching payment method configurations:', error)
       return []
     }
     
@@ -537,7 +526,6 @@ export class FeatureFlagsService {
       .single()
     
     if (tenantError) {
-      console.error('Error fetching tenant:', tenantError)
       return { analytics: false }
     }
     
@@ -549,7 +537,6 @@ export class FeatureFlagsService {
       .select('feature_key, enabled, target_tiers')
     
     if (error) {
-      console.error('Error fetching feature flags:', error)
       return { analytics: false }
     }
     
@@ -592,7 +579,6 @@ export class FeatureFlagsService {
     const errors = results.filter(r => r.error)
     
     if (errors.length > 0) {
-      console.error('Error updating feature flags:', errors)
       throw new Error('Failed to update some feature flags')
     }
   }

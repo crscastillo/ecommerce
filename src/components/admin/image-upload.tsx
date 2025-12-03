@@ -92,7 +92,6 @@ export function ImageUpload({
           updateImages([...images, result.url])
         }
       } catch (error) {
-        console.error('Upload error:', error)
         setUploadingImages(prev =>
           prev.map(img =>
             img.id === uploadingImage.id
@@ -276,7 +275,6 @@ export function ImageUpload({
                     className="object-cover"
                     unoptimized={imageUrl.includes('supabase')}
                     onError={(e) => {
-                      console.error('Failed to load image in ImageUpload:', imageUrl)
                       const target = e.currentTarget as HTMLImageElement
                       target.src = createImagePlaceholder(`Image ${index + 1}`)
                     }}

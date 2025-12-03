@@ -36,7 +36,6 @@ export default function StoreHomepage({ tenant }: StoreHomepageProps) {
   useEffect(() => {
     async function fetchData() {
       if (!tenant?.id) {
-        console.log('StoreHomepage: No tenant ID available:', tenant);
         setLoading(false);
         setProductsLoading(false);
         return;
@@ -55,20 +54,15 @@ export default function StoreHomepage({ tenant }: StoreHomepageProps) {
         ]);
         
         if (categoriesResult.error) {
-          console.error('StoreHomepage: Categories API error:', categoriesResult.error);
         } else {
-          console.log('StoreHomepage: Categories fetched successfully, count:', categoriesResult.data?.length);
           setCategories(categoriesResult.data || []);
         }
 
         if (productsResult.error) {
-          console.error('StoreHomepage: Products API error:', productsResult.error);
         } else {
-          console.log('StoreHomepage: Products fetched successfully, count:', productsResult.data?.length);
           setProducts(productsResult.data || []);
         }
       } catch (error) {
-        console.error('StoreHomepage: Error fetching data:', error);
       } finally {
         setLoading(false);
         setProductsLoading(false);

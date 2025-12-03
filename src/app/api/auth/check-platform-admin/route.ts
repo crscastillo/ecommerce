@@ -37,7 +37,6 @@ export async function GET(request: NextRequest) {
       userEmail: user.email 
     })
   } catch (error) {
-    console.error('Error checking platform admin status:', error)
     return NextResponse.json(
       { error: 'Internal server error' }, 
       { status: 500 }

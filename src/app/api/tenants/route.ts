@@ -24,7 +24,6 @@ export async function GET(request: NextRequest) {
       .order('created_at', { ascending: false })
 
     if (tenantsError) {
-      console.error('Tenants fetch error:', tenantsError)
       return NextResponse.json(
         { error: `Failed to fetch tenants: ${tenantsError.message}` },
         { status: 500 }
@@ -37,7 +36,6 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('API error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -118,7 +116,6 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (tenantError) {
-      console.error('Tenant creation error:', tenantError)
       return NextResponse.json(
         { error: `Failed to create tenant: ${tenantError.message}` },
         { status: 500 }
@@ -153,7 +150,6 @@ export async function POST(request: NextRequest) {
       ])
 
     if (categoriesError) {
-      console.warn('Failed to create default categories:', categoriesError)
       // Don't fail the entire operation for categories
     }
 
@@ -163,7 +159,6 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('API error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

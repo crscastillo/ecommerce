@@ -54,10 +54,110 @@ export function CartItemCard({ item, tenant, onUpdateQuantity, onRemove, formatP
   return (
     <Card className={`transition-all duration-200 hover:shadow-md ${isRemoving ? 'opacity-50 scale-95' : ''}`}>
       <CardContent className="p-0">
-        <div className="flex flex-col sm:flex-row">
+        {/* Mobile Compact Layout */}
+        <div className="flex lg:hidden pl-4 pr-2">
+          {/* Small Product Image on Left */}
+          <div className="relative flex-shrink-0">
+            <div className="w-20 h-20 relative bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden rounded-lg">
+              {item.image ? (
+                <Image
+                  src={item.image}
+                  alt={item.name}
+                  fill
+                  className="object-cover"
+                />
+              ) : (
+                <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+                  <ShoppingBag className="w-8 h-8 text-gray-400" />
+                </div>
+              )}
+              {discount > 0 && (
+                <Badge className="absolute -top-1 -left-1 bg-red-500 text-white text-xs px-1 py-0">
+                  -{Math.round(discount)}%
+                </Badge>
+              )}
+            </div>
+          </div>
+
+          {/* Product Info Taking Most of Row */}
+          <div className="flex-1 ml-3 mr-3 min-w-0">
+            <div className="flex justify-between items-start mb-1">
+              <Link 
+                href={`/products/${item.slug}`}
+                className="text-sm font-medium text-gray-900 hover:text-blue-600 transition-colors line-clamp-2 flex-1 pr-3"
+              >
+                {item.name}
+              </Link>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleRemove}
+                disabled={isRemoving}
+                className="h-6 w-6 p-0 text-red-600 hover:text-red-800 hover:bg-red-50 flex-shrink-0 ml-2"
+              >
+                <Trash2 className="w-3 h-3" />
+              </Button>
+            </div>
+            
+            {/* Price and Meta */}
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-xs font-medium text-gray-600">
+                {formatPrice(item.price, tenant)}
+              </span>
+              {item.comparePrice && item.comparePrice > item.price && (
+                <span className="text-xs text-gray-500 line-through">
+                  {formatPrice(item.comparePrice, tenant)}
+                </span>
+              )}
+            </div>
+
+            {/* Quantity and Total */}
+            <div className="flex items-center justify-between pr-2">
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-gray-500">Qty:</span>
+                <div className="flex items-center bg-gray-50 rounded p-1">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleQuantityChange(item.quantity - 1)}
+                    disabled={item.quantity <= 1 || isUpdating}
+                    className="h-6 w-6 p-0 hover:bg-white"
+                  >
+                    <Minus className="w-3 h-3" />
+                  </Button>
+                  <span className="w-8 text-center text-sm font-medium">
+                    {item.quantity}
+                  </span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleQuantityChange(item.quantity + 1)}
+                    disabled={item.maxQuantity ? item.quantity >= item.maxQuantity : false || isUpdating}
+                    className="h-6 w-6 p-0 hover:bg-white"
+                  >
+                    <Plus className="w-3 h-3" />
+                  </Button>
+                </div>
+              </div>
+              <div className="text-base font-bold text-gray-900 ml-2">
+                {formatPrice(item.price * item.quantity, tenant)}
+              </div>
+            </div>
+
+            {/* Stock Status */}
+            {item.maxQuantity && item.quantity >= item.maxQuantity && (
+              <p className="text-xs text-amber-600 mt-1">
+                Max quantity reached
+              </p>
+            )}
+          </div>
+        </div>
+
+        {/* Desktop Layout */}
+        <div className="hidden lg:flex flex-row pl-4 pr-2">
           {/* Product Image */}
           <div className="relative">
-            <div className="w-full sm:w-32 h-40 sm:h-32 relative bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
+            <div className="w-32 h-32 relative bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden rounded-l-lg">
               {item.image ? (
                 <Image
                   src={item.image}
@@ -76,22 +176,11 @@ export function CartItemCard({ item, tenant, onUpdateQuantity, onRemove, formatP
                 </Badge>
               )}
             </div>
-            <div className="absolute top-2 right-2 sm:hidden">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleRemove}
-                disabled={isRemoving}
-                className="h-8 w-8 p-0 bg-white/80 hover:bg-white text-red-600 hover:text-red-800 shadow-sm"
-              >
-                <Trash2 className="w-4 h-4" />
-              </Button>
-            </div>
           </div>
 
-          {/* Product Details */}
-          <div className="flex-1 p-4 sm:p-6">
-            <div className="flex flex-col sm:flex-row sm:items-start gap-4">
+          {/* Product Details - Desktop */}
+          <div className="flex-1 p-6">
+            <div className="flex flex-row items-start gap-4">
               {/* Product Info */}
               <div className="flex-1 min-w-0">
                 <div className="flex items-start gap-2 mb-2">
@@ -124,7 +213,7 @@ export function CartItemCard({ item, tenant, onUpdateQuantity, onRemove, formatP
                 {/* Pricing */}
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <span className="text-lg font-bold text-gray-900">
+                    <span className="text-sm font-medium text-gray-600">
                       {formatPrice(item.price, tenant)}
                     </span>
                     {item.comparePrice && item.comparePrice > item.price && (
@@ -132,7 +221,7 @@ export function CartItemCard({ item, tenant, onUpdateQuantity, onRemove, formatP
                         {formatPrice(item.comparePrice, tenant)}
                       </span>
                     )}
-                    <span className="text-sm text-gray-600">each</span>
+                    <span className="text-sm text-gray-600">{t('each')}</span>
                   </div>
                   {savings > 0 && (
                     <p className="text-sm text-green-600 font-medium">
@@ -142,8 +231,8 @@ export function CartItemCard({ item, tenant, onUpdateQuantity, onRemove, formatP
                 </div>
               </div>
 
-              {/* Quantity & Actions */}
-              <div className="flex flex-row sm:flex-col items-center sm:items-end gap-4">
+              {/* Quantity & Actions - Desktop */}
+              <div className="flex flex-col items-end gap-4">
                 {/* Quantity Controls */}
                 <div className="flex items-center bg-gray-50 rounded-lg p-1">
                   <Button
@@ -155,7 +244,7 @@ export function CartItemCard({ item, tenant, onUpdateQuantity, onRemove, formatP
                   >
                     <Minus className="w-4 h-4" />
                   </Button>
-                  <span className={`w-12 text-center font-semibold transition-opacity ${isUpdating ? 'opacity-50' : ''}`}>
+                  <span className={`w-12 text-center font-semibold transition-opacity text-base ${isUpdating ? 'opacity-50' : ''}`}>
                     {item.quantity}
                   </span>
                   <Button
@@ -177,11 +266,11 @@ export function CartItemCard({ item, tenant, onUpdateQuantity, onRemove, formatP
 
                 {/* Item Total */}
                 <div className="text-right">
-                  <p className="text-xl font-bold text-gray-900">
+                  <p className="text-2xl font-bold text-gray-900">
                     {formatPrice(item.price * item.quantity, tenant)}
                   </p>
                   {item.quantity > 1 && (
-                    <p className="text-sm text-gray-600">
+                    <p className="text-xs text-gray-500">
                       {item.quantity} × {formatPrice(item.price, tenant)}
                     </p>
                   )}

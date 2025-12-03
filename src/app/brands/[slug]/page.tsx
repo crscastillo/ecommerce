@@ -67,7 +67,6 @@ export default function BrandPage() {
           const brandData = await response.json()
           setBrand(brandData.brand)
         } else {
-          console.error('Brand not found')
           return
         }
 
@@ -94,10 +93,8 @@ export default function BrandPage() {
         if (productsResult.data) {
           setProducts(productsResult.data)
         } else {
-          console.error('Error loading products:', productsResult.error)
         }
       } catch (error) {
-        console.error('Error loading brand data:', error)
       } finally {
         setLoading(false)
       }

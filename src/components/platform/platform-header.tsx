@@ -41,7 +41,6 @@ export function PlatformHeader() {
       await supabase.auth.signOut()
       router.push('/login')
     } catch (error) {
-      console.error('Error signing out:', error)
     }
   }
 

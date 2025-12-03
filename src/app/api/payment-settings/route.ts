@@ -26,7 +26,6 @@ export async function POST(request: NextRequest) {
       }
     )
     
-    console.log('API: Saving payment methods for tenant:', tenant_id)
     
     // First check if record exists
     const { data: existing } = await supabase
@@ -68,15 +67,12 @@ export async function POST(request: NextRequest) {
     }
 
     if (error) {
-      console.error('Payment settings save error:', error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    console.log('API: Payment settings saved successfully')
 
     return NextResponse.json({ data })
   } catch (error) {
-    console.error('Server error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -105,7 +101,6 @@ export async function GET(request: NextRequest) {
       }
     )
     
-    console.log('API: Fetching payment settings for tenant:', tenantId)
     
     const { data, error } = await supabase
       .from('tenant_payment_settings')
@@ -114,14 +109,11 @@ export async function GET(request: NextRequest) {
       .single()
 
     if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
-      console.error('Database error:', error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    console.log('API: Returning payment settings:', data ? 'found' : 'not found')
     return NextResponse.json({ data })
   } catch (error) {
-    console.error('Server error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

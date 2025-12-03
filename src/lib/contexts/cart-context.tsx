@@ -76,7 +76,6 @@ export function CartProvider({
         }
       }
     } catch (error) {
-      console.warn('Failed to load cart from localStorage:', error)
     }
     setMounted(true)
   }, [storageKey])
@@ -88,7 +87,6 @@ export function CartProvider({
     try {
       localStorage.setItem(storageKey, JSON.stringify(items))
     } catch (error) {
-      console.warn('Failed to save cart to localStorage:', error)
     }
   }, [items, storageKey, mounted])
 

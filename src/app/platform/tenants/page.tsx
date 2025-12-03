@@ -120,7 +120,6 @@ export default function TenantsPage() {
               last_activity: recentOrder?.created_at || tenant.updated_at
             }
           } catch (err) {
-            console.warn(`Failed to load metrics for tenant ${tenant.id}:`, err)
             return {
               ...tenant,
               products_count: 0,
@@ -135,7 +134,6 @@ export default function TenantsPage() {
       setTenants(enrichedTenants)
 
     } catch (err: any) {
-      console.error('Error loading tenants:', err)
       setError(err.message || 'Failed to load tenants')
     } finally {
       setLoading(false)
@@ -183,7 +181,6 @@ export default function TenantsPage() {
         t.id === tenantId ? { ...t, is_active: !currentStatus } : t
       ))
     } catch (err: any) {
-      console.error('Error updating tenant status:', err)
       alert('Failed to update tenant status')
     }
   }

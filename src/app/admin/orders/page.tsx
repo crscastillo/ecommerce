@@ -82,13 +82,11 @@ export default function OrdersPage() {
         .order('created_at', { ascending: false })
 
       if (error) {
-        console.error('Error loading orders:', error)
         return
       }
 
       setOrders(orders || [])
     } catch (error) {
-      console.error('Error loading orders:', error)
     } finally {
       setLoading(false)
     }
@@ -115,7 +113,6 @@ export default function OrdersPage() {
         .eq('tenant_id', tenant.id)
 
       if (error) {
-        console.error('Error loading stats:', error)
         return
       }
 
@@ -130,7 +127,6 @@ export default function OrdersPage() {
 
       setStats(stats)
     } catch (error) {
-      console.error('Error loading stats:', error)
     }
   }
 
@@ -138,7 +134,6 @@ export default function OrdersPage() {
     try {
       // Don't update if no tenant ID
       if (!tenant?.id) {
-        console.error('No tenant ID available')
         return
       }
       
@@ -149,14 +144,12 @@ export default function OrdersPage() {
         .eq('tenant_id', tenant.id)
 
       if (error) {
-        console.error('Error updating order:', error)
         return
       }
 
       // Refresh orders and stats
       await Promise.all([loadOrders(), loadStats()])
     } catch (error) {
-      console.error('Error updating order:', error)
     }
   }
 

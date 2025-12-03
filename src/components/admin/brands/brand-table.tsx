@@ -275,7 +275,6 @@ export function BrandTable({ brands, onEdit, onDelete }: BrandTableProps) {
                   await onDelete(deleteBrand.id)
                   setDeleteBrand(null)
                 } catch (error) {
-                  console.error('Error deleting brand:', error)
                 } finally {
                   setDeleting(false)
                 }

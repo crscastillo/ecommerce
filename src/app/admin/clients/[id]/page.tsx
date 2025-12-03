@@ -76,7 +76,6 @@ export default function CustomerDetailsPage() {
         .single()
 
       if (error) {
-        console.error('Error loading customer:', error)
         if (error.code === 'PGRST116') {
           router.push('/admin/clients')
         }
@@ -85,7 +84,6 @@ export default function CustomerDetailsPage() {
 
       setCustomer(customer)
     } catch (error) {
-      console.error('Error:', error)
     } finally {
       setLoading(false)
     }
@@ -108,13 +106,11 @@ export default function CustomerDetailsPage() {
         .order('created_at', { ascending: false })
 
       if (error) {
-        console.error('Error loading customer orders:', error)
         return
       }
 
       setOrders(orders || [])
     } catch (error) {
-      console.error('Error:', error)
     } finally {
       setOrdersLoading(false)
     }

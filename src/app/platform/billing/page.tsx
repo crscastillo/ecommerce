@@ -163,7 +163,6 @@ export default function PlatformBillingPage() {
       })
 
     } catch (err: any) {
-      console.error('Error loading billing data:', err)
     } finally {
       setLoading(false)
     }
@@ -235,7 +234,6 @@ export default function PlatformBillingPage() {
       setIsDialogOpen(false)
       setTimeout(() => setMessage(''), 3000)
     } catch (err: any) {
-      console.error('Error saving plan:', err)
       setMessage('Failed to save subscription plan')
       setMessageType('error')
     }

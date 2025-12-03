@@ -31,7 +31,6 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         
         setIsAuthenticated(true)
       } catch (error) {
-        console.error('Auth check failed:', error)
         router.replace('/login')
       } finally {
         setIsLoading(false)

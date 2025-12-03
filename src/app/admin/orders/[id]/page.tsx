@@ -95,7 +95,6 @@ export default function OrderDetailsPage() {
         .single()
 
       if (error) {
-        console.error('Error loading order:', error)
         return
       }
 
@@ -105,7 +104,6 @@ export default function OrderDetailsPage() {
         setTrackingNumbers(Array.isArray(order.tracking_numbers) ? order.tracking_numbers as TrackingNumber[] : [])
       }
     } catch (error) {
-      console.error('Error loading order:', error)
     } finally {
       setLoading(false)
     }
@@ -124,7 +122,6 @@ export default function OrderDetailsPage() {
         .eq('tenant_id', tenant.id)
 
       if (error) {
-        console.error('Error updating order:', error)
         return
       }
 
@@ -132,7 +129,6 @@ export default function OrderDetailsPage() {
       setOrder(prev => prev ? { ...prev, [field]: value } : null)
       
     } catch (error) {
-      console.error('Error updating order:', error)
     } finally {
       setUpdating(false)
     }
@@ -201,7 +197,6 @@ export default function OrderDetailsPage() {
         .eq('tenant_id', tenant.id)
 
       if (error) {
-        console.error('Error updating tracking numbers:', error)
         return
       }
 
@@ -213,7 +208,6 @@ export default function OrderDetailsPage() {
       setShowTrackingModal(false)
       
     } catch (error) {
-      console.error('Error updating tracking numbers:', error)
     } finally {
       setUpdating(false)
     }
@@ -601,7 +595,6 @@ export default function OrderDetailsPage() {
                           .eq('tenant_id', tenant.id)
 
                         if (error) {
-                          console.error('Error updating notes:', error)
                           return
                         }
 
@@ -609,7 +602,6 @@ export default function OrderDetailsPage() {
                         setEditingNotes(false)
                         
                       } catch (error) {
-                        console.error('Error updating notes:', error)
                       } finally {
                         setUpdating(false)
                       }
@@ -691,7 +683,6 @@ export default function OrderDetailsPage() {
                           .eq('tenant_id', tenant.id)
 
                         if (error) {
-                          console.error('Error updating tags:', error)
                           return
                         }
 
@@ -699,7 +690,6 @@ export default function OrderDetailsPage() {
                         setEditingTags(false)
                         
                       } catch (error) {
-                        console.error('Error updating tags:', error)
                       } finally {
                         setUpdating(false)
                       }

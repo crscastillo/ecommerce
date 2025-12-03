@@ -67,7 +67,6 @@ export default function ProductEditPage() {
 
         setProduct(productData)
       } catch (err: any) {
-        console.error('Error loading product:', err)
         setError(err.message || t('failedToLoadProduct'))
       } finally {
         setLoading(false)

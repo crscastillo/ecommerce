@@ -389,7 +389,11 @@
     "brand": "Brand",
     "category": "Category",
     "each": "each",
-    "continue": "Continue"
+    "continue": "Continue",
+    "addedToCart": "Added to cart!",
+    "addedToCartDescription": "{productName} has been added to your cart",
+    "failedToAddToCart": "Failed to add to cart",
+    "tryAgainLater": "Please try again later"
   },
   "category": {
     "notFound": "Category Not Found",

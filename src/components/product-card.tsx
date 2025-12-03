@@ -77,6 +77,7 @@ export function ProductCard({ product, viewMode = 'grid', tenantSettings = {} }:
   const { addToCart, items } = useCart()
   const { success, error: showError } = useToast()
   const t = useTranslations()
+  const cartT = useTranslations('cart')
 
   // Helper functions for variable products
   const getProductPrice = () => {
@@ -211,13 +212,13 @@ export function ProductCard({ product, viewMode = 'grid', tenantSettings = {} }:
       }, 500)
 
       success(
-        'Added to cart!',
-        `${product.name} has been added to your cart`
+        cartT('addedToCart'),
+        cartT('addedToCartDescription', { productName: product.name })
       )
     } catch (err) {
       showError(
-        'Failed to add to cart',
-        'Please try again later'
+        cartT('failedToAddToCart'),
+        cartT('tryAgainLater')
       )
     } finally {
       setAddingToCart(false)
@@ -422,6 +423,11 @@ export function ProductCard({ product, viewMode = 'grid', tenantSettings = {} }:
     <Card className="group overflow-hidden hover:shadow-lg transition-all duration-300 flex flex-col h-full">
       {/* Image */}
       <div className="aspect-square relative bg-gray-100 overflow-hidden flex-shrink-0">
+        {/* Mobile: Clickable image for navigation */}
+        <Link href={`/products/${product.slug}`} className="block md:hidden absolute inset-0 z-10">
+          <span className="sr-only">View {product.name}</span>
+        </Link>
+        
         {!imageError ? (
           <Image
             src={getImageUrl()}
@@ -437,7 +443,7 @@ export function ProductCard({ product, viewMode = 'grid', tenantSettings = {} }:
         )}
         
         {/* Badges */}
-        <div className="absolute top-2 left-2 flex flex-col gap-1">
+        <div className="absolute top-2 left-2 flex flex-col gap-1 z-20">
           {product.is_featured && (
             <Badge variant="default" className="text-xs">
               {t('product.featured')}
@@ -450,18 +456,36 @@ export function ProductCard({ product, viewMode = 'grid', tenantSettings = {} }:
           )}
         </div>
 
-        {/* Wishlist */}
+        {/* Wishlist - Desktop only */}
         <button
           onClick={() => setIsWishlisted(!isWishlisted)}
-          className="absolute top-2 right-2 p-2 rounded-full bg-white shadow-sm hover:shadow-md transition-all opacity-0 group-hover:opacity-100"
+          className="absolute top-2 right-2 p-2 rounded-full bg-white shadow-sm hover:shadow-md transition-all opacity-0 group-hover:opacity-100 hidden md:block z-20"
         >
           <Heart 
             className={`h-4 w-4 ${isWishlisted ? 'fill-red-500 text-red-500' : 'text-gray-400'}`}
           />
         </button>
 
-        {/* Quick Actions */}
-        <div className="absolute bottom-2 left-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+        {/* Mobile: Small Add to Cart button */}
+        {!isOutOfStock && (
+          <Button
+            size="sm"
+            className="absolute bottom-2 right-2 h-8 w-8 p-0 rounded-full md:hidden z-20 shadow-lg"
+            disabled={addingToCart}
+            onClick={(e) => {
+              handleAddToCart(e)
+            }}
+          >
+            {addingToCart ? (
+              <div className="h-3 w-3 animate-spin rounded-full border border-white border-t-transparent" />
+            ) : (
+              <ShoppingCart className="h-4 w-4" />
+            )}
+          </Button>
+        )}
+
+        {/* Desktop: Quick Actions on hover */}
+        <div className="absolute bottom-2 left-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity hidden md:block">
           <Button 
             size="sm" 
             className="w-full"

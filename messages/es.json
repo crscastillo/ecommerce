@@ -1618,7 +1618,11 @@
     "brand": "Marca",
     "category": "Categoría",
     "each": "c/u",
-    "continue": "Continuar"
+    "continue": "Continuar",
+    "addedToCart": "¡Agregado al carrito!",
+    "addedToCartDescription": "{productName} ha sido agregado a tu carrito",
+    "failedToAddToCart": "Error al agregar al carrito",
+    "tryAgainLater": "Por favor intenta de nuevo más tarde"
   },
   "category": {
     "form": {

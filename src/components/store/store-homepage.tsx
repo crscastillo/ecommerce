@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import Image from "next/image";
-import { ProductCard } from "@/components/product-card";
+import { HomepageProductCard } from "@/components/homepage-product-card";
 import { getCategories, getProducts, type Category, type Product } from "@/lib/services/api";
 
 interface StoreHomepageProps {
@@ -145,11 +145,7 @@ export default function StoreHomepage({ tenant }: StoreHomepageProps) {
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 justify-items-center">
             {products.slice(0, 8).map((product) => (
               <div key={product.id} className="w-full max-w-[280px]">
-                <ProductCard
-                  product={product}
-                  viewMode="grid"
-                  tenantSettings={{}}
-                />
+                <HomepageProductCard product={product} />
               </div>
             ))}
           </div>

@@ -28,6 +28,7 @@ export default function ProductPage() {
   const { addToCart, isInCart, getCartItem } = useCart()
   const { success, error: showError } = useToast()
   const t = useTranslations()
+  const cartT = useTranslations('cart')
   const [product, setProduct] = useState<Product | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -166,16 +167,16 @@ export default function ProductPage() {
 
       // Show success toast
       success(
-        'Added to cart!',
-        `${quantity} ${quantity === 1 ? 'item' : 'items'} added to your cart`
+        cartT('addedToCart'),
+        cartT('addedToCartDescription', { productName: `${quantity} ${quantity === 1 ? t('cart.item') : t('cart.items')}` })
       )
       
       // Reset quantity to 1 after adding
       setQuantity(1)
     } catch (err) {
       showError(
-        'Failed to add to cart',
-        'Please try again later'
+        cartT('failedToAddToCart'),
+        cartT('tryAgainLater')
       )
     } finally {
       setAddingToCart(false)

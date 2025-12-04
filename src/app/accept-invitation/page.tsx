@@ -72,6 +72,7 @@ function AcceptInvitationContent() {
           tenant_id,
           email,
           role,
+          invited_at,
           expires_at,
           tenants:tenant_id (
             name,
@@ -190,7 +191,8 @@ function AcceptInvitationContent() {
           user_id: authData?.user?.id,
           role: invitation.role,
           is_active: true,
-          invited_at: new Date().toISOString()
+          invited_at: invitation.invited_at,
+          accepted_at: new Date().toISOString()
         })
 
       if (tenantUserError) {
@@ -209,7 +211,11 @@ function AcceptInvitationContent() {
       
       // Redirect to tenant admin after a brief delay
       setTimeout(() => {
-        router.push(`https://${invitation.tenant.subdomain}.${process.env.NEXT_PUBLIC_BASE_DOMAIN || 'localhost:3000'}/admin`)
+        const isDev = process.env.NODE_ENV === 'development'
+        const redirectUrl = isDev 
+          ? `http://${invitation.tenant.subdomain}.localhost:3000/admin`
+          : `https://${invitation.tenant.subdomain}.${process.env.NEXT_PUBLIC_BASE_DOMAIN || 'yourdomain.com'}/admin`
+        window.location.href = redirectUrl
       }, 2000)
 
     } catch (error) {

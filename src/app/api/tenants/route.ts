@@ -153,6 +153,23 @@ export async function POST(request: NextRequest) {
       // Don't fail the entire operation for categories
     }
 
+    // Add the owner to tenant_users table
+    const { error: tenantUserError } = await supabase
+      .from('tenant_users')
+      .insert({
+        tenant_id: tenantData.id,
+        user_id: user.id,
+        role: 'owner',
+        is_active: true,
+        invited_at: new Date().toISOString(),
+        accepted_at: new Date().toISOString()
+      })
+
+    if (tenantUserError) {
+      // Don't fail for this, but log it
+      console.error('Failed to create tenant_users entry for owner:', tenantUserError)
+    }
+
     return NextResponse.json({
       success: true,
       tenant: tenantData

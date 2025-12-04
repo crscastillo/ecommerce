@@ -117,7 +117,7 @@ export async function POST(request: NextRequest) {
       // Construct URL with tenant subdomain
       const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000')
       const tenantUrl = baseUrl.includes('localhost') 
-        ? `${tenantData.subdomain}.${baseUrl}` 
+        ? `${baseUrl.replace('http://', 'http://' + tenantData.subdomain + '.')}` 
         : `https://${tenantData.subdomain}.${baseUrl.replace('https://', '')}`
       const redirectUrl = `${tenantUrl}/accept-invitation?invitation_id=${data[0].id}`
 

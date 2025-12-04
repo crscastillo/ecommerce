@@ -15,13 +15,14 @@ import { useEffect } from 'react'
 
 interface LoginFormProps {
   onSubmit: (credentials: LoginCredentials) => Promise<void>
+  onEmailChange?: (email: string) => void
   loading?: boolean
   error?: string
   isSubdomain?: boolean
   tenantName?: string
 }
 
-export function LoginForm({ onSubmit, loading, error, isSubdomain, tenantName }: LoginFormProps) {
+export function LoginForm({ onSubmit, onEmailChange, loading, error, isSubdomain, tenantName }: LoginFormProps) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const t = useTranslations('auth')

@@ -15,6 +15,7 @@ interface InvitationData {
   tenant_id: string
   email: string
   role: string
+  invited_at: string
   tenant: {
     name: string
     subdomain: string
@@ -115,6 +116,7 @@ function AcceptInvitationContent() {
         tenant_id: data.tenant_id,
         email: data.email,
         role: data.role,
+        invited_at: data.invited_at,
         tenant: {
           name: (data.tenants as any)?.name || 'Unknown Store',
           subdomain: tenantSubdomain

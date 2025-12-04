@@ -37,6 +37,7 @@ function AcceptInvitationContent() {
   const searchParams = useSearchParams()
   const token = searchParams.get('token')
   const invitationId = searchParams.get('invitation_id')
+  const tenantSubdomain = searchParams.get('tenant_subdomain')
 
   const supabase = createClient()
 
@@ -127,6 +128,20 @@ function AcceptInvitationContent() {
       if (typeof window !== 'undefined') {
         const currentHost = window.location.host
         if (!currentHost.startsWith(`${tenantSubdomain}.`)) {
+          // If we have tenant_subdomain parameter and we're on main domain, redirect immediately
+          if (tenantSubdomain && currentHost.includes('localhost') || currentHost.includes(process.env.NEXT_PUBLIC_BASE_DOMAIN || '')) {
+            const params = []
+            if (invitationId) params.push(`invitation_id=${encodeURIComponent(invitationId)}`)
+            if (token) params.push(`token=${encodeURIComponent(token)}`)
+            const paramString = params.length ? `?${params.join('&')}` : ''
+            
+            const targetUrl = currentHost.includes('localhost')
+              ? `http://${tenantSubdomain}.localhost:3000/accept-invitation${paramString}`
+              : `https://${tenantSubdomain}.${process.env.NEXT_PUBLIC_BASE_DOMAIN}/accept-invitation${paramString}`
+            
+            window.location.href = targetUrl
+            return
+          }
           setWrongSubdomain(true)
         }
       }

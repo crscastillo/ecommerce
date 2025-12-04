@@ -95,7 +95,7 @@ export async function POST(request: NextRequest) {
     // Get tenant subdomain for proper URL construction
     const { data: tenantData, error: subdomainError } = await supabase
       .from('tenants')
-      .select('subdomain')
+      .select('subdomain, name')
       .eq('id', tenantId)
       .single()
 
@@ -114,19 +114,16 @@ export async function POST(request: NextRequest) {
       
       // User doesn't exist, use Supabase invite (we'll handle existing users later)
       
-      // Construct URL with tenant subdomain
+      // Construct URL - redirect to main domain first, then handle tenant redirection in the app
       const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000')
-      const tenantUrl = baseUrl.includes('localhost') 
-        ? `${baseUrl.replace('http://', 'http://' + tenantData.subdomain + '.')}` 
-        : `https://${tenantData.subdomain}.${baseUrl.replace('https://', '')}`
-      const redirectUrl = `${tenantUrl}/accept-invitation?invitation_id=${data[0].id}`
+      const redirectUrl = `${baseUrl}/accept-invitation?invitation_id=${data[0].id}&tenant_subdomain=${tenantData.subdomain}`
 
       const { data: inviteData, error: inviteError } = await supabase.auth.admin.inviteUserByEmail(email, {
         data: {
           tenant_id: tenantId,
           role: role,
           invitation_id: data[0].id,
-          store_name: tenant.name || 'Store'
+          store_name: tenantData.name || 'Store'
         },
         redirectTo: redirectUrl
       })

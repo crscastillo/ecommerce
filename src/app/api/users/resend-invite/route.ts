@@ -87,16 +87,13 @@ export async function POST(request: NextRequest) {
       } else {
         // Send invitation email using Supabase Auth
         try {
-          // Construct URL with tenant subdomain
+          // Construct URL - redirect to main domain first, then handle tenant redirection in the app
           const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000')
-          const tenantUrl = baseUrl.includes('localhost') 
-            ? `${baseUrl.replace('http://', 'http://' + tenantData.subdomain + '.')}` 
-            : `https://${tenantData.subdomain}.${baseUrl.replace('https://', '')}`
           
           const inviteOptions = {
             email: invitation.email,
             options: {
-              redirectTo: `${tenantUrl}/accept-invitation?invitation_id=${invitation.id}`
+              redirectTo: `${baseUrl}/accept-invitation?invitation_id=${invitation.id}&tenant_subdomain=${tenantData.subdomain}`
             }
           }
 

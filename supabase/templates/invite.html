@@ -105,7 +105,11 @@
             <div class="invitation-details">
                 <p><strong>Email:</strong> {{ .Email }}</p>
                 <p><strong>Role:</strong> {{ .Data.role }}</p>
+                {{ if .Data.store_name }}
+                <p><strong>Store:</strong> {{ .Data.store_name }}</p>
+                {{ else }}
                 <p><strong>Store:</strong> You'll have access to manage and collaborate on the store</p>
+                {{ end }}
             </div>
             
             <p>Click the button below to accept this invitation and create your account:</p>

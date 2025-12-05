@@ -30,10 +30,28 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Check environment variables
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+    
+    console.log('Environment check:', {
+      hasSupabaseUrl: !!supabaseUrl,
+      hasServiceRoleKey: !!serviceRoleKey,
+      supabaseUrlPrefix: supabaseUrl?.substring(0, 20) + '...',
+      serviceRoleKeyPrefix: serviceRoleKey?.substring(0, 20) + '...'
+    })
+
+    if (!supabaseUrl || !serviceRoleKey) {
+      return NextResponse.json(
+        { error: 'Missing Supabase configuration. Check environment variables.' },
+        { status: 500 }
+      )
+    }
+
     // Use service role key to bypass RLS
     const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      supabaseUrl,
+      serviceRoleKey,
       {
         auth: {
           autoRefreshToken: false,

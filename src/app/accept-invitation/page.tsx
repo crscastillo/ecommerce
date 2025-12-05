@@ -52,22 +52,61 @@ function AcceptInvitationContent() {
 
   const loadInvitation = async () => {
     try {
-      // If we have a token, verify it with Supabase Auth first
-      if (token) {
-        const { data: verifyData, error: verifyError } = await supabase.auth.verifyOtp({
-          type: 'invite',
-          token_hash: token
-        })
+      console.log('Accept invitation flow - params:', { invitationId, tenantSubdomain, token })
+
+      let currentInvitationId = invitationId
+      
+      // Check if we have an invitation ID, otherwise try to get it from user session
+      if (!currentInvitationId) {
+        // Try to get invitation info from user session (for direct Supabase auth flow)
+        const { data: { user } } = await supabase.auth.getUser()
+        console.log('User session:', user)
         
-        if (verifyError) {
-          setError('Invalid or expired invitation link')
+        if (!user?.email) {
+          setError('Invalid invitation link - missing invitation ID and no active session')
           setLoading(false)
           return
         }
+        
+        // Look for invitation by email instead
+        console.log('Looking for invitation by email:', user.email)
+        const { data, error } = await supabase
+          .from('tenant_users_invitations')
+          .select(`
+            id,
+            tenant_id,
+            email,
+            role,
+            invited_at,
+            expires_at,
+            tenants:tenant_id (
+              name,
+              subdomain
+            )
+          `)
+          .eq('email', user.email)
+          .eq('is_active', true)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle()
+
+        console.log('Invitation by email result:', { data, error })
+        
+        if (error || !data) {
+          setError('No active invitation found for your email address')
+          setLoading(false)
+          return
+        }
+        
+        // Use the found invitation data
+        currentInvitationId = data.id
+        console.log('Found invitation ID:', currentInvitationId)
       }
 
-      // Load invitation details
-      let query = supabase
+      console.log('Loading invitation with ID:', currentInvitationId)
+
+      // Load invitation details using the invitation ID
+      const { data, error } = await supabase
         .from('tenant_users_invitations')
         .select(`
           id,
@@ -81,25 +120,21 @@ function AcceptInvitationContent() {
             subdomain
           )
         `)
+        .eq('id', currentInvitationId)
         .eq('is_active', true)
+        .single()
 
-      if (invitationId) {
-        query = query.eq('id', invitationId)
-      } else {
-        // If no invitation ID, we need to find it by email from the auth verification
-        const { data: { user } } = await supabase.auth.getUser()
-        if (!user?.email) {
-          setError('Unable to identify invitation')
-          setLoading(false)
-          return
-        }
-        query = query.eq('email', user.email)
-      }
-
-      const { data, error } = await query.single()
+      console.log('Invitation query result:', { data, error })
 
       if (error || !data) {
-        setError('Invitation not found or has expired')
+        console.error('Database error:', error)
+        if (error?.code === 'PGRST116') {
+          setError('Invitation not found. It may have already been used or expired.')
+        } else if (error) {
+          setError(`Database error: ${error.message}`)
+        } else {
+          setError('Invitation not found or has expired')
+        }
         setLoading(false)
         return
       }
@@ -111,7 +146,7 @@ function AcceptInvitationContent() {
         return
       }
 
-      const tenantSubdomain = (data.tenants as any)?.subdomain || 'unknown'
+      const dbSubdomain = (data.tenants as any)?.subdomain || 'unknown'
       setInvitation({
         id: data.id,
         tenant_id: data.tenant_id,
@@ -120,29 +155,54 @@ function AcceptInvitationContent() {
         invited_at: data.invited_at,
         tenant: {
           name: (data.tenants as any)?.name || 'Unknown Store',
-          subdomain: tenantSubdomain
+          subdomain: dbSubdomain
         }
       })
 
-      // Subdomain check: if not on the correct subdomain, set flag
+      // Subdomain check: if not on the correct subdomain, redirect to correct subdomain
       if (typeof window !== 'undefined') {
         const currentHost = window.location.host
-        if (!currentHost.startsWith(`${tenantSubdomain}.`)) {
-          // If we have tenant_subdomain parameter and we're on main domain, redirect immediately
-          if (tenantSubdomain && currentHost.includes('localhost') || currentHost.includes(process.env.NEXT_PUBLIC_BASE_DOMAIN || '')) {
+        const currentUrl = window.location.href
+        // Use tenant_subdomain from URL parameter if available, otherwise use from database  
+        const targetSubdomain = tenantSubdomain || dbSubdomain
+        
+        console.log('Subdomain check:', {
+          currentHost,
+          targetSubdomain,
+          tenantSubdomain,
+          dbSubdomain,
+          currentUrl
+        })
+        
+        // Check if we're not on the correct tenant subdomain
+        if (!currentHost.startsWith(`${targetSubdomain}.`)) {
+          // If we're on the main domain, redirect to correct tenant subdomain
+          const isLocalhost = currentHost.includes('localhost')
+          const isMainDomain = currentHost === 'aluro.shop' || currentHost === 'localhost:3000' || currentHost.includes('localhost')
+          
+          console.log('Redirect check:', { isLocalhost, isMainDomain, shouldRedirect: isMainDomain })
+          
+          if (isMainDomain) {
             const params = []
-            if (invitationId) params.push(`invitation_id=${encodeURIComponent(invitationId)}`)
+            if (currentInvitationId) params.push(`invitation_id=${encodeURIComponent(currentInvitationId)}`)
             if (token) params.push(`token=${encodeURIComponent(token)}`)
             const paramString = params.length ? `?${params.join('&')}` : ''
             
-            const targetUrl = currentHost.includes('localhost')
-              ? `http://${tenantSubdomain}.localhost:3000/accept-invitation${paramString}`
-              : `https://${tenantSubdomain}.${process.env.NEXT_PUBLIC_BASE_DOMAIN}/accept-invitation${paramString}`
+            const targetUrl = isLocalhost
+              ? `http://${targetSubdomain}.localhost:3000/accept-invitation${paramString}`
+              : `https://${targetSubdomain}.aluro.shop/accept-invitation${paramString}`
             
-            window.location.href = targetUrl
+            console.log('Redirecting to:', targetUrl)
+            
+            // Use replace instead of href to avoid back button issues
+            window.location.replace(targetUrl)
             return
+          } else {
+            console.log('Not main domain, showing wrong subdomain message')
+            setWrongSubdomain(true)
           }
-          setWrongSubdomain(true)
+        } else {
+          console.log('Already on correct subdomain')
         }
       }
     } catch (error) {

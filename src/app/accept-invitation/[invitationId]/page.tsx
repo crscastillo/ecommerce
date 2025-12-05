@@ -89,7 +89,7 @@ export default function AcceptInvitationPage() {
 
       setInvitation({
         ...data,
-        tenant: data.tenants
+        tenant: Array.isArray(data.tenants) ? data.tenants[0] : data.tenants
       })
 
     } catch (err) {
@@ -128,6 +128,8 @@ export default function AcceptInvitationPage() {
       setSubmitting(true)
       setError('')
 
+      let currentUser = null
+
       // Sign up the user
       const { data: authData, error: signUpError } = await supabase.auth.signUp({
         email: invitation.email,
@@ -153,14 +155,15 @@ export default function AcceptInvitationPage() {
             return
           }
 
-          authData.user = signInData.user
+          currentUser = signInData?.user
         } else {
           setError(signUpError.message)
           return
         }
+      } else {
+        currentUser = authData?.user
       }
-
-      if (!authData?.user) {
+      if (!currentUser) {
         setError('Failed to create account')
         return
       }
@@ -170,7 +173,7 @@ export default function AcceptInvitationPage() {
         .from('tenant_users')
         .insert({
           tenant_id: invitation.tenant_id,
-          user_id: authData.user.id,
+          user_id: currentUser.id,
           role: invitation.role,
           is_active: true,
           invited_at: invitation.invited_at,

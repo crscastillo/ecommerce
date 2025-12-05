@@ -73,15 +73,15 @@ export function CartRecommendations({ tenant, formatPrice }: CartRecommendations
       <div className="mt-8 lg:mt-16">
         <Card>
           <CardContent className="p-4 lg:p-6">
-            <h3 className="text-base font-semibold text-gray-900 mb-4">
+            <h3 className="text-base font-semibold text-foreground mb-4">
               {t('youMightAlsoLike')}
             </h3>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 lg:gap-4">
               {Array.from({ length: 4 }).map((_, i) => (
                 <div key={i} className="animate-pulse">
-                  <div className="aspect-square bg-gray-200 rounded-lg mb-2"></div>
-                  <div className="h-4 bg-gray-200 rounded mb-1"></div>
-                  <div className="h-3 bg-gray-200 rounded w-2/3"></div>
+                  <div className="aspect-square bg-muted rounded-lg mb-2"></div>
+                  <div className="h-4 bg-muted rounded mb-1"></div>
+                  <div className="h-3 bg-muted rounded w-2/3"></div>
                 </div>
               ))}
             </div>
@@ -99,7 +99,7 @@ export function CartRecommendations({ tenant, formatPrice }: CartRecommendations
     <div className="mt-8 lg:mt-16">
       <Card>
         <CardContent className="p-4 lg:p-6">
-          <h3 className="text-base font-semibold text-gray-900 mb-4">
+          <h3 className="text-base font-semibold text-foreground mb-4">
             {t('youMightAlsoLike')}
           </h3>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 lg:gap-4">
@@ -109,7 +109,7 @@ export function CartRecommendations({ tenant, formatPrice }: CartRecommendations
                 href={`/products/${product.slug}`}
                 className="group cursor-pointer"
               >
-                <div className="aspect-square bg-gray-200 rounded-lg mb-2 group-hover:shadow-md transition-shadow overflow-hidden relative">
+                <div className="aspect-square bg-muted rounded-lg mb-2 group-hover:shadow-md transition-shadow overflow-hidden relative">
                   {product.images && product.images.length > 0 ? (
                     <Image
                       src={product.images[0]}
@@ -119,8 +119,8 @@ export function CartRecommendations({ tenant, formatPrice }: CartRecommendations
                       sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                     />
                   ) : (
-                    <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                      <span className="text-gray-400 text-xs">No image</span>
+                    <div className="w-full h-full bg-muted flex items-center justify-center">
+                      <span className="text-muted-foreground text-xs">No image</span>
                     </div>
                   )}
                   {product.is_featured && (
@@ -131,10 +131,10 @@ export function CartRecommendations({ tenant, formatPrice }: CartRecommendations
                     </div>
                   )}
                 </div>
-                <div className="text-xs lg:text-sm font-medium text-gray-900 line-clamp-2 group-hover:text-primary transition-colors">
+                <div className="text-xs lg:text-sm font-medium text-foreground line-clamp-2 group-hover:text-primary transition-colors">
                   {product.name}
                 </div>
-                <div className="text-xs lg:text-sm text-gray-600">
+                <div className="text-xs lg:text-sm text-muted-foreground">
                   {formatPrice(product.price, tenant)}
                 </div>
               </Link>

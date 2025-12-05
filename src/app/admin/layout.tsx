@@ -55,8 +55,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   // Show loading while checking authentication
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     )
   }
@@ -68,7 +68,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
   return (
     <TenantProvider>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-background">
         {/* Sidebar */}
         <AdminSidebar 
           isOpen={sidebarOpen}

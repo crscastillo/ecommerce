@@ -210,7 +210,7 @@ export function PaymentMethodsContent() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Payment Methods</h1>
+        <h1 className="text-3xl font-bold text-foreground mb-2">Payment Methods</h1>
         <p className="text-gray-600">
           Configure and manage payment methods for your store. Enable the payment options you want to offer your customers.
         </p>
@@ -237,7 +237,7 @@ export function PaymentMethodsContent() {
                         <span>{method.name}</span>
                         {method.enabled && <Badge variant="default">Enabled</Badge>}
                       </CardTitle>
-                      <p className="text-sm text-gray-600 mt-1">{method.description}</p>
+                      <p className="text-sm text-muted-foreground mt-1">{method.description}</p>
                       {method.fees && (
                         <p className="text-xs text-gray-500 mt-1">Fees: {method.fees}</p>
                       )}
@@ -252,7 +252,7 @@ export function PaymentMethodsContent() {
 
               {/* Stripe Configuration */}
               {method.id === 'stripe' && method.enabled && (
-                <CardContent className="border-t bg-gray-50">
+                <CardContent className="border-t bg-muted">
                   <div className="space-y-4">
                     <div>
                       <Label htmlFor="stripe-publishable">Publishable Key</Label>
@@ -282,7 +282,7 @@ export function PaymentMethodsContent() {
 
               {/* TiloPay Configuration */}
               {method.id === 'tilopay' && method.enabled && (
-                <CardContent className="border-t bg-gray-50">
+                <CardContent className="border-t bg-muted">
                   <div className="space-y-4">
                     <div>
                       <Label htmlFor="tilopay-api">API Key</Label>
@@ -312,7 +312,7 @@ export function PaymentMethodsContent() {
 
               {/* Bank Transfer Details */}
               {method.id === 'bank_transfer' && method.enabled && (
-                <CardContent className="border-t bg-gray-50">
+                <CardContent className="border-t bg-muted">
                   <div className="space-y-4">
                     <div>
                       <Label htmlFor="bank-name">Bank Name</Label>

@@ -230,7 +230,7 @@ export function ProductCard({ product, viewMode = 'grid', tenantSettings = {} }:
       <Card className="overflow-hidden hover:shadow-lg transition-shadow">
         <div className="flex flex-col sm:flex-row">
           {/* Image */}
-          <div className="w-full sm:w-48 h-48 flex-shrink-0 relative bg-gray-100">
+          <div className="w-full sm:w-48 h-48 flex-shrink-0 relative bg-muted">
             {!imageError ? (
               <Image
                 src={getImageUrl()}
@@ -241,7 +241,7 @@ export function ProductCard({ product, viewMode = 'grid', tenantSettings = {} }:
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center">
-                <Package className="h-12 w-12 text-gray-400" />
+                <Package className="h-12 w-12 text-muted-foreground" />
               </div>
             )}
             
@@ -265,7 +265,7 @@ export function ProductCard({ product, viewMode = 'grid', tenantSettings = {} }:
               className="absolute top-2 right-2 p-2 rounded-full bg-white shadow-sm hover:shadow-md transition-shadow"
             >
               <Heart 
-                className={`h-4 w-4 ${isWishlisted ? 'fill-red-500 text-red-500' : 'text-gray-400'}`}
+                className={`h-4 w-4 ${isWishlisted ? 'fill-red-500 text-red-500' : 'text-muted-foreground'}`}
               />
             </button>
           </div>
@@ -278,7 +278,7 @@ export function ProductCard({ product, viewMode = 'grid', tenantSettings = {} }:
                   href={`/products/${product.slug}`}
                   className="hover:underline"
                 >
-                  <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-1">
+                  <h3 className="text-base sm:text-lg font-semibold text-foreground mb-1">
                     {product.name}
                   </h3>
                 </Link>
@@ -286,7 +286,7 @@ export function ProductCard({ product, viewMode = 'grid', tenantSettings = {} }:
                 <div className="flex items-center gap-2 text-xs sm:text-sm mb-2 sm:mb-0">
                   {product.brand && (
                     <>
-                      <span className="text-gray-600">{t('product.by')}</span>
+                      <span className="text-muted-foreground">{t('product.by')}</span>
                       <Link 
                         href={`/brands/${product.brand.slug}`}
                         className="font-medium text-blue-600 hover:text-blue-800"
@@ -297,11 +297,11 @@ export function ProductCard({ product, viewMode = 'grid', tenantSettings = {} }:
                   )}
                   {product.category && (
                     <>
-                      {product.brand && <span className="text-gray-400">•</span>}
-                      <span className="text-gray-600">{t('product.in')}</span>
+                      {product.brand && <span className="text-muted-foreground">•</span>}
+                      <span className="text-muted-foreground">{t('product.in')}</span>
                       <Link 
                         href={`/products?category=${product.category.slug}`}
-                        className="text-gray-600 hover:text-gray-900"
+                        className="text-muted-foreground hover:text-foreground"
                       >
                         {product.category.name}
                       </Link>
@@ -310,7 +310,7 @@ export function ProductCard({ product, viewMode = 'grid', tenantSettings = {} }:
                 </div>
 
                 {product.short_description && (
-                  <p className="text-gray-600 text-xs sm:text-sm mb-2 sm:mb-4 line-clamp-2 hidden sm:block">
+                  <p className="text-muted-foreground text-xs sm:text-sm mb-2 sm:mb-4 line-clamp-2 hidden sm:block">
                     {product.short_description}
                   </p>
                 )}
@@ -335,16 +335,16 @@ export function ProductCard({ product, viewMode = 'grid', tenantSettings = {} }:
                 <div className="sm:hidden mb-2">
                   <div className="flex items-center gap-1">
                     {priceRange && priceRange.hasRange ? (
-                      <span className="text-base font-bold text-gray-900">
+                      <span className="text-base font-bold text-foreground">
                         {formatPrice(priceRange.minPrice, tenant)} - {formatPrice(priceRange.maxPrice, tenant)}
                       </span>
                     ) : (
-                      <span className="text-base font-bold text-gray-900">
+                      <span className="text-base font-bold text-foreground">
                         {formatPrice(currentPrice, tenant)}
                       </span>
                     )}
                     {currentComparePrice && currentComparePrice > currentPrice && (
-                      <span className="text-xs text-gray-500 line-through">
+                      <span className="text-xs text-muted-foreground line-through">
                         {formatPrice(currentComparePrice, tenant)}
                       </span>
                     )}
@@ -352,7 +352,7 @@ export function ProductCard({ product, viewMode = 'grid', tenantSettings = {} }:
                 </div>
 
                 {/* Stock status - mobile */}
-                <div className="text-xs sm:text-sm text-gray-600 sm:hidden mb-2">
+                <div className="text-xs sm:text-sm text-muted-foreground sm:hidden mb-2">
                   {isOutOfStock ? (
                     <span className="text-red-600">{t('product.outOfStock')}</span>
                   ) : lowStockBadge.show ? (
@@ -367,16 +367,16 @@ export function ProductCard({ product, viewMode = 'grid', tenantSettings = {} }:
               <div className="text-right hidden sm:block">
                 <div className="flex items-center gap-2 mb-1">
                   {priceRange && priceRange.hasRange ? (
-                    <span className="text-xl font-bold text-gray-900">
+                    <span className="text-xl font-bold text-foreground">
                       {formatPrice(priceRange.minPrice, tenant)} - {formatPrice(priceRange.maxPrice, tenant)}
                     </span>
                   ) : (
-                    <span className="text-xl font-bold text-gray-900">
+                    <span className="text-xl font-bold text-foreground">
                       {formatPrice(currentPrice, tenant)}
                     </span>
                   )}
                   {currentComparePrice && currentComparePrice > currentPrice && (
-                    <span className="text-sm text-gray-500 line-through">
+                    <span className="text-sm text-muted-foreground line-through">
                       {formatPrice(currentComparePrice, tenant)}
                     </span>
                   )}
@@ -387,7 +387,7 @@ export function ProductCard({ product, viewMode = 'grid', tenantSettings = {} }:
             {/* Bottom row - Stock and Add to Cart */}
             <div className="flex items-center justify-between mt-auto">
               {/* Stock status - desktop */}
-              <div className="text-sm text-gray-600 hidden sm:block">
+              <div className="text-sm text-muted-foreground hidden sm:block">
                 {isOutOfStock ? (
                   <span className="text-red-600">{t('product.outOfStock')}</span>
                 ) : lowStockBadge.show ? (
@@ -422,7 +422,7 @@ export function ProductCard({ product, viewMode = 'grid', tenantSettings = {} }:
   return (
     <Card className="group overflow-hidden hover:shadow-lg transition-all duration-300 flex flex-col h-full">
       {/* Image */}
-      <div className="aspect-square relative bg-gray-100 overflow-hidden flex-shrink-0">
+      <div className="aspect-square relative bg-muted overflow-hidden flex-shrink-0">
         {/* Mobile: Clickable image for navigation */}
         <Link href={`/products/${product.slug}`} className="block md:hidden absolute inset-0 z-10">
           <span className="sr-only">View {product.name}</span>
@@ -438,7 +438,7 @@ export function ProductCard({ product, viewMode = 'grid', tenantSettings = {} }:
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            <Package className="h-16 w-16 text-gray-400" />
+            <Package className="h-16 w-16 text-muted-foreground" />
           </div>
         )}
         
@@ -462,7 +462,7 @@ export function ProductCard({ product, viewMode = 'grid', tenantSettings = {} }:
           className="absolute top-2 right-2 p-2 rounded-full bg-white shadow-sm hover:shadow-md transition-all opacity-0 group-hover:opacity-100 hidden md:block z-20"
         >
           <Heart 
-            className={`h-4 w-4 ${isWishlisted ? 'fill-red-500 text-red-500' : 'text-gray-400'}`}
+            className={`h-4 w-4 ${isWishlisted ? 'fill-red-500 text-red-500' : 'text-muted-foreground'}`}
           />
         </button>
 
@@ -507,7 +507,7 @@ export function ProductCard({ product, viewMode = 'grid', tenantSettings = {} }:
             href={`/products/${product.slug}`}
             className="hover:underline"
           >
-            <h3 className="font-semibold text-gray-900 mb-0.5 sm:mb-1 line-clamp-2 text-sm sm:text-base">
+            <h3 className="font-semibold text-foreground mb-0.5 sm:mb-1 line-clamp-2 text-sm sm:text-base">
               {product.name}
             </h3>
           </Link>
@@ -515,7 +515,7 @@ export function ProductCard({ product, viewMode = 'grid', tenantSettings = {} }:
           <div className="space-y-0.5 sm:space-y-1">
             {product.brand && (
               <div className="text-xs sm:text-sm">
-                <span className="text-gray-500">{t('product.by')} </span>
+                <span className="text-muted-foreground">{t('product.by')} </span>
                 <Link 
                   href={`/brands/${product.brand.slug}`}
                   className="font-medium text-blue-600 hover:text-blue-800"
@@ -528,7 +528,7 @@ export function ProductCard({ product, viewMode = 'grid', tenantSettings = {} }:
             {product.category && (
               <Link 
                 href={`/products?category=${product.category.slug}`}
-                className="text-xs sm:text-sm text-gray-600 hover:text-gray-900 block"
+                className="text-xs sm:text-sm text-muted-foreground hover:text-foreground block"
               >
                 {product.category.name}
               </Link>
@@ -536,7 +536,7 @@ export function ProductCard({ product, viewMode = 'grid', tenantSettings = {} }:
           </div>
 
           {product.short_description && (
-            <p className="text-gray-600 text-xs sm:text-sm mt-1 sm:mt-2 line-clamp-2 hidden sm:block">
+            <p className="text-muted-foreground text-xs sm:text-sm mt-1 sm:mt-2 line-clamp-2 hidden sm:block">
               {product.short_description}
             </p>
           )}
@@ -564,16 +564,16 @@ export function ProductCard({ product, viewMode = 'grid', tenantSettings = {} }:
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1 sm:gap-2">
               {priceRange && priceRange.hasRange ? (
-                <span className="text-base sm:text-lg font-bold text-gray-900">
+                <span className="text-base sm:text-lg font-bold text-foreground">
                   {formatPrice(priceRange.minPrice, tenant)} - {formatPrice(priceRange.maxPrice, tenant)}
                 </span>
               ) : (
-                <span className="text-base sm:text-lg font-bold text-gray-900">
+                <span className="text-base sm:text-lg font-bold text-foreground">
                   {formatPrice(currentPrice, tenant)}
                 </span>
               )}
               {currentComparePrice && currentComparePrice > currentPrice && (
-                <span className="text-xs sm:text-sm text-gray-500 line-through">
+                <span className="text-xs sm:text-sm text-muted-foreground line-through">
                   {formatPrice(currentComparePrice, tenant)}
                 </span>
               )}

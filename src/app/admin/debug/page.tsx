@@ -19,7 +19,7 @@ export default function DebugPage() {
     <div className="p-6 space-y-4">
       <h1 className="text-2xl font-bold">Admin Language Debug</h1>
       
-      <div className="bg-gray-100 p-4 rounded">
+      <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded">
         <h2 className="text-lg font-semibold mb-2">Current Translations</h2>
         <p><strong>Dashboard:</strong> {t('dashboard')}</p>
         <p><strong>Products:</strong> {t('products')}</p>

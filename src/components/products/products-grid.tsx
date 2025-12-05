@@ -116,7 +116,7 @@ export function ProductsGrid({
       </div>
 
       {/* Results count */}
-      <div className="mt-8 text-center text-sm text-gray-600">
+      <div className="mt-8 text-center text-sm text-muted-foreground">
         {t('products.showingResults', { count: products.length })}
       </div>
     </>

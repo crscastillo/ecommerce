@@ -129,11 +129,11 @@ export default function ResetPasswordPage() {
 
   if (validatingSession) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <Card className="w-full max-w-md">
           <CardContent className="p-8 text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">Validating reset session...</p>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+            <p className="text-muted-foreground">Validating reset session...</p>
           </CardContent>
         </Card>
       </div>
@@ -141,14 +141,14 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <div className="mx-auto w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-4">
-            <Shield className="h-6 w-6 text-blue-600" />
+          <div className="mx-auto w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+            <Shield className="h-6 w-6 text-primary" />
           </div>
           <CardTitle className="text-2xl">Reset Your Password</CardTitle>
-          <p className="text-gray-600 text-sm">
+          <p className="text-muted-foreground text-sm">
             Enter your new password below
           </p>
         </CardHeader>

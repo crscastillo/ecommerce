@@ -13,6 +13,7 @@ import {
   Crown
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { ThemeToggle } from '@/components/theme-toggle'
 import { cn } from '@/lib/utils'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
@@ -98,7 +99,10 @@ export function PlatformSidebar() {
               </ul>
             </li>
             
-            <li className="mt-auto">
+            <li className="mt-auto space-y-2">
+              <div className="px-2">
+                <ThemeToggle variant="dropdown" size="sm" showLabel />
+              </div>
               <Button
                 variant="ghost"
                 onClick={handleLogout}

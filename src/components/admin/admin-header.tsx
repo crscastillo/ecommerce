@@ -22,6 +22,7 @@ import {
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
+import { ThemeToggle } from '@/components/theme-toggle'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 
@@ -49,7 +50,7 @@ export default function AdminHeader({ onMenuClick }: AdminHeaderProps) {
   }
 
   return (
-    <header className="bg-white shadow-sm border-b border-gray-200 w-full">
+    <header className="bg-background shadow-sm border-b border-border w-full">
       <div className="px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center flex-1">
@@ -70,12 +71,12 @@ export default function AdminHeader({ onMenuClick }: AdminHeaderProps) {
               </label>
               <div className="relative">
                 <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                  <Search className="h-4 w-4 text-gray-400" />
+                  <Search className="h-4 w-4 text-muted-foreground" />
                 </div>
                 <Input
                   id="search"
                   name="search"
-                  className="block w-full rounded-md border-gray-300 pl-10 text-sm"
+                  className="block w-full rounded-md pl-10 text-sm"
                   placeholder={t('header.searchPlaceholder')}
                   type="search"
                 />
@@ -94,6 +95,9 @@ export default function AdminHeader({ onMenuClick }: AdminHeaderProps) {
               <ExternalLink className="h-4 w-4 mr-2" />
               {t('header.visitStore')}
             </Button>
+
+            {/* Theme Toggle */}
+            <ThemeToggle variant="button" size="sm" />
 
             {/* Notifications */}
             <Button variant="ghost" size="sm" className="relative">

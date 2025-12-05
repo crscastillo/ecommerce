@@ -197,7 +197,7 @@ export function SecurityTab({
                   {saving ? t('security.signingOut') : t('security.logoutAllDevices')}
                 </Button>
               ) : (
-                <div className="text-xs text-gray-500 p-2 bg-gray-50 rounded">
+                <div className="text-xs text-muted-foreground p-2 bg-muted rounded">
                   Advanced session management not available for your plan
                 </div>
               )}

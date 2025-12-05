@@ -17,6 +17,7 @@ import {
 import { ShoppingCart, User, Search, Menu } from "lucide-react"
 import { useTenant } from "@/lib/contexts/tenant-context"
 import { useCart } from "@/lib/contexts/cart-context"
+import { ThemeToggle } from "@/components/theme-toggle"
 import { useState, useEffect } from "react"
 import { getNavigationCategories, type Category } from "@/lib/services/api"
 import { useTranslations } from "next-intl"
@@ -181,6 +182,9 @@ export function Header() {
           
           {/* Cart and User Actions */}
           <div className="flex items-center space-x-2">
+            {/* Theme Toggle */}
+            <ThemeToggle variant="button" size="sm" />
+            
             <Link href="/cart">
               <Button variant="ghost" size="sm" className="relative">
                 <ShoppingCart className="h-5 w-5" />

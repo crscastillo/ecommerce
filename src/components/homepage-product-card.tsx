@@ -162,7 +162,7 @@ export function HomepageProductCard({ product }: HomepageProductCardProps) {
   return (
     <Card className="group overflow-hidden hover:shadow-lg transition-all duration-300 flex flex-col h-full">
       {/* Image */}
-      <div className="aspect-square relative bg-gray-100 overflow-hidden flex-shrink-0">
+      <div className="aspect-square relative bg-muted overflow-hidden flex-shrink-0">
         {/* Mobile: Clickable image for navigation */}
         <Link href={`/products/${product.slug}`} className="block md:hidden absolute inset-0 z-10">
           <span className="sr-only">View {product.name}</span>
@@ -178,7 +178,7 @@ export function HomepageProductCard({ product }: HomepageProductCardProps) {
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            <Package className="h-16 w-16 text-gray-400" />
+            <Package className="h-16 w-16 text-muted-foreground" />
           </div>
         )}
         
@@ -202,7 +202,7 @@ export function HomepageProductCard({ product }: HomepageProductCardProps) {
           className="absolute top-2 right-2 p-2 rounded-full bg-white shadow-sm hover:shadow-md transition-all opacity-0 group-hover:opacity-100 hidden md:block z-20"
         >
           <Heart 
-            className={`h-4 w-4 ${isWishlisted ? 'fill-red-500 text-red-500' : 'text-gray-400'}`}
+            className={`h-4 w-4 ${isWishlisted ? 'fill-red-500 text-red-500' : 'text-muted-foreground'}`}
           />
         </button>
 
@@ -243,7 +243,7 @@ export function HomepageProductCard({ product }: HomepageProductCardProps) {
             href={`/products/${product.slug}`}
             className="hover:underline"
           >
-            <h3 className="font-semibold text-gray-900 mb-1 line-clamp-2 text-sm sm:text-base">
+            <h3 className="font-semibold text-foreground mb-1 line-clamp-2 text-sm sm:text-base">
               {product.name}
             </h3>
           </Link>
@@ -253,16 +253,16 @@ export function HomepageProductCard({ product }: HomepageProductCardProps) {
         <div className="mt-auto pt-2">
           <div className="flex items-center gap-1 sm:gap-2">
             {priceRange && priceRange.hasRange ? (
-              <span className="text-base sm:text-lg font-bold text-gray-900">
+              <span className="text-base sm:text-lg font-bold text-foreground">
                 {formatPrice(priceRange.minPrice, tenant)} - {formatPrice(priceRange.maxPrice, tenant)}
               </span>
             ) : (
-              <span className="text-base sm:text-lg font-bold text-gray-900">
+              <span className="text-base sm:text-lg font-bold text-foreground">
                 {formatPrice(currentPrice, tenant)}
               </span>
             )}
             {currentComparePrice && currentComparePrice > currentPrice && (
-              <span className="text-xs sm:text-sm text-gray-500 line-through">
+              <span className="text-xs sm:text-sm text-muted-foreground line-through">
                 {formatPrice(currentComparePrice, tenant)}
               </span>
             )}

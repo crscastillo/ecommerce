@@ -31,12 +31,12 @@ export function CheckoutSteps({ currentStep }: CheckoutStepsProps) {
                 ? 'border-blue-600 bg-blue-600 text-white' 
                 : index < currentStepIndex
                 ? 'border-green-600 bg-green-600 text-white'
-                : 'border-gray-300 text-gray-500'
+                : 'border-border text-muted-foreground'
             }`}>
               <Icon className="w-5 h-5" />
             </div>
             <span className={`ml-2 font-medium ${
-              currentStep === step ? 'text-blue-600' : 'text-gray-500'
+              currentStep === step ? 'text-primary' : 'text-muted-foreground'
             }`}>
               {label}
             </span>
@@ -44,7 +44,7 @@ export function CheckoutSteps({ currentStep }: CheckoutStepsProps) {
               <div className={`w-16 h-0.5 mx-4 ${
                 index < currentStepIndex
                   ? 'bg-green-600'
-                  : 'bg-gray-300'
+                  : 'bg-border'
               }`} />
             )}
           </div>

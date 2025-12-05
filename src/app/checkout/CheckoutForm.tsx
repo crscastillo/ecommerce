@@ -82,17 +82,17 @@ export default function CheckoutForm() {
           {paymentMethod === 'mobile_bank_transfer' && (
             <div className="mb-6">
               <label className="block mb-2 font-medium">Mobile Bank Transfer Instructions</label>
-              <div className="bg-gray-100 p-4 rounded">
+              <div className="bg-muted p-4 rounded">
                 <p>Send your payment to the following bank account:</p>
                 <p className="mt-2 font-mono">Account: 123456789<br />Bank: Example Bank<br />Phone: +1234567890</p>
-                <p className="mt-2 text-sm text-gray-600">After payment, please reply to the confirmation email with your transaction receipt.</p>
+                <p className="mt-2 text-sm text-muted-foreground">After payment, please reply to the confirmation email with your transaction receipt.</p>
               </div>
             </div>
           )}
           {paymentMethod === 'tilopay' && (
             <div className="mb-6">
               <label className="block mb-2 font-medium">Tilopay Instructions</label>
-              <div className="bg-gray-100 p-4 rounded">
+              <div className="bg-muted p-4 rounded">
                 <p>You'll be redirected to Tilopay to complete your payment securely.</p>
               </div>
             </div>

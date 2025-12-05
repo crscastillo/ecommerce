@@ -45,8 +45,8 @@ export function CartItemsList({
           />
           {index < items.length - 1 && (
             <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 z-10">
-              <div className="bg-gray-300 rounded-full p-1">
-                <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+              <div className="bg-muted rounded-full p-1">
+                <div className="w-2 h-2 bg-muted-foreground rounded-full"></div>
               </div>
             </div>
           )}

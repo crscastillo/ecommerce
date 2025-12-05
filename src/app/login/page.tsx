@@ -101,10 +101,10 @@ export default function Login() {
   // Show loading spinner while checking tenant/auth
   if (tenantLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-blue-600" />
-          <p className="text-gray-600">Loading...</p>
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-primary" />
+          <p className="text-muted-foreground">Loading...</p>
         </div>
       </div>
     )
@@ -113,17 +113,17 @@ export default function Login() {
   // Show error if tenant detection failed
   if (tenantError && isOnSubdomain) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4">
+      <div className="min-h-screen flex items-center justify-center bg-background py-12 px-4">
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
-            <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-            <CardTitle className="text-red-700">Tenant Not Found</CardTitle>
+            <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-4" />
+            <CardTitle className="text-destructive">Tenant Not Found</CardTitle>
             <CardDescription>{tenantError}</CardDescription>
           </CardHeader>
           <CardContent className="text-center">
             <Link 
               href={getMainDomainUrl()}
-              className="text-blue-600 hover:text-blue-500 underline"
+              className="text-primary hover:text-primary/80 underline"
             >
               Return to main site
             </Link>
@@ -134,12 +134,12 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-background py-12 px-4 sm:px-6 lg:px-8">
       <Card className="w-full max-w-md">
         <CardHeader>
           <div className="flex items-center justify-center mb-4">
-            <Store className="h-8 w-8 text-blue-600 mr-2" />
-            <span className="text-xl font-bold">
+            <Store className="h-8 w-8 text-primary mr-2" />
+            <span className="text-xl font-bold text-foreground">
               {isOnSubdomain ? (tenantInfo?.name || 'Store') : platformConfig.name}
             </span>
           </div>
@@ -161,7 +161,7 @@ export default function Login() {
         <CardContent>
           {/* Success Message */}
           {(success || successMessage) && (
-            <div className="mb-4 flex items-start gap-2 text-sm p-3 rounded-md bg-green-50 text-green-700 border border-green-200">
+            <div className="mb-4 flex items-start gap-2 text-sm p-3 rounded-md bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-800">
               <CheckCircle2 className="w-4 h-4 mt-0.5 flex-shrink-0" />
               <span>{successMessage || 'Login successful!'}</span>
             </div>
@@ -181,14 +181,14 @@ export default function Login() {
             {isOnSubdomain ? (
               <Link 
                 href={getMainDomainUrl()}
-                className="text-blue-600 hover:text-blue-500"
+                className="text-primary hover:text-primary/80"
               >
                 {t('backToMainSite')}
               </Link>
             ) : (
               <>
-                <span className="text-gray-600">{t('dontHaveAccount')} </span>
-                <Link href="/signup" className="font-medium text-blue-600 hover:text-blue-500">
+                <span className="text-muted-foreground">{t('dontHaveAccount')} </span>
+                <Link href="/signup" className="font-medium text-primary hover:text-primary/80">
                   {t('signUp')}
                 </Link>
               </>
@@ -197,7 +197,7 @@ export default function Login() {
           
           {/* Tenant Info */}
           {isOnSubdomain && tenantInfo && (
-            <div className="mt-4 text-center text-xs text-gray-500 border-t pt-4">
+            <div className="mt-4 text-center text-xs text-muted-foreground border-t border-border pt-4">
               {t('tenant')}: {tenantInfo.subdomain}
             </div>
           )}

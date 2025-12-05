@@ -16,12 +16,12 @@ export function CartHeader({ itemCount }: CartHeaderProps) {
     <div className="mb-8">
       <div className="flex flex-col gap-4">
         <div>
-          <h1 className="flex items-center gap-2 text-2xl font-bold text-gray-900">
+          <h1 className="flex items-center gap-2 text-2xl font-bold text-foreground">
             <ShoppingCart className="w-6 h-6" />
             {t('title')}
           </h1>
           <div className="mt-2">
-            <p className="text-gray-600">
+            <p className="text-muted-foreground">
               {itemCount} {itemCount === 1 ? t('item') : t('items')} {t('inYourCart')}
             </p>
           </div>

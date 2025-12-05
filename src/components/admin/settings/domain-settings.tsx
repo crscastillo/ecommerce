@@ -83,7 +83,7 @@ export function DomainSettings({ onSave, saving = false }: DomainSettingsProps) 
           {/* Current Subdomain */}
           <div className="space-y-3">
             <Label>{t('domain.currentSubdomain', { defaultMessage: 'Current Subdomain' })}</Label>
-            <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-md">
+            <div className="flex items-center gap-2 p-3 bg-muted rounded-md">
               <Globe className="h-4 w-4 text-gray-400" />
               <span className="font-mono text-sm">{getSubdomainUrl()}</span>
               <Badge variant="secondary" className="text-xs">

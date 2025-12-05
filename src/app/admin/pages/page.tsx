@@ -46,8 +46,8 @@ export default function PagesPage() {
           {/* Mobile Header */}
           <div className="flex flex-col space-y-3 md:hidden">
             <div>
-              <h1 className="text-xl font-bold text-gray-900">{t('title')}</h1>
-              <p className="text-gray-600 text-sm mt-1">{t('subtitle')}</p>
+              <h1 className="text-xl font-bold text-foreground">{t('title')}</h1>
+              <p className="text-muted-foreground text-sm mt-1">{t('subtitle')}</p>
             </div>
             <div className="flex justify-start">
               <Button size="sm">
@@ -60,8 +60,8 @@ export default function PagesPage() {
           {/* Desktop Header */}
           <div className="hidden md:flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">{t('title')}</h1>
-              <p className="text-gray-600 mt-2">{t('subtitle')}</p>
+              <h1 className="text-2xl font-bold text-foreground">{t('title')}</h1>
+              <p className="text-muted-foreground mt-2">{t('subtitle')}</p>
             </div>
             <Button>
               <Plus className="h-4 w-4 mr-2" />
@@ -95,10 +95,10 @@ export default function PagesPage() {
         <CardContent>
           <div className="space-y-4">
             {mockPages.map((page) => (
-              <div key={page.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50">
+              <div key={page.id} className="flex items-center justify-between p-4 border border-border rounded-lg hover:bg-muted">
                 <div className="flex-1">
-                  <div className="flex items-center gap-3">
-                    <h3 className="font-medium text-gray-900">{page.title}</h3>
+                  <div className="flex items-center space-x-3">
+                    <h3 className="font-medium text-foreground">{page.title}</h3>
                     <Badge variant={page.status === 'published' ? 'default' : 'secondary'}>
                       {t(`status.${page.status}`)}
                     </Badge>
@@ -122,9 +122,9 @@ export default function PagesPage() {
             ))}
           </div>
           
-          <div className="mt-6 p-4 border-2 border-dashed border-gray-200 rounded-lg text-center">
-            <FileText className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-            <h3 className="text-sm font-medium text-gray-900 mb-1">{t('noPages')}</h3>
+          <div className="mt-6 p-4 border-2 border-dashed border-border rounded-lg text-center">
+            <FileText className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+            <h3 className="text-sm font-medium text-foreground mb-1">{t('noPages')}</h3>
             <p className="text-xs text-gray-500 mb-3">{t('noPagesDescription')}</p>
             <Button variant="outline" size="sm">
               <Plus className="h-4 w-4 mr-2" />

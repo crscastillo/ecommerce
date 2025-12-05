@@ -423,11 +423,11 @@ export default function ProductsPage() {
     <Suspense fallback={
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
-          <div className="h-8 bg-gray-200 rounded mb-2 max-w-md animate-pulse"></div>
-          <div className="h-4 bg-gray-200 rounded max-w-xl animate-pulse"></div>
+          <div className="h-8 bg-muted rounded mb-2 max-w-md animate-pulse"></div>
+          <div className="h-4 bg-muted rounded max-w-xl animate-pulse"></div>
         </div>
         <div className="animate-pulse">
-          <div className="h-64 bg-gray-200 rounded"></div>
+          <div className="h-64 bg-muted rounded"></div>
         </div>
       </div>
     }>

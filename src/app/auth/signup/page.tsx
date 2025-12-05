@@ -12,9 +12,9 @@ export default function AuthSignUp() {
   }, [router])
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="min-h-screen flex items-center justify-center bg-background">
       <div className="text-center">
-        <p>Redirecting to signup...</p>
+        <p className="text-muted-foreground">Redirecting to signup...</p>
       </div>
     </div>
   )

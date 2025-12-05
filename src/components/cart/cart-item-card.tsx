@@ -58,7 +58,7 @@ export function CartItemCard({ item, tenant, onUpdateQuantity, onRemove, formatP
         <div className="flex lg:hidden pl-4 pr-2">
           {/* Small Product Image on Left */}
           <div className="relative flex-shrink-0">
-            <div className="w-20 h-20 relative bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden rounded-lg">
+            <div className="w-20 h-20 relative bg-muted overflow-hidden rounded-lg">
               {item.image ? (
                 <Image
                   src={item.image}
@@ -67,8 +67,8 @@ export function CartItemCard({ item, tenant, onUpdateQuantity, onRemove, formatP
                   className="object-cover"
                 />
               ) : (
-                <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
-                  <ShoppingBag className="w-8 h-8 text-gray-400" />
+                <div className="w-full h-full bg-muted flex items-center justify-center">
+                  <ShoppingBag className="w-8 h-8 text-muted-foreground" />
                 </div>
               )}
               {discount > 0 && (
@@ -84,7 +84,7 @@ export function CartItemCard({ item, tenant, onUpdateQuantity, onRemove, formatP
             <div className="flex justify-between items-start mb-1">
               <Link 
                 href={`/products/${item.slug}`}
-                className="text-sm font-medium text-gray-900 hover:text-blue-600 transition-colors line-clamp-2 flex-1 pr-3"
+                className="text-sm font-medium text-foreground hover:text-primary transition-colors line-clamp-2 flex-1 pr-3"
               >
                 {item.name}
               </Link>
@@ -101,11 +101,11 @@ export function CartItemCard({ item, tenant, onUpdateQuantity, onRemove, formatP
             
             {/* Price and Meta */}
             <div className="flex items-center gap-2 mb-2">
-              <span className="text-xs font-medium text-gray-600">
+              <span className="text-xs font-medium text-muted-foreground">
                 {formatPrice(item.price, tenant)}
               </span>
               {item.comparePrice && item.comparePrice > item.price && (
-                <span className="text-xs text-gray-500 line-through">
+                <span className="text-xs text-muted-foreground line-through">
                   {formatPrice(item.comparePrice, tenant)}
                 </span>
               )}
@@ -114,8 +114,8 @@ export function CartItemCard({ item, tenant, onUpdateQuantity, onRemove, formatP
             {/* Quantity and Total */}
             <div className="flex items-center justify-between pr-2">
               <div className="flex items-center gap-2">
-                <span className="text-xs text-gray-500">Qty:</span>
-                <div className="flex items-center bg-gray-50 rounded p-1">
+                <span className="text-xs text-muted-foreground">Qty:</span>
+                <div className="flex items-center bg-muted rounded p-1">
                   <Button
                     variant="ghost"
                     size="sm"
@@ -139,7 +139,7 @@ export function CartItemCard({ item, tenant, onUpdateQuantity, onRemove, formatP
                   </Button>
                 </div>
               </div>
-              <div className="text-base font-bold text-gray-900 ml-2">
+              <div className="text-base font-bold text-foreground ml-2">
                 {formatPrice(item.price * item.quantity, tenant)}
               </div>
             </div>
@@ -157,7 +157,7 @@ export function CartItemCard({ item, tenant, onUpdateQuantity, onRemove, formatP
         <div className="hidden lg:flex flex-row pl-4 pr-2">
           {/* Product Image */}
           <div className="relative">
-            <div className="w-32 h-32 relative bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden rounded-l-lg">
+            <div className="w-32 h-32 relative bg-muted overflow-hidden rounded-l-lg">
               {item.image ? (
                 <Image
                   src={item.image}
@@ -166,8 +166,8 @@ export function CartItemCard({ item, tenant, onUpdateQuantity, onRemove, formatP
                   className="object-cover transition-transform duration-300 hover:scale-105"
                 />
               ) : (
-                <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
-                  <ShoppingBag className="w-12 h-12 text-gray-400" />
+                <div className="w-full h-full bg-muted flex items-center justify-center">
+                  <ShoppingBag className="w-12 h-12 text-muted-foreground" />
                 </div>
               )}
               {discount > 0 && (
@@ -186,7 +186,7 @@ export function CartItemCard({ item, tenant, onUpdateQuantity, onRemove, formatP
                 <div className="flex items-start gap-2 mb-2">
                   <Link 
                     href={`/products/${item.slug}`}
-                    className="text-lg font-semibold text-gray-900 hover:text-blue-600 transition-colors line-clamp-2 group"
+                    className="text-lg font-semibold text-foreground hover:text-primary transition-colors line-clamp-2 group"
                   >
                     {item.name}
                     <ExternalLink className="w-4 h-4 inline ml-1 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -206,22 +206,22 @@ export function CartItemCard({ item, tenant, onUpdateQuantity, onRemove, formatP
                     </Badge>
                   )}
                   {item.sku && (
-                    <span className="text-xs text-gray-500">{t('sku')}: {item.sku}</span>
+                    <span className="text-xs text-muted-foreground">{t('sku')}: {item.sku}</span>
                   )}
                 </div>
 
                 {/* Pricing */}
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium text-gray-600">
+                    <span className="text-sm font-medium text-muted-foreground">
                       {formatPrice(item.price, tenant)}
                     </span>
                     {item.comparePrice && item.comparePrice > item.price && (
-                      <span className="text-sm text-gray-500 line-through">
+                      <span className="text-sm text-muted-foreground line-through">
                         {formatPrice(item.comparePrice, tenant)}
                       </span>
                     )}
-                    <span className="text-sm text-gray-600">{t('each')}</span>
+                    <span className="text-sm text-muted-foreground">{t('each')}</span>
                   </div>
                   {savings > 0 && (
                     <p className="text-sm text-green-600 font-medium">
@@ -234,7 +234,7 @@ export function CartItemCard({ item, tenant, onUpdateQuantity, onRemove, formatP
               {/* Quantity & Actions - Desktop */}
               <div className="flex flex-col items-end gap-4">
                 {/* Quantity Controls */}
-                <div className="flex items-center bg-gray-50 rounded-lg p-1">
+                <div className="flex items-center bg-muted rounded-lg p-1">
                   <Button
                     variant="ghost"
                     size="sm"
@@ -259,18 +259,18 @@ export function CartItemCard({ item, tenant, onUpdateQuantity, onRemove, formatP
                 </div>
                 
                 {item.maxQuantity && (
-                  <p className="text-xs text-gray-500 text-center">
+                  <p className="text-xs text-muted-foreground text-center">
                     Max: {item.maxQuantity}
                   </p>
                 )}
 
                 {/* Item Total */}
                 <div className="text-right">
-                  <p className="text-2xl font-bold text-gray-900">
+                  <p className="text-2xl font-bold text-foreground">
                     {formatPrice(item.price * item.quantity, tenant)}
                   </p>
                   {item.quantity > 1 && (
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-muted-foreground">
                       {item.quantity} × {formatPrice(item.price, tenant)}
                     </p>
                   )}
@@ -304,7 +304,7 @@ export function CartItemCard({ item, tenant, onUpdateQuantity, onRemove, formatP
                 {t('remove')}
               </Button>
               
-              <Button variant="ghost" size="sm" className="text-gray-600">
+              <Button variant="ghost" size="sm" className="text-muted-foreground">
                 <Heart className="w-4 h-4 mr-2" />
                 {t('saveForLater')}
               </Button>

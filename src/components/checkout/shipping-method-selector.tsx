@@ -122,7 +122,7 @@ export function ShippingMethodSelector({
         </CardHeader>
         <CardContent>
           <div className="text-center py-4">
-            <p className="text-gray-600">{t('shippingMethod.calculating')}</p>
+            <p className="text-muted-foreground">{t('shippingMethod.calculating')}</p>
           </div>
         </CardContent>
       </Card>
@@ -155,7 +155,7 @@ export function ShippingMethodSelector({
           {t('shippingMethod.title')}
         </CardTitle>
         {calculationResult.totalWeight > 0 && (
-          <p className="text-sm text-gray-600 flex items-center">
+          <p className="text-sm text-muted-foreground flex items-center">
             <Package className="w-4 h-4 mr-1" />
             {t('shippingMethod.packageWeight', { weight: calculationResult.totalWeight.toFixed(1) })}
           </p>
@@ -164,7 +164,7 @@ export function ShippingMethodSelector({
       <CardContent>
         {calculationResult.availableMethods.length === 0 ? (
           <div className="text-center py-4">
-            <p className="text-gray-600">{t('shippingMethod.noMethods')}</p>
+            <p className="text-muted-foreground">{t('shippingMethod.noMethods')}</p>
           </div>
         ) : (
           <RadioGroup 
@@ -176,7 +176,7 @@ export function ShippingMethodSelector({
               const isRecommended = method.id === calculationResult.recommendedMethodId
               
               return (
-                <div key={method.id} className="flex items-start space-x-3 p-3 rounded-lg border hover:bg-gray-50 transition-colors">
+                <div key={method.id} className="flex items-start space-x-3 p-3 rounded-lg border hover:bg-muted/50 transition-colors">
                   <RadioGroupItem 
                     value={method.id} 
                     id={method.id}
@@ -201,9 +201,9 @@ export function ShippingMethodSelector({
                             </Badge>
                           )}
                         </div>
-                        <p className="text-sm text-gray-600 mt-1">{method.description}</p>
+                        <p className="text-sm text-muted-foreground mt-1">{method.description}</p>
                         {method.estimatedDays && (
-                          <p className="text-xs text-gray-500 flex items-center mt-1">
+                          <p className="text-xs text-muted-foreground flex items-center mt-1">
                             <Clock className="w-3 h-3 mr-1" />
                             {method.estimatedDays}
                           </p>

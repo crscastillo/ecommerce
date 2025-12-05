@@ -7,6 +7,7 @@ import { useState, useEffect } from 'react'
 import { useTenant } from '@/lib/contexts/tenant-context'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { ThemeToggle } from '@/components/theme-toggle'
 import { platformConfig } from '@/lib/config/platform'
 import { FeatureFlagsService } from '@/lib/services/feature-flags'
 import {
@@ -65,9 +66,9 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
 
   if (isLoading) {
     return (
-      <div className="fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg lg:block">
-        <div className="flex h-16 items-center justify-center border-b border-gray-200">
-          <div className="h-8 w-32 bg-gray-200 rounded animate-pulse" />
+      <div className="fixed inset-y-0 left-0 z-50 w-64 bg-background shadow-lg lg:block">
+        <div className="flex h-16 items-center justify-center border-b border-border">
+          <div className="h-8 w-32 bg-muted rounded animate-pulse" />
         </div>
       </div>
     )
@@ -81,25 +82,25 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
           className="fixed inset-0 z-40 lg:hidden"
           onClick={onClose}
         >
-          <div className="absolute inset-0 bg-gray-600 opacity-75" />
+          <div className="absolute inset-0 bg-gray-600 dark:bg-gray-900 opacity-75" />
         </div>
       )}
 
       {/* Sidebar */}
       <div className={cn(
-        "fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0",
+        "fixed inset-y-0 left-0 z-50 w-64 bg-background shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0",
         isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
       )}>
         <div className="flex h-full flex-col">
           {/* Logo */}
-          <div className="flex h-16 items-center justify-between px-4 border-b border-gray-200 bg-gray-50">
+          <div className="flex h-16 items-center justify-between px-4 border-b border-border bg-muted">
             <div className="flex items-center">
-              <Store className="h-6 w-6 text-blue-600" />
+              <Store className="h-6 w-6 text-primary" />
               <div className="ml-2">
-                <p className="text-sm font-semibold text-gray-900">
+                <p className="text-sm font-semibold text-foreground">
                   {tenant?.name || 'Demo Store'}
                 </p>
-                <p className="text-xs text-gray-500">Admin</p>
+                <p className="text-xs text-muted-foreground">Admin</p>
               </div>
             </div>
             <Button
@@ -135,15 +136,15 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
                     className={cn(
                       "group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors",
                       isActive
-                        ? "bg-blue-100 text-blue-700"
-                        : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                        ? "bg-accent text-accent-foreground"
+                        : "text-muted-foreground hover:bg-accent/50 hover:text-accent-foreground"
                     )}
                     onClick={onClose}
                   >
                     <item.icon
                       className={cn(
                         "mr-3 h-5 w-5 flex-shrink-0",
-                        isActive ? "text-blue-500" : "text-gray-400 group-hover:text-gray-500"
+                        isActive ? "text-accent-foreground" : "text-muted-foreground group-hover:text-accent-foreground"
                       )}
                     />
                     {t(item.key)}
@@ -152,21 +153,28 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
               })}
           </nav>
 
+          {/* Theme Toggle */}
+          <div className="border-t border-border p-4">
+            <div className="flex items-center justify-center">
+              <ThemeToggle variant="dropdown" size="sm" showLabel />
+            </div>
+          </div>
+
           {/* Subscription info */}
-          <div className="border-t border-gray-200 p-4">
+          <div className="border-t border-border p-4">
             <div className="flex items-center justify-between">
               <Badge variant="outline" className="text-xs">
                 {tenant?.subscription_tier || (tenant?.settings as any)?.plan || 'Starter'} Plan
               </Badge>
               <Link 
                 href="/admin/settings?tab=billing"
-                className="text-xs text-blue-600 hover:text-blue-800"
+                className="text-xs text-primary hover:text-primary/80"
                 onClick={onClose}
               >
                 Upgrade
               </Link>
             </div>
-            <p className="mt-1 text-xs text-gray-500">
+            <p className="mt-1 text-xs text-muted-foreground">
               {tenant?.subdomain}.{platformConfig.getDomain()}
             </p>
           </div>

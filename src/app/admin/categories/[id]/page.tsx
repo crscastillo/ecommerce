@@ -69,7 +69,7 @@ export default function CategoryPage() {
         <Card className="border-red-200">
           <CardContent className="p-8 text-center">
             <AlertCircle className="mx-auto h-12 w-12 text-red-500 mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">Error Loading Category</h3>
+            <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">Error Loading Category</h3>
             <p className="text-gray-600 mb-4">{error}</p>
             <Button asChild>
               <Link href="/admin/categories">
@@ -88,7 +88,7 @@ export default function CategoryPage() {
         <Card className="border-red-200">
           <CardContent className="p-8 text-center">
             <FolderOpen className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">Category Not Found</h3>
+            <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">Category Not Found</h3>
             <p className="text-gray-600 mb-4">
               The category you're looking for doesn't exist or you don't have permission to view it.
             </p>

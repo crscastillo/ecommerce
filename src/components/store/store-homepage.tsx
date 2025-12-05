@@ -110,7 +110,7 @@ export default function StoreHomepage({ tenant }: StoreHomepageProps) {
           <Button size="lg" variant="secondary" asChild>
             <Link href="/products">{t('store.shopNow')}</Link>
           </Button>
-          <Button size="lg" variant="outline" className="text-white border-white hover:bg-white hover:text-blue-600">
+          <Button size="lg" variant="outline" className="text-white border-white hover:bg-white hover:text-primary">
             {t('common.learnMore')}
           </Button>
         </div>
@@ -129,12 +129,12 @@ export default function StoreHomepage({ tenant }: StoreHomepageProps) {
             {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
               <div key={i} className="w-full max-w-[280px]">
                 <Card className="hover:shadow-lg transition-shadow h-full flex flex-col">
-                  <div className="aspect-square bg-gray-200 animate-pulse"></div>
+                  <div className="aspect-square bg-muted animate-pulse"></div>
                   <CardContent className="p-4 flex flex-col h-full">
                     <div className="flex-1 space-y-2">
-                      <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
-                      <div className="h-3 bg-gray-200 rounded animate-pulse w-3/4"></div>
-                      <div className="h-4 bg-gray-200 rounded animate-pulse w-1/2"></div>
+                      <div className="h-4 bg-muted rounded animate-pulse"></div>
+                      <div className="h-3 bg-muted rounded animate-pulse w-3/4"></div>
+                      <div className="h-4 bg-muted rounded animate-pulse w-1/2"></div>
                     </div>
                   </CardContent>
                 </Card>
@@ -151,7 +151,7 @@ export default function StoreHomepage({ tenant }: StoreHomepageProps) {
           </div>
         ) : (
           <div className="text-center py-12">
-            <p className="text-gray-600 mb-8">
+            <p className="text-muted-foreground mb-8">
               {t('store.noFeaturedProducts')}
             </p>
             <Button asChild variant="outline">
@@ -180,15 +180,15 @@ export default function StoreHomepage({ tenant }: StoreHomepageProps) {
             {[1, 2, 3].map((i) => (
               <Card key={i} className="hover:shadow-lg transition-shadow w-full max-w-sm">
                 <CardHeader>
-                  <div className="h-6 bg-gray-200 rounded animate-pulse mb-2"></div>
-                  <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+                  <div className="h-6 bg-muted rounded animate-pulse mb-2"></div>
+                  <div className="h-4 bg-muted rounded animate-pulse"></div>
                 </CardHeader>
                 <CardContent>
-                  <div className="bg-gray-200 h-32 rounded-md mb-4 animate-pulse"></div>
-                  <div className="h-6 bg-gray-200 rounded animate-pulse w-20"></div>
+                  <div className="bg-muted h-32 rounded-md mb-4 animate-pulse"></div>
+                  <div className="h-6 bg-muted rounded animate-pulse w-20"></div>
                 </CardContent>
                 <CardFooter>
-                  <div className="h-10 bg-gray-200 rounded animate-pulse w-full"></div>
+                  <div className="h-10 bg-muted rounded animate-pulse w-full"></div>
                 </CardFooter>
               </Card>
             ))}
@@ -240,7 +240,7 @@ export default function StoreHomepage({ tenant }: StoreHomepageProps) {
           </div>
         ) : (
           <div className="text-center py-12">
-            <p className="text-gray-600 mb-8">
+            <p className="text-muted-foreground mb-8">
               {t('store.storeBeingSetup')}
             </p>
             <Button asChild variant="outline">
@@ -251,9 +251,9 @@ export default function StoreHomepage({ tenant }: StoreHomepageProps) {
       </section>
 
       {/* Call to Action */}
-      <section className="text-center py-16 bg-gray-50 rounded-lg">
-        <h2 className="text-3xl font-bold mb-4">{t('store.readyToStartShopping')}</h2>
-        <p className="text-gray-600 mb-8 max-w-2xl mx-auto">
+      <section className="text-center py-16 bg-muted rounded-lg">
+        <h2 className="text-3xl font-bold mb-4 text-foreground">{t('store.readyToStartShopping')}</h2>
+        <p className="text-muted-foreground mb-8 max-w-2xl mx-auto">
           {t('store.joinCustomers')}
         </p>
         <div className="space-x-4">

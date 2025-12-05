@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 import { useTenant } from '@/lib/contexts/tenant-context'
 import { THEME_COLORS, type ThemeId } from '@/lib/theme/colors'
 import { usePathname } from 'next/navigation'
+import { AutoThemeProvider } from '@/components/auto-theme-provider'
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const { tenant } = useTenant()
@@ -116,5 +117,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     }
   }, [tenant?.theme_config, isAdmin])
   
-  return <>{children}</>
+  return (
+    <AutoThemeProvider>
+      {children}
+    </AutoThemeProvider>
+  )
 }

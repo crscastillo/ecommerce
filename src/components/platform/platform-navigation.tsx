@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Store } from "lucide-react"
 import Link from "next/link"
 import { PublicLanguageToggle } from "@/components/public/language-toggle"
+import { ThemeToggle } from "@/components/theme-toggle"
 import { platformConfig } from "@/lib/config/platform"
 import { useTranslations } from "next-intl"
 
@@ -26,6 +27,7 @@ export function PlatformNavigation({ user, onGoToAdmin }: PlatformNavigationProp
             </span>
           </div>
           <div className="flex items-center space-x-4">
+            <ThemeToggle variant="button" size="sm" />
             <PublicLanguageToggle />
             {user ? (
               <Button variant="default" onClick={onGoToAdmin}>

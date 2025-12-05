@@ -318,7 +318,7 @@ export function ShippingForm({ shippingInfo, onUpdate, onSubmit, showSubmitButto
                       </SelectItem>
                     ))
                   ) : (
-                    <SelectItem value="" disabled>
+                    <SelectItem value="no-countries" disabled>
                       No countries available for shipping
                     </SelectItem>
                   )}

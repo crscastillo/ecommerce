@@ -95,11 +95,11 @@ function StripePaymentForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="p-4 border rounded-lg bg-gray-50">
+      <div className="p-4 border rounded-lg bg-muted">
         <CardElement options={cardElementOptions} />
       </div>
       
-      <div className="text-sm text-gray-600">
+      <div className="text-sm text-muted-foreground">
         <p>💳 Test card numbers:</p>
         <p>• Visa: 4242 4242 4242 4242</p>
         <p>• Mastercard: 5555 5555 5555 4444</p>

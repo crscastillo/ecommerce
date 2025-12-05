@@ -19,7 +19,7 @@ export default function TranslationDebugPage() {
     <div className="p-6 space-y-6">
       <h1 className="text-2xl font-bold">Translation Debug Page</h1>
       
-      <div className="bg-gray-100 p-4 rounded">
+      <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded">
         <h2 className="text-lg font-semibold mb-2">Translation Test</h2>
         <p><strong>t('tabs.store'):</strong> "{t('tabs.store')}"</p>
         <p><strong>t('sections.storeInformation'):</strong> "{t('sections.storeInformation')}"</p>

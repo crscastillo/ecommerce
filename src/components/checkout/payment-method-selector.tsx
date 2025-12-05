@@ -28,9 +28,9 @@ export function PaymentMethodSelector({
             <Card key={i} className="border-2 border-gray-200">
               <CardContent className="p-4 text-center">
                 <div className="animate-pulse">
-                  <div className="w-12 h-12 bg-gray-200 rounded-lg mx-auto mb-2"></div>
-                  <div className="h-4 bg-gray-200 rounded w-24 mx-auto mb-1"></div>
-                  <div className="h-3 bg-gray-200 rounded w-32 mx-auto"></div>
+                  <div className="w-12 h-12 bg-muted rounded-lg mx-auto mb-2"></div>
+                  <div className="h-4 bg-muted rounded w-24 mx-auto mb-1"></div>
+                  <div className="h-3 bg-muted rounded w-32 mx-auto"></div>
                 </div>
               </CardContent>
             </Card>
@@ -44,10 +44,10 @@ export function PaymentMethodSelector({
     return (
       <div>
         <Label className="text-base font-medium mb-3 block">Choose Payment Method</Label>
-        <div className="text-center py-8 bg-gray-50 rounded-lg">
-          <CreditCard className="w-12 h-12 text-gray-400 mx-auto mb-2" />
-          <h3 className="font-medium text-gray-900 mb-1">No Payment Methods Available</h3>
-          <p className="text-sm text-gray-600">
+        <div className="text-center py-8 bg-muted rounded-lg">
+          <CreditCard className="w-12 h-12 text-muted-foreground mx-auto mb-2" />
+          <h3 className="font-medium text-foreground mb-1">No Payment Methods Available</h3>
+          <p className="text-sm text-muted-foreground">
             Please contact the store owner to configure payment methods.
           </p>
         </div>
@@ -73,16 +73,16 @@ export function PaymentMethodSelector({
               <div className="mb-2">
                 <div className={`inline-flex items-center justify-center w-12 h-12 rounded-lg mb-2 ${
                   method.id === 'stripe' ? 'bg-indigo-100' : 
-                  method.id === 'tilopay' ? 'bg-green-100' : 'bg-gray-100'
+                  method.id === 'tilopay' ? 'bg-green-100' : 'bg-muted'
                 }`}>
                   <CreditCard className={`w-6 h-6 ${
                     method.id === 'stripe' ? 'text-indigo-600' : 
-                    method.id === 'tilopay' ? 'text-green-600' : 'text-gray-600'
+                    method.id === 'tilopay' ? 'text-green-600' : 'text-muted-foreground'
                   }`} />
                 </div>
               </div>
               <h3 className="font-medium">{method.name}</h3>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-muted-foreground">
                 {method.id === 'stripe' ? 'Secure payment with Stripe' :
                  method.id === 'traditional' ? 'Enter card details manually' :
                  method.id === 'tilopay' ? 'Costa Rican payment gateway' :
@@ -92,9 +92,9 @@ export function PaymentMethodSelector({
                  'Secure payment processing'}
               </p>
               <div className="mt-2 flex justify-center space-x-2">
-                <span className="text-xs bg-gray-200 px-2 py-1 rounded">Visa</span>
-                <span className="text-xs bg-gray-200 px-2 py-1 rounded">MC</span>
-                {method.id === 'stripe' && <span className="text-xs bg-gray-200 px-2 py-1 rounded">Amex</span>}
+                <span className="text-xs bg-muted px-2 py-1 rounded">Visa</span>
+                <span className="text-xs bg-muted px-2 py-1 rounded">MC</span>
+                {method.id === 'stripe' && <span className="text-xs bg-muted px-2 py-1 rounded">Amex</span>}
               </div>
 
             </CardContent>

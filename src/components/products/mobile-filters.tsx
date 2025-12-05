@@ -142,9 +142,9 @@ export function MobileFilters({
           <div className="flex-1 overflow-y-auto p-6 space-y-6">
             {/* Search */}
             <div>
-              <Label className="text-sm font-medium text-gray-700 mb-2 block">{t('products.search')}</Label>
+              <Label className="text-sm font-medium text-foreground mb-2 block">{t('products.search')}</Label>
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                 <Input
                   type="text"
                   placeholder={t('products.searchPlaceholder')}
@@ -157,7 +157,7 @@ export function MobileFilters({
 
             {/* Categories */}
             <div>
-              <Label className="text-sm font-medium text-gray-700 mb-3 block">{t('navigation.categories')}</Label>
+              <Label className="text-sm font-medium text-foreground mb-3 block">{t('navigation.categories')}</Label>
               <div className="space-y-2">
                 {categories.map((category) => (
                   <label key={category.id} className="flex items-center space-x-2">
@@ -165,9 +165,9 @@ export function MobileFilters({
                       type="checkbox"
                       checked={selectedCategories.includes(category.slug)}
                       onChange={(e) => onCategoryChange(category.slug, e.target.checked)}
-                      className="w-4 h-4 text-blue-600"
+                      className="w-4 h-4 text-primary"
                     />
-                    <span className="text-sm text-gray-700">{category.name}</span>
+                    <span className="text-sm text-foreground">{category.name}</span>
                   </label>
                 ))}
               </div>
@@ -175,7 +175,7 @@ export function MobileFilters({
 
             {/* Brands */}
             <div>
-              <Label className="text-sm font-medium text-gray-700 mb-3 block">{t('navigation.brands')}</Label>
+              <Label className="text-sm font-medium text-foreground mb-3 block">{t('navigation.brands')}</Label>
               <div className="space-y-2">
                 {brands.map((brand) => (
                   <label key={brand.id} className="flex items-center space-x-2">
@@ -183,9 +183,9 @@ export function MobileFilters({
                       type="checkbox"
                       checked={selectedBrands.includes(brand.slug)}
                       onChange={(e) => onBrandChange(brand.slug, e.target.checked)}
-                      className="w-4 h-4 text-blue-600"
+                      className="w-4 h-4 text-primary"
                     />
-                    <span className="text-sm text-gray-700">{brand.name}</span>
+                    <span className="text-sm text-foreground">{brand.name}</span>
                   </label>
                 ))}
               </div>
@@ -193,12 +193,12 @@ export function MobileFilters({
 
             {/* Price Range */}
             <div>
-              <Label className="text-sm font-medium text-gray-700 mb-3 block">{t('products.priceRange') || 'Price Range'}</Label>
+              <Label className="text-sm font-medium text-foreground mb-3 block">{t('products.priceRange') || 'Price Range'}</Label>
               <div className="space-y-4">
                 {/* Simple input fields */}
                 <div className="flex items-center space-x-2">
                   <div className="flex-1">
-                    <Label className="text-xs text-gray-500 mb-1 block">{t('products.minPrice')}</Label>
+                    <Label className="text-xs text-muted-foreground mb-1 block">{t('products.minPrice')}</Label>
                     <Input
                       type="number"
                       placeholder="0"
@@ -211,9 +211,9 @@ export function MobileFilters({
                       min="0"
                     />
                   </div>
-                  <span className="text-gray-400 text-sm pt-5">-</span>
+                  <span className="text-muted-foreground text-sm pt-5">-</span>
                   <div className="flex-1">
-                    <Label className="text-xs text-gray-500 mb-1 block">{t('products.maxPrice')}</Label>
+                    <Label className="text-xs text-muted-foreground mb-1 block">{t('products.maxPrice')}</Label>
                     <Input
                       type="number"
                       placeholder={t('products.noLimit')}
@@ -240,7 +240,7 @@ export function MobileFilters({
                 
                 {/* Quick preset buttons */}
                 <div className="space-y-2">
-                  <Label className="text-xs text-gray-500">{t('products.quickFilters')}</Label>
+                  <Label className="text-xs text-muted-foreground">{t('products.quickFilters')}</Label>
                   <div className="grid grid-cols-2 gap-2">
                     {priceRanges.map((range, index) => (
                       <Button
@@ -257,7 +257,7 @@ export function MobileFilters({
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="w-full h-7 text-xs text-gray-500"
+                    className="w-full h-7 text-xs text-muted-foreground"
                     onClick={() => onPriceRangeChange(0, maxProductPrice)}
                   >
                     {t('products.clearPriceFilter')}
@@ -267,7 +267,7 @@ export function MobileFilters({
             </div>
           </div>
 
-          <div className="px-6 py-4 border-t bg-gray-50">
+          <div className="px-6 py-4 border-t bg-muted">
             <div className="flex gap-3">
               <Button
                 variant="outline"

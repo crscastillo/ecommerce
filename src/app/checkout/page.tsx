@@ -321,7 +321,7 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-background py-8">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8">
@@ -329,8 +329,8 @@ export default function CheckoutPage() {
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Cart
           </Link>
-          <h1 className="text-3xl font-bold text-gray-900">Checkout</h1>
-          <p className="text-gray-600 mt-2">
+          <h1 className="text-3xl font-bold text-foreground">Checkout</h1>
+          <p className="text-muted-foreground mt-2">
             Complete your order for {getItemCount()} {getItemCount() === 1 ? 'item' : 'items'}
           </p>
         </div>
@@ -390,10 +390,10 @@ export default function CheckoutPage() {
                   <Card className="mt-4">
                     <CardContent className="pt-6">
                       <h3 className="font-medium mb-4">Mobile Bank Transfer</h3>
-                      <div className="bg-gray-100 p-4 rounded">
+                      <div className="bg-muted p-4 rounded">
                         <p>Send your payment to the following mobile bank account:</p>
                         <p className="mt-2 font-mono">Account: 123456789<br />Bank: Example Mobile Bank<br />Phone: +1234567890</p>
-                        <p className="mt-2 text-sm text-gray-600">After payment, reply to the confirmation email with your transaction receipt.</p>
+                        <p className="mt-2 text-sm text-muted-foreground">After payment, reply to the confirmation email with your transaction receipt.</p>
                       </div>
                       <div className="flex space-x-4 mt-6">
                         <Button type="button" variant="outline" onClick={() => setCurrentStep('shipping')} className="flex-1">Back to Shipping</Button>
@@ -408,10 +408,10 @@ export default function CheckoutPage() {
                   <Card className="mt-4">
                     <CardContent className="pt-6">
                       <h3 className="font-medium mb-4">Bank Transfer</h3>
-                      <div className="bg-gray-100 p-4 rounded">
+                      <div className="bg-muted p-4 rounded">
                         <p>Send your payment to the following bank account:</p>
                         <p className="mt-2 font-mono">Account: 987654321<br />Bank: Example Bank<br />SWIFT: EXAMPBANK</p>
-                        <p className="mt-2 text-sm text-gray-600">After payment, reply to the confirmation email with your transaction receipt.</p>
+                        <p className="mt-2 text-sm text-muted-foreground">After payment, reply to the confirmation email with your transaction receipt.</p>
                       </div>
                       <div className="flex space-x-4 mt-6">
                         <Button type="button" variant="outline" onClick={() => setCurrentStep('shipping')} className="flex-1">Back to Shipping</Button>

@@ -64,7 +64,7 @@ export function LoginForm({ onSubmit, onEmailChange, loading, error, isSubdomain
       </div>
       
       {error && (
-        <div className="flex items-start gap-2 text-sm p-3 rounded-md bg-red-50 text-red-700 border border-red-200">
+        <div className="flex items-start gap-2 text-sm p-3 rounded-md bg-destructive/10 text-destructive border border-destructive/20">
           <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
           <span>{error}</span>
         </div>
@@ -313,7 +313,7 @@ export function TenantDetailsForm({
             className="rounded-r-none"
             disabled={loading}
           />
-          <div className="bg-gray-100 border border-l-0 px-3 py-2 text-sm text-gray-600 rounded-r-md">
+          <div className="bg-muted border border-l-0 px-3 py-2 text-sm text-muted-foreground rounded-r-md">
             .{platformConfig.getDomain()}
           </div>
         </div>
@@ -321,7 +321,7 @@ export function TenantDetailsForm({
           {isChecking && (
             <>
               <Loader2 className="w-4 h-4 animate-spin" />
-              <span className="text-sm text-gray-600">Checking...</span>
+              <span className="text-sm text-muted-foreground">Checking...</span>
             </>
           )}
           {isAvailable === true && (

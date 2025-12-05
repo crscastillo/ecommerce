@@ -65,7 +65,7 @@ export function OrderReview({
         {/* Shipping Info Review */}
         <div>
           <h3 className="font-medium mb-2">Shipping Address</h3>
-          <div className="bg-gray-50 p-4 rounded-lg">
+          <div className="bg-muted p-4 rounded-lg">
             <p>{shippingInfo.firstName} {shippingInfo.lastName}</p>
             <p>{shippingInfo.address}</p>
             <p>{shippingInfo.city}, {shippingInfo.state} {shippingInfo.zipCode}</p>
@@ -77,17 +77,17 @@ export function OrderReview({
         {/* Payment Info Review */}
         <div>
           <h3 className="font-medium mb-2">Payment Method</h3>
-          <div className="bg-gray-50 p-4 rounded-lg">
+          <div className="bg-muted p-4 rounded-lg">
             {paymentMethod === 'stripe' && paymentDetails?.card ? (
               <div>
                 <p className="flex items-center">
                   <CreditCard className="w-4 h-4 mr-2" />
                   Stripe Payment
                 </p>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-muted-foreground">
                   **** **** **** {paymentDetails.card.last4 || '****'}
                 </p>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-muted-foreground">
                   {paymentDetails.card.brand?.toUpperCase()} ending in {paymentDetails.card.last4}
                 </p>
               </div>
@@ -97,10 +97,10 @@ export function OrderReview({
                   <CreditCard className="w-4 h-4 mr-2" />
                   TiloPay Payment
                 </p>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-muted-foreground">
                   Payment ID: {paymentDetails.paymentId}
                 </p>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-muted-foreground">
                   Secure payment processed via TiloPay
                 </p>
               </div>
@@ -114,7 +114,7 @@ export function OrderReview({
                 <p>{paymentDetails.cardholderName}</p>
               </div>
             ) : (
-              <p className="text-gray-600">No payment method selected</p>
+              <p className="text-muted-foreground">No payment method selected</p>
             )}
           </div>
         </div>
@@ -124,20 +124,20 @@ export function OrderReview({
           <h3 className="font-medium mb-2">Order Items</h3>
           <div className="space-y-2">
             {items.map((item) => (
-              <div key={item.id} className="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
+              <div key={item.id} className="flex items-center justify-between bg-muted p-3 rounded-lg">
                 <div className="flex items-center space-x-3">
-                  <div className="w-12 h-12 relative bg-gray-200 rounded overflow-hidden">
+                  <div className="w-12 h-12 relative bg-muted-foreground/10 rounded overflow-hidden">
                     {item.image ? (
                       <Image src={item.image} alt={item.name} fill className="object-cover" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
-                        <ShoppingBag className="w-6 h-6 text-gray-400" />
+                        <ShoppingBag className="w-6 h-6 text-muted-foreground" />
                       </div>
                     )}
                   </div>
                   <div>
                     <p className="font-medium">{item.name}</p>
-                    <p className="text-sm text-gray-600">Qty: {item.quantity}</p>
+                    <p className="text-sm text-muted-foreground">Qty: {item.quantity}</p>
                   </div>
                 </div>
                 <p className="font-medium">{formatPrice(item.price * item.quantity, tenant)}</p>

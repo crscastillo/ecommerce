@@ -57,7 +57,7 @@ export function ActiveFilters({
 
   return (
     <div className="mt-4 flex items-center gap-2 flex-wrap">
-      <span className="text-sm text-gray-600">{t('products.activeFilters')}:</span>
+      <span className="text-sm text-muted-foreground">{t('products.activeFilters')}:</span>
       
       {selectedCategories.map(categorySlug => {
         const category = categories.find(c => c.slug === categorySlug)

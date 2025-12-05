@@ -122,9 +122,9 @@ export function ProductsSidebar({
   return (
     <div className="hidden md:block w-64 flex-shrink-0">
       <div className="sticky top-8">
-        <div className="bg-white rounded-lg border p-6 space-y-6">
+        <div className="bg-card rounded-lg border border-border p-6 space-y-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-gray-900">{t('products.filters')}</h2>
+            <h2 className="text-lg font-semibold text-foreground">{t('products.filters')}</h2>
             {hasActiveFilters && (
               <Button
                 variant="ghost"
@@ -139,9 +139,9 @@ export function ProductsSidebar({
 
           {/* Search */}
           <div>
-            <Label className="text-sm font-medium text-gray-700 mb-2 block">{t('products.search')}</Label>
+            <Label className="text-sm font-medium text-foreground mb-2 block">{t('products.search')}</Label>
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
               <Input
                 type="text"
                 placeholder={t('products.searchPlaceholder')}
@@ -154,7 +154,7 @@ export function ProductsSidebar({
 
           {/* Categories */}
           <div>
-            <Label className="text-sm font-medium text-gray-700 mb-3 block">{t('navigation.categories')}</Label>
+            <Label className="text-sm font-medium text-foreground mb-3 block">{t('navigation.categories')}</Label>
             <div className="space-y-2">
               {categories.map((category) => (
                 <label key={category.id} className="flex items-center space-x-2">
@@ -162,9 +162,9 @@ export function ProductsSidebar({
                     type="checkbox"
                     checked={selectedCategories.includes(category.slug)}
                     onChange={(e) => onCategoryChange(category.slug, e.target.checked)}
-                    className="w-4 h-4 text-blue-600"
+                    className="w-4 h-4 text-primary"
                   />
-                  <span className="text-sm text-gray-700">{category.name}</span>
+                  <span className="text-sm text-foreground">{category.name}</span>
                 </label>
               ))}
             </div>
@@ -172,7 +172,7 @@ export function ProductsSidebar({
 
           {/* Brands */}
           <div>
-            <Label className="text-sm font-medium text-gray-700 mb-3 block">{t('navigation.brands')}</Label>
+            <Label className="text-sm font-medium text-foreground mb-3 block">{t('navigation.brands')}</Label>
             <div className="space-y-2">
               {brands.map((brand) => (
                 <label key={brand.id} className="flex items-center space-x-2">
@@ -180,9 +180,9 @@ export function ProductsSidebar({
                     type="checkbox"
                     checked={selectedBrands.includes(brand.slug)}
                     onChange={(e) => onBrandChange(brand.slug, e.target.checked)}
-                    className="w-4 h-4 text-blue-600"
+                    className="w-4 h-4 text-primary"
                   />
-                  <span className="text-sm text-gray-700">{brand.name}</span>
+                  <span className="text-sm text-foreground">{brand.name}</span>
                 </label>
               ))}
             </div>
@@ -190,12 +190,12 @@ export function ProductsSidebar({
 
           {/* Price Range */}
           <div>
-            <Label className="text-sm font-medium text-gray-700 mb-3 block">{t('products.priceRange') || 'Price Range'}</Label>
+            <Label className="text-sm font-medium text-foreground mb-3 block">{t('products.priceRange') || 'Price Range'}</Label>
             <div className="space-y-4">
               {/* Simple input fields */}
               <div className="flex items-center space-x-2">
                 <div className="flex-1">
-                  <Label className="text-xs text-gray-500 mb-1 block">{t('products.minPrice')}</Label>
+                  <Label className="text-xs text-muted-foreground mb-1 block">{t('products.minPrice')}</Label>
                   <Input
                     type="number"
                     placeholder="0"
@@ -208,9 +208,9 @@ export function ProductsSidebar({
                     min="0"
                   />
                 </div>
-                <span className="text-gray-400 text-sm pt-5">-</span>
+                <span className="text-muted-foreground text-sm pt-5">-</span>
                 <div className="flex-1">
-                  <Label className="text-xs text-gray-500 mb-1 block">{t('products.maxPrice')}</Label>
+                  <Label className="text-xs text-muted-foreground mb-1 block">{t('products.maxPrice')}</Label>
                   <Input
                     type="number"
                     placeholder={t('products.noLimit')}
@@ -228,8 +228,8 @@ export function ProductsSidebar({
               
               {/* Current range display */}
               {(priceRange.min > 0 || priceRange.max < maxProductPrice) && (
-                <div className="text-center p-2 bg-blue-50 rounded-lg">
-                  <span className="text-sm font-medium text-blue-800">
+                <div className="text-center p-2 bg-primary/10 rounded-lg">
+                  <span className="text-sm font-medium text-primary">
                     {currencySymbol}{priceRange.min} - {priceRange.max === maxProductPrice ? t('products.noLimit') : `${currencySymbol}${priceRange.max}`}
                   </span>
                 </div>
@@ -237,7 +237,7 @@ export function ProductsSidebar({
               
               {/* Quick preset buttons */}
               <div className="space-y-2">
-                <Label className="text-xs text-gray-500">{t('products.quickFilters')}</Label>
+                <Label className="text-xs text-muted-foreground">{t('products.quickFilters')}</Label>
                 <div className="grid grid-cols-2 gap-2">
                   {priceRanges.map((range, index) => (
                     <Button
@@ -254,7 +254,7 @@ export function ProductsSidebar({
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="w-full h-7 text-xs text-gray-500"
+                  className="w-full h-7 text-xs text-muted-foreground"
                   onClick={() => onPriceRangeChange(0, maxProductPrice)}
                 >
                   {t('products.clearPriceFilter')}

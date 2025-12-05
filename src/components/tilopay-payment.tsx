@@ -174,9 +174,9 @@ export function TiloPayPayment({
     return (
       <Card>
         <CardContent className="p-6 text-center">
-          <CreditCard className="mx-auto h-12 w-12 text-gray-400" />
-          <h3 className="mt-2 text-sm font-medium text-gray-900">TiloPay Not Configured</h3>
-          <p className="mt-1 text-sm text-gray-500">
+          <CreditCard className="mx-auto h-12 w-12 text-muted-foreground" />
+          <h3 className="mt-2 text-sm font-medium text-foreground">TiloPay Not Configured</h3>
+          <p className="mt-1 text-sm text-muted-foreground">
             Please configure TiloPay API keys in the admin settings.
           </p>
         </CardContent>
@@ -264,7 +264,7 @@ export function TiloPayPayment({
           </div>
         </div>
 
-        <div className="text-sm text-gray-600">
+        <div className="text-sm text-muted-foreground">
           <p className="font-medium">Test Cards:</p>
           <p>• 4242424242424242 - Success</p>
           <p>• 4000000000000002 - Declined</p>

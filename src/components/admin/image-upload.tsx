@@ -289,10 +289,10 @@ export function ImageUpload({
                       type="button"
                       variant="destructive"
                       size="sm"
-                      className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6 p-0"
+                      className="absolute top-2 right-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity h-8 w-8 md:h-6 md:w-6 p-0 shadow-lg"
                       onClick={() => removeImage(imageUrl)}
                     >
-                      <X className="h-3 w-3" />
+                      <X className="h-4 w-4 md:h-3 md:w-3" />
                     </Button>
                   )}
                 </div>

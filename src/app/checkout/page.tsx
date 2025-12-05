@@ -321,16 +321,16 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background py-8">
+    <div className="min-h-screen bg-background py-4 sm:py-8">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="mb-8">
-          <Link href="/cart" className="inline-flex items-center text-blue-600 hover:text-blue-800 mb-4">
+        <div className="mb-6 sm:mb-8">
+          <Link href="/cart" className="inline-flex items-center text-blue-600 hover:text-blue-800 mb-3 sm:mb-4 text-sm sm:text-base">
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Cart
           </Link>
-          <h1 className="text-3xl font-bold text-foreground">Checkout</h1>
-          <p className="text-muted-foreground mt-2">
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Checkout</h1>
+          <p className="text-muted-foreground mt-2 text-sm sm:text-base">
             Complete your order for {getItemCount()} {getItemCount() === 1 ? 'item' : 'items'}
           </p>
         </div>
@@ -338,9 +338,22 @@ export default function CheckoutPage() {
         {/* Progress Steps */}
         <CheckoutSteps currentStep={currentStep} />
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Order Summary - Mobile First */}
+        <div className="lg:hidden mb-6">
+          <CheckoutSummary
+            items={items}
+            subtotal={subtotal}
+            shipping={shipping}
+            tax={tax}
+            total={total}
+            formatPrice={formatPrice}
+            tenant={tenant}
+          />
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
           {/* Main Content */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 space-y-6">
             {/* Shipping Information */}
             {currentStep === 'shipping' && (
               <div className="space-y-6">
@@ -367,8 +380,8 @@ export default function CheckoutPage() {
                 
                 {/* Continue to Payment Button */}
                 {selectedShippingMethodId && (
-                  <div className="flex justify-end">
-                    <Button onClick={handleShippingSubmit} size="lg">
+                  <div className="flex justify-end pt-4">
+                    <Button onClick={handleShippingSubmit} size="lg" className="w-full sm:w-auto min-h-[48px]">
                       {t('shipping.continueToPayment')}
                     </Button>
                   </div>
@@ -395,9 +408,9 @@ export default function CheckoutPage() {
                         <p className="mt-2 font-mono">Account: 123456789<br />Bank: Example Mobile Bank<br />Phone: +1234567890</p>
                         <p className="mt-2 text-sm text-muted-foreground">After payment, reply to the confirmation email with your transaction receipt.</p>
                       </div>
-                      <div className="flex space-x-4 mt-6">
-                        <Button type="button" variant="outline" onClick={() => setCurrentStep('shipping')} className="flex-1">Back to Shipping</Button>
-                        <Button type="button" className="flex-1" onClick={() => setCurrentStep('review')}>Continue</Button>
+                      <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-6">
+                        <Button type="button" variant="outline" onClick={() => setCurrentStep('shipping')} className="flex-1 min-h-[48px]" size="lg">Back to Shipping</Button>
+                        <Button type="button" className="flex-1 min-h-[48px]" onClick={() => setCurrentStep('review')} size="lg">Continue</Button>
                       </div>
                     </CardContent>
                   </Card>
@@ -413,9 +426,9 @@ export default function CheckoutPage() {
                         <p className="mt-2 font-mono">Account: 987654321<br />Bank: Example Bank<br />SWIFT: EXAMPBANK</p>
                         <p className="mt-2 text-sm text-muted-foreground">After payment, reply to the confirmation email with your transaction receipt.</p>
                       </div>
-                      <div className="flex space-x-4 mt-6">
-                        <Button type="button" variant="outline" onClick={() => setCurrentStep('shipping')} className="flex-1">Back to Shipping</Button>
-                        <Button type="button" className="flex-1" onClick={() => setCurrentStep('review')}>Continue</Button>
+                      <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-6">
+                        <Button type="button" variant="outline" onClick={() => setCurrentStep('shipping')} className="flex-1 min-h-[48px]" size="lg">Back to Shipping</Button>
+                        <Button type="button" className="flex-1 min-h-[48px]" onClick={() => setCurrentStep('review')} size="lg">Continue</Button>
                       </div>
                     </CardContent>
                   </Card>
@@ -451,12 +464,13 @@ export default function CheckoutPage() {
                         )
                       })()}
                       
-                      <div className="flex space-x-4 mt-6">
+                      <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-6">
                         <Button 
                           type="button" 
                           variant="outline" 
                           onClick={() => setCurrentStep('shipping')}
-                          className="flex-1"
+                          className="flex-1 min-h-[48px]"
+                          size="lg"
                         >
                           Back to Shipping
                         </Button>
@@ -495,12 +509,13 @@ export default function CheckoutPage() {
                         )
                       })()}
                       
-                      <div className="flex space-x-4 mt-6">
+                      <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-6">
                         <Button 
                           type="button" 
                           variant="outline" 
                           onClick={() => setCurrentStep('shipping')}
-                          className="flex-1"
+                          className="flex-1 min-h-[48px]"
+                          size="lg"
                         >
                           Back to Shipping
                         </Button>
@@ -542,8 +557,8 @@ export default function CheckoutPage() {
             )}
           </div>
 
-          {/* Order Summary Sidebar */}
-          <div className="lg:col-span-1">
+          {/* Order Summary Sidebar - Desktop Only */}
+          <div className="lg:col-span-1 hidden lg:block">
             <CheckoutSummary
               items={items}
               subtotal={subtotal}

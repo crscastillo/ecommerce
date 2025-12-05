@@ -58,31 +58,31 @@ export function PaymentMethodSelector({
   return (
     <div>
       <Label className="text-base font-medium mb-3 block">Choose Payment Method</Label>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
         {availablePaymentMethods.map((method) => (
           <Card 
             key={method.id}
-            className={`cursor-pointer border-2 transition-colors ${
+            className={`cursor-pointer border-2 transition-colors min-h-[120px] sm:min-h-[140px] ${
               selectedPaymentMethod === method.id 
                 ? 'border-blue-500 bg-blue-50' 
                 : 'border-gray-200 hover:border-gray-300'
             }`}
             onClick={() => onSelect(method.id)}
           >
-            <CardContent className="p-4 text-center">
+            <CardContent className="p-3 sm:p-4 text-center flex flex-col justify-center h-full">
               <div className="mb-2">
-                <div className={`inline-flex items-center justify-center w-12 h-12 rounded-lg mb-2 ${
+                <div className={`inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-lg mb-2 ${
                   method.id === 'stripe' ? 'bg-indigo-100' : 
                   method.id === 'tilopay' ? 'bg-green-100' : 'bg-muted'
                 }`}>
-                  <CreditCard className={`w-6 h-6 ${
+                  <CreditCard className={`w-5 h-5 sm:w-6 sm:h-6 ${
                     method.id === 'stripe' ? 'text-indigo-600' : 
                     method.id === 'tilopay' ? 'text-green-600' : 'text-muted-foreground'
                   }`} />
                 </div>
               </div>
-              <h3 className="font-medium">{method.name}</h3>
-              <p className="text-sm text-muted-foreground">
+              <h3 className="font-medium text-sm sm:text-base">{method.name}</h3>
+              <p className="text-xs sm:text-sm text-muted-foreground">
                 {method.id === 'stripe' ? 'Secure payment with Stripe' :
                  method.id === 'traditional' ? 'Enter card details manually' :
                  method.id === 'tilopay' ? 'Costa Rican payment gateway' :

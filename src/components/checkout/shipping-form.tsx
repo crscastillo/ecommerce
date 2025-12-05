@@ -152,8 +152,8 @@ export function ShippingForm({ shippingInfo, onUpdate, onSubmit, showSubmitButto
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <form onSubmit={onSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <form onSubmit={onSubmit} className="space-y-4 sm:space-y-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <Label htmlFor="firstName">{t('shipping.firstName')} *</Label>
               <Input
@@ -210,7 +210,7 @@ export function ShippingForm({ shippingInfo, onUpdate, onSubmit, showSubmitButto
             />
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <Label htmlFor="city">{t('shipping.city')} *</Label>
               <Input
@@ -293,7 +293,7 @@ export function ShippingForm({ shippingInfo, onUpdate, onSubmit, showSubmitButto
             </div>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <Label htmlFor="zipCode">{t('shipping.zipCode')} *</Label>
               <Input
@@ -328,7 +328,7 @@ export function ShippingForm({ shippingInfo, onUpdate, onSubmit, showSubmitButto
           </div>
           
           {showSubmitButton && (
-            <Button type="submit" className="w-full mt-6">
+            <Button type="submit" className="w-full mt-6 min-h-[48px]" size="lg">
               {t('shipping.continueToPayment')}
             </Button>
           )}

@@ -55,29 +55,29 @@ export function OrderReview({
 }: OrderReviewProps) {
   return (
     <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center">
+      <CardHeader className="pb-3 sm:pb-6">
+        <CardTitle className="flex items-center text-lg sm:text-xl">
           <Shield className="w-5 h-5 mr-2" />
           Review Your Order
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-4 sm:space-y-6">
         {/* Shipping Info Review */}
         <div>
-          <h3 className="font-medium mb-2">Shipping Address</h3>
-          <div className="bg-muted p-4 rounded-lg">
-            <p>{shippingInfo.firstName} {shippingInfo.lastName}</p>
-            <p>{shippingInfo.address}</p>
-            <p>{shippingInfo.city}, {shippingInfo.state} {shippingInfo.zipCode}</p>
-            <p>{shippingInfo.country}</p>
-            <p>{shippingInfo.email}</p>
+          <h3 className="font-medium mb-2 text-sm sm:text-base">Shipping Address</h3>
+          <div className="bg-muted p-3 sm:p-4 rounded-lg">
+            <p className="text-sm sm:text-base">{shippingInfo.firstName} {shippingInfo.lastName}</p>
+            <p className="text-sm sm:text-base">{shippingInfo.address}</p>
+            <p className="text-sm sm:text-base">{shippingInfo.city}, {shippingInfo.state} {shippingInfo.zipCode}</p>
+            <p className="text-sm sm:text-base">{shippingInfo.country}</p>
+            <p className="text-sm sm:text-base">{shippingInfo.email}</p>
           </div>
         </div>
 
         {/* Payment Info Review */}
         <div>
-          <h3 className="font-medium mb-2">Payment Method</h3>
-          <div className="bg-muted p-4 rounded-lg">
+          <h3 className="font-medium mb-2 text-sm sm:text-base">Payment Method</h3>
+          <div className="bg-muted p-3 sm:p-4 rounded-lg">
             {paymentMethod === 'stripe' && paymentDetails?.card ? (
               <div>
                 <p className="flex items-center">
@@ -121,44 +121,46 @@ export function OrderReview({
 
         {/* Order Items */}
         <div>
-          <h3 className="font-medium mb-2">Order Items</h3>
+          <h3 className="font-medium mb-2 text-sm sm:text-base">Order Items</h3>
           <div className="space-y-2">
             {items.map((item) => (
               <div key={item.id} className="flex items-center justify-between bg-muted p-3 rounded-lg">
-                <div className="flex items-center space-x-3">
-                  <div className="w-12 h-12 relative bg-muted-foreground/10 rounded overflow-hidden">
+                <div className="flex items-center space-x-2 sm:space-x-3 flex-1 min-w-0">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 relative bg-muted-foreground/10 rounded overflow-hidden flex-shrink-0">
                     {item.image ? (
                       <Image src={item.image} alt={item.name} fill className="object-cover" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
-                        <ShoppingBag className="w-6 h-6 text-muted-foreground" />
+                        <ShoppingBag className="w-5 h-5 sm:w-6 sm:h-6 text-muted-foreground" />
                       </div>
                     )}
                   </div>
-                  <div>
-                    <p className="font-medium">{item.name}</p>
-                    <p className="text-sm text-muted-foreground">Qty: {item.quantity}</p>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-medium text-sm sm:text-base truncate">{item.name}</p>
+                    <p className="text-xs sm:text-sm text-muted-foreground">Qty: {item.quantity}</p>
                   </div>
                 </div>
-                <p className="font-medium">{formatPrice(item.price * item.quantity, tenant)}</p>
+                <p className="font-medium text-sm sm:text-base whitespace-nowrap ml-2">{formatPrice(item.price * item.quantity, tenant)}</p>
               </div>
             ))}
           </div>
         </div>
         
-        <div className="flex space-x-4">
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-2">
           <Button 
             type="button" 
             variant="outline" 
             onClick={onBack}
-            className="flex-1"
+            className="flex-1 min-h-[48px]"
+            size="lg"
           >
             Back to Payment
           </Button>
           <Button 
             onClick={onPlaceOrder}
             disabled={isProcessing}
-            className="flex-1"
+            className="flex-1 min-h-[48px]"
+            size="lg"
           >
             {isProcessing ? 'Processing...' : 'Place Order'}
           </Button>

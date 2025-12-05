@@ -5,6 +5,7 @@ export async function POST(request: NextRequest) {
   try {
     const { tenantId, email, role } = await request.json()
     
+    // Basic validation
     if (!tenantId || !email || !role) {
       return NextResponse.json(
         { error: 'Missing required fields: tenantId, email, role' }, 
@@ -12,7 +13,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Validate email format
+    // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(email)) {
       return NextResponse.json(
@@ -21,7 +22,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Validate role
+    // Role validation
     const validRoles = ['admin', 'staff', 'viewer']
     if (!validRoles.includes(role)) {
       return NextResponse.json(
@@ -30,150 +31,127 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Check environment variables
+    // Initialize Supabase admin client
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
     const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-    
-    console.log('Environment check:', {
-      hasSupabaseUrl: !!supabaseUrl,
-      hasServiceRoleKey: !!serviceRoleKey,
-      supabaseUrlPrefix: supabaseUrl?.substring(0, 20) + '...',
-      serviceRoleKeyPrefix: serviceRoleKey?.substring(0, 20) + '...'
-    })
 
     if (!supabaseUrl || !serviceRoleKey) {
       return NextResponse.json(
-        { error: 'Missing Supabase configuration. Check environment variables.' },
+        { error: 'Missing Supabase configuration' },
         { status: 500 }
       )
     }
 
-    // Use service role key to bypass RLS
-    const supabase = createClient(
-      supabaseUrl,
-      serviceRoleKey,
-      {
-        auth: {
-          autoRefreshToken: false,
-          persistSession: false,
-        },
-      }
-    )
+    const supabase = createClient(supabaseUrl, serviceRoleKey, {
+      auth: { autoRefreshToken: false, persistSession: false }
+    })
 
-
-    // Check if tenant exists and get tenant details
+    // Get tenant information
     const { data: tenant, error: tenantError } = await supabase
       .from('tenants')
       .select('id, name, subdomain')
       .eq('id', tenantId)
       .single()
 
-    if (tenantError) {
+    if (tenantError || !tenant) {
       return NextResponse.json(
         { error: 'Tenant not found' },
         { status: 404 }
       )
     }
 
-    // Check if invitation already exists for this email and tenant
+    // Check for existing active invitation
     const { data: existingInvitation } = await supabase
       .from('tenant_users_invitations')
-      .select('id, is_active')
+      .select('id')
       .eq('tenant_id', tenantId)
       .eq('email', email)
-      .maybeSingle()
+      .eq('is_active', true)
+      .single()
 
-    if (existingInvitation && existingInvitation.is_active) {
+    if (existingInvitation) {
       return NextResponse.json(
-        { error: 'An active invitation already exists for this email' },
+        { error: 'Active invitation already exists for this email' },
         { status: 400 }
       )
     }
 
-    // Insert the invitation
-    const { data, error } = await supabase
+    // Create invitation record
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days
+    const { data: invitation, error: invitationError } = await supabase
       .from('tenant_users_invitations')
       .insert({
         tenant_id: tenantId,
         email: email,
         role: role,
         invited_at: new Date().toISOString(),
-        expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
+        expires_at: expiresAt.toISOString(),
+        is_active: true
       })
-      .select()
-
-    if (error) {
-      return NextResponse.json(
-        { error: error.message },
-        { status: 500 }
-      )
-    }
-
-
-    // Get tenant subdomain for proper URL construction
-    const { data: tenantData, error: subdomainError } = await supabase
-      .from('tenants')
-      .select('subdomain, name')
-      .eq('id', tenantId)
+      .select('id')
       .single()
 
-    if (subdomainError || !tenantData) {
+    if (invitationError || !invitation) {
       return NextResponse.json(
-        { error: 'Failed to get tenant information' },
+        { error: 'Failed to create invitation' },
         { status: 500 }
       )
     }
 
-    // Send invitation email using Supabase Auth Admin API
-    let emailStatus = 'not_sent'
+    // Construct redirect URL
+    const host = request.headers.get('host') || 'localhost:3000'
+    const protocol = host.includes('localhost') ? 'http' : 'https'
+    const baseUrl = host.includes('localhost') 
+      ? `${protocol}://${host}`
+      : (process.env.NEXT_PUBLIC_SITE_URL || `${protocol}://${host}`)
+
+    const redirectUrl = `${baseUrl}/accept-invitation/${invitation.id}`
+
+    // Send invitation email
+    let emailStatus = 'pending'
     let emailError = null
 
     try {
-      
-      // User doesn't exist, use Supabase invite (we'll handle existing users later)
-      
-      // Construct URL - redirect to main domain first, then handle tenant redirection in the app
-      const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000')
-      const redirectUrl = `${baseUrl}/accept-invitation?invitation_id=${data[0].id}&tenant_subdomain=${tenantData.subdomain}`
-
-      const { data: inviteData, error: inviteError } = await supabase.auth.admin.inviteUserByEmail(email, {
+      const { error: emailSendError } = await supabase.auth.admin.inviteUserByEmail(email, {
         data: {
+          invitation_id: invitation.id,
           tenant_id: tenantId,
-          role: role,
-          invitation_id: data[0].id,
-          store_name: tenantData.name || 'Store'
+          tenant_name: tenant.name,
+          tenant_subdomain: tenant.subdomain,
+          role: role
         },
         redirectTo: redirectUrl
       })
 
-      if (inviteError) {
+      if (emailSendError) {
         emailStatus = 'failed'
-        emailError = inviteError.message || 'Failed to send invitation email'
-        
-        // Check for common errors
-        if (inviteError.message?.includes('User already registered')) {
-          emailStatus = 'user_exists'
-          emailError = 'User already has an account and can sign in directly'
-        }
+        emailError = emailSendError.message
       } else {
         emailStatus = 'sent'
       }
-
     } catch (err) {
       emailStatus = 'failed'
-      emailError = (err as Error).message || 'Unexpected error sending invitation email'
+      emailError = (err as Error).message
     }
 
     return NextResponse.json({
       success: true,
-      invitation: data[0],
+      invitation: {
+        id: invitation.id,
+        email,
+        role,
+        tenant: tenant.name,
+        expires_at: expiresAt.toISOString()
+      },
       email_status: emailStatus,
-      email_error: emailError
+      email_error: emailError,
+      redirect_url: redirectUrl
     })
 
   } catch (error) {
+    console.error('Invitation error:', error)
     return NextResponse.json(
-      { error: 'An unexpected error occurred during user invitation.' },
+      { error: 'Failed to process invitation' },
       { status: 500 }
     )
   }

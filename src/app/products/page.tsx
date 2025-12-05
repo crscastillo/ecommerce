@@ -157,6 +157,34 @@ function ProductsPageContent() {
     return { maxPrice: Math.max(roundedMax, roundingUnit * 4) } // Ensure at least 4 units for range generation
   }
 
+  // Sync URL parameters with state when searchParams change
+  useEffect(() => {
+    const categoryParam = searchParams?.get('category')
+    const newSelectedCategories = categoryParam ? categoryParam.split(',').filter(Boolean) : []
+    
+    const brandParam = searchParams?.get('brand')
+    const newSelectedBrands = brandParam ? brandParam.split(',').filter(Boolean) : []
+    
+    const searchParam = searchParams?.get('search') || ''
+    
+    const sortParam = searchParams?.get('sort') as SortOption
+    const newSortBy = sortParam && ['newest', 'price-low', 'price-high', 'name'].includes(sortParam) ? sortParam : 'newest'
+    
+    const minPriceParam = searchParams?.get('min_price')
+    const maxPriceParam = searchParams?.get('max_price')
+    const newPriceRange = {
+      min: minPriceParam ? parseFloat(minPriceParam) : 0,
+      max: maxPriceParam ? parseFloat(maxPriceParam) : (maxProductPrice || 1000)
+    }
+    
+    // Update state if URL params have changed
+    setSelectedCategories(newSelectedCategories)
+    setSelectedBrands(newSelectedBrands)
+    setSearchQuery(searchParam)
+    setSortBy(newSortBy)
+    setPriceRange(newPriceRange)
+  }, [searchParams, maxProductPrice])
+
   // Debounced price range change to prevent excessive API calls
   const [debouncedPriceRange, setDebouncedPriceRange] = useState(priceRange)
   
@@ -264,7 +292,6 @@ function ProductsPageContent() {
       ? [...selectedCategories, categorySlug]
       : selectedCategories.filter(slug => slug !== categorySlug)
     
-    setSelectedCategories(newCategories)
     updateURL({ category: newCategories })
   }
 
@@ -273,7 +300,6 @@ function ProductsPageContent() {
       ? [...selectedBrands, brandSlug]
       : selectedBrands.filter(slug => slug !== brandSlug)
     
-    setSelectedBrands(newBrands)
     updateURL({ brand: newBrands })
   }
 
@@ -282,12 +308,11 @@ function ProductsPageContent() {
     setPriceRange(newPriceRange)
   }, [])
 
+  const handleSearchChange = (query: string) => {
+    updateURL({ search: query })
+  }
+
   const clearFilters = () => {
-    setSelectedCategories([])
-    setSelectedBrands([])
-    setSearchQuery('')
-    setSortBy('newest')
-    setPriceRange({ min: 0, max: maxProductPrice })
     updateURL({ category: [], brand: [], search: '', sort: 'newest', priceRange: { min: 0, max: maxProductPrice } })
   }
 
@@ -321,7 +346,7 @@ function ProductsPageContent() {
         {/* Sidebar Filters - Hidden on mobile */}
         <ProductsSidebar
           searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
+          onSearchChange={handleSearchChange}
           categories={categories}
           selectedCategories={selectedCategories}
           onCategoryChange={handleCategoryChange}
@@ -344,10 +369,7 @@ function ProductsPageContent() {
             viewMode={viewMode}
             onViewModeChange={setViewMode}
             sortBy={sortBy}
-            onSortChange={(newSort) => {
-              setSortBy(newSort)
-              updateURL({ sort: newSort })
-            }}
+            onSortChange={(newSort) => updateURL({ sort: newSort })}
             hasActiveFilters={hasActiveFilters}
             activeFiltersCount={selectedCategories.length + selectedBrands.length + (searchQuery ? 1 : 0)}
             onShowMobileFilters={() => setShowMobileFilters(true)}
@@ -363,14 +385,10 @@ function ProductsPageContent() {
             brands={brands}
             onRemoveBrand={(brandId) => handleBrandChange(brandId, false)}
             searchQuery={searchQuery}
-            onRemoveSearch={() => {
-              setSearchQuery('')
-              updateURL({ search: '' })
-            }}
+            onRemoveSearch={() => handleSearchChange('')}
             priceRange={priceRange}
             onRemovePriceRange={() => {
               const defaultRange = { min: 0, max: maxProductPrice }
-              setPriceRange(defaultRange)
               updateURL({ priceRange: defaultRange })
             }}
             onClearAll={clearFilters}
@@ -397,10 +415,7 @@ function ProductsPageContent() {
         show={showMobileFilters}
         onClose={() => setShowMobileFilters(false)}
         searchQuery={searchQuery}
-        onSearchChange={(query) => {
-          setSearchQuery(query)
-          updateURL({ search: query })
-        }}
+        onSearchChange={handleSearchChange}
         categories={categories}
         selectedCategories={selectedCategories}
         onCategoryChange={handleCategoryChange}
